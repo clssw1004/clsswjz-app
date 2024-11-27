@@ -18,14 +18,28 @@ class ApiService {
     }
   }
 
-  static Future<void> saveAccountItem(Map<String, dynamic> data) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/api/account/item'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(data),
-    );
+  static Future<void> saveAccountItem(Map<String, dynamic> data, {String? id}) async {
+    final Uri uri;
+    final http.Response response;
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (id != null) {
+      uri = Uri.parse('$_baseUrl/api/account/item/$id');
+      response = await http.patch(
+        uri,
+        headers: headers,
+        body: json.encode(data),
+      );
+    } else {
+      uri = Uri.parse('$_baseUrl/api/account/item');
+      response = await http.post(
+        uri,
+        headers: headers,
+        body: json.encode(data),
+      );
+    }
 
     if (!_isSuccessStatusCode(response.statusCode)) {
       throw Exception('Failed to save transaction');

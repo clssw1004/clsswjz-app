@@ -26,11 +26,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   List<Map<String, dynamic>> _accountBooks = [];
   Map<String, dynamic>? _selectedBook;
+  String? _recordId; // 添加记录ID字段
 
   @override
   void initState() {
     super.initState();
-    _loadAccountBooks();
+    _loadAccountBooks().then((_) {
+      _initializeData(); // 在加载完账本后初始化数据
+    });
     _fetchCategories();
   }
 
@@ -65,6 +68,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
       _descriptionController.text = data['description'] ?? '';
       _transactionType = data['type'] == 'EXPENSE' ? '支出' : '收入';
       _selectedCategory = data['category'];
+      _recordId = data['id']; // 保存记录ID
+      
+      // 设置账本
+      final bookId = data['accountBookId'];
+      _selectedBook = _accountBooks.firstWhere(
+        (book) => book['id'] == bookId,
+        orElse: () => _accountBooks.first,
+      );
       
       // 解析日期时间
       final dateTime = DateTime.parse(data['accountDate']);
@@ -117,22 +128,32 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
     try {
-      await ApiService.saveAccountItem(data);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('保存成功')),
+      // 根据是否有记录ID决定是更新还是新增
+      await ApiService.saveAccountItem(
+        data,
+        id: _recordId,
       );
       
-      // 清空表单
-      _amountController.clear();
-      _descriptionController.clear();
-      setState(() {
-        _selectedCategory = null;
-        _selectedDate = DateTime.now();
-        _selectedTime = TimeOfDay.now();
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_recordId == null ? '保存成功' : '更新成功')),
+      );
+      
+      // 如果是编辑模式，保存后返回上一页
+      if (_recordId != null) {
+        Navigator.pop(context);
+      } else {
+        // 新增模式则清空表单
+        _amountController.clear();
+        _descriptionController.clear();
+        setState(() {
+          _selectedCategory = null;
+          _selectedDate = DateTime.now();
+          _selectedTime = TimeOfDay.now();
+        });
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('保存失败: $e')),
+        SnackBar(content: Text('${_recordId == null ? '保存' : '更新'}失败: $e')),
       );
     }
   }
@@ -303,9 +324,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
                         'description': _descriptionController.text,
                         'type': _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
                         'category': _selectedCategory,
-                        'accountBookId': _selectedBook?['id'],
-                        'accountDate': _formattedDateTime,
                       };
+                      
+                      // 只在新增时添加这些字段
+                      if (_recordId == null) {
+                        data['accountBookId'] = _selectedBook?['id'];
+                        data['accountDate'] = _formattedDateTime;
+                      }
+                      
                       _saveTransaction(data);
                     }
                   },
