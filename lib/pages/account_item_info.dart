@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:clsswjz_app/services/api_service.dart'; // 导入ApiService
+import '../services/api_service.dart'; // 导入ApiService
 import 'package:intl/intl.dart'; // 添加日期格式化包
+import '../services/data_service.dart'; // 导入DataService
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData; // 添加初始数据参数
@@ -28,36 +29,59 @@ class _AccountItemFormState extends State<AccountItemForm> {
   Map<String, dynamic>? _selectedBook;
   String? _recordId; // 添加记录ID字段
 
+  final _dataService = DataService();
+
   @override
   void initState() {
     super.initState();
     _loadAccountBooks().then((_) {
       _initializeData(); // 在加载完账本后初始化数据
+      _fetchCategories(); // 在初始化数据后加载分类
     });
-    _fetchCategories();
   }
 
   Future<void> _loadAccountBooks() async {
     try {
-      final books = await ApiService.fetchAccountBooks();
+      final books = await _dataService.fetchAccountBooks();
       setState(() {
         _accountBooks = books;
-        _selectedBook = books.isNotEmpty ? books.first : null;
+        _selectedBook = widget.initialData != null 
+            ? books.firstWhere(
+                (book) => book['id'] == widget.initialData!['accountBookId'],
+                orElse: () => books.first,
+              )
+            : books.first;
       });
     } catch (e) {
-      print('加载账本失败: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('加载账本失败: $e')),
+      );
     }
   }
 
   Future<void> _fetchCategories() async {
+    if (_selectedBook == null) return;
+    
     try {
-      final categories = await ApiService.fetchCategories();
+      final categories = await _dataService.fetchCategories(_selectedBook!['id']);
       setState(() {
         _categories = categories;
       });
     } catch (e) {
-      print('获取分类失败: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('获取分类失败: $e')),
+      );
     }
+  }
+
+  // 在账本选择改变时也需要重新加载分类
+  void _onBookChanged(Map<String, dynamic>? newBook) {
+    setState(() {
+      _selectedBook = newBook;
+      _selectedCategory = null; // 清空已选分类
+      _categories = []; // 清空分类列表
+    });
+    _fetchCategories(); // 重新加载分类
   }
 
   // 初始化表单数据
@@ -68,7 +92,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
       _descriptionController.text = data['description'] ?? '';
       _transactionType = data['type'] == 'EXPENSE' ? '支出' : '收入';
       _selectedCategory = data['category'];
-      _recordId = data['id']; // 保存记录ID
+      _recordId = data['id'];
       
       // 设置账本
       final bookId = data['accountBookId'];
@@ -114,21 +138,24 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   // 获取完整的日期时间字符串
   String get _formattedDateTime {
-    final date = _selectedDate;
+    if (_selectedDate == null && _selectedTime == null) {
+      return DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    }
+    final date = _selectedDate ?? DateTime.now();
+    final time = _selectedTime ?? TimeOfDay.now();
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(
       DateTime(
         date.year,
         date.month,
         date.day,
-        _selectedTime.hour,
-        _selectedTime.minute,
+        time.hour,
+        time.minute,
       ),
     );
   }
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
     try {
-      // 根据是否有记录ID决定是更新还是新增
       await ApiService.saveAccountItem(
         data,
         id: _recordId,
@@ -138,19 +165,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
         SnackBar(content: Text(_recordId == null ? '保存成功' : '更新成功')),
       );
       
-      // 如果是编辑模式，保存后返回上一页
-      if (_recordId != null) {
-        Navigator.pop(context);
-      } else {
-        // 新增模式则清空表单
-        _amountController.clear();
-        _descriptionController.clear();
-        setState(() {
-          _selectedCategory = null;
-          _selectedDate = DateTime.now();
-          _selectedTime = TimeOfDay.now();
-        });
-      }
+      // 返回上一页，并传递刷新标记
+      Navigator.pop(context, true);
+      
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${_recordId == null ? '保存' : '更新'}失败: $e')),
@@ -181,10 +198,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
   @override
   Widget build(BuildContext context) {
     final currencySymbol = _selectedBook?['currencySymbol'] ?? '¥';
+    final isEditing = widget.initialData != null;
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialData == null ? '记录新账目' : '编辑账目'),
+        title: Text(isEditing ? '编辑账目' : '记录新账目'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -194,30 +212,36 @@ class _AccountItemFormState extends State<AccountItemForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 账本选择
-              DropdownButtonFormField<Map<String, dynamic>>(
-                value: _selectedBook,
-                decoration: InputDecoration(
-                  labelText: '账本',
-                  prefixIcon: Icon(Icons.book),
-                ),
-                items: _accountBooks.map((book) {
-                  return DropdownMenuItem(
-                    value: book,
-                    child: Text(book['name']),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedBook = newValue;
-                  });
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return '请选择账本';
-                  }
-                  return null;
-                },
-              ),
+              isEditing
+                  ? // 编辑模式下显示只读的账本信息
+                    InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: '账本',
+                        prefixIcon: Icon(Icons.book),
+                      ),
+                      child: Text(_selectedBook?['name'] ?? ''),
+                    )
+                  : // 新增模式下显示下拉选择
+                    DropdownButtonFormField<Map<String, dynamic>>(
+                      value: _selectedBook,
+                      decoration: InputDecoration(
+                        labelText: '账本',
+                        prefixIcon: Icon(Icons.book),
+                      ),
+                      items: _accountBooks.map((book) {
+                        return DropdownMenuItem(
+                          value: book,
+                          child: Text(book['name']),
+                        );
+                      }).toList(),
+                      onChanged: _onBookChanged,
+                      validator: (value) {
+                        if (value == null) {
+                          return '请选择账本';
+                        }
+                        return null;
+                      },
+                    ),
 
               SizedBox(height: 16),
 
@@ -240,7 +264,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
               SizedBox(height: 16),
 
-              // 交易类型选择
               Row(
                 children: [
                   Text('类型：'),
@@ -270,28 +293,39 @@ class _AccountItemFormState extends State<AccountItemForm> {
               SizedBox(height: 16),
               
               // 分类选择
-              DropdownButtonFormField<String>(
-                value: _selectedCategory,
-                decoration: InputDecoration(
-                  labelText: '分类',
-                  prefixIcon: Icon(Icons.category),
-                ),
-                items: _categories.map((String category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category),
+              Autocomplete<String>(
+                initialValue: TextEditingValue(text: _selectedCategory ?? ''),
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return _categories;
+                  }
+                  return _categories.where((category) =>
+                    category.toLowerCase().contains(textEditingValue.text.toLowerCase())
                   );
-                }).toList(),
-                onChanged: (String? newValue) {
+                },
+                onSelected: (String selection) {
                   setState(() {
-                    _selectedCategory = newValue;
+                    _selectedCategory = selection;
                   });
                 },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '请选择分类';
-                  }
-                  return null;
+                fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+                  return TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    decoration: InputDecoration(
+                      labelText: '分类',
+                      prefixIcon: Icon(Icons.category),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '请选择或输入分类';
+                      }
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                      return null;
+                    },
+                  );
                 },
               ),
               
@@ -324,12 +358,12 @@ class _AccountItemFormState extends State<AccountItemForm> {
                         'description': _descriptionController.text,
                         'type': _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
                         'category': _selectedCategory,
+                        'accountDate': _formattedDateTime,
                       };
                       
-                      // 只在新增时添加这些字段
-                      if (_recordId == null) {
-                        data['accountBookId'] = _selectedBook?['id'];
-                        data['accountDate'] = _formattedDateTime;
+                      // 编辑模式下
+                      if (_recordId != null) {
+                        data['id'] = _recordId;
                       }
                       
                       _saveTransaction(data);
