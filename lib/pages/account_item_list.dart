@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../pages/account_item_info.dart';
 import '../services/data_service.dart';
-import './create_account_book_page.dart';
+import '../theme/theme_provider.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
@@ -109,399 +110,364 @@ class _AccountItemListState extends State<AccountItemList> {
   }
 
   Widget _buildFilterSection() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
-      height: _isFilterExpanded ? 200 : 0,
-      child: Card(
-        margin: EdgeInsets.all(8),
-        child: Padding(
-          padding: EdgeInsets.all(8),
-          child: Column(
-            children: [
-              DropdownButtonFormField<String>(
-                key: _dropdownKey,
-                value: _selectedCategory,
-                decoration: InputDecoration(
-                  labelText: '分类',
-                  isDense: true,
-                  suffixIcon: _isCategoryLoading
-                      ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.grey,
-                          ),
-                        )
-                      : null,
-                ),
-                items: [
-                  DropdownMenuItem(value: null, child: Text('全部')),
-                  ..._categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                ],
-                onChanged: _isCategoryLoading
-                    ? null
-                    : (value) {
-                        setState(() {
-                          _selectedCategory = value;
-                        });
-                        _loadAccountItems();
-                      },
-                onTap: () {
-                  if (_selectedBook != null && !_isCategoryLoading) {
-                    _loadCategories();
-                  }
-                },
-              ),
-              SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                value: _selectedType,
-                decoration: InputDecoration(
-                  labelText: '类型',
-                  isDense: true,
-                ),
-                items: [
-                  DropdownMenuItem(value: null, child: Text('全部')),
-                  DropdownMenuItem(value: 'EXPENSE', child: Text('支出')),
-                  DropdownMenuItem(value: 'INCOME', child: Text('收入')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedType = value;
-                  });
-                  _loadAccountItems();
-                },
-              ),
-              SizedBox(height: 8),
-              Row(
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        final themeColor = themeProvider.themeColor;
+        return AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          height: _isFilterExpanded ? 200 : 0,
+          child: Card(
+            margin: EdgeInsets.all(8),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.grey[200]!),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: TextButton.icon(
-                      icon: Icon(Icons.calendar_today),
-                      label: Text(_startDate == null
-                          ? '开始日期'
-                          : DateFormat('yyyy-MM-dd').format(_startDate!)),
-                      onPressed: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: _startDate ?? DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (date != null) {
-                          setState(() {
-                            _startDate = date;
-                          });
-                          _loadAccountItems();
-                        }
-                      },
+                  DropdownButtonFormField<String>(
+                    key: _dropdownKey,
+                    value: _selectedCategory,
+                    decoration: InputDecoration(
+                      labelText: '分类',
+                      labelStyle: TextStyle(color: Colors.grey[700]),
+                      isDense: true,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: themeColor),
+                      ),
                     ),
+                    items: [
+                      DropdownMenuItem(value: null, child: Text('全部')),
+                      ..._categories.map((category) {
+                        return DropdownMenuItem(
+                          value: category,
+                          child: Text(category),
+                        );
+                      }).toList(),
+                    ],
+                    onChanged: _isCategoryLoading
+                        ? null
+                        : (value) {
+                            setState(() {
+                              _selectedCategory = value;
+                            });
+                            _loadAccountItems();
+                          },
+                    onTap: () {
+                      if (_selectedBook != null && !_isCategoryLoading) {
+                        _loadCategories();
+                      }
+                    },
                   ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: TextButton.icon(
-                      icon: Icon(Icons.calendar_today),
-                      label: Text(_endDate == null
-                          ? '结束日期'
-                          : DateFormat('yyyy-MM-dd').format(_endDate!)),
-                      onPressed: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: _endDate ?? DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (date != null) {
-                          setState(() {
-                            _endDate = date;
-                          });
-                          _loadAccountItems();
-                        }
-                      },
+                  SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _selectedType,
+                    decoration: InputDecoration(
+                      labelText: '类型',
+                      isDense: true,
                     ),
+                    items: [
+                      DropdownMenuItem(value: null, child: Text('全部')),
+                      DropdownMenuItem(value: 'EXPENSE', child: Text('支出')),
+                      DropdownMenuItem(value: 'INCOME', child: Text('收入')),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedType = value;
+                      });
+                      _loadAccountItems();
+                    },
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton.icon(
+                          icon: Icon(Icons.calendar_today),
+                          label: Text(_startDate == null
+                              ? '开始日期'
+                              : DateFormat('yyyy-MM-dd').format(_startDate!)),
+                          onPressed: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: _startDate ?? DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (date != null) {
+                              setState(() {
+                                _startDate = date;
+                              });
+                              _loadAccountItems();
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: TextButton.icon(
+                          icon: Icon(Icons.calendar_today),
+                          label: Text(_endDate == null
+                              ? '结束日期'
+                              : DateFormat('yyyy-MM-dd').format(_endDate!)),
+                          onPressed: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: _endDate ?? DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (date != null) {
+                              setState(() {
+                                _endDate = date;
+                              });
+                              _loadAccountItems();
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_accountBooks.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('账目列表'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.book_outlined,
-                size: 64,
-                color: Colors.grey,
-              ),
-              SizedBox(height: 16),
-              Text(
-                '还没有账本',
-                style: TextStyle(fontSize: 18),
-              ),
-              SizedBox(height: 8),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CreateAccountBookPage(),
-                    ),
-                  );
-                  if (result == true) {
-                    _loadAccountBooks();
-                  }
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        final themeColor = themeProvider.themeColor;
+        return Scaffold(
+          appBar: AppBar(
+            title: Row(
+              children: [
+                Text('账目列表'),
+                SizedBox(width: 16),
+                Expanded(
+                  child: DropdownButton<Map<String, dynamic>>(
+                    value: _selectedBook,
+                    isExpanded: true,
+                    items: _accountBooks.map((book) {
+                      return DropdownMenuItem(
+                        value: book,
+                        child: Text(book['name']),
+                      );
+                    }).toList(),
+                    onChanged: _onBookChanged,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(
+                    _isFilterExpanded ? Icons.filter_list_off : Icons.filter_list),
+                onPressed: () {
+                  setState(() {
+                    _isFilterExpanded = !_isFilterExpanded;
+                  });
                 },
-                icon: Icon(Icons.add),
-                label: Text('创建账本'),
+              ),
+              IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: _loadAccountItems,
               ),
             ],
           ),
-        ),
-      );
-    }
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Text('账目列表'),
-            SizedBox(width: 16),
-            Expanded(
-              child: DropdownButton<Map<String, dynamic>>(
-                value: _selectedBook,
-                isExpanded: true,
-                items: _accountBooks.map((book) {
-                  return DropdownMenuItem(
-                    value: book,
-                    child: Text(book['name']),
-                  );
-                }).toList(),
-                onChanged: _onBookChanged,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-                _isFilterExpanded ? Icons.filter_list_off : Icons.filter_list),
-            onPressed: () {
-              setState(() {
-                _isFilterExpanded = !_isFilterExpanded;
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: _loadAccountItems,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildFilterSection(),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _loadAccountItems,
-              child: ListView.builder(
-                itemCount: _accountItems.length,
-                itemBuilder: (context, index) {
-                  final item = _accountItems[index];
-                  final isExpense = item['type'] == 'EXPENSE';
-                  final currencySymbol = _selectedBook?['currencySymbol'] ?? '¥';
+          body: Column(
+            children: [
+              _buildFilterSection(),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _loadAccountItems,
+                  child: ListView.builder(
+                    itemCount: _accountItems.length,
+                    itemBuilder: (context, index) {
+                      final item = _accountItems[index];
+                      final isExpense = item['type'] == 'EXPENSE';
+                      final currencySymbol = _selectedBook?['currencySymbol'] ?? '¥';
 
-                  return Dismissible(
-                    key: Key(item['id'].toString()),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.only(right: 20.0),
-                      color: Colors.red,
-                      child: Icon(
-                        Icons.delete_outline,
-                        color: Colors.white,
-                      ),
-                    ),
-                    confirmDismiss: (direction) async {
-                      return await showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('确认删除'),
-                            content: Text('确定要删除这条账目记录吗？'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(false),
-                                child: Text('取消'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(true),
-                                child: Text(
-                                  '删除',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
+                      return Dismissible(
+                        key: Key(item['id'].toString()),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: EdgeInsets.only(right: 20.0),
+                          color: Colors.red,
+                          child: Icon(
+                            Icons.delete_outline,
+                            color: Colors.white,
+                          ),
+                        ),
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('确认删除'),
+                                content: Text('确定要删除这条账目记录吗？'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(false),
+                                    child: Text('取消'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(true),
+                                    child: Text(
+                                      '删除',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                    onDismissed: (direction) async {
-                      try {
-                        await ApiService.deleteAccountItem(item['id']);
-                        
-                        setState(() {
-                          _accountItems.removeAt(index);
-                        });
-                        
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('删除成功'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        
-                        _loadAccountItems();
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('删除失败: $e'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        _loadAccountItems();
-                      }
-                    },
-                    child: Card(
-                      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      child: InkWell(
-                        onTap: () => _navigateToEdit(item),
-                        child: Container(
-                          padding: EdgeInsets.all(12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: isExpense 
-                                      ? Colors.red.withOpacity(0.1) 
-                                      : Colors.green.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Icon(
-                                  isExpense 
-                                      ? Icons.arrow_circle_down_outlined 
-                                      : Icons.arrow_circle_up_outlined,
-                                  color: isExpense ? Colors.red : Colors.green,
-                                  size: 24,
-                                ),
+                        onDismissed: (direction) async {
+                          try {
+                            await ApiService.deleteAccountItem(item['id']);
+                            
+                            setState(() {
+                              _accountItems.removeAt(index);
+                            });
+                            
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('删除成功'),
+                                duration: Duration(seconds: 2),
                               ),
-                              SizedBox(width: 12),
-                              
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
+                            );
+                            
+                            _loadAccountItems();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('删除失败: $e'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            _loadAccountItems();
+                          }
+                        },
+                        child: Card(
+                          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          elevation: 0,
+                          child: InkWell(
+                            onTap: () => _navigateToEdit(item),
+                            child: Container(
+                              padding: EdgeInsets.all(16),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: isExpense 
+                                          ? themeColor.withOpacity(0.08) 
+                                          : themeColor.withOpacity(0.08),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Icon(
+                                      isExpense 
+                                          ? Icons.arrow_circle_down_outlined 
+                                          : Icons.arrow_circle_up_outlined,
+                                      color: isExpense
+                                          ? Colors.red[700] 
+                                          : Colors.green[700],
+                                      size: 24,
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Expanded(
-                                          child: Text(
-                                            '$currencySymbol${item['amount'].toString()}',
-                                            style: TextStyle(
-                                              color: isExpense ? Colors.red : Colors.green,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                '$currencySymbol${item['amount'].toString()}',
+                                                style: TextStyle(
+                                                  color: isExpense 
+                                                      ? Colors.red[700] 
+                                                      : Colors.green[700],
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 4,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: themeColor.withOpacity(0.08),
+                                                borderRadius: BorderRadius.circular(16),
+                                              ),
+                                              child: Text(
+                                                item['category'],
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: themeColor,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[100],
-                                            borderRadius: BorderRadius.circular(12),
-                                            border: Border.all(
-                                              color: Colors.grey[300]!,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            item['category'],
+                                        if (item['description']?.isNotEmpty) ...[
+                                          SizedBox(height: 4),
+                                          Text(
+                                            item['description'],
                                             style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[700],
+                                              color: Colors.grey[600],
+                                              fontSize: 14,
                                             ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                        SizedBox(height: 4),
+                                        Text(
+                                          _formatDateTime(item['accountDate']),
+                                          style: TextStyle(
+                                            color: Colors.grey[500],
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 4),
-                                    
-                                    if (item['description']?.isNotEmpty)
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: 4),
-                                        child: Text(
-                                          item['description'],
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 14,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Text(
-                                        _formatDateTime(item['accountDate']),
-                                        style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-      floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
-          ? FloatingActionButton(
-              onPressed: _navigateToCreate,
-              child: Icon(Icons.add),
-            )
-          : null,
+          floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
+              ? FloatingActionButton(
+                  onPressed: _navigateToCreate,
+                  child: Icon(Icons.add),
+                )
+              : null,
+        );
+      },
     );
   }
 
