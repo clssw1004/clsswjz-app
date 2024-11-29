@@ -4,7 +4,7 @@ import 'package:intl/intl.dart'; // 添加日期格式化包
 import '../services/data_service.dart'; // 导入DataService
 import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
-import 'package:flutter/foundation.dart' show listEquals;
+import 'package:flutter/services.dart'; // 导入此包以使用 TextInputFormatter
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData; // 添加初始数据参数
@@ -450,10 +450,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
             child: TextFormField(
               controller: _amountController,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')), // 允许输入数字和最多两位小数
+              ],
               style: TextStyle(
                 fontSize: 28, 
                 fontWeight: FontWeight.w500,
-                color: Colors.grey[900],  // 更深的颜色提高可读性
+                color: Colors.grey[900],
               ),
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -468,6 +471,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
               validator: (value) {
                 if (value == null || value.isEmpty) return '请输入金额';
                 return null;
+              },
+              onFieldSubmitted: (value) {
+                // 格式化金额为两位小数
+                final parsedValue = double.tryParse(value) ?? 0.0;
+                _amountController.text = parsedValue.toStringAsFixed(2);
               },
             ),
           ),

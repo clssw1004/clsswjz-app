@@ -14,25 +14,6 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _checkExistingSession();
-  }
-
-  Future<void> _checkExistingSession() async {
-    if (await UserService.hasValidSession()) {
-      await UserService.initializeSession();
-      final userInfo = await UserService.getUserInfo();
-      if (userInfo != null && mounted) {
-        Navigator.of(context).pushReplacementNamed(
-          '/home',
-          arguments: userInfo,
-        );
-      }
-    }
-  }
-
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -52,8 +33,9 @@ class _LoginPageState extends State<LoginPage> {
         );
         
         if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed(
+        Navigator.of(context).pushNamedAndRemoveUntil(
           '/home',
+          (route) => false,
           arguments: loginResult['userInfo'],
         );
       } catch (e) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../services/data_service.dart';
+import '../services/user_service.dart';
 import '../theme/theme_manager.dart';
 import '../theme/theme_provider.dart';
 
@@ -27,13 +28,13 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
+  void _signOut(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('确认注销'),
-          content: Text('确定要注销当前账户吗？'),
+          title: Text('确认退出'),
+          content: Text('确定要退出登录吗？'),
           actions: <Widget>[
             TextButton(
               child: Text('取消'),
@@ -46,14 +47,21 @@ class SettingsPage extends StatelessWidget {
                 '确定',
                 style: TextStyle(color: Colors.red),
               ),
-              onPressed: () {
-                // 清空token
-                ApiService.clearToken();
-                // 返回登录页面，并清空导航栈
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login',
-                  (Route<dynamic> route) => false,
-                );
+              onPressed: () async {
+                try {
+                  // 使用 UserService 清除会话信息
+                  await UserService.clearSession();
+                  
+                  // 返回登录页面，并清空导航栈
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/login',
+                    (Route<dynamic> route) => false,
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('退出登录失败: $e')),
+                  );
+                }
               },
             ),
           ],
@@ -196,82 +204,109 @@ class SettingsPage extends StatelessWidget {
             title: Text('设置'),
             elevation: 0,
           ),
-          body: ListView(
+          body: Column(
             children: [
-              // 用户信息卡片
-              Card(
-                margin: EdgeInsets.all(16),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey[200]!),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      _buildUserAvatar(context, userInfo['nickname'] ?? ''),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: ListView(
+                  children: [
+                    // 用户信息卡片
+                    Card(
+                      margin: EdgeInsets.all(16),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.grey[200]!),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Row(
                           children: [
-                            Text(
-                              userInfo['nickname'] ?? userInfo['username'] ?? '',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              userInfo['username'] ?? '',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
+                            _buildUserAvatar(context, userInfo['nickname'] ?? ''),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    userInfo['nickname'] ?? userInfo['username'] ?? '',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    userInfo['username'] ?? '',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
+                    ),
+                    Divider(),
+                    // 新增账本
+                    ListTile(
+                      leading: Icon(Icons.add_box),
+                      title: Text('新增账本'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/create-account-book').then((_) {
+                          _dataService.fetchAccountBooks(forceRefresh: true);
+                        });
+                      },
+                    ),
+                    // 主题设置
+                    ListTile(
+                      leading: Icon(Icons.color_lens),
+                      title: Text('主题设置'),
+                      trailing: Icon(Icons.chevron_right),
+                      onTap: () => _showThemeColorPicker(context),
+                    ),
+                    // 后台服务设置
+                    ListTile(
+                      leading: Icon(Icons.dns),
+                      title: Text('后台服务设置'),
+                      trailing: Icon(Icons.chevron_right),
+                      onTap: () => _showApiHostDialog(context),
+                    ),
+                  ],
+                ),
+              ),
+              // 退出登录按钮固定在底部
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _signOut(context),
+                    icon: Icon(
+                      Icons.logout,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                    label: Text(
+                      '退出登录',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Colors.red),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
               ),
-              Divider(),
-              // 新增账本
-              ListTile(
-                leading: Icon(Icons.add_box),
-                title: Text('新增账本'),
-                onTap: () {
-                  Navigator.pushNamed(context, '/create-account-book').then((_) {
-                    _dataService.fetchAccountBooks(forceRefresh: true);
-                  });
-                },
-              ),
-              // 主题设置
-              ListTile(
-                leading: Icon(Icons.color_lens),
-                title: Text('主题设置'),
-                trailing: Icon(Icons.chevron_right),
-                onTap: () => _showThemeColorPicker(context),
-              ),
-              // 添加后台服务设置
-              ListTile(
-                leading: Icon(Icons.dns),
-                title: Text('后台服务设置'),
-                trailing: Icon(Icons.chevron_right),
-                onTap: () => _showApiHostDialog(context),
-              ),
-              // 注销账户
-              ListTile(
-                leading: Icon(Icons.logout, color: Colors.red),
-                title: Text('注销账户'),
-                onTap: () => _logout(context),
-              ),
-
-              Divider(),
             ],
           ),
         );
