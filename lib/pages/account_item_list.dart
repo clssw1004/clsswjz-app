@@ -91,7 +91,7 @@ class _AccountItemListState extends State<AccountItemList> {
     try {
       final items = await ApiService.fetchAccountItems(
         accountBookId: _selectedBook!['id'],
-        category: _selectedCategory,
+        categories: _selectedCategories,
         type: _selectedType,
         startDate: _startDate,
         endDate: _endDate,
@@ -155,101 +155,85 @@ class _AccountItemListState extends State<AccountItemList> {
                   SizedBox(height: 12),
                   
                   // 分类多选下拉
-                  Container(
-                    width: double.infinity,
-                    child: PopupMenuButton<String>(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _selectedCategories.isEmpty 
-                                    ? '选择分类' 
-                                    : _selectedCategories.join(', '),
-                                style: TextStyle(
-                                  color: _selectedCategories.isEmpty 
-                                      ? Colors.grey[600] 
-                                      : Colors.black87,
-                                  fontSize: 14,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (_selectedCategories.isNotEmpty)
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                constraints: BoxConstraints(),
-                                icon: Icon(Icons.clear, size: 18),
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedCategories = [];
-                                    _selectedCategory = null;
-                                  });
-                                  _loadAccountItems();
-                                },
-                              ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
-                          ],
-                        ),
-                      ),
-                      itemBuilder: (context) => [
-                        PopupMenuItem<String>(
-                          value: '',
-                          child: Row(
-                            children: [
-                              Icon(
-                                _selectedCategories.isEmpty 
-                                    ? Icons.check_box 
-                                    : Icons.check_box_outline_blank,
-                                color: themeColor,
-                                size: 20,
-                              ),
-                              SizedBox(width: 8),
-                              Text('全部'),
-                            ],
-                          ),
-                        ),
-                        ..._categories.map((category) => PopupMenuItem<String>(
-                          value: category,
-                          child: Row(
-                            children: [
-                              Icon(
+                  PopupMenuButton<String>(
+                    constraints: BoxConstraints(
+                      maxHeight: 300,
+                    ),
+                    position: PopupMenuPosition.under,
+                    itemBuilder: (BuildContext context) => [
+                      ..._categories.map((category) => PopupMenuItem<String>(
+                        value: category,
+                        enabled: false, // 禁用默认点击行为
+                        child: StatefulBuilder(
+                          builder: (BuildContext context, StateSetter setStatePopup) {
+                            return ListTile(
+                              dense: true,
+                              leading: Icon(
                                 _selectedCategories.contains(category)
                                     ? Icons.check_box
                                     : Icons.check_box_outline_blank,
                                 color: themeColor,
                                 size: 20,
                               ),
-                              SizedBox(width: 8),
-                              Text(category),
-                            ],
+                              title: Text(category),
+                              onTap: () {
+                                setStatePopup(() {
+                                  setState(() {
+                                    if (_selectedCategories.contains(category)) {
+                                      _selectedCategories.remove(category);
+                                    } else {
+                                      _selectedCategories.add(category);
+                                    }
+                                    _selectedCategory = _selectedCategories.join(',');
+                                  });
+                                });
+                                _loadAccountItems();
+                              },
+                            );
+                          },
+                        ),
+                      )).toList(),
+                    ],
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _selectedCategories.isEmpty 
+                                  ? '选择分类' 
+                                  : _selectedCategories.join(', '),
+                              style: TextStyle(
+                                color: _selectedCategories.isEmpty 
+                                    ? Colors.grey[600] 
+                                    : Colors.black87,
+                                fontSize: 14,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        )).toList(),
-                      ],
-                      onSelected: (String value) {
-                        setState(() {
-                          if (value.isEmpty) {
-                            // 选择"全部"
-                            _selectedCategories = [];
-                            _selectedCategory = null;
-                          } else {
-                            if (_selectedCategories.contains(value)) {
-                              _selectedCategories.remove(value);
-                            } else {
-                              _selectedCategories.add(value);
-                            }
-                            _selectedCategory = _selectedCategories.join(',');
-                          }
-                        });
-                        _loadAccountItems();
-                      },
+                          if (_selectedCategories.isNotEmpty)
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                              icon: Icon(Icons.clear, size: 18),
+                              onPressed: () {
+                                setState(() {
+                                  _selectedCategories = [];
+                                  _selectedCategory = null;
+                                });
+                                _loadAccountItems();
+                              },
+                            ),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 12),

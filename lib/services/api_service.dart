@@ -76,31 +76,27 @@ class ApiService {
   }
 
   static Future<List<Map<String, dynamic>>> fetchAccountItems({
-    String? accountBookId,
-    String? category,
+    required String accountBookId,
+    List<String>? categories,
     String? type,
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final queryParams = <String, String>{};
+    final Map<String, dynamic> body = {
+      'accountBookId': accountBookId,
+    };
+    
+    if (categories?.isNotEmpty ?? false) body['categories'] = categories;
+    if (type != null) body['type'] = type;
+    if (startDate != null) body['startDate'] = startDate.toIso8601String();
+    if (endDate != null) body['endDate'] = endDate.toIso8601String();
 
-    if (accountBookId != null) queryParams['accountBookId'] = accountBookId;
-    if (category != null) queryParams['category'] = category;
-    if (type != null) queryParams['type'] = type;
-    if (startDate != null) {
-      queryParams['startDate'] = startDate.toIso8601String();
-    }
-    if (endDate != null) {
-      queryParams['endDate'] = endDate.toIso8601String();
-    }
-
-    final uri = Uri.parse('$_baseUrl/api/account/item').replace(
-      queryParameters: queryParams,
-    );
-
-    final response = await http.get(
+    final uri = Uri.parse('$_baseUrl/api/account/item/list');
+    
+    final response = await http.post(
       uri,
-      headers: _getHeaders(),
+      headers: _getHeaders(needsContentType: true),
+      body: json.encode(body),
     );
 
     if (_isSuccessStatusCode(response.statusCode)) {
