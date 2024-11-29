@@ -1,8 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String _baseUrl = 'http://192.168.2.199:3000';
+  static String _baseUrl = 'http://192.168.2.199:3000';
   static String? _token;
 
   static void setToken(String token) {
@@ -203,5 +204,21 @@ class ApiService {
     if (response.statusCode != 200) {
       throw Exception('Failed to delete account item');
     }
+  }
+
+  static Future<String> getApiHost() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('api_host') ?? _baseUrl;
+  }
+
+  static Future<void> setApiHost(String host) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('api_host', host);
+    _baseUrl = host; // 更新当前使用的基础URL
+  }
+
+  static Future<String> _buildUrl(String endpoint) async {
+    final baseUrl = await getApiHost();
+    return '$baseUrl$endpoint';
   }
 }

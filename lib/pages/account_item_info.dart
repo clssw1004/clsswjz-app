@@ -4,6 +4,7 @@ import 'package:intl/intl.dart'; // 添加日期格式化包
 import '../services/data_service.dart'; // 导入DataService
 import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData; // 添加初始数据参数
@@ -363,7 +364,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
     }
   }
 
-  // 类型选择组件
+  // 修改类型选择组件
   Widget _buildTypeSelector(Color themeColor) {
     return Row(
       children: [
@@ -372,18 +373,25 @@ class _AccountItemFormState extends State<AccountItemForm> {
             onPressed: () => setState(() => _transactionType = '支出'),
             style: ElevatedButton.styleFrom(
               backgroundColor: _transactionType == '支出' 
-                  ? themeColor.withOpacity(0.9)  // 选中时使用主题色，稍微降低透明度
+                  ? themeColor.withOpacity(0.9)
                   : Colors.grey[100],
               foregroundColor: _transactionType == '支出' 
                   ? Colors.white 
-                  : Colors.grey[800],  // 未选中时使用深灰色
-              elevation: _transactionType == '支出' ? 1 : 0,  // 降低阴影
-              padding: EdgeInsets.symmetric(vertical: 12),
+                  : Colors.grey[800],
+              elevation: _transactionType == '支出' ? 1 : 0,
+              padding: EdgeInsets.symmetric(vertical: 8),
+              minimumSize: Size(80, 32),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text('支出', style: TextStyle(fontSize: 16)),
+            child: Text(
+              '支出', 
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ),
         SizedBox(width: 12),
@@ -398,12 +406,19 @@ class _AccountItemFormState extends State<AccountItemForm> {
                   ? Colors.white 
                   : Colors.grey[800],
               elevation: _transactionType == '收入' ? 1 : 0,
-              padding: EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: 8),
+              minimumSize: Size(80, 32),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text('收入', style: TextStyle(fontSize: 16)),
+            child: Text(
+              '收入', 
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ),
       ],
@@ -466,42 +481,56 @@ class _AccountItemFormState extends State<AccountItemForm> {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
         final themeColor = themeProvider.themeColor;
-        
-        final screenWidth = MediaQuery.of(context).size.width;
-        final padding = 16.0;
-        final spacing = 8.0;
-        final itemsPerRow = 4;
-        final itemWidth = (screenWidth - (padding * 2) - (spacing * (itemsPerRow - 1))) / itemsPerRow;
-        
-        final maxButtons = itemsPerRow * 3;
-        final showAllButton = _categories.length > maxButtons;
-
-        List<Widget> categoryButtons = _displayCategories.map((category) {
+        final categoryButtons = _displayCategories.map((category) {
           final isSelected = _selectedCategory == category;
           return SizedBox(
-            width: itemWidth,
+            width: 85,  // 调整按钮宽度以适应文字
             child: Padding(
               padding: EdgeInsets.all(4),
-              child: ElevatedButton(
-                onPressed: () => setState(() => _selectedCategory = category),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isSelected 
-                      ? themeColor.withOpacity(0.9)
-                      : Colors.grey[100],
-                  foregroundColor: isSelected 
-                      ? Colors.white 
-                      : themeColor,
-                  elevation: isSelected ? 1 : 0,
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _selectedCategory = category;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: isSelected 
+                          ? themeColor.withOpacity(0.12)  // 选中时使用主题色的12%透明度
+                          : Colors.transparent,
+                      border: Border.all(
+                        color: isSelected 
+                            ? themeColor  // 选中时使用主题色边框
+                            : Colors.grey[400]!,  // 未选中时使用浅灰色边框
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        category,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isSelected 
+                              ? themeColor  // 选中时文字使用主题色
+                              : Colors.grey[700],  // 未选中时使用深灰色
+                          fontWeight: isSelected 
+                              ? FontWeight.w500  // 选中时字体加粗
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                child: Text(
-                  category,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14),
                 ),
               ),
             ),
@@ -509,49 +538,92 @@ class _AccountItemFormState extends State<AccountItemForm> {
         }).toList();
 
         // "全部"按钮样式
-        if (showAllButton) {
-          categoryButtons.add(
-            SizedBox(
-              width: itemWidth,
-              child: Padding(
-                padding: EdgeInsets.all(4),
-                child: OutlinedButton(  // 改用 OutlinedButton
-                  onPressed: _showCategoryDialog,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: themeColor,
-                    side: BorderSide(color: themeColor.withOpacity(0.5)),
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
+        categoryButtons.add(
+          SizedBox(
+            width: 85,
+            child: Padding(
+              padding: EdgeInsets.all(4),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _showCategoryDialog,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      border: Border.all(
+                        color: themeColor.withOpacity(0.5),
+                        width: 1,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.more_horiz,
+                            size: 16,
+                            color: themeColor,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            '更多',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: themeColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Text('全部', style: TextStyle(fontSize: 14)),
                 ),
               ),
             ),
-          );
-        }
+          ),
+        );
 
-        return Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          alignment: WrapAlignment.start,
-          children: categoryButtons,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '分类',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[800],
+              ),
+            ),
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: categoryButtons,
+            ),
+          ],
         );
       },
     );
   }
 
-  // 分类选择弹窗
+  // 修改分类选择弹窗方法
   void _showCategoryDialog() {
+    final TextEditingController searchController = TextEditingController();
+    
     showDialog(
       context: context,
       builder: (context) {
-        final searchController = TextEditingController();
+        final themeColor = Provider.of<ThemeProvider>(context).themeColor;
         List<String> filteredCategories = List.from(_categories);
 
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setDialogState) {
             return AlertDialog(
               title: Text('分类'),
               content: Container(
@@ -562,32 +634,75 @@ class _AccountItemFormState extends State<AccountItemForm> {
                     TextField(
                       controller: searchController,
                       decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: themeColor,
+                        ),
                         hintText: '搜索分类',
-                        border: OutlineInputBorder(),
+                        hintStyle: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 14,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: themeColor, width: 2),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        isDense: true,
                       ),
+                      cursorColor: themeColor,
                       onChanged: (value) {
-                        setState(() {
-                          filteredCategories = _categories.where((category) =>
-                            category.toLowerCase().contains(value.toLowerCase())
-                          ).toList();
-                        });
+                        if (value.trim().isEmpty) {
+                          setDialogState(() {
+                            filteredCategories = List.from(_categories);
+                          });
+                        } else {
+                          final newFilteredCategories = _categories
+                              .where((category) => category.toLowerCase()
+                              .contains(value.toLowerCase().trim()))
+                              .toList();
+                          setDialogState(() {
+                            filteredCategories = newFilteredCategories;
+                          });
+                        }
                       },
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 12),
                     Expanded(
                       child: ListView.builder(
                         itemCount: filteredCategories.length,
                         itemBuilder: (context, index) {
                           final category = filteredCategories[index];
+                          final isSelected = _selectedCategory == category;
                           return ListTile(
-                            title: Text(category),
-                            selected: _selectedCategory == category,
+                            title: Text(
+                              category,
+                              style: TextStyle(
+                                color: Colors.grey[800],
+                                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                              ),
+                            ),
+                            selected: isSelected,
+                            selectedTileColor: themeColor.withOpacity(0.12),
+                            selectedColor: themeColor,
                             onTap: () {
-                              Navigator.pop(context);
-                              setState(() {
-                                _selectedCategory = category;
-                                _updateDisplayCategories();
+                              Navigator.of(context).pop();
+                              Future.microtask(() {
+                                setState(() {
+                                  _selectedCategory = category;
+                                  _updateDisplayCategories();
+                                });
                               });
                             },
                           );
@@ -601,7 +716,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
           },
         );
       },
-    );
+    ).then((_) {
+      searchController.dispose();
+    });
   }
 
   // 添加账本名称提示组件
@@ -720,7 +837,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                             }
                           },
                           icon: Icon(
-                            Icons.check_circle_outline,
+                            Icons.save_outlined,
                             color: Colors.white,
                             size: 18,
                           ),
