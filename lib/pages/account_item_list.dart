@@ -494,7 +494,9 @@ class _AccountItemListState extends State<AccountItemList> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AccountItemForm(),
+        builder: (context) => AccountItemForm(
+          initialBook: _selectedBook,
+        ),
       ),
     );
 
