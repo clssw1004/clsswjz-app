@@ -17,14 +17,12 @@ class ThemeManager {
 
   static Future<Color> getThemeColor() async {
     final prefs = await SharedPreferences.getInstance();
-    print('>>>>>>>>>>>getThemeColor: ${prefs.getInt(_themeColorKey)}');
     final colorValue = prefs.getInt(_themeColorKey) ?? 0xFF2196F3; // 默认蓝色
     return Color(colorValue);
   }
 
   static Future<void> setThemeColor(Color color) async {
     final prefs = await SharedPreferences.getInstance();
-    print('>>>>>>>>>>>getThemeColor: ${color.value}');
     await prefs.setInt(_themeColorKey, color.value);
   }
 }

@@ -14,7 +14,7 @@ class AccountItemForm extends StatefulWidget {
       : super(key: key);
 
   @override
-  _AccountItemFormState createState() => _AccountItemFormState();
+  State<AccountItemForm> createState() => _AccountItemFormState();
 }
 
 class _AccountItemFormState extends State<AccountItemForm> {
@@ -55,20 +55,23 @@ class _AccountItemFormState extends State<AccountItemForm> {
   }
 
   Future<void> _loadAccountBooks() async {
+    if (!mounted) return;
     try {
       final books = await _dataService.fetchAccountBooks();
+      if (!mounted) return;
       setState(() {
         _accountBooks = books;
         _selectedBook ??= widget.initialBook ??
-              (widget.initialData != null
-                  ? books.firstWhere(
-                      (book) =>
-                          book['id'] == widget.initialData!['accountBookId'],
-                      orElse: () => books.first,
-                    )
-                  : books.first);
+            (widget.initialData != null
+                ? books.firstWhere(
+                    (book) =>
+                        book['id'] == widget.initialData!['accountBookId'],
+                    orElse: () => books.first,
+                  )
+                : books.first);
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('加载账本失败: $e')),
       );
@@ -93,17 +96,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
   }
 
   void _updateDisplayCategories() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final padding = 16.0;
-    final spacing = 8.0;
-    final itemsPerRow = 4;
-    final maxButtons = itemsPerRow * 3;
-    
+    const maxButtons = 12;
+
     if (_categories.length <= maxButtons) {
       _displayCategories = List.from(_categories);
     } else {
       // 如果选中的分类不在前几个，则将其放在倒数第二个位置
-      if (_selectedCategory != null && 
+      if (_selectedCategory != null &&
           !_categories.take(maxButtons - 1).contains(_selectedCategory)) {
         final initialCategories = _categories.take(maxButtons - 2).toList();
         initialCategories.add(_selectedCategory!);
@@ -148,81 +147,110 @@ class _AccountItemFormState extends State<AccountItemForm> {
     }
   }
 
-  // 选择日期
+  // 修改选择日期的方法
   Future<void> _selectDate(BuildContext context) async {
-    final themeColor = Provider.of<ThemeProvider>(context, listen: false).themeColor;
+    if (!mounted) return;
+
+    // 使用静态变量存储当前选择，避免直接修改状态
+    DateTime? selectedDate = _selectedDate;
     
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: themeColor,  // 设置主题色
-              onPrimary: Colors.white,  // 主题色上的文字颜色
-              surface: Colors.white,
-              onSurface: Colors.grey[800]!,  // 日期文字颜色
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: themeColor,  // 按钮文字颜色
+    try {
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100),
+        builder: (BuildContext context, Widget? child) {
+          if (child == null) return Container();
+          
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                primary: Theme.of(context).primaryColor,
+                onPrimary: Colors.white,
+                surface: Colors.white,
+                onSurface: Colors.grey[800]!,
               ),
             ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
+            child: child,
+          );
+        },
+      );
+
+      // 在UI更新前检查组件状态
+      if (!mounted) return;
+      
+      // 使用延迟更新状态，避免在build过程中setState
+      if (picked != null && picked != selectedDate) {
+        Future.microtask(() {
+          setState(() {
+            _selectedDate = picked;
+          });
+        });
+      }
+    } catch (e, stackTrace) {
+      print('Date picker error: $e\n$stackTrace');
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('选择日期时出错，请重试')),
+      );
     }
   }
 
-  // 选择时间
+  // 修改选择时间的方法
   Future<void> _selectTime(BuildContext context) async {
-    final themeColor = Provider.of<ThemeProvider>(context, listen: false).themeColor;
+    if (!mounted) return;
+
+    // 使用静态变量存储当前选择，避免直接修改状态
+    TimeOfDay? selectedTime = _selectedTime;
     
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: themeColor,  // 设置主题色
-              onPrimary: Colors.white,  // 主题色上的文字颜色
-              surface: Colors.white,
-              onSurface: Colors.grey[800]!,  // 时间文字颜色
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: themeColor,  // 按钮文字颜色
+    try {
+      final TimeOfDay? picked = await showTimePicker(
+        context: context,
+        initialTime: selectedTime,
+        builder: (BuildContext context, Widget? child) {
+          if (child == null) return Container();
+          
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                primary: Theme.of(context).primaryColor,
+                onPrimary: Colors.white,
+                surface: Colors.white,
+                onSurface: Colors.grey[800]!,
               ),
             ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
+            child: child,
+          );
+        },
+      );
+
+      // 在UI更新前检查组件状态
+      if (!mounted) return;
+      
+      // 使用延迟更新状态，避免在build过程中setState
+      if (picked != null && picked != selectedTime) {
+        Future.microtask(() {
+          setState(() {
+            _selectedTime = picked;
+          });
+        });
+      }
+    } catch (e, stackTrace) {
+      print('Time picker error: $e\n$stackTrace');
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('选择时间时出错，请重试')),
+      );
     }
   }
 
   // 获取完整的日期时间字符串
   String get _formattedDateTime {
-    if (_selectedDate == null && _selectedTime == null) {
-      return DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-    }
-    final date = _selectedDate ?? DateTime.now();
-    final time = _selectedTime ?? TimeOfDay.now();
+    final date = _selectedDate;
+    final time = _selectedTime;
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(
       DateTime(
         date.year,
@@ -245,7 +273,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
         id: _recordId,
       );
 
-
       // 返回上一页，并传递刷新标记
       Navigator.pop(context, true);
     } catch (e) {
@@ -256,28 +283,23 @@ class _AccountItemFormState extends State<AccountItemForm> {
     }
   }
 
-  // 修改日期时间选择器的样式
+  // 修改日期时间选择器的构建方法
   Widget _buildDateTimeSelectors(Color themeColor) {
+    if (!mounted) return Container();
+    
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[50],  // 浅色背景
+        color: Colors.grey[50],
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
           Expanded(
             child: OutlinedButton.icon(
-              icon: Icon(
-                Icons.calendar_today,
-                color: themeColor,
-                size: 18,
-              ),
+              icon: Icon(Icons.calendar_today, color: themeColor, size: 18),
               label: Text(
                 DateFormat('yyyy年MM月dd日').format(_selectedDate),
-                style: TextStyle(
-                  color: Colors.grey[800],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey[800], fontSize: 14),
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: themeColor,
@@ -294,17 +316,10 @@ class _AccountItemFormState extends State<AccountItemForm> {
           SizedBox(width: 8),
           Expanded(
             child: OutlinedButton.icon(
-              icon: Icon(
-                Icons.access_time,
-                color: themeColor,
-                size: 18,
-              ),
+              icon: Icon(Icons.access_time, color: themeColor, size: 18),
               label: Text(
                 _selectedTime.format(context),
-                style: TextStyle(
-                  color: Colors.grey[800],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey[800], fontSize: 14),
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: themeColor,
@@ -333,11 +348,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
         'category': _selectedCategory,
         'accountDate': _formattedDateTime,
       };
-      
+
       try {
         data['accountBookId'] = _selectedBook!['id'];
         await ApiService.saveAccountItem(data);
-        
+
         // 显示成功提示
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -355,7 +370,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
             ),
           ),
         );
-        
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('保存失败: $e')),
@@ -372,12 +386,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
           child: ElevatedButton(
             onPressed: () => setState(() => _transactionType = '支出'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: _transactionType == '支出' 
+              backgroundColor: _transactionType == '支出'
                   ? themeColor.withOpacity(0.9)
                   : Colors.grey[100],
-              foregroundColor: _transactionType == '支出' 
-                  ? Colors.white 
-                  : Colors.grey[800],
+              foregroundColor:
+                  _transactionType == '支出' ? Colors.white : Colors.grey[800],
               elevation: _transactionType == '支出' ? 1 : 0,
               padding: EdgeInsets.symmetric(vertical: 8),
               minimumSize: Size(80, 32),
@@ -386,7 +399,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
               ),
             ),
             child: Text(
-              '支出', 
+              '支出',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -399,12 +412,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
           child: ElevatedButton(
             onPressed: () => setState(() => _transactionType = '收入'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: _transactionType == '收入' 
+              backgroundColor: _transactionType == '收入'
                   ? themeColor.withOpacity(0.9)
                   : Colors.grey[100],
-              foregroundColor: _transactionType == '收入' 
-                  ? Colors.white 
-                  : Colors.grey[800],
+              foregroundColor:
+                  _transactionType == '收入' ? Colors.white : Colors.grey[800],
               elevation: _transactionType == '收入' ? 1 : 0,
               padding: EdgeInsets.symmetric(vertical: 8),
               minimumSize: Size(80, 32),
@@ -413,7 +425,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
               ),
             ),
             child: Text(
-              '收入', 
+              '收入',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -451,10 +463,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
               controller: _amountController,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')), // 允许输入数字和最多两位小数
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'^\d*\.?\d{0,2}')), // 允许输入数字和最多两位小数
               ],
               style: TextStyle(
-                fontSize: 28, 
+                fontSize: 28,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey[900],
               ),
@@ -492,7 +505,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
         final categoryButtons = _displayCategories.map((category) {
           final isSelected = _selectedCategory == category;
           return SizedBox(
-            width: 85,  // 调整按钮宽度以适应文字
+            width: 85, // 调整按钮宽度以适应文字
             child: Padding(
               padding: EdgeInsets.all(4),
               child: Material(
@@ -506,13 +519,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
                   borderRadius: BorderRadius.circular(8),
                   child: Ink(
                     decoration: BoxDecoration(
-                      color: isSelected 
-                          ? themeColor.withOpacity(0.12)  // 选中时使用主题色的12%透明度
+                      color: isSelected
+                          ? themeColor.withOpacity(0.12) // 选中时使用主题色的12%透明度
                           : Colors.transparent,
                       border: Border.all(
-                        color: isSelected 
-                            ? themeColor  // 选中时使用主题色边框
-                            : Colors.grey[400]!,  // 未选中时使用浅灰色边框
+                        color: isSelected
+                            ? themeColor // 选中时使用主题色边框
+                            : Colors.grey[400]!, // 未选中时使用浅灰色边框
                         width: 1,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -529,11 +542,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14,
-                          color: isSelected 
-                              ? themeColor  // 选中时文字使用主题色
-                              : Colors.grey[700],  // 未选中时使用深灰色
-                          fontWeight: isSelected 
-                              ? FontWeight.w500  // 选中时字体加粗
+                          color: isSelected
+                              ? themeColor // 选中时文字使用主题色
+                              : Colors.grey[700], // 未选中时使用深灰色
+                          fontWeight: isSelected
+                              ? FontWeight.w500 // 选中时字体加粗
                               : FontWeight.normal,
                         ),
                       ),
@@ -623,7 +636,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
   // 修改分类选择弹窗方法
   void _showCategoryDialog() {
     final TextEditingController searchController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) {
@@ -677,8 +690,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
                           });
                         } else {
                           final newFilteredCategories = _categories
-                              .where((category) => category.toLowerCase()
-                              .contains(value.toLowerCase().trim()))
+                              .where((category) => category
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase().trim()))
                               .toList();
                           setDialogState(() {
                             filteredCategories = newFilteredCategories;
@@ -698,7 +712,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
                               category,
                               style: TextStyle(
                                 color: Colors.grey[800],
-                                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                                fontWeight: isSelected
+                                    ? FontWeight.w500
+                                    : FontWeight.normal,
                               ),
                             ),
                             selected: isSelected,
@@ -859,8 +875,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: themeColor,
                             foregroundColor: Colors.white,
-                            padding:
-                                EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 4),
                             minimumSize: Size(60, 36),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -886,8 +902,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
-                            padding:
-                                EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 4),
                             minimumSize: Size(60, 36),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),

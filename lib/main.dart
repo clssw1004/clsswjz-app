@@ -5,6 +5,7 @@ import 'pages/register_page.dart';
 import 'theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'services/user_service.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,6 +58,16 @@ class MyApp extends StatelessWidget {
             }
             return null;
           },
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('zh', 'CN'),
+            Locale('en', 'US'),
+          ],
+          locale: const Locale('zh', 'CN'),
         );
 
         return FutureBuilder<Map<String, dynamic>?>(

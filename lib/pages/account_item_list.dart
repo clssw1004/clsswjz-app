@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../pages/account_item_info.dart';
 import '../services/data_service.dart';
 import '../theme/theme_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
@@ -25,6 +26,9 @@ class _AccountItemListState extends State<AccountItemList> {
   bool _isFilterExpanded = false;
   bool _isCategoryLoading = false;
   Key _dropdownKey = GlobalKey();
+  List<String> _selectedCategories = [];
+  double? _minAmount;
+  double? _maxAmount;
 
   @override
   void initState() {
@@ -33,8 +37,10 @@ class _AccountItemListState extends State<AccountItemList> {
   }
 
   Future<void> _loadAccountBooks() async {
+    if (!mounted) return;
     try {
       final books = await _dataService.fetchAccountBooks(forceRefresh: true);
+      if (!mounted) return;
       setState(() {
         _accountBooks = books;
         if (books.isNotEmpty && _selectedBook == null) {
@@ -46,6 +52,7 @@ class _AccountItemListState extends State<AccountItemList> {
         _loadAccountItems();
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('加载账本失败: $e')),
       );
@@ -53,27 +60,23 @@ class _AccountItemListState extends State<AccountItemList> {
   }
 
   Future<void> _loadCategories() async {
-    if (_selectedBook == null) return;
+    if (_selectedBook == null || !mounted) return;
 
-    setState(() {
-      _isCategoryLoading = true;
-    });
+    setState(() => _isCategoryLoading = true);
 
     try {
       final categories = await _dataService.fetchCategories(
         _selectedBook!['id'],
         forceRefresh: true,
       );
-      setState(
-        () {
-          _isCategoryLoading = false;
-          _categories = categories;
-        },
-      );
-    } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isCategoryLoading = false;
+        _categories = categories;
       });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isCategoryLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('获取分类失败: $e')),
       );
@@ -81,11 +84,9 @@ class _AccountItemListState extends State<AccountItemList> {
   }
 
   Future<void> _loadAccountItems() async {
-    if (_selectedBook == null) return;
+    if (_selectedBook == null || !mounted) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final items = await ApiService.fetchAccountItems(
@@ -95,14 +96,14 @@ class _AccountItemListState extends State<AccountItemList> {
         startDate: _startDate,
         endDate: _endDate,
       );
+      if (!mounted) return;
       setState(() {
         _accountItems = items;
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (!mounted) return;
+      setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('加载账目失败: $e')),
       );
@@ -113,93 +114,235 @@ class _AccountItemListState extends State<AccountItemList> {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
         final themeColor = themeProvider.themeColor;
+        
         return AnimatedContainer(
           duration: Duration(milliseconds: 300),
-          height: _isFilterExpanded ? 200 : 0,
+          height: _isFilterExpanded ? 280 : 0,
           child: Card(
-            margin: EdgeInsets.all(8),
+            margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(color: Colors.grey[200]!),
             ),
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(12),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DropdownButtonFormField<String>(
-                    key: _dropdownKey,
-                    value: _selectedCategory,
-                    decoration: InputDecoration(
-                      labelText: '分类',
-                      labelStyle: TextStyle(color: Colors.grey[700]),
-                      isDense: true,
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: themeColor),
-                      ),
-                    ),
-                    items: [
-                      DropdownMenuItem(value: null, child: Text('全部')),
-                      ..._categories.map((category) {
-                        return DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList(),
+                  // 类型选择按钮组
+                  SegmentedButton<String>(
+                    segments: const [
+                      ButtonSegment(value: '', label: Text('全部')),
+                      ButtonSegment(value: 'EXPENSE', label: Text('支出')),
+                      ButtonSegment(value: 'INCOME', label: Text('收入')),
                     ],
-                    onChanged: _isCategoryLoading
-                        ? null
-                        : (value) {
-                            setState(() {
-                              _selectedCategory = value;
-                            });
-                            _loadAccountItems();
-                          },
-                    onTap: () {
-                      if (_selectedBook != null && !_isCategoryLoading) {
-                        _loadCategories();
-                      }
-                    },
-                  ),
-                  SizedBox(height: 8),
-                  DropdownButtonFormField<String>(
-                    value: _selectedType,
-                    decoration: InputDecoration(
-                      labelText: '类型',
-                      isDense: true,
-                    ),
-                    items: [
-                      DropdownMenuItem(value: null, child: Text('全部')),
-                      DropdownMenuItem(value: 'EXPENSE', child: Text('支出')),
-                      DropdownMenuItem(value: 'INCOME', child: Text('收入')),
-                    ],
-                    onChanged: (value) {
+                    selected: {_selectedType ?? ''},
+                    onSelectionChanged: (Set<String> newSelection) {
                       setState(() {
-                        _selectedType = value;
+                        _selectedType = newSelection.first.isEmpty ? null : newSelection.first;
                       });
                       _loadAccountItems();
                     },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (states) => states.contains(MaterialState.selected)
+                            ? themeColor
+                            : Colors.transparent,
+                      ),
+                    ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 12),
+                  
+                  // 分类多选下拉
+                  Container(
+                    width: double.infinity,
+                    child: PopupMenuButton<String>(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey[300]!),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _selectedCategories.isEmpty 
+                                    ? '选择分类' 
+                                    : _selectedCategories.join(', '),
+                                style: TextStyle(
+                                  color: _selectedCategories.isEmpty 
+                                      ? Colors.grey[600] 
+                                      : Colors.black87,
+                                  fontSize: 14,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (_selectedCategories.isNotEmpty)
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Icon(Icons.clear, size: 18),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedCategories = [];
+                                    _selectedCategory = null;
+                                  });
+                                  _loadAccountItems();
+                                },
+                              ),
+                            SizedBox(width: 8),
+                            Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                          ],
+                        ),
+                      ),
+                      itemBuilder: (context) => [
+                        PopupMenuItem<String>(
+                          value: '',
+                          child: Row(
+                            children: [
+                              Icon(
+                                _selectedCategories.isEmpty 
+                                    ? Icons.check_box 
+                                    : Icons.check_box_outline_blank,
+                                color: themeColor,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text('全部'),
+                            ],
+                          ),
+                        ),
+                        ..._categories.map((category) => PopupMenuItem<String>(
+                          value: category,
+                          child: Row(
+                            children: [
+                              Icon(
+                                _selectedCategories.contains(category)
+                                    ? Icons.check_box
+                                    : Icons.check_box_outline_blank,
+                                color: themeColor,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(category),
+                            ],
+                          ),
+                        )).toList(),
+                      ],
+                      onSelected: (String value) {
+                        setState(() {
+                          if (value.isEmpty) {
+                            // 选择"全部"
+                            _selectedCategories = [];
+                            _selectedCategory = null;
+                          } else {
+                            if (_selectedCategories.contains(value)) {
+                              _selectedCategories.remove(value);
+                            } else {
+                              _selectedCategories.add(value);
+                            }
+                            _selectedCategory = _selectedCategories.join(',');
+                          }
+                        });
+                        _loadAccountItems();
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  
+                  // 金额范围
                   Row(
                     children: [
                       Expanded(
-                        child: TextButton.icon(
-                          icon: Icon(Icons.calendar_today),
-                          label: Text(_startDate == null
-                              ? '开始日期'
-                              : DateFormat('yyyy-MM-dd').format(_startDate!)),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            labelText: '最小金额',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                            suffixIcon: _minAmount != null
+                                ? IconButton(
+                                    icon: Icon(Icons.clear),
+                                    onPressed: () {
+                                      setState(() => _minAmount = null);
+                                      _loadAccountItems();
+                                    },
+                                  )
+                                : null,
+                          ),
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            setState(() => _minAmount = double.tryParse(value));
+                            _loadAccountItems();
+                          },
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            labelText: '最大金额',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                            suffixIcon: _maxAmount != null
+                                ? IconButton(
+                                    icon: Icon(Icons.clear),
+                                    onPressed: () {
+                                      setState(() => _maxAmount = null);
+                                      _loadAccountItems();
+                                    },
+                                  )
+                                : null,
+                          ),
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            setState(() => _maxAmount = double.tryParse(value));
+                            _loadAccountItems();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  
+                  // 日期范围
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          icon: Icon(Icons.calendar_today, size: 16),
+                          label: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  _startDate == null ? '开始日期' : DateFormat('MM-dd').format(_startDate!),
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                              ),
+                              if (_startDate != null)
+                                IconButton(
+                                  icon: Icon(Icons.clear, size: 16),
+                                  onPressed: () {
+                                    setState(() => _startDate = null);
+                                    _loadAccountItems();
+                                  },
+                                ),
+                            ],
+                          ),
                           onPressed: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: _startDate ?? DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2100),
-                            );
+                            final date = await _selectDate(context);
                             if (date != null) {
-                              setState(() {
-                                _startDate = date;
-                              });
+                              setState(() => _startDate = date);
                               _loadAccountItems();
                             }
                           },
@@ -207,22 +350,33 @@ class _AccountItemListState extends State<AccountItemList> {
                       ),
                       SizedBox(width: 8),
                       Expanded(
-                        child: TextButton.icon(
-                          icon: Icon(Icons.calendar_today),
-                          label: Text(_endDate == null
-                              ? '结束日期'
-                              : DateFormat('yyyy-MM-dd').format(_endDate!)),
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          icon: Icon(Icons.calendar_today, size: 16),
+                          label: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  _endDate == null ? '结束日期' : DateFormat('MM-dd').format(_endDate!),
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                              ),
+                              if (_endDate != null)
+                                IconButton(
+                                  icon: Icon(Icons.clear, size: 16),
+                                  onPressed: () {
+                                    setState(() => _endDate = null);
+                                    _loadAccountItems();
+                                  },
+                                ),
+                            ],
+                          ),
                           onPressed: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: _endDate ?? DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2100),
-                            );
+                            final date = await _selectDate(context);
                             if (date != null) {
-                              setState(() {
-                                _endDate = date;
-                              });
+                              setState(() => _endDate = date);
                               _loadAccountItems();
                             }
                           },
@@ -248,16 +402,21 @@ class _AccountItemListState extends State<AccountItemList> {
           appBar: AppBar(
             title: Row(
               children: [
-                Text('账目列表'),
-                SizedBox(width: 16),
                 Expanded(
                   child: DropdownButton<Map<String, dynamic>>(
                     value: _selectedBook,
                     isExpanded: true,
+                    icon: Icon(Icons.arrow_drop_down),
                     items: _accountBooks.map((book) {
                       return DropdownMenuItem(
                         value: book,
-                        child: Text(book['name']),
+                        child: Row(
+                          children: [
+                            Icon(Icons.book, size: 20),
+                            SizedBox(width: 8),
+                            Text(book['name']),
+                          ],
+                        ),
                       );
                     }).toList(),
                     onChanged: _onBookChanged,
@@ -287,172 +446,216 @@ class _AccountItemListState extends State<AccountItemList> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _loadAccountItems,
-                  child: ListView.builder(
-                    itemCount: _accountItems.length,
-                    itemBuilder: (context, index) {
-                      final item = _accountItems[index];
-                      final isExpense = item['type'] == 'EXPENSE';
-                      final currencySymbol = _selectedBook?['currencySymbol'] ?? '¥';
+                  child: Builder(
+                    builder: (context) {
+                      final groupedItems = _groupItemsByDate();
+                      final dates = groupedItems.keys.toList()..sort((a, b) => b.compareTo(a));
+                      
+                      if (dates.isEmpty) {
+                        return Center(
+                          child: Text('暂无数据'),
+                        );
+                      }
 
-                      return Dismissible(
-                        key: Key(item['id'].toString()),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: EdgeInsets.only(right: 20.0),
-                          color: Colors.red,
-                          child: Icon(
-                            Icons.delete_outline,
-                            color: Colors.white,
-                          ),
-                        ),
-                        confirmDismiss: (direction) async {
-                          return await showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('确认删除'),
-                                content: Text('确定要删除这条账目记录吗？'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () => Navigator.of(context).pop(false),
-                                    child: Text('取消'),
+                      return ListView.builder(
+                        itemCount: dates.length,
+                        itemBuilder: (context, dateIndex) {
+                          final date = dates[dateIndex];
+                          final items = groupedItems[date]!;
+                          
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 日期头部
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                                child: Text(
+                                  date,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey[700],
                                   ),
-                                  TextButton(
-                                    onPressed: () => Navigator.of(context).pop(true),
-                                    child: Text(
-                                      '删除',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        onDismissed: (direction) async {
-                          try {
-                            await ApiService.deleteAccountItem(item['id']);
-                            
-                            setState(() {
-                              _accountItems.removeAt(index);
-                            });
-                            
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('删除成功'),
-                                duration: Duration(seconds: 2),
+                                ),
                               ),
-                            );
-                            
-                            _loadAccountItems();
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('删除失败: $e'),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                            _loadAccountItems();
-                          }
-                        },
-                        child: Card(
-                          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          elevation: 0,
-                          child: InkWell(
-                            onTap: () => _navigateToEdit(item),
-                            child: Container(
-                              padding: EdgeInsets.all(16),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: isExpense 
-                                          ? themeColor.withOpacity(0.08) 
-                                          : themeColor.withOpacity(0.08),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                              // 当天的账目列表
+                              ...items.map((item) {
+                                final isExpense = item['type'] == 'EXPENSE';
+                                final currencySymbol = _selectedBook?['currencySymbol'] ?? '¥';
+                                
+                                return Dismissible(
+                                  key: Key(item['id'].toString()),
+                                  direction: DismissDirection.endToStart,
+                                  background: Container(
+                                    alignment: Alignment.centerRight,
+                                    padding: EdgeInsets.only(right: 20.0),
+                                    color: Colors.red,
                                     child: Icon(
-                                      isExpense 
-                                          ? Icons.arrow_circle_down_outlined 
-                                          : Icons.arrow_circle_up_outlined,
-                                      color: isExpense
-                                          ? Colors.red[700] 
-                                          : Colors.green[700],
-                                      size: 24,
+                                      Icons.delete_outline,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(width: 16),
-                                  
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
+                                  confirmDismiss: (direction) async {
+                                    return await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('确认删除'),
+                                          content: Text('确定要删除这条账目记录吗？'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () => Navigator.of(context).pop(false),
+                                              child: Text('取消'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () => Navigator.of(context).pop(true),
                                               child: Text(
-                                                '$currencySymbol${item['amount'].toString()}',
-                                                style: TextStyle(
-                                                  color: isExpense 
-                                                      ? Colors.red[700] 
-                                                      : Colors.green[700],
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 16,
+                                                '删除',
+                                                style: TextStyle(color: Colors.red),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  onDismissed: (direction) async {
+                                    try {
+                                      await ApiService.deleteAccountItem(item['id']);
+                                      
+                                      setState(() {
+                                        _accountItems.removeWhere((element) => element['id'] == item['id']);
+                                      });
+                                      
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('删除成功'),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                      
+                                      _loadAccountItems();
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('删除失败: $e'),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                      _loadAccountItems();
+                                    }
+                                  },
+                                  child: Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    elevation: 0,
+                                    child: InkWell(
+                                      onTap: () => _navigateToEdit(item),
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                        height: 88,
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: themeColor.withOpacity(0.08),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  isExpense ? '支' : '收',
+                                                  style: TextStyle(
+                                                    color: isExpense ? Colors.red[700] : Colors.green[700],
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 4,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: themeColor.withOpacity(0.08),
-                                                borderRadius: BorderRadius.circular(16),
-                                              ),
-                                              child: Text(
-                                                item['category'],
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: themeColor,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                            SizedBox(width: 12),
+                                            
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          '$currencySymbol${item['amount'].toString()}',
+                                                          style: TextStyle(
+                                                            color: isExpense ? Colors.red[700] : Colors.green[700],
+                                                            fontWeight: FontWeight.w600,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        padding: EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 2,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: themeColor.withOpacity(0.08),
+                                                          borderRadius: BorderRadius.circular(12),
+                                                        ),
+                                                        child: Text(
+                                                          item['category'],
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: themeColor,
+                                                            fontWeight: FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          item['description']?.isNotEmpty == true 
+                                                              ? item['description']
+                                                              : '无备注',
+                                                          style: TextStyle(
+                                                            color: item['description']?.isNotEmpty == true 
+                                                                ? Colors.grey[600]
+                                                                : Colors.grey[400],
+                                                            fontSize: 13,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        DateFormat('HH:mm').format(
+                                                          DateTime.parse(item['accountDate'])
+                                                        ),
+                                                        style: TextStyle(
+                                                          color: Colors.grey[500],
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ],
                                         ),
-                                        if (item['description']?.isNotEmpty) ...[
-                                          SizedBox(height: 4),
-                                          Text(
-                                            item['description'],
-                                            style: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontSize: 14,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                        SizedBox(height: 4),
-                                        Text(
-                                          _formatDateTime(item['accountDate']),
-                                          style: TextStyle(
-                                            color: Colors.grey[500],
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                                );
+                              }).toList(),
+                            ],
+                          );
+                        },
                       );
                     },
                   ),
@@ -515,5 +718,61 @@ class _AccountItemListState extends State<AccountItemList> {
     });
     _loadCategories();
     _loadAccountItems();
+  }
+
+  Map<String, List<Map<String, dynamic>>> _groupItemsByDate() {
+    final groupedItems = <String, List<Map<String, dynamic>>>{};
+    
+    for (var item in _accountItems) {
+      final date = DateTime.parse(item['accountDate']);
+      final dateStr = DateFormat('yyyy-MM-dd').format(date);
+      
+      if (!groupedItems.containsKey(dateStr)) {
+        groupedItems[dateStr] = [];
+      }
+      groupedItems[dateStr]!.add(item);
+    }
+    
+    return groupedItems;
+  }
+
+  Future<DateTime?> _selectDate(BuildContext context) async {
+    if (!mounted) return null;
+
+    try {
+      final DateTime? picked = await showDialog<DateTime>(
+        context: context,
+        builder: (BuildContext context) {
+          return Theme(
+            data: Theme.of(context),
+            child: Builder(
+              builder: (BuildContext context) {
+                return Localizations(
+                  locale: const Locale('zh', 'CN'),
+                  delegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  child: DatePickerDialog(
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      );
+
+      return picked;
+    } catch (e) {
+      if (!mounted) return null;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('选择日期时出错，请重试')),
+      );
+      return null;
+    }
   }
 }
