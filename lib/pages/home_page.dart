@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'account_item_list.dart';
 import 'settings_page.dart';
-import 'account_item_info.dart';
 
 class HomePage extends StatefulWidget {
   final Map<String, dynamic> userInfo;
@@ -56,19 +55,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      floatingActionButton: _currentIndex == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AccountItemForm(),
-                  ),
-                );
-              },
-              child: Icon(Icons.add),
-            )
-          : null,
     );
   }
-} 
+}

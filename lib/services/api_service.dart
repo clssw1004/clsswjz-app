@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiService {
-  static const String _baseUrl = 'http://192.168.2.147:3000';
+  static const String _baseUrl = 'http://192.168.2.199:3000';
   static String? _token;
 
   static void setToken(String token) {
@@ -33,12 +33,12 @@ class ApiService {
     final uri = Uri.parse('$_baseUrl/api/account/category').replace(
       queryParameters: {'accountBookId': accountBookId},
     );
-    
+
     final response = await http.get(
       uri,
       headers: _getHeaders(),
     );
-    
+
     if (_isSuccessStatusCode(response.statusCode)) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((category) => category['name'].toString()).toList();
@@ -47,10 +47,11 @@ class ApiService {
     }
   }
 
-  static Future<void> saveAccountItem(Map<String, dynamic> data, {String? id}) async {
+  static Future<void> saveAccountItem(Map<String, dynamic> data,
+      {String? id}) async {
     final Uri uri;
     final http.Response response;
-    
+
     if (id != null) {
       uri = Uri.parse('$_baseUrl/api/account/item/$id');
       response = await http.patch(
@@ -80,7 +81,7 @@ class ApiService {
     DateTime? endDate,
   }) async {
     final queryParams = <String, String>{};
-    
+
     if (accountBookId != null) queryParams['accountBookId'] = accountBookId;
     if (category != null) queryParams['category'] = category;
     if (type != null) queryParams['type'] = type;
@@ -99,7 +100,7 @@ class ApiService {
       uri,
       headers: _getHeaders(),
     );
-    
+
     if (_isSuccessStatusCode(response.statusCode)) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((item) => Map<String, dynamic>.from(item)).toList();
@@ -113,7 +114,7 @@ class ApiService {
       Uri.parse('$_baseUrl/api/account/book'),
       headers: _getHeaders(),
     );
-    
+
     if (_isSuccessStatusCode(response.statusCode)) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((book) => Map<String, dynamic>.from(book)).toList();
@@ -122,7 +123,8 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String username, String password) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/api/auth/login'),
       headers: {'Content-Type': 'application/json'},
@@ -189,4 +191,16 @@ class ApiService {
       throw Exception('Registration failed');
     }
   }
-} 
+
+  static Future<void> deleteAccountItem(String id) async {
+    final url = Uri.parse('$_baseUrl/api/account/item/$id');
+    final response = await http.delete(
+      url,
+      headers: await _getHeaders(),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete account item');
+    }
+  }
+}
