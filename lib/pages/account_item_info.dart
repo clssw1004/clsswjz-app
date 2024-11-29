@@ -281,6 +281,243 @@ class _AccountItemFormState extends State<AccountItemForm> {
     }
   }
 
+  // 类型选择组件
+  Widget _buildTypeSelector() {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () => setState(() => _transactionType = '支出'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _transactionType == '支出' 
+                  ? Colors.red[400] 
+                  : Colors.grey[100],
+              foregroundColor: _transactionType == '支出' 
+                  ? Colors.white 
+                  : Colors.grey[600],
+              elevation: _transactionType == '支出' ? 2 : 0,
+              padding: EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              '支出',
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () => setState(() => _transactionType = '收入'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _transactionType == '收入' 
+                  ? Colors.green[400] 
+                  : Colors.grey[100],
+              foregroundColor: _transactionType == '收入' 
+                  ? Colors.white 
+                  : Colors.grey[600],
+              elevation: _transactionType == '收入' ? 2 : 0,
+              padding: EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              '收入',
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 金额输入组件
+  Widget _buildAmountInput() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            _selectedBook?['currencySymbol'] ?? '¥',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[800],
+            ),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: TextFormField(
+              controller: _amountController,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: '0.00',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) return '请输入金额';
+                return null;
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 分类选择组件
+  Widget _buildCategorySelector() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final padding = 16.0;
+    final spacing = 8.0;
+    final itemsPerRow = 4;
+    final itemWidth = (screenWidth - (padding * 2) - (spacing * (itemsPerRow - 1))) / itemsPerRow;
+    
+    // 计算最大显示按钮数（不包括"全部"按钮）
+    final maxButtons = itemsPerRow * 3;
+    final showAllButton = _categories.length > maxButtons;
+    final displayCategories = showAllButton 
+        ? _categories.take(maxButtons - 1).toList()
+        : _categories;
+
+    List<Widget> categoryButtons = displayCategories.map((category) {
+      return SizedBox(
+        width: itemWidth,
+        child: Padding(
+          padding: EdgeInsets.all(4),
+          child: ElevatedButton(
+            onPressed: () => setState(() => _selectedCategory = category),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _selectedCategory == category 
+                  ? Theme.of(context).primaryColor 
+                  : Colors.grey[100],
+              foregroundColor: _selectedCategory == category 
+                  ? Colors.white 
+                  : Colors.grey[700],
+              elevation: _selectedCategory == category ? 2 : 0,
+              padding: EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              category,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+      );
+    }).toList();
+
+    // 添加"全部"按钮
+    if (showAllButton) {
+      categoryButtons.add(
+        SizedBox(
+          width: itemWidth,
+          child: Padding(
+            padding: EdgeInsets.all(4),
+            child: ElevatedButton(
+              onPressed: _showCategoryDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[100],
+                foregroundColor: Colors.grey[700],
+                elevation: 0,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                '全部',
+                style: TextStyle(fontSize: 14),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: spacing,
+      runSpacing: spacing,
+      alignment: WrapAlignment.start,
+      children: categoryButtons,
+    );
+  }
+
+  // 分类选择弹窗
+  void _showCategoryDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final searchController = TextEditingController();
+        List<String> filteredCategories = _categories;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('分类'),
+              content: Container(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        hintText: '搜索分类',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          filteredCategories = _categories.where((category) =>
+                            category.toLowerCase().contains(value.toLowerCase())
+                          ).toList();
+                        });
+                      },
+                    ),
+                    SizedBox(height: 8),
+                    Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: filteredCategories.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(filteredCategories[index]),
+                            onTap: () {
+                              setState(() {
+                                _selectedCategory = filteredCategories[index];
+                              });
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currencySymbol = _selectedBook?['currencySymbol'] ?? '¥';
@@ -322,144 +559,18 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
                 SizedBox(height: 16), // 缩小间距
 
-                // 金额输入
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '金额',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    TextFormField(
-                      controller: _amountController,
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
-                      style: TextStyle(fontSize: 24),
-                      decoration: InputDecoration(
-                        prefixText: currencySymbol,
-                        prefixStyle: TextStyle(fontSize: 24),
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return '请输入金额';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
+                // 类型选择
+                _buildTypeSelector(),
 
                 SizedBox(height: 16), // 缩小间距
 
-                // 类型选择
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '类型',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile(
-                            title: Text('支出'),
-                            value: '支出',
-                            groupValue: _transactionType,
-                            onChanged: (value) {
-                              setState(() {
-                                _transactionType = value.toString();
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile(
-                            title: Text('收入'),
-                            value: '收入',
-                            groupValue: _transactionType,
-                            onChanged: (value) {
-                              setState(() {
-                                _transactionType = value.toString();
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                // 金额输入
+                _buildAmountInput(),
 
                 SizedBox(height: 16), // 缩小间距
 
                 // 分类选择
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '分类',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Autocomplete<String>(
-                      initialValue:
-                          TextEditingValue(text: _selectedCategory ?? ''),
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        if (textEditingValue.text.isEmpty) {
-                          return _categories;
-                        }
-                        return _categories.where((category) => category
-                            .toLowerCase()
-                            .contains(textEditingValue.text.toLowerCase()));
-                      },
-                      onSelected: (String selection) {
-                        setState(() {
-                          _selectedCategory = selection;
-                        });
-                      },
-                      fieldViewBuilder: (context, textEditingController,
-                          focusNode, onFieldSubmitted) {
-
-                        return TextFormField(
-                          controller: textEditingController,
-                          focusNode: focusNode,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: '选择或输入分类',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return '请选择或输入分类';
-                            }
-                            setState(() {
-                              _selectedCategory = value;
-                            });
-                            return null;
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                _buildCategorySelector(),
 
                 SizedBox(height: 16), // 缩小间距
 

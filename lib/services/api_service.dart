@@ -67,6 +67,7 @@ class ApiService {
         body: json.encode(data),
       );
     }
+    print(data);
 
     if (!_isSuccessStatusCode(response.statusCode)) {
       throw Exception('Failed to save transaction');
