@@ -39,18 +39,22 @@ class _AccountItemFormState extends State<AccountItemForm> {
   // 添加一个变量来存储显示在前三行的分类
   List<String> _displayCategories = [];
 
+  // 添加新的状态变量
+  Map<String, dynamic>? _selectedFund;
+  List<Map<String, dynamic>> _fundList = [];
+
   @override
   void initState() {
     super.initState();
     _loadAccountBooks().then((_) {
       if (widget.initialBook != null) {
-        // 如果有初始账本，直接使用
         setState(() {
           _selectedBook = widget.initialBook;
         });
       }
-      _initializeData(); // 在加载完账本后初始化数据
-      _loadCategories(); // 在初始化数据后加载分类
+      _initializeData();
+      _loadCategories();
+      _loadFundList(); // 添加加载账户列表
     });
   }
 
@@ -262,21 +266,160 @@ class _AccountItemFormState extends State<AccountItemForm> {
     );
   }
 
-  Future<void> _saveTransaction(Map<String, dynamic> data) async {
+  // 添加加载账户列表方法
+  Future<void> _loadFundList() async {
+    if (_selectedBook == null) return;
     try {
-      // 添加账本ID到请求数据中
-      data['accountBookId'] = _selectedBook!['id'];
+      final funds = await ApiService.fetchFundList(_selectedBook!['id']);
+      setState(() {
+        _fundList = funds;
+        // 如果是编辑模式，设置初始选中的账户
+        if (widget.initialData != null && widget.initialData!['fundId'] != null) {
+          _selectedFund = funds.firstWhere(
+            (fund) => fund['id'] == widget.initialData!['fundId'],
+            orElse: () => Map<String, dynamic>.from({}), // 修复返回值类型
+          );
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('加载账户列表失败: $e')),
+      );
+    }
+  }
 
-      // 等待保存操作完成
+  // 添加账户选择弹窗
+  void _showFundSelector(BuildContext context, Color themeColor) {
+    // 根据当前类型筛选可用账户
+    final isExpense = _transactionType == '支出';
+    final availableFunds = _fundList.where((fund) =>
+        isExpense ? fund['fundOut'] == true : fund['fundIn'] == true).toList();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('选择账户'),
+          content: Container(
+            width: double.maxFinite,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.6,
+            ),
+            child: availableFunds.isEmpty
+                ? Center(
+                    child: Text(
+                      '没有可用的${isExpense ? '支出' : '收入'}账户',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: availableFunds.length,
+                    itemBuilder: (context, index) {
+                      final fund = availableFunds[index];
+                      final isSelected = _selectedFund?['id'] == fund['id'];
+                      return ListTile(
+                        title: Text(
+                          fund['fundName'],
+                          style: TextStyle(
+                            color: isSelected ? themeColor : Colors.grey[800],
+                            fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                          ),
+                        ),
+                        selected: isSelected,
+                        selectedTileColor: themeColor.withOpacity(0.12),
+                        onTap: () {
+                          setState(() {
+                            _selectedFund = fund;
+                          });
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+          ),
+        );
+      },
+    );
+  }
+
+  // 添加账户选择组件
+  Widget _buildFundSelector() {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        final themeColor = themeProvider.themeColor;
+        return Container(
+          margin: EdgeInsets.only(bottom: 16),
+          child: OutlinedButton(
+            onPressed: () => _showFundSelector(context, themeColor),
+            style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              side: BorderSide(color: Colors.grey[300]!),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.account_balance_wallet,
+                  size: 20,
+                  color: _selectedFund != null ? themeColor : Colors.grey[600],
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _selectedFund?['fundName'] as String? ?? '选择账户',
+                    style: TextStyle(
+                      color: _selectedFund != null ? Colors.grey[800] : Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.grey[600],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // 修改保存方法，添加 accountBookId
+  Future<void> _saveTransaction(Map<String, dynamic> data) async {
+    if (_selectedFund == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('请选择账户')),
+      );
+      return;
+    }
+
+    if (_selectedBook == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('请选择账本')),
+      );
+      return;
+    }
+
+    // 添加 fundId 和 accountBookId 到保存数据中
+    data['fundId'] = _selectedFund!['id'];
+    data['accountBookId'] = _selectedBook!['id'];
+
+    try {
       await ApiService.saveAccountItem(
         data,
         id: _recordId,
       );
-
-      // 返回上一页，并传递刷新标记
+      if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {
-      // 显示错误提示
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${_recordId == null ? '保存' : '更新'}失败: $e')),
       );
@@ -341,12 +484,21 @@ class _AccountItemFormState extends State<AccountItemForm> {
   // 添加保存并继续的方法
   Future<void> _saveAndContinue() async {
     if (_formKey.currentState!.validate()) {
+      if (_selectedFund == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('请选择账户')),
+        );
+        return;
+      }
+
       final data = {
         'amount': double.parse(_amountController.text),
         'description': _descriptionController.text,
         'type': _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
         'category': _selectedCategory,
         'accountDate': _formattedDateTime,
+        'fundId': _selectedFund!['id'],  // 添加 fundId
       };
 
       try {
@@ -354,6 +506,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
         await ApiService.saveAccountItem(data);
 
         // 显示成功提示
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('保存成功，请继续记录'),
@@ -497,7 +650,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
     );
   }
 
-  // 分类选择组件
   Widget _buildCategorySelector() {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
@@ -811,18 +963,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
                   // 日期时间选择 - 移到分类选择后面
                   _buildDateTimeSelectors(themeColor),
                   SizedBox(height: 16),
-                  // 描述信息
+                  // 在描述组件之前添加账户选择器
+                  _buildFundSelector(),
+                  // 描述组件
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '描述',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
+                      Text('描述'),
                       SizedBox(height: 8),
                       TextFormField(
                         controller: _descriptionController,

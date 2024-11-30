@@ -217,4 +217,21 @@ class ApiService {
     final baseUrl = await getApiHost();
     return '$baseUrl$endpoint';
   }
+
+  static Future<List<Map<String, dynamic>>> fetchFundList(String accountBookId) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/api/account/fund/listByAccountBookId'),
+      headers: _getHeaders(needsContentType: true),
+      body: json.encode({
+        'accountBookId': accountBookId,
+      }),
+    );
+
+    if (_isSuccessStatusCode(response.statusCode)) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((fund) => Map<String, dynamic>.from(fund)).toList();
+    } else {
+      throw Exception('Failed to load fund list');
+    }
+  }
 }
