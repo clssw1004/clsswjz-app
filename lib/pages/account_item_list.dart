@@ -5,30 +5,80 @@ import '../services/api_service.dart';
 import '../pages/account_item_info.dart';
 import '../services/data_service.dart';
 import '../theme/theme_provider.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
-  _AccountItemListState createState() => _AccountItemListState();
+  AccountItemListState createState() => AccountItemListState();
 }
 
-class _AccountItemListState extends State<AccountItemList> {
+class AccountItemListState extends State<AccountItemList> {
   final _dataService = DataService();
   List<Map<String, dynamic>> _accountItems = [];
   List<Map<String, dynamic>> _accountBooks = [];
   List<String> _categories = [];
   Map<String, dynamic>? _selectedBook;
-  String? _selectedCategory;
   String? _selectedType;
   DateTime? _startDate;
   DateTime? _endDate;
   bool _isLoading = true;
   bool _isFilterExpanded = false;
-  bool _isCategoryLoading = false;
-  Key _dropdownKey = GlobalKey();
   List<String> _selectedCategories = [];
   double? _minAmount;
   double? _maxAmount;
+
+  // 筛选组件样式常量
+  static const double _filterButtonWidth = 120.0;
+  static const double _filterButtonHeight = 40.0;
+  static const double _filterButtonRadius = 8.0;
+  static const double _filterIconSize = 18.0;
+  static const double _filterFontSize = 13.0;
+  static const EdgeInsets _filterButtonPadding = EdgeInsets.symmetric(horizontal: 12, vertical: 0);
+  
+  // 获取统一的按钮样式
+  ButtonStyle _getFilterButtonStyle(Color themeColor, bool isSelected) {
+    return OutlinedButton.styleFrom(
+      padding: _filterButtonPadding,
+      foregroundColor: isSelected ? themeColor : Colors.grey[700],
+      side: BorderSide(
+        color: isSelected ? themeColor : Colors.grey[300]!,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_filterButtonRadius),
+      ),
+      minimumSize: Size(0, _filterButtonHeight),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    );
+  }
+
+  // 获取统一的文字样式
+  TextStyle _getFilterTextStyle() {
+    return TextStyle(
+      fontSize: _filterFontSize,
+      color: Colors.grey[700],
+    );
+  }
+
+  // 封装筛选按钮组件
+  Widget _buildFilterButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    bool isSelected = false,
+    required Color themeColor,
+  }) {
+    return SizedBox(
+      width: _filterButtonWidth,
+      child: OutlinedButton.icon(
+        style: _getFilterButtonStyle(themeColor, isSelected),
+        icon: Icon(icon, size: _filterIconSize),
+        label: Text(
+          label,
+          style: _getFilterTextStyle(),
+        ),
+        onPressed: onPressed,
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -62,7 +112,6 @@ class _AccountItemListState extends State<AccountItemList> {
   Future<void> _loadCategories() async {
     if (_selectedBook == null || !mounted) return;
 
-    setState(() => _isCategoryLoading = true);
 
     try {
       final categories = await _dataService.fetchCategories(
@@ -71,12 +120,10 @@ class _AccountItemListState extends State<AccountItemList> {
       );
       if (!mounted) return;
       setState(() {
-        _isCategoryLoading = false;
         _categories = categories;
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _isCategoryLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('获取分类失败: $e')),
       );
@@ -110,34 +157,12 @@ class _AccountItemListState extends State<AccountItemList> {
     }
   }
 
+  // 在筛选区域使用封装的组件
   Widget _buildFilterSection() {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
         final themeColor = themeProvider.themeColor;
-
-        // 定义统一的样式常量
-        const double componentHeight = 40.0;
-        const double borderRadius = 8.0;
-        const double fontSize = 13.0;
-        const double iconSize = 18.0;
-        const EdgeInsets contentPadding = EdgeInsets.symmetric(horizontal: 12);
-        final borderSide = BorderSide(color: Colors.grey[300]!);
-        final defaultTextStyle = TextStyle(
-          fontSize: fontSize,
-          color: Colors.grey[700],
-        );
-        final selectedTextStyle = TextStyle(
-          fontSize: fontSize,
-          color: themeColor,
-          fontWeight: FontWeight.w500,
-        );
-
-        // 统一的边框样式
-        final borderStyle = RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-          side: borderSide,
-        );
-
+        
         return AnimatedContainer(
           duration: Duration(milliseconds: 300),
           height: _isFilterExpanded ? 216 : 0,
@@ -194,205 +219,23 @@ class _AccountItemListState extends State<AccountItemList> {
                   ),
                   SizedBox(height: 8),
                   
-                  // 类型和分类选择按钮
+                  // 类型和分类选择
                   Row(
                     children: [
-                      // 类型选择按钮
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                          foregroundColor: _selectedType != null ? themeColor : Colors.grey[700],
-                          side: BorderSide(
-                            color: _selectedType != null ? themeColor : Colors.grey[300]!,
-                          ),
-                          shape: borderStyle,
-                          minimumSize: Size(0, componentHeight),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        icon: Icon(Icons.account_balance_wallet_outlined, size: iconSize),
-                        label: Text(
-                          _getTypeText(),
-                          style: defaultTextStyle,
-                        ),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Consumer<ThemeProvider>(
-                                builder: (context, themeProvider, _) {
-                                  final themeColor = themeProvider.themeColor;
-                                  return AlertDialog(
-                                    titlePadding:
-                                        EdgeInsets.fromLTRB(24, 16, 24, 0),
-                                    contentPadding:
-                                        EdgeInsets.fromLTRB(20, 12, 20, 0),
-                                    title: Text(
-                                      '选择类型',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    content: Container(
-                                      width: double.maxFinite,
-                                      child: Wrap(
-                                        spacing: 6,
-                                        runSpacing: 6,
-                                        children: [
-                                          _buildTypeOption('', '全部', themeColor),
-                                          _buildTypeOption(
-                                              'EXPENSE', '支出', themeColor),
-                                          _buildTypeOption(
-                                              'INCOME', '收入', themeColor),
-                                        ],
-                                      ),
-                                    ),
-                                    actions: [
-                    
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
+                      _buildFilterButton(
+                        icon: Icons.account_balance_wallet_outlined,
+                        label: _getTypeText(),
+                        onPressed: () => _showTypeSelector(context),
+                        isSelected: _selectedType != null,
+                        themeColor: themeColor,
                       ),
                       SizedBox(width: 8),
-                      // 分类选择按钮
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                          foregroundColor: _selectedCategories.isEmpty ? Colors.grey[700] : themeColor,
-                          side: BorderSide(
-                            color: _selectedCategories.isEmpty ? Colors.grey[300]! : themeColor,
-                          ),
-                          shape: borderStyle,
-                          minimumSize: Size(0, componentHeight),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        icon: Icon(Icons.category_outlined, size: iconSize),
-                        label: Text(
-                          _selectedCategories.isEmpty 
-                              ? '选择分类' 
-                              : '已选${_selectedCategories.length}个',
-                          style: defaultTextStyle,
-                        ),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Consumer<ThemeProvider>(
-                                builder: (context, themeProvider, _) {
-                                  final themeColor = themeProvider.themeColor;
-                                  return AlertDialog(
-                                    titlePadding:
-                                        EdgeInsets.fromLTRB(24, 20, 16, 0),
-                                    contentPadding:
-                                        EdgeInsets.fromLTRB(20, 12, 20, 0),
-                                    title: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          '选择分类',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    content: Container(
-                                      width: double.maxFinite,
-                                      constraints: BoxConstraints(
-                                        maxHeight: MediaQuery.of(context).size.height * 0.4,
-                                      ),
-                                      child: SingleChildScrollView(
-                                        child: Wrap(
-                                          spacing: 8,
-                                          runSpacing: 8,
-                                          alignment: WrapAlignment.start,
-                                          children: _categories.map((category) =>
-                                            StatefulBuilder(
-                                              builder: (context, setStateDialog) {
-                                                final isSelected = _selectedCategories.contains(category);
-                                                return IntrinsicWidth(
-                                                  child: Material(
-                                                    color: isSelected ? themeColor : Colors.grey[200],
-                                                    borderRadius: BorderRadius.circular(16),
-                                                    child: InkWell(
-                                                      borderRadius: BorderRadius.circular(16),
-                                                      onTap: () {
-                                                        setStateDialog(() {
-                                                          if (isSelected) {
-                                                            _selectedCategories.remove(category);
-                                                          } else {
-                                                            _selectedCategories.add(category);
-                                                          }
-                                                        });
-                                                        setState(() {});
-                                                        _loadAccountItems();
-                                                      },
-                                                      child: Container(
-                                                        padding: EdgeInsets.symmetric(
-                                                          horizontal: 12,
-                                                          vertical: 6,
-                                                        ),
-                                                        child: Text(
-                                                          category,
-                                                          style: TextStyle(
-                                                            color: isSelected ? Colors.white : Colors.black87,
-                                                            fontSize: 13,
-                                                            fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ).toList(),
-                                        ),
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _selectedCategories.clear();
-                                          });
-                                          _loadAccountItems();
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text(
-                                          '清除选择',
-                                          style: TextStyle(
-                                            color: Colors.black54,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: Text(
-                                          '关闭',
-                                          style: TextStyle(
-                                            color: themeColor,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
+                      _buildFilterButton(
+                        icon: Icons.category_outlined,
+                        label: _selectedCategories.isEmpty ? '选择分类' : '已选${_selectedCategories.length}个',
+                        onPressed: () => _showCategorySelector(context),
+                        isSelected: _selectedCategories.isNotEmpty,
+                        themeColor: themeColor,
                       ),
                     ],
                   ),
@@ -401,72 +244,20 @@ class _AccountItemListState extends State<AccountItemList> {
                   // 金额范围
                   Row(
                     children: [
-                      SizedBox(
-                        height: componentHeight,
-                        child: IntrinsicWidth(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              labelText: '最小金额',
-                              labelStyle: defaultTextStyle,
-                              prefixIcon: Icon(
-                                Icons.currency_yen,
-                                size: iconSize,
-                                color: Colors.grey[600],
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(borderRadius),
-                                borderSide: borderSide,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(borderRadius),
-                                borderSide: borderSide,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(borderRadius),
-                                borderSide: BorderSide(color: themeColor),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                              constraints: BoxConstraints(maxWidth: 140),
-                              isDense: true,
-                            ),
-                            style: defaultTextStyle,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
+                      _buildFilterButton(
+                        icon: Icons.currency_yen,
+                        label: _minAmount?.toString() ?? '最小金额',
+                        onPressed: () => _showAmountInput(context, true),
+                        isSelected: _minAmount != null,
+                        themeColor: themeColor,
                       ),
                       SizedBox(width: 8),
-                      SizedBox(
-                        height: componentHeight,
-                        child: IntrinsicWidth(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              labelText: '最大金额',
-                              labelStyle: defaultTextStyle,
-                              prefixIcon: Icon(
-                                Icons.currency_yen,
-                                size: iconSize,
-                                color: Colors.grey[600],
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(borderRadius),
-                                borderSide: borderSide,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(borderRadius),
-                                borderSide: borderSide,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(borderRadius),
-                                borderSide: BorderSide(color: themeColor),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                              constraints: BoxConstraints(maxWidth: 140),
-                              isDense: true,
-                            ),
-                            style: defaultTextStyle,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
+                      _buildFilterButton(
+                        icon: Icons.currency_yen,
+                        label: _maxAmount?.toString() ?? '最大金额',
+                        onPressed: () => _showAmountInput(context, false),
+                        isSelected: _maxAmount != null,
+                        themeColor: themeColor,
                       ),
                     ],
                   ),
@@ -475,20 +266,9 @@ class _AccountItemListState extends State<AccountItemList> {
                   // 日期范围
                   Row(
                     children: [
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                          foregroundColor: Colors.grey[700],
-                          side: borderSide,
-                          shape: borderStyle,
-                          minimumSize: Size(0, componentHeight),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        icon: Icon(Icons.calendar_today, size: iconSize),
-                        label: Text(
-                          _startDate == null ? '开始日期' : DateFormat('MM-dd').format(_startDate!),
-                          style: defaultTextStyle,
-                        ),
+                      _buildFilterButton(
+                        icon: Icons.calendar_today,
+                        label: _startDate == null ? '开始日期' : DateFormat('yyyy-MM-dd').format(_startDate!),
                         onPressed: () async {
                           final date = await _selectDate(context);
                           if (date != null) {
@@ -496,22 +276,13 @@ class _AccountItemListState extends State<AccountItemList> {
                             _loadAccountItems();
                           }
                         },
+                        isSelected: _startDate != null,
+                        themeColor: themeColor,
                       ),
                       SizedBox(width: 8),
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                          foregroundColor: Colors.grey[700],
-                          side: borderSide,
-                          shape: borderStyle,
-                          minimumSize: Size(0, componentHeight),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        icon: Icon(Icons.calendar_today, size: iconSize),
-                        label: Text(
-                          _endDate == null ? '结束日期' : DateFormat('MM-dd').format(_endDate!),
-                          style: defaultTextStyle,
-                        ),
+                      _buildFilterButton(
+                        icon: Icons.calendar_today,
+                        label: _endDate == null ? '结束日期' : DateFormat('yyyy-MM-dd').format(_endDate!),
                         onPressed: () async {
                           final date = await _selectDate(context);
                           if (date != null) {
@@ -519,6 +290,8 @@ class _AccountItemListState extends State<AccountItemList> {
                             _loadAccountItems();
                           }
                         },
+                        isSelected: _endDate != null,
+                        themeColor: themeColor,
                       ),
                     ],
                   ),
@@ -855,11 +628,6 @@ class _AccountItemListState extends State<AccountItemList> {
     );
   }
 
-  String _formatDateTime(String dateTimeStr) {
-    final dateTime = DateTime.parse(dateTimeStr);
-    return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
-  }
-
   void _navigateToEdit(Map<String, dynamic> item) async {
     final result = await Navigator.push(
       context,
@@ -893,9 +661,7 @@ class _AccountItemListState extends State<AccountItemList> {
   void _onBookChanged(Map<String, dynamic>? newBook) {
     setState(() {
       _selectedBook = newBook;
-      _selectedCategory = null;
       _categories = [];
-      _dropdownKey = GlobalKey();
     });
     _loadCategories();
     _loadAccountItems();
@@ -920,41 +686,29 @@ class _AccountItemListState extends State<AccountItemList> {
   Future<DateTime?> _selectDate(BuildContext context) async {
     if (!mounted) return null;
 
-    try {
-      final DateTime? picked = await showDialog<DateTime>(
-        context: context,
-        builder: (BuildContext context) {
-          return Theme(
-            data: Theme.of(context),
-            child: Builder(
-              builder: (BuildContext context) {
-                return Localizations(
-                  locale: const Locale('zh', 'CN'),
-                  delegates: const [
-                    GlobalMaterialLocalizations.delegate,
-                    GlobalWidgetsLocalizations.delegate,
-                    GlobalCupertinoLocalizations.delegate,
-                  ],
-                  child: DatePickerDialog(
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                  ),
-                );
-              },
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            dialogTheme: DialogTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-          );
-        },
-      );
+          ),
+          child: child!,
+        );
+      },
+    );
 
+    if (picked != null && mounted) {
       return picked;
-    } catch (e) {
-      if (!mounted) return null;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('择日期时出错，请重试')),
-      );
-      return null;
     }
+    return null;
   }
 
   String _getTypeText() {
@@ -966,6 +720,194 @@ class _AccountItemListState extends State<AccountItemList> {
       default:
         return '选择类型';
     }
+  }
+
+  void _showTypeSelector(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, _) {
+            final themeColor = themeProvider.themeColor;
+            return AlertDialog(
+              titlePadding: EdgeInsets.fromLTRB(24, 16, 24, 0),
+              contentPadding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+              title: Text(
+                '选择类型',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+              ),
+              content: Container(
+                width: double.maxFinite,
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    _buildTypeOption('', '全部', themeColor),
+                    _buildTypeOption(
+                        'EXPENSE', '支出', themeColor),
+                    _buildTypeOption(
+                        'INCOME', '收入', themeColor),
+                  ],
+                ),
+              ),
+              actions: [
+
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showCategorySelector(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, _) {
+            final themeColor = themeProvider.themeColor;
+            return AlertDialog(
+              titlePadding: EdgeInsets.fromLTRB(24, 20, 16, 0),
+              contentPadding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '选择分类',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              content: Container(
+                width: double.maxFinite,
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.4,
+                ),
+                child: SingleChildScrollView(
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.start,
+                    children: _categories.map((category) =>
+                      StatefulBuilder(
+                        builder: (context, setStateDialog) {
+                          final isSelected = _selectedCategories.contains(category);
+                          return IntrinsicWidth(
+                            child: Material(
+                              color: isSelected ? themeColor : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(16),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  setStateDialog(() {
+                                    if (isSelected) {
+                                      _selectedCategories.remove(category);
+                                    } else {
+                                      _selectedCategories.add(category);
+                                    }
+                                  });
+                                  setState(() {});
+                                  _loadAccountItems();
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  child: Text(
+                                    category,
+                                    style: TextStyle(
+                                      color: isSelected ? Colors.white : Colors.black87,
+                                      fontSize: 13,
+                                      fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ).toList(),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedCategories.clear();
+                    });
+                    _loadAccountItems();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    '清除选择',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(context).pop(),
+                  child: Text(
+                    '关闭',
+                    style: TextStyle(
+                      color: themeColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showAmountInput(BuildContext context, bool isMin) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String tempAmount = '';
+        return AlertDialog(
+          title: Text('输入${isMin ? '最小' : '最大'}金额'),
+          content: TextField(
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            onChanged: (value) => tempAmount = value,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (isMin) {
+                  _onMinAmountChanged(tempAmount);
+                } else {
+                  _onMaxAmountChanged(tempAmount);
+                }
+                Navigator.pop(context);
+              },
+              child: Text('确定'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildTypeOption(String value, String label, Color themeColor) {
@@ -1017,5 +959,19 @@ class _AccountItemListState extends State<AccountItemList> {
            _maxAmount != null ||
            _startDate != null ||
            _endDate != null;
+  }
+
+  void _onMinAmountChanged(String value) {
+    setState(() {
+      _minAmount = double.tryParse(value);
+    });
+    _loadAccountItems();
+  }
+
+  void _onMaxAmountChanged(String value) {
+    setState(() {
+      _maxAmount = double.tryParse(value);
+    });
+    _loadAccountItems();
   }
 }
