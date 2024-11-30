@@ -13,7 +13,7 @@ class SettingsPage extends StatelessWidget {
   SettingsPage({required this.userInfo});
 
   Widget _buildUserAvatar(BuildContext context, String nickname) {
-    final themeColor = Provider.of<ThemeProvider>(context).themeColor;
+    final themeColor = Theme.of(context).primaryColor;
     return CircleAvatar(
       radius: 30,
       backgroundColor: themeColor.withOpacity(0.1),
@@ -71,47 +71,79 @@ class SettingsPage extends StatelessWidget {
   }
 
   void _showThemeColorPicker(BuildContext context) {
+    final themeColor = Theme.of(context).primaryColor;
+    
     showDialog(
       context: context,
       builder: (context) {
-        return Consumer<ThemeProvider>(
-          builder: (context, themeProvider, _) {
-            return AlertDialog(
-              title: Text('选择主题色'),
-              content: Container(
-                width: double.maxFinite,
-                child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: ThemeManager.themeColors.map((color) {
-                    return InkWell(
-                      onTap: () {
-                        themeProvider.setThemeColor(color);
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('主题色已更新')),
-                        );
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: color == themeProvider.themeColor 
-                                ? Colors.black 
-                                : Colors.grey[300]!,
-                            width: color == themeProvider.themeColor ? 3 : 2,
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+        return AlertDialog(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '主题设置',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            );
-          },
+              SizedBox(height: 8),
+              Text(
+                '选择您喜欢的主题色和显示模式',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+          content: Consumer<ThemeProvider>(
+            builder: (context, themeProvider, _) {
+              return SingleChildScrollView(
+                child: Container(
+                  width: double.maxFinite,
+                  child: Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: ThemeManager.themeColors.map((color) {
+                      return InkWell(
+                        onTap: () {
+                          themeProvider.setThemeColor(color);
+                          Navigator.pop(context);
+                        },
+                        borderRadius: BorderRadius.circular(24),
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: color == themeColor 
+                                  ? Colors.white 
+                                  : Colors.transparent,
+                              width: 3,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: color.withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: color == themeColor
+                              ? Icon(Icons.check, color: Colors.white)
+                              : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              );
+            },
+          ),
         );
       },
     );
@@ -215,7 +247,9 @@ class SettingsPage extends StatelessWidget {
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey[200]!),
+                        side: BorderSide(
+                          color: Theme.of(context).dividerColor,
+                        ),
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(16),
@@ -232,7 +266,7 @@ class SettingsPage extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.grey[800],
+                                      color: Theme.of(context).textTheme.titleLarge?.color,
                                     ),
                                   ),
                                   SizedBox(height: 4),
@@ -240,7 +274,7 @@ class SettingsPage extends StatelessWidget {
                                     userInfo['username'] ?? '',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.grey[600],
+                                      color: Theme.of(context).textTheme.bodyMedium?.color,
                                     ),
                                   ),
                                 ],
@@ -261,10 +295,38 @@ class SettingsPage extends StatelessWidget {
                         });
                       },
                     ),
+                    // 深色模式设置
+                    ListTile(
+                      leading: Icon(Icons.dark_mode),
+                      title: Text('深色模式'),
+                      trailing: DropdownButton<ThemeMode>(
+                        value: themeProvider.themeMode,
+                        underline: SizedBox(),
+                        items: [
+                          DropdownMenuItem(
+                            value: ThemeMode.system,
+                            child: Text('跟随系统'),
+                          ),
+                          DropdownMenuItem(
+                            value: ThemeMode.light,
+                            child: Text('浅色'),
+                          ),
+                          DropdownMenuItem(
+                            value: ThemeMode.dark,
+                            child: Text('深色'),
+                          ),
+                        ],
+                        onChanged: (ThemeMode? mode) {
+                          if (mode != null) {
+                            themeProvider.setThemeMode(mode);
+                          }
+                        },
+                      ),
+                    ),
                     // 主题设置
                     ListTile(
                       leading: Icon(Icons.color_lens),
-                      title: Text('主题设置'),
+                      title: Text('主题颜色'),
                       trailing: Icon(Icons.chevron_right),
                       onTap: () => _showThemeColorPicker(context),
                     ),
@@ -294,15 +356,11 @@ class SettingsPage extends StatelessWidget {
                       '退出登录',
                       style: TextStyle(
                         color: Colors.red,
-                        fontSize: 16,
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 12),
                       side: BorderSide(color: Colors.red),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      padding: EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),

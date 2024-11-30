@@ -15,41 +15,45 @@ class FundSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<AccountItemProvider, ThemeProvider>(
-      builder: (context, provider, themeProvider, _) {
-        final themeColor = themeProvider.themeColor;
-        
+    final themeColor = Theme.of(context).primaryColor;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Consumer<AccountItemProvider>(
+      builder: (context, provider, _) {
         return Container(
           margin: EdgeInsets.only(bottom: 16),
           child: OutlinedButton(
             onPressed: () => _showFundSelector(context, provider, themeColor),
             style: OutlinedButton.styleFrom(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              side: BorderSide(color: Colors.grey[300]!),
+              side: BorderSide(color: isDark ? Colors.white24 : Colors.grey[300]!),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
+              backgroundColor: isDark ? Colors.white10 : Colors.transparent,
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.account_balance_wallet,
                   size: 20,
-                  color: selectedFund != null ? themeColor : Colors.grey[600],
+                  color: selectedFund != null ? themeColor : (isDark ? Colors.white60 : Colors.grey[600]),
                 ),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     selectedFund?['fundName'] ?? '选择账户',
                     style: TextStyle(
-                      color: selectedFund != null ? Colors.grey[800] : Colors.grey[600],
+                      color: selectedFund != null 
+                          ? (isDark ? Colors.white : Colors.grey[800])
+                          : (isDark ? Colors.white60 : Colors.grey[600]),
                       fontSize: 14,
                     ),
                   ),
                 ),
                 Icon(
                   Icons.arrow_drop_down,
-                  color: Colors.grey[600],
+                  color: isDark ? Colors.white60 : Colors.grey[600],
                 ),
               ],
             ),
@@ -64,6 +68,7 @@ class FundSelector extends StatelessWidget {
     AccountItemProvider provider,
     Color themeColor,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isExpense = provider.transactionType == 'EXPENSE';
     final availableFunds = provider.fundList.where((fund) =>
         isExpense ? fund['fundOut'] == true : fund['fundIn'] == true).toList();
@@ -72,7 +77,12 @@ class FundSelector extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('选择账户'),
+          title: Text(
+            '选择账户',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.grey[800],
+            ),
+          ),
           content: Container(
             width: double.maxFinite,
             constraints: BoxConstraints(
@@ -82,7 +92,9 @@ class FundSelector extends StatelessWidget {
                 ? Center(
                     child: Text(
                       '没有可用的${isExpense ? '支出' : '收入'}账户',
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(
+                        color: isDark ? Colors.white60 : Colors.grey[600],
+                      ),
                     ),
                   )
                 : ListView.builder(
@@ -95,7 +107,9 @@ class FundSelector extends StatelessWidget {
                         title: Text(
                           fund['fundName'],
                           style: TextStyle(
-                            color: isSelected ? themeColor : Colors.grey[800],
+                            color: isSelected 
+                                ? themeColor 
+                                : (isDark ? Colors.white : Colors.grey[800]),
                             fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
                           ),
                         ),

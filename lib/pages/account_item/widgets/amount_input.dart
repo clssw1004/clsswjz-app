@@ -30,28 +30,32 @@ class _AmountInputState extends State<AmountInput> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Consumer<AccountItemProvider>(
       builder: (context, provider, _) {
-        final book = provider.selectedBook;
         return Container(
           padding: EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(color: Colors.grey[200]!),
+              bottom: BorderSide(
+                color: isDark ? Colors.white24 : Colors.grey[300]!,
+                width: 1,
+              ),
             ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                book?['currencySymbol'] ?? '¥',
+                '¥',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey[800],
+                  color: isDark ? Colors.white : Colors.grey[800],
                 ),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: 8),
               Expanded(
                 child: TextFormField(
                   controller: _controller,
@@ -62,17 +66,22 @@ class _AmountInputState extends State<AmountInput> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w500,
-                    color: Colors.grey[900],
+                    color: isDark ? Colors.white : Colors.grey[800],
                   ),
                   decoration: InputDecoration(
-                    border: InputBorder.none,
                     hintText: '0.00',
                     hintStyle: TextStyle(
-                      color: Colors.grey[400],
+                      color: isDark ? Colors.white38 : Colors.grey[400],
                       fontSize: 28,
                     ),
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    fillColor: Colors.transparent,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) return '请输入金额';

@@ -34,7 +34,9 @@ void main() async {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
           return MaterialApp(
-            theme: themeProvider.themeData,
+            theme: themeProvider.lightTheme,
+            darkTheme: themeProvider.darkTheme,
+            themeMode: themeProvider.themeMode,
             title: '记账本',
             routes: {
               '/login': (context) => LoginPage(),

@@ -96,11 +96,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   @override
   Widget build(BuildContext context) {
+    final themeColor = Theme.of(context).primaryColor;
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
-          final themeColor = themeProvider.themeColor;
           return Scaffold(
             appBar: AppBar(
               title: Text(_recordId == null ? '新增记录' : '编辑记录'),
