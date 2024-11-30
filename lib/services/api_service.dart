@@ -212,7 +212,6 @@ class ApiService {
     _baseUrl = host; // 更新当前使用的基础URL
   }
 
-
   static Future<List<Map<String, dynamic>>> fetchFundList(
       String accountBookId) async {
     final response = await http.post(
@@ -228,6 +227,54 @@ class ApiService {
       return data.map((fund) => Map<String, dynamic>.from(fund)).toList();
     } else {
       throw Exception('Failed to load fund list');
+    }
+  }
+
+  /// 编辑账本
+  /// [bookId] 账本ID
+  /// [data] 更新的数据，包含 name, description, currencySymbol, members 等字段
+  static Future<Map<String, dynamic>> updateAccountBook(
+      String bookId, Map<String, dynamic> data) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$_baseUrl/api/account/book/$bookId'),
+        headers: _getHeaders(needsContentType: true),
+        body: json.encode({
+          'id': bookId,
+          'name': data['name'],
+          'description': data['description'],
+          'currencySymbol': data['currencySymbol'],
+          'members': data['members']
+              ?.map((member) => {
+                    'userId': member['userId'],
+                    'canViewBook': member['canViewBook'] ?? false,
+                    'canEditBook': member['canEditBook'] ?? false,
+                    'canDeleteBook': member['canDeleteBook'] ?? false,
+                    'canViewItem': member['canViewItem'] ?? false,
+                    'canEditItem': member['canEditItem'] ?? false,
+                    'canDeleteItem': member['canDeleteItem'] ?? false,
+                  })
+              .toList(),
+        }),
+      );
+
+      if (_isSuccessStatusCode(response.statusCode)) {
+        return {
+          'code': 0,
+          'data': json.decode(response.body),
+          'message': '更新成功',
+        };
+      } else {
+        return {
+          'code': response.statusCode,
+          'message': '更新失败',
+        };
+      }
+    } catch (e) {
+      return {
+        'code': -1,
+        'message': '更新失败：$e',
+      };
     }
   }
 }

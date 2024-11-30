@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'account_book_info.dart';
 
-class AccountBookManagePage extends StatefulWidget {
+class AccountBookList extends StatefulWidget {
   @override
-  _AccountBookManagePageState createState() => _AccountBookManagePageState();
+  _AccountBookListState createState() => _AccountBookListState();
 }
 
-class _AccountBookManagePageState extends State<AccountBookManagePage> {
+class _AccountBookListState extends State<AccountBookList> {
   List<dynamic> _accountBooks = [];
   bool _isLoading = true;
   String? _error;
@@ -142,7 +143,12 @@ class _AccountBookManagePageState extends State<AccountBookManagePage> {
             color: isDark ? Colors.white54 : Colors.grey[400],
           ),
           onTap: () {
-            // TODO: 处理账本点击事件
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AccountBookInfo(accountBook: book),
+              ),
+            );
           },
         );
       },
