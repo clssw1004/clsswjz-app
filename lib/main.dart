@@ -7,115 +7,80 @@ import 'package:provider/provider.dart';
 import 'services/user_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+Future<Map<String, dynamic>?> _initializeApp() async {
+  try {
+    final hasSession = await UserService.hasValidSession();
+    if (hasSession) {
+      await UserService.initializeSession();
+      return await UserService.getUserInfo();
+    }
+    return null;
+  } catch (e) {
+    print('初始化应用失败: $e');
+    return null;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
   
   runApp(
-    ChangeNotifierProvider.value(
-      value: themeProvider,
-      child: MyApp(),
-    ),
-  );
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) {
-        // 先创建一个基础的 MaterialApp 配置
-        final materialApp = MaterialApp(
-          title: '记账本',
-          theme: ThemeData(
-            primarySwatch: MaterialColor(
-              themeProvider.themeColor.value,
-              <int, Color>{
-                50: themeProvider.themeColor.withOpacity(0.1),
-                100: themeProvider.themeColor.withOpacity(0.2),
-                200: themeProvider.themeColor.withOpacity(0.3),
-                300: themeProvider.themeColor.withOpacity(0.4),
-                400: themeProvider.themeColor.withOpacity(0.5),
-                500: themeProvider.themeColor.withOpacity(0.6),
-                600: themeProvider.themeColor.withOpacity(0.7),
-                700: themeProvider.themeColor.withOpacity(0.8),
-                800: themeProvider.themeColor.withOpacity(0.9),
-                900: themeProvider.themeColor.withOpacity(1.0),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            theme: themeProvider.themeData,
+            title: '记账本',
+            routes: {
+              '/login': (context) => LoginPage(),
+              '/register': (context) => RegisterPage(),
+            },
+            onGenerateRoute: (settings) {
+              if (settings.name == '/home') {
+                final userInfo = settings.arguments as Map<String, dynamic>;
+                return MaterialPageRoute(
+                  builder: (context) => HomePage(userInfo: userInfo),
+                );
+              }
+              return null;
+            },
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('zh', 'CN'),
+              Locale('en', 'US'),
+            ],
+            locale: const Locale('zh', 'CN'),
+            home: FutureBuilder<Map<String, dynamic>?>(
+              future: _initializeApp(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Scaffold(
+                    body: Center(
+                      child: CircularProgressIndicator(
+                        color: themeProvider.themeColor,
+                      ),
+                    ),
+                  );
+                }
+                return snapshot.data != null 
+                    ? HomePage(userInfo: snapshot.data!)
+                    : LoginPage();
               },
             ),
-          ),
-          routes: {
-            '/login': (context) => LoginPage(),
-            '/register': (context) => RegisterPage(),
-          },
-          onGenerateRoute: (settings) {
-            if (settings.name == '/home') {
-              final userInfo = settings.arguments as Map<String, dynamic>;
-              return MaterialPageRoute(
-                builder: (context) => HomePage(userInfo: userInfo),
-              );
-            }
-            return null;
-          },
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('zh', 'CN'),
-            Locale('en', 'US'),
-          ],
-          locale: const Locale('zh', 'CN'),
-        );
-
-        return FutureBuilder<Map<String, dynamic>?>(
-          future: _initializeApp(),
-          builder: (context, snapshot) {
-            // 如果正在加载，显示加载页面
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return MaterialApp(
-                theme: materialApp.theme,
-                home: Scaffold(
-                  body: Center(
-                    child: CircularProgressIndicator(
-                      color: themeProvider.themeColor,
-                    ),
-                  ),
-                ),
-              );
-            }
-
-            // 根据是否有用户信息返回不同的页面
-            return MaterialApp(
-              title: materialApp.title,
-              theme: materialApp.theme,
-              routes: materialApp.routes ?? {}, // 添加空map作为默认值
-              onGenerateRoute: materialApp.onGenerateRoute,
-              home: snapshot.data != null 
-                  ? HomePage(userInfo: snapshot.data!)  // 有用户信息直接进入主页
-                  : LoginPage(),  // 没有用户信息进入登录页
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Future<Map<String, dynamic>?> _initializeApp() async {
-    try {
-      final hasSession = await UserService.hasValidSession();
-      if (hasSession) {
-        await UserService.initializeSession();
-        return await UserService.getUserInfo();
-      }
-      return null;
-    } catch (e) {
-      print('初始化应用失败: $e');
-      return null;
-    }
-  }
+          );
+        },
+      ),
+    ),
+  );
 }
 
 

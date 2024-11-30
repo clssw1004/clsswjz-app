@@ -9,9 +9,10 @@ class DataService {
   // 缓存数据
   List<Map<String, dynamic>>? _cachedBooks;
   List<String>? _cachedCategories;
-  
+
   // 获取账本列表
-  Future<List<Map<String, dynamic>>> fetchAccountBooks({bool forceRefresh = false}) async {
+  Future<List<Map<String, dynamic>>> fetchAccountBooks(
+      {bool forceRefresh = false}) async {
     try {
       if (_cachedBooks == null || forceRefresh) {
         _cachedBooks = await ApiService.fetchAccountBooks();
@@ -24,7 +25,8 @@ class DataService {
   }
 
   // 获取分类列表
-  Future<List<String>> fetchCategories(String accountBookId, {bool forceRefresh = false}) async {
+  Future<List<String>> fetchCategories(String accountBookId,
+      {bool forceRefresh = false}) async {
     try {
       if (_cachedCategories == null || forceRefresh) {
         _cachedCategories = await ApiService.fetchCategories(accountBookId);
@@ -46,4 +48,14 @@ class DataService {
   Map<String, dynamic>? getDefaultBook() {
     return _cachedBooks?.isNotEmpty == true ? _cachedBooks!.first : null;
   }
-} 
+
+  Future<List<Map<String, dynamic>>> fetchFundList(String bookId) async {
+    try {
+      final response = await ApiService.fetchFundList(bookId);
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      print('Error in fetchFundList: $e');
+      return [];
+    }
+  }
+}

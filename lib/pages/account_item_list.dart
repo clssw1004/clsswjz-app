@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../pages/account_item_info.dart';
 import '../services/data_service.dart';
 import '../theme/theme_provider.dart';
+import 'account_item/providers/account_item_provider.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
@@ -473,7 +474,7 @@ class AccountItemListState extends State<AccountItemList> {
                                         horizontal: 8, vertical: 4),
                                     elevation: 0,
                                     child: InkWell(
-                                      onTap: () => _navigateToEdit(item),
+                                      onTap: () => _editRecord(item),
                                       child: Container(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 16, vertical: 12),
@@ -548,13 +549,18 @@ class AccountItemListState extends State<AccountItemList> {
                                                                   .circular(12),
                                                         ),
                                                         child: Text(
-                                                          item['category'],
+                                                          item['category'].toString().length > 4 
+                                                              ? '${item['category'].toString().substring(0, 4)}...'
+                                                              : item['category'].toString(),
                                                           style: TextStyle(
                                                             fontSize: 12,
                                                             color: themeColor,
                                                             fontWeight:
                                                                 FontWeight.w500,
                                                           ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                         ),
                                                       ),
                                                     ],
@@ -619,7 +625,7 @@ class AccountItemListState extends State<AccountItemList> {
           ),
           floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
               ? FloatingActionButton(
-                  onPressed: _navigateToCreate,
+                  onPressed: _addNewRecord,
                   child: Icon(Icons.add),
                 )
               : null,
@@ -628,32 +634,37 @@ class AccountItemListState extends State<AccountItemList> {
     );
   }
 
-  void _navigateToEdit(Map<String, dynamic> item) async {
-    final result = await Navigator.push(
-      context,
+  void _addNewRecord() async {
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AccountItemForm(initialData: item),
+        builder: (context) => ChangeNotifierProvider(
+          create: (_) => AccountItemProvider(),
+          child: AccountItemForm(
+            initialBook: _selectedBook,
+          ),
+        ),
       ),
     );
-
+    
     if (result == true) {
-      await _loadCategories();
       _loadAccountItems();
     }
   }
 
-  void _navigateToCreate() async {
-    final result = await Navigator.push(
-      context,
+  void _editRecord(Map<String, dynamic> record) async {
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AccountItemForm(
-          initialBook: _selectedBook,
+        builder: (context) => ChangeNotifierProvider(
+          create: (_) => AccountItemProvider(),
+          child: AccountItemForm(
+            initialData: record,
+            initialBook: _selectedBook,
+          ),
         ),
       ),
     );
-
+    
     if (result == true) {
-      await _loadCategories();
       _loadAccountItems();
     }
   }

@@ -48,13 +48,14 @@ class ApiService {
     }
   }
 
-  static Future<void> saveAccountItem(Map<String, dynamic> data,
-      {String? id}) async {
+  static Future<void> saveAccountItem(
+    Map<String, dynamic> data,
+  ) async {
     final Uri uri;
     final http.Response response;
 
-    if (id != null) {
-      uri = Uri.parse('$_baseUrl/api/account/item/$id');
+    if (data['id'] != null) {
+      uri = Uri.parse('$_baseUrl/api/account/item/${data['id']}');
       response = await http.patch(
         uri,
         headers: _getHeaders(needsContentType: true),
@@ -68,8 +69,6 @@ class ApiService {
         body: json.encode(data),
       );
     }
-    print(data);
-
     if (!_isSuccessStatusCode(response.statusCode)) {
       throw Exception('Failed to save transaction');
     }
@@ -85,14 +84,14 @@ class ApiService {
     final Map<String, dynamic> body = {
       'accountBookId': accountBookId,
     };
-    
+
     if (categories?.isNotEmpty ?? false) body['categories'] = categories;
     if (type != null) body['type'] = type;
     if (startDate != null) body['startDate'] = startDate.toIso8601String();
     if (endDate != null) body['endDate'] = endDate.toIso8601String();
 
     final uri = Uri.parse('$_baseUrl/api/account/item/list');
-    
+
     final response = await http.post(
       uri,
       headers: _getHeaders(needsContentType: true),
@@ -218,7 +217,8 @@ class ApiService {
     return '$baseUrl$endpoint';
   }
 
-  static Future<List<Map<String, dynamic>>> fetchFundList(String accountBookId) async {
+  static Future<List<Map<String, dynamic>>> fetchFundList(
+      String accountBookId) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/api/account/fund/listByAccountBookId'),
       headers: _getHeaders(needsContentType: true),
