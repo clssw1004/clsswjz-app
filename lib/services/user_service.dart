@@ -5,6 +5,7 @@ import 'api_service.dart';
 
 class UserService {
   static const String _sessionFileName = 'user_session.json';
+  static Map<String, dynamic>? _cachedUserInfo;
 
   // 获取本地存储文件
   static Future<File> get _sessionFile async {
@@ -12,98 +13,58 @@ class UserService {
     return File('${directory.path}/$_sessionFileName');
   }
 
+  // 检查是否有有效的会话
+  static Future<bool> hasValidSession() async {
+    final sessionData = await getUserSession();
+    return sessionData != null && sessionData['token'] != null;
+  }
+
+  // 初始化会话
+  static Future<void> initializeSession() async {
+    final sessionData = await getUserSession();
+    if (sessionData != null) {
+      _cachedUserInfo = sessionData['userInfo'];
+      ApiService.setToken(sessionData['token']);
+    }
+  }
+
+  // 获取用户信息
+  static Map<String, dynamic>? getUserInfo() {
+    return _cachedUserInfo;
+  }
+
   // 保存用户会话信息
   static Future<void> saveUserSession(
     String token,
     Map<String, dynamic> userInfo,
   ) async {
+    final file = await _sessionFile;
     final sessionData = {
       'token': token,
       'userInfo': userInfo,
-      'timestamp': DateTime.now().toIso8601String(),
     };
-
-    final file = await _sessionFile;
     await file.writeAsString(json.encode(sessionData));
+    _cachedUserInfo = userInfo;
+    ApiService.setToken(token);
   }
 
-  // 检查会话是否有效
-  static Future<bool> hasValidSession() async {
-    try {
-      final file = await _sessionFile;
-      if (!await file.exists()) {
-        return false;
-      }
-
-      final sessionData = json.decode(await file.readAsString());
-      final timestamp = DateTime.parse(sessionData['timestamp']);
-      final now = DateTime.now();
-
-      // 检查会话是否过期（例如30天）
-      if (now.difference(timestamp).inDays > 30) {
-        await clearSession();
-        return false;
-      }
-
-      return sessionData['token'] != null;
-    } catch (e) {
-      print('检查会话状态失败: $e');
-      return false;
-    }
-  }
-
-  // 获取用户信息
-  static Future<Map<String, dynamic>?> getUserInfo() async {
-    try {
-      final file = await _sessionFile;
-      if (!await file.exists()) {
-        return null;
-      }
-
-      final sessionData = json.decode(await file.readAsString());
-      return sessionData['userInfo'];
-    } catch (e) {
-      print('获取用户信息失败: $e');
-      return null;
-    }
-  }
-
-  // 清除会话
-  static Future<void> clearSession() async {
-    try {
-      final file = await _sessionFile;
-      if (await file.exists()) {
-        await file.delete();
-      }
-      ApiService.clearToken();
-    } catch (e) {
-      print('清除会话失败: $e');
-    }
-  }
-
-  // 初始化会话
-  static Future<void> initializeSession() async {
+  // 获取用户会话信息
+  static Future<Map<String, dynamic>?> getUserSession() async {
     try {
       final file = await _sessionFile;
       if (await file.exists()) {
         final sessionData = json.decode(await file.readAsString());
-        final token = sessionData['token'];
-        if (token != null) {
-          ApiService.setToken(token);
-
-          // 更新会话时间戳
-          await saveUserSession(
-            token,
-            sessionData['userInfo'],
-          );
-        }
+        ApiService.setToken(sessionData['token']);
+        _cachedUserInfo = sessionData['userInfo'];
+        return sessionData;
       }
     } catch (e) {
-      print('初始化会话失败: $e');
+      print('获取用户会话失败: $e');
     }
+    return null;
   }
 
-  // 刷新会话时间戳
+  // 刷新会话
   static Future<void> refreshSession() async {
     try {
       final file = await _sessionFile;
@@ -116,6 +77,20 @@ class UserService {
       }
     } catch (e) {
       print('刷新会话失败: $e');
+    }
+  }
+
+  // 退出登录
+  static Future<void> logout() async {
+    try {
+      final file = await _sessionFile;
+      if (await file.exists()) {
+        await file.delete();
+      }
+      _cachedUserInfo = null;
+      ApiService.clearToken(); // 需要在 ApiService 中添加这个方法
+    } catch (e) {
+      print('退出登录失败: $e');
     }
   }
 }

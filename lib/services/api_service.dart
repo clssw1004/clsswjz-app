@@ -212,10 +212,6 @@ class ApiService {
     _baseUrl = host; // 更新当前使用的基础URL
   }
 
-  static Future<String> _buildUrl(String endpoint) async {
-    final baseUrl = await getApiHost();
-    return '$baseUrl$endpoint';
-  }
 
   static Future<List<Map<String, dynamic>>> fetchFundList(
       String accountBookId) async {

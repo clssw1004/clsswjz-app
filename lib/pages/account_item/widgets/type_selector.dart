@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../theme/theme_provider.dart';
 
 class TypeSelector extends StatelessWidget {
   final String value;

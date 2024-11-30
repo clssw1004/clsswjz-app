@@ -6,6 +6,7 @@ import 'theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'services/user_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'pages/account_book_manage_page.dart';
 
 Future<Map<String, dynamic>?> _initializeApp() async {
   try {
@@ -41,6 +42,7 @@ void main() async {
             routes: {
               '/login': (context) => LoginPage(),
               '/register': (context) => RegisterPage(),
+              '/account-books': (context) => AccountBookManagePage(),
             },
             onGenerateRoute: (settings) {
               if (settings.name == '/home') {
