@@ -8,16 +8,27 @@ class ThemeColorSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return ListTile(
-      leading: Icon(Icons.palette),
-      title: Text('主题颜色'),
+      leading: Icon(
+        Icons.palette,
+        color: colorScheme.primary,
+      ),
+      title: Text(
+        '主题颜色',
+        style: theme.textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onSurface,
+        ),
+      ),
       onTap: () => _showThemeColorPicker(context),
     );
   }
 
   void _showThemeColorPicker(BuildContext context) {
-    final themeColor = Theme.of(context).primaryColor;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     showDialog(
       context: context,
@@ -28,18 +39,13 @@ class ThemeColorSelector extends StatelessWidget {
             children: [
               Text(
                 '主题颜色',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: theme.textTheme.titleLarge,
               ),
               SizedBox(height: 8),
               Text(
                 '选择您喜欢的主题色',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.white60 : Colors.grey[600],
-                  fontWeight: FontWeight.normal,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -53,6 +59,7 @@ class ThemeColorSelector extends StatelessWidget {
                     spacing: 12,
                     runSpacing: 12,
                     children: ThemeManager.themeColors.map((color) {
+                      final isSelected = color == theme.primaryColor;
                       return InkWell(
                         onTap: () {
                           themeProvider.setThemeColor(color);
@@ -66,9 +73,7 @@ class ThemeColorSelector extends StatelessWidget {
                             color: color,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: color == themeColor 
-                                  ? Colors.white 
-                                  : Colors.transparent,
+                              color: isSelected ? colorScheme.onPrimary : Colors.transparent,
                               width: 3,
                             ),
                             boxShadow: [
@@ -79,9 +84,9 @@ class ThemeColorSelector extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: color == themeColor
-                              ? Icon(Icons.check, color: Colors.white)
-                              : null
+                          child: isSelected
+                              ? Icon(Icons.check, color: colorScheme.onPrimary)
+                              : null,
                         ),
                       );
                     }).toList(),

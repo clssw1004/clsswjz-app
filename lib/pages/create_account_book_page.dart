@@ -14,12 +14,19 @@ class _CreateAccountBookPageState extends State<CreateAccountBookPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('新增账本'),
+        title: Text(
+          '新增账本',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
         elevation: 0,
+        backgroundColor: colorScheme.surface,
       ),
       body: Form(
         key: _formKey,
@@ -31,7 +38,19 @@ class _CreateAccountBookPageState extends State<CreateAccountBookPage> {
               decoration: InputDecoration(
                 labelText: '账本名称',
                 hintText: '请输入账本名称',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: colorScheme.primary),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary),
+                ),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -46,28 +65,46 @@ class _CreateAccountBookPageState extends State<CreateAccountBookPage> {
               decoration: InputDecoration(
                 labelText: '账本描述',
                 hintText: '请输入账本描述（选填）',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: colorScheme.primary),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary),
+                ),
               ),
               maxLines: 3,
             ),
             SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _submitForm,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: _isLoading
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            isDark ? Colors.white70 : Colors.white,
-                          ),
-                        ),
-                      )
-                    : Text('创建账本'),
+            FilledButton(
+              onPressed: _submitForm,
+              style: FilledButton.styleFrom(
+                minimumSize: Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
+              child: _isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(colorScheme.onPrimary),
+                      ),
+                    )
+                  : Text(
+                      '创建账本',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
             ),
           ],
         ),

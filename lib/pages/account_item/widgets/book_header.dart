@@ -35,8 +35,7 @@ class BookHeader extends StatelessWidget {
           Expanded(
             child: Text(
               book != null ? book!['name'] : '未选择账本',
-              style: TextStyle(
-                fontSize: 14,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),

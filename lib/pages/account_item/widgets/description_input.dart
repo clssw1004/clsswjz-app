@@ -10,16 +10,16 @@ class DescriptionInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '描述',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: isDark ? Colors.white : Colors.grey[800],
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: colorScheme.onSurface,
           ),
         ),
         SizedBox(height: 8),
@@ -27,34 +27,28 @@ class DescriptionInput extends StatelessWidget {
           controller: controller,
           decoration: InputDecoration(
             hintText: '添加描述信息（选填）',
-            hintStyle: TextStyle(
-              color: isDark ? Colors.white38 : Colors.grey[400],
-              fontSize: 14,
+            hintStyle: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: isDark ? Colors.white24 : Colors.grey[300]!,
-              ),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: isDark ? Colors.white24 : Colors.grey[300]!,
-              ),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              borderSide: BorderSide(color: colorScheme.primary),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             filled: true,
-            fillColor: isDark ? Colors.white10 : Colors.grey[50],
+            fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
           ),
           maxLines: 3,
-          style: TextStyle(
-            fontSize: 14,
-            color: isDark ? Colors.white : Colors.grey[800],
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface,
           ),
         ),
       ],

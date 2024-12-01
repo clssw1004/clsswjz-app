@@ -30,7 +30,8 @@ class _AmountInputState extends State<AmountInput> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     return Consumer<AccountItemProvider>(
       builder: (context, provider, _) {
@@ -39,7 +40,7 @@ class _AmountInputState extends State<AmountInput> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isDark ? Colors.white24 : Colors.grey[300]!,
+                color: colorScheme.outlineVariant,
                 width: 1,
               ),
             ),
@@ -49,10 +50,8 @@ class _AmountInputState extends State<AmountInput> {
             children: [
               Text(
                 '¥',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.grey[800],
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  color: colorScheme.onSurface,
                 ),
               ),
               SizedBox(width: 8),
@@ -63,16 +62,13 @@ class _AmountInputState extends State<AmountInput> {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                   ],
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.white : Colors.grey[800],
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    color: colorScheme.onSurface,
                   ),
                   decoration: InputDecoration(
                     hintText: '0.00',
-                    hintStyle: TextStyle(
-                      color: isDark ? Colors.white38 : Colors.grey[400],
-                      fontSize: 28,
+                    hintStyle: theme.textTheme.headlineMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                     isDense: true,
                     contentPadding: EdgeInsets.zero,

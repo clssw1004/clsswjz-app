@@ -52,40 +52,86 @@ class _BookInfoEditState extends State<BookInfoEdit> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Stack(
       children: [
         ListView(
           children: [
             Card(
               margin: EdgeInsets.all(16),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: colorScheme.outlineVariant),
+              ),
               child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextField(
+                    TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
                         labelText: '账本名称',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: colorScheme.primary),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colorScheme.outline),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colorScheme.primary),
+                        ),
                       ),
                     ),
                     SizedBox(height: 16),
-                    TextField(
+                    TextFormField(
                       controller: _descriptionController,
                       decoration: InputDecoration(
                         labelText: '账本描述',
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: colorScheme.primary),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colorScheme.outline),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colorScheme.outline),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: colorScheme.primary),
+                        ),
                       ),
-                      maxLines: null,
+                      maxLines: 3,
                     ),
                     SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Text('币种：'),
-                        SizedBox(width: 8),
-                        Text(_currencySymbol),
-                      ],
+                    DropdownButtonFormField<String>(
+                      value: _currencySymbol,
+                      decoration: InputDecoration(
+                        labelText: '币种',
+                        labelStyle: TextStyle(color: colorScheme.primary),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      items: ['¥', '\$', '€', '£'].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() => _currencySymbol = val);
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -95,7 +141,9 @@ class _BookInfoEditState extends State<BookInfoEdit> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 '成员管理',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
               ),
             ),
             SizedBox(height: 8),
@@ -117,10 +165,10 @@ class _BookInfoEditState extends State<BookInfoEdit> {
           child: Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: colorScheme.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: colorScheme.shadow.withOpacity(0.1),
                   blurRadius: 10,
                   offset: Offset(0, -5),
                 ),
@@ -130,7 +178,7 @@ class _BookInfoEditState extends State<BookInfoEdit> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (!widget.isSaving)
-                  TextButton(
+                  FilledButton(
                     onPressed: _handleSave,
                     child: Text('保存'),
                   )
@@ -141,13 +189,19 @@ class _BookInfoEditState extends State<BookInfoEdit> {
                       child: SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                        ),
                       ),
                     ),
                   ),
                 TextButton(
                   onPressed: widget.onCancel,
-                  child: Text('取消'),
+                  child: Text(
+                    '取消',
+                    style: TextStyle(color: colorScheme.primary),
+                  ),
                 ),
               ],
             ),

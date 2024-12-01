@@ -47,8 +47,20 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text('注册')),
+      appBar: AppBar(
+        title: Text(
+          '注册',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+      ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Form(
@@ -59,7 +71,22 @@ class _RegisterPageState extends State<RegisterPage> {
                 controller: _usernameController,
                 decoration: InputDecoration(
                   labelText: '用户名',
-                  prefixIcon: Icon(Icons.person),
+                  prefixIcon: Icon(
+                    Icons.person,
+                    color: colorScheme.primary,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.outline),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.primary),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -125,10 +152,25 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               SizedBox(height: 24),
               _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                      ),
+                    )
+                  : FilledButton(
                       onPressed: _register,
-                      child: Text('注册'),
+                      style: FilledButton.styleFrom(
+                        minimumSize: Size(double.infinity, 48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        '注册',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
                     ),
             ],
           ),

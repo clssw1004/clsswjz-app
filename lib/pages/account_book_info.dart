@@ -285,7 +285,6 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return AlertDialog(
       title: Text('添加成员'),

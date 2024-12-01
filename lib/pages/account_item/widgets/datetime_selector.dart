@@ -17,30 +17,33 @@ class DateTimeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = Theme.of(context).primaryColor;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? Colors.white10 : Colors.grey[50],
+        color: colorScheme.surfaceVariant.withOpacity(0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
           Expanded(
             child: OutlinedButton.icon(
-              icon: Icon(Icons.calendar_today, color: themeColor, size: 18),
+              icon: Icon(
+                Icons.calendar_today, 
+                color: colorScheme.primary, 
+                size: 18
+              ),
               label: Text(
                 DateFormat('yyyy年MM月dd日').format(selectedDate),
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.grey[800]!,
-                  fontSize: 14,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: themeColor,
+                foregroundColor: colorScheme.primary,
                 backgroundColor: Colors.transparent,
-                side: BorderSide(color: isDark ? Colors.white24 : Colors.grey[300]!),
+                side: BorderSide(color: colorScheme.outlineVariant),
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -52,18 +55,21 @@ class DateTimeSelector extends StatelessWidget {
           SizedBox(width: 8),
           Expanded(
             child: OutlinedButton.icon(
-              icon: Icon(Icons.access_time, color: themeColor, size: 18),
+              icon: Icon(
+                Icons.access_time, 
+                color: colorScheme.primary, 
+                size: 18
+              ),
               label: Text(
                 '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}',
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.grey[800]!,
-                  fontSize: 14,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: themeColor,
+                foregroundColor: colorScheme.primary,
                 backgroundColor: Colors.transparent,
-                side: BorderSide(color: isDark ? Colors.white24 : Colors.grey[300]!),
+                side: BorderSide(color: colorScheme.outlineVariant),
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -78,8 +84,8 @@ class DateTimeSelector extends StatelessWidget {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final themeColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -89,16 +95,11 @@ class DateTimeSelector extends StatelessWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: themeColor,
-              onPrimary: Colors.white,
-              surface: isDark ? Color(0xFF2C2C2C) : Colors.white,
-              onSurface: isDark ? Colors.white : Colors.grey[800]!,
-            ),
-            dialogBackgroundColor: isDark ? Color(0xFF1E1E1E) : Colors.white,
+            colorScheme: colorScheme,
+            dialogBackgroundColor: colorScheme.surface,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: isDark ? Colors.white70 : themeColor,
+                foregroundColor: colorScheme.primary,
               ),
             ),
           ),
@@ -113,8 +114,8 @@ class DateTimeSelector extends StatelessWidget {
   }
 
   Future<void> _selectTime(BuildContext context) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final themeColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -122,28 +123,17 @@ class DateTimeSelector extends StatelessWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: themeColor,
-              onPrimary: Colors.white,
-              surface: isDark ? Color(0xFF2C2C2C) : Colors.white,
-              onSurface: isDark ? Colors.white : Colors.grey[800]!,
-            ),
-            dialogBackgroundColor: isDark ? Color(0xFF1E1E1E) : Colors.white,
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: isDark ? Colors.white70 : themeColor,
-              ),
-            ),
+            colorScheme: colorScheme,
             timePickerTheme: TimePickerThemeData(
-              backgroundColor: isDark ? Color(0xFF1E1E1E) : Colors.white,
-              hourMinuteColor: isDark ? Colors.white10 : Colors.grey.shade100,
-              hourMinuteTextColor: isDark ? Colors.white : Colors.grey[800]!,
-              dayPeriodColor: isDark ? Colors.white10 : Colors.grey.shade100,
-              dayPeriodTextColor: isDark ? Colors.white : Colors.grey[800]!,
-              dialBackgroundColor: isDark ? Colors.white10 : Colors.grey.shade100,
-              dialHandColor: themeColor,
-              dialTextColor: isDark ? Colors.white : Colors.grey[800]!,
-              entryModeIconColor: isDark ? Colors.white70 : Colors.grey[600],
+              backgroundColor: colorScheme.surface,
+              hourMinuteColor: colorScheme.surfaceVariant,
+              hourMinuteTextColor: colorScheme.onSurface,
+              dayPeriodColor: colorScheme.surfaceVariant,
+              dayPeriodTextColor: colorScheme.onSurface,
+              dialBackgroundColor: colorScheme.surfaceVariant,
+              dialHandColor: colorScheme.primary,
+              dialTextColor: colorScheme.onSurface,
+              entryModeIconColor: colorScheme.onSurfaceVariant,
             ),
           ),
           child: child!,

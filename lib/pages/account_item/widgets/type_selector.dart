@@ -12,17 +12,19 @@ class TypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Row(
       children: [
         Expanded(
           child: OutlinedButton(
             onPressed: () => onChanged('支出'),
             style: OutlinedButton.styleFrom(
-              backgroundColor: value == '支出' ? themeColor : null,
-              foregroundColor: value == '支出' ? Colors.white : themeColor,
+              backgroundColor: value == '支出' ? colorScheme.primary : colorScheme.surface,
+              foregroundColor: value == '支出' ? colorScheme.onPrimary : colorScheme.primary,
               side: BorderSide(
-                color: value == '支出' ? themeColor : Colors.grey[300]!,
+                color: value == '支出' ? colorScheme.primary : colorScheme.outline,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -30,8 +32,7 @@ class TypeSelector extends StatelessWidget {
             ),
             child: Text(
               '支出',
-              style: TextStyle(
-                fontSize: 14,
+              style: theme.textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -42,10 +43,10 @@ class TypeSelector extends StatelessWidget {
           child: OutlinedButton(
             onPressed: () => onChanged('收入'),
             style: OutlinedButton.styleFrom(
-              backgroundColor: value == '收入' ? themeColor : null,
-              foregroundColor: value == '收入' ? Colors.white : themeColor,
+              backgroundColor: value == '收入' ? colorScheme.primary : colorScheme.surface,
+              foregroundColor: value == '收入' ? colorScheme.onPrimary : colorScheme.primary,
               side: BorderSide(
-                color: value == '收入' ? themeColor : Colors.grey[300]!,
+                color: value == '收入' ? colorScheme.primary : colorScheme.outline,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -53,8 +54,7 @@ class TypeSelector extends StatelessWidget {
             ),
             child: Text(
               '收入',
-              style: TextStyle(
-                fontSize: 14,
+              style: theme.textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
             ),

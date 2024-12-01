@@ -14,11 +14,17 @@ class CategoryDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final TextEditingController _controller = TextEditingController();
-    final themeColor = Theme.of(context).primaryColor;
     
     return AlertDialog(
-      title: Text('选择分类', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+      title: Text(
+        '选择分类', 
+        style: theme.textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.bold
+        ),
+      ),
       content: Container(
         width: double.maxFinite,
         constraints: BoxConstraints(
@@ -32,7 +38,7 @@ class CategoryDialog extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: '输入新分类',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.add),
+                  icon: Icon(Icons.add, color: colorScheme.primary),
                   onPressed: () {
                     if (_controller.text.isNotEmpty) {
                       onSelected(_controller.text.trim());
@@ -41,6 +47,15 @@ class CategoryDialog extends StatelessWidget {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.outline),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary),
                 ),
               ),
               onSubmitted: (value) {
@@ -54,7 +69,7 @@ class CategoryDialog extends StatelessWidget {
               child: Theme(
                 data: Theme.of(context).copyWith(
                   scrollbarTheme: ScrollbarThemeData(
-                    thumbColor: MaterialStateProperty.all(themeColor),
+                    thumbColor: MaterialStateProperty.all(colorScheme.primary),
                   ),
                 ),
                 child: Scrollbar(
@@ -66,8 +81,17 @@ class CategoryDialog extends StatelessWidget {
                       children: categories.map((category) {
                         final isSelected = selectedCategory == category;
                         return ChoiceChip(
-                          label: Text(category),
+                          label: Text(
+                            category,
+                            style: TextStyle(
+                              color: isSelected 
+                                  ? colorScheme.onPrimary 
+                                  : colorScheme.onSurface,
+                            ),
+                          ),
                           selected: isSelected,
+                          selectedColor: colorScheme.primary,
+                          backgroundColor: colorScheme.surfaceVariant,
                           onSelected: (_) => onSelected(category),
                         );
                       }).toList(),

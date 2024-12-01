@@ -31,29 +31,37 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        items: [
-          BottomNavigationBarItem(
+        destinations: [
+          NavigationDestination(
             icon: Icon(Icons.list),
             label: '账目',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: Icon(Icons.bar_chart),
             label: '统计',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: Icon(Icons.settings),
             label: '设置',
           ),
         ],
+        backgroundColor: colorScheme.surface,
+        indicatorColor: colorScheme.secondaryContainer,
+        surfaceTintColor: colorScheme.surfaceTint,
+        height: 64,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
     );
   }

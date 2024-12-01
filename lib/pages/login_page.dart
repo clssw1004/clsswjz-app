@@ -55,6 +55,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -68,7 +71,22 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _usernameController,
                   decoration: InputDecoration(
                     labelText: '用户名',
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: Icon(
+                      Icons.person,
+                      color: colorScheme.primary,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: colorScheme.primary),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -82,7 +100,22 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   decoration: InputDecoration(
                     labelText: '密码',
-                    prefixIcon: Icon(Icons.lock),
+                    prefixIcon: Icon(
+                      Icons.lock,
+                      color: colorScheme.primary,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: colorScheme.primary),
+                    ),
                   ),
                   obscureText: true,
                   validator: (value) {
@@ -94,10 +127,23 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: 24),
                 _isLoading
-                    ? CircularProgressIndicator()
-                    : ElevatedButton(
+                    ? CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                      )
+                    : FilledButton(
                         onPressed: _login,
-                        child: Text('登录'),
+                        style: FilledButton.styleFrom(
+                          minimumSize: Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          '登录',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onPrimary,
+                          ),
+                        ),
                       ),
                 SizedBox(height: 16),
                 TextButton(
@@ -107,7 +153,12 @@ class _LoginPageState extends State<LoginPage> {
                       MaterialPageRoute(builder: (context) => RegisterPage()),
                     );
                   },
-                  child: Text('还没有账号？立即注册'),
+                  child: Text(
+                    '还没有账号？立即注册',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.primary,
+                    ),
+                  ),
                 ),
               ],
             ),
