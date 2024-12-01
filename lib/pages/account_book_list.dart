@@ -38,6 +38,25 @@ class _AccountBookListState extends State<AccountBookList> {
     }
   }
 
+  Future<void> _openAccountBookInfo(Map<String, dynamic> accountBook) async {
+    final updatedAccountBook = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AccountBookInfo(accountBook: accountBook),
+      ),
+    );
+
+    if (updatedAccountBook != null) {
+      // 更新列表中的账本数据
+      setState(() {
+        final index = _accountBooks.indexWhere((book) => book['id'] == updatedAccountBook['id']);
+        if (index != -1) {
+          _accountBooks[index] = updatedAccountBook;
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -143,12 +162,7 @@ class _AccountBookListState extends State<AccountBookList> {
             color: isDark ? Colors.white54 : Colors.grey[400],
           ),
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AccountBookInfo(accountBook: book),
-              ),
-            );
+            _openAccountBookInfo(book);
           },
         );
       },
