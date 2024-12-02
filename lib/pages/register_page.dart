@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../utils/message_helper.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -17,9 +18,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() => _isLoading = true);
 
       try {
         await ApiService.register(
@@ -28,19 +27,21 @@ class _RegisterPageState extends State<RegisterPage> {
           email: _emailController.text,
           nickname: _nicknameController.text,
         );
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('注册成功，请登录')),
+
+        if (!mounted) return;
+        MessageHelper.showSuccess(
+          context,
+          message: '注册成功，请登录',
         );
         Navigator.pop(context);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('注册失败: $e')),
+        if (!mounted) return;
+        MessageHelper.showError(
+          context,
+          message: '注册失败：$e',
         );
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -154,7 +155,8 @@ class _RegisterPageState extends State<RegisterPage> {
               _isLoading
                   ? Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(colorScheme.primary),
                       ),
                     )
                   : FilledButton(
@@ -178,4 +180,4 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
-} 
+}

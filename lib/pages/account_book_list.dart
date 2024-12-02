@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../utils/message_helper.dart';
+import '../constants/book_icons.dart';
 import 'account_book/widgets/book_info.dart';
 
 class AccountBookList extends StatefulWidget {
@@ -35,6 +37,15 @@ class _AccountBookListState extends State<AccountBookList> {
         _error = '获取账本列表失败：$e';
         _isLoading = false;
       });
+
+      if (mounted) {
+        MessageHelper.showError(
+          context,
+          message: '获取账本列表失败',
+          actionLabel: '重试',
+          onAction: _fetchAccountBooks,
+        );
+      }
     }
   }
 
@@ -57,9 +68,24 @@ class _AccountBookListState extends State<AccountBookList> {
     }
   }
 
+  IconData _getBookIcon(Map<String, dynamic> book) {
+    if (book['icon'] == null || book['icon'].isEmpty) {
+      return BookIcons.defaultIcon;
+    }
+    try {
+      return IconData(
+        int.parse(book['icon']),
+        fontFamily: 'MaterialIcons',
+      );
+    } catch (e) {
+      return BookIcons.defaultIcon;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -78,12 +104,12 @@ class _AccountBookListState extends State<AccountBookList> {
       ),
       body: RefreshIndicator(
         onRefresh: _fetchAccountBooks,
-        child: _buildContent(isDark),
+        child: _buildContent(isDark, colorScheme),
       ),
     );
   }
 
-  Widget _buildContent(bool isDark) {
+  Widget _buildContent(bool isDark, ColorScheme colorScheme) {
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
     }
@@ -141,13 +167,11 @@ class _AccountBookListState extends State<AccountBookList> {
         final book = _accountBooks[index];
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-            child: Text(
-              book['name']?[0] ?? '?',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.w500,
-              ),
+            backgroundColor: colorScheme.primaryContainer,
+            child: Icon(
+              _getBookIcon(book),
+              color: colorScheme.onPrimaryContainer,
+              size: 20,
             ),
           ),
           title: Text(
@@ -157,6 +181,17 @@ class _AccountBookListState extends State<AccountBookList> {
               color: isDark ? Colors.white : Colors.grey[800],
             ),
           ),
+          subtitle:
+              book['description'] != null && book['description'].isNotEmpty
+                  ? Text(
+                      book['description'],
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.grey[600],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : null,
           trailing: Icon(
             Icons.chevron_right,
             color: isDark ? Colors.white54 : Colors.grey[400],

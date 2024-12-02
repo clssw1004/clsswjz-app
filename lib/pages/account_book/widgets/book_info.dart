@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/message_helper.dart';
+import '../../../constants/book_icons.dart';
+import '../../../widgets/icon_picker_dialog.dart';
 import 'member_list.dart';
 
 class BookInfo extends StatefulWidget {
@@ -19,6 +22,7 @@ class _BookInfoState extends State<BookInfo> {
   late TextEditingController _descriptionController;
   late String _currencySymbol;
   late List<dynamic> _members;
+  late IconData _selectedIcon;
   bool _isSaving = false;
 
   @override
@@ -29,12 +33,48 @@ class _BookInfoState extends State<BookInfo> {
         TextEditingController(text: widget.accountBook['description']);
     _currencySymbol = widget.accountBook['currencySymbol'] ?? '¥';
     _members = List<dynamic>.from(widget.accountBook['members'] ?? []);
+    _selectedIcon = _getBookIcon(widget.accountBook);
+  }
+
+  IconData _getBookIcon(Map<String, dynamic> book) {
+    if (book == null) return BookIcons.defaultIcon;
+
+    final String? iconString = book['icon']?.toString();
+    if (iconString == null || iconString.isEmpty) {
+      return BookIcons.defaultIcon;
+    }
+
+    try {
+      final int iconCode = int.parse(iconString);
+      return IconData(
+        iconCode,
+        fontFamily: 'MaterialIcons',
+      );
+    } catch (e) {
+      debugPrint('解析图标代码失败: $e');
+      return BookIcons.defaultIcon;
+    }
+  }
+
+  Future<void> _showIconPicker() async {
+    final IconData? selectedIcon = await showDialog<IconData>(
+      context: context,
+      builder: (context) => IconPickerDialog(
+        selectedIcon: _selectedIcon,
+        icons: BookIcons.icons,
+      ),
+    );
+
+    if (selectedIcon != null) {
+      setState(() => _selectedIcon = selectedIcon);
+    }
   }
 
   Future<void> _saveChanges() async {
     if (_nameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('账本名称不能为空')),
+      MessageHelper.showWarning(
+        context,
+        message: '账本名称不能为空',
       );
       return;
     }
@@ -50,6 +90,7 @@ class _BookInfoState extends State<BookInfo> {
           'description': _descriptionController.text,
           'currencySymbol': _currencySymbol,
           'members': _members,
+          'icon': _selectedIcon.codePoint.toString(),
         },
       );
 
@@ -60,11 +101,13 @@ class _BookInfoState extends State<BookInfo> {
           'description': _descriptionController.text,
           'currencySymbol': _currencySymbol,
           'members': _members,
+          'icon': _selectedIcon.codePoint.toString(),
           'updatedAt': DateTime.now().toString(),
         };
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存成功')),
+        MessageHelper.showSuccess(
+          context,
+          message: '保存成功',
         );
 
         Navigator.pop(context, updatedAccountBook);
@@ -153,6 +196,16 @@ class _BookInfoState extends State<BookInfo> {
                     decoration: InputDecoration(
                       labelText: '账本名称',
                       labelStyle: TextStyle(color: colorScheme.primary),
+                      prefixIcon: InkWell(
+                        onTap: _showIconPicker,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Icon(
+                            _selectedIcon,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: colorScheme.outline),

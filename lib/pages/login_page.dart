@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../pages/register_page.dart';
 import '../services/user_service.dart';
+import '../utils/message_helper.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -16,22 +17,19 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() => _isLoading = true);
 
       try {
         final loginResult = await ApiService.login(
           _usernameController.text,
           _passwordController.text,
         );
-        
-        // 保存用户会话信息
+
         await UserService.saveUserSession(
           loginResult['token'],
           loginResult['userInfo'],
         );
-        
+
         if (!mounted) return;
         Navigator.of(context).pushNamedAndRemoveUntil(
           '/home',
@@ -40,14 +38,13 @@ class _LoginPageState extends State<LoginPage> {
         );
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('登录失败: $e')),
+        MessageHelper.showError(
+          context,
+          message: '登录失败，请检查用户名和密码',
         );
       } finally {
         if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
+          setState(() => _isLoading = false);
         }
       }
     }
@@ -128,7 +125,8 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 24),
                 _isLoading
                     ? CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(colorScheme.primary),
                       )
                     : FilledButton(
                         onPressed: _login,

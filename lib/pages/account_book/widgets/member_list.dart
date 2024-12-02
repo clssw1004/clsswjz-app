@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../utils/message_helper.dart';
 
-class MemberList extends StatelessWidget {
+class MemberList extends StatefulWidget {
   final List<dynamic> members;
   final String createdBy;
   final bool isEditing;
@@ -16,19 +17,55 @@ class MemberList extends StatelessWidget {
     this.onAddMember,
   }) : super(key: key);
 
+  @override
+  State<MemberList> createState() => _MemberListState();
+}
+
+class _MemberListState extends State<MemberList> {
   void _updateMemberPermission(int index, String permission, bool value) {
-    if (!isEditing) return;
-    final updatedMembers = List<dynamic>.from(members);
+    if (!widget.isEditing) return;
+    final updatedMembers = List<dynamic>.from(widget.members);
     updatedMembers[index] = Map<String, dynamic>.from(updatedMembers[index]);
     updatedMembers[index][permission] = value;
-    onMembersChanged?.call(updatedMembers);
+    widget.onMembersChanged?.call(updatedMembers);
   }
 
-  void _removeMember(int index) {
-    if (!isEditing) return;
-    final updatedMembers = List<dynamic>.from(members);
-    updatedMembers.removeAt(index);
-    onMembersChanged?.call(updatedMembers);
+  Future<void> _removeMember(int index) async {
+    if (!widget.isEditing) return;
+
+    final shouldRemove = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('确认删除'),
+        content: Text('确定要移除该成员吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              '删除',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldRemove ?? false) {
+      final updatedMembers = List<dynamic>.from(widget.members);
+      updatedMembers.removeAt(index);
+      widget.onMembersChanged?.call(updatedMembers);
+
+      if (mounted) {
+        MessageHelper.showSuccess(
+          context,
+          message: '成员已移除',
+        );
+      }
+    }
   }
 
   @override
@@ -39,11 +76,11 @@ class MemberList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (isEditing)
+        if (widget.isEditing)
           Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: FilledButton.icon(
-              onPressed: onAddMember,
+              onPressed: widget.onAddMember,
               icon: Icon(Icons.person_add_outlined, size: 18),
               label: Text('添加成员'),
               style: FilledButton.styleFrom(
@@ -57,10 +94,10 @@ class MemberList extends StatelessWidget {
         ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: members.length,
+          itemCount: widget.members.length,
           itemBuilder: (context, index) {
-            final member = members[index];
-            final isCreator = member['userId'] == createdBy;
+            final member = widget.members[index];
+            final isCreator = member['userId'] == widget.createdBy;
 
             return Card(
               margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -105,7 +142,7 @@ class MemberList extends StatelessWidget {
                         ],
                       ],
                     ),
-                    trailing: isEditing && !isCreator
+                    trailing: widget.isEditing && !isCreator
                         ? IconButton(
                             icon: Icon(Icons.remove_circle_outline, size: 18),
                             color: colorScheme.error,
@@ -202,7 +239,7 @@ class MemberList extends StatelessWidget {
     final isEnabled = member[permission] == true;
 
     return InkWell(
-      onTap: isEditing
+      onTap: widget.isEditing
           ? () => _updateMemberPermission(index, permission, !isEnabled)
           : null,
       child: Container(

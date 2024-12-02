@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import './run_mode_util.dart';
-import './error_message_helper.dart';
+import './message_helper.dart';
 
 class ApiErrorHandler {
   static Future<void> handleError(BuildContext context, dynamic error) async {
@@ -31,7 +31,7 @@ class ApiErrorHandler {
     } else {
       // 生产模式展示友好提示
       if (context.mounted) {
-        ErrorMessageHelper.showError(
+        MessageHelper.showError(
           context,
           message: '操作失败，请稍后重试',
         );

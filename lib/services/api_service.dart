@@ -182,7 +182,12 @@ class ApiService {
     }
   }
 
-  static Future<void> createAccountBook(String name, String description) async {
+  static Future<void> createAccountBook(
+    String name,
+    String description, {
+    required String currencySymbol,
+    required String icon,
+  }) async {
     final uri = Uri.parse('$_baseUrl/api/account/book');
     final response = await http.post(
       uri,
@@ -190,6 +195,8 @@ class ApiService {
       body: json.encode({
         'name': name,
         'description': description,
+        'currencySymbol': currencySymbol,
+        'icon': icon,
       }),
     );
 

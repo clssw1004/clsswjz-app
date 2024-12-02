@@ -10,6 +10,7 @@ import './account_item/widgets/description_input.dart';
 import './account_item/widgets/book_header.dart';
 import './account_item/providers/account_item_provider.dart';
 import 'package:intl/intl.dart';
+import '../utils/message_helper.dart';
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -272,10 +273,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
     try {
       await _provider.saveTransaction(context, data);
       if (!mounted) return;
-      // 返回 true 表示数据已更新，需要刷新列表
+
+      MessageHelper.showSuccess(
+        context,
+        message: '保存成功',
+      );
+
       Navigator.pop(context, true);
     } catch (e) {
-      // ApiErrorHandler 已经处理了错误提示，这里只需要处理其他逻辑
       if (!mounted) return;
     }
   }
