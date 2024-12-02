@@ -43,30 +43,32 @@ class _AccountItemFormState extends State<AccountItemForm> {
   void initState() {
     super.initState();
     _provider = AccountItemProvider();
-    
+
     // 立即设置初始账本
     _selectedBook = widget.initialBook;
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      
+
       // 设置provider中的账本并加载相关数据
-      await _provider.setSelectedBook(widget.initialBook);
+      await _provider.setSelectedBook(context, widget.initialBook);
       if (widget.initialBook != null) {
         await _loadCategories();
         await _loadFundList();
       }
-      
+
       // 设置初始数据
       if (widget.initialData != null) {
         setState(() {
           _recordId = widget.initialData!['id'];
-          _transactionType = widget.initialData!['type'] == 'EXPENSE' ? '支出' : '收入';
+          _transactionType =
+              widget.initialData!['type'] == 'EXPENSE' ? '支出' : '收入';
           _provider.setTransactionType(_transactionType);
           _amountController.text = widget.initialData!['amount'].toString();
-          _selectedCategory = widget.initialData!['category'];  // 设置分类
-          _descriptionController.text = widget.initialData!['description'] ?? '';
-          
+          _selectedCategory = widget.initialData!['category'];
+          _descriptionController.text =
+              widget.initialData!['description'] ?? '';
+
           // 设置账户信息
           if (widget.initialData!['fundId'] != null) {
             _selectedFund = _provider.fundList.firstWhere(
@@ -74,7 +76,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
               orElse: () => <String, dynamic>{},
             );
           }
-          
+
           // 设置日期时间
           if (widget.initialData!['accountDate'] != null) {
             final dateTime = DateTime.parse(widget.initialData!['accountDate']);
@@ -114,7 +116,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                   children: [
                     // 账本头部
                     BookHeader(book: _selectedBook),
-                    
+
                     // 类型选择器
                     TypeSelector(
                       value: _transactionType,
@@ -124,44 +126,49 @@ class _AccountItemFormState extends State<AccountItemForm> {
                       },
                     ),
                     SizedBox(height: 16),
-                    
+
                     // 金额输入
                     AmountInput(
-                      initialValue: widget.initialData != null 
-                          ? double.parse(widget.initialData!['amount'].toString())
+                      initialValue: widget.initialData != null
+                          ? double.parse(
+                              widget.initialData!['amount'].toString())
                           : null,
-                      onChanged: (value) => _amountController.text = value.toString(),
+                      onChanged: (value) =>
+                          _amountController.text = value.toString(),
                     ),
                     SizedBox(height: 16),
-                    
+
                     // 分类选择器
                     CategorySelector(
                       selectedCategory: _selectedCategory,
-                      onChanged: (category) => setState(() => _selectedCategory = category),
+                      onChanged: (category) =>
+                          setState(() => _selectedCategory = category),
                     ),
                     SizedBox(height: 16),
-                    
+
                     // 日期时间选择器
                     DateTimeSelector(
                       selectedDate: _selectedDate,
                       selectedTime: _selectedTime,
-                      onDateChanged: (date) => setState(() => _selectedDate = date),
-                      onTimeChanged: (time) => setState(() => _selectedTime = time),
+                      onDateChanged: (date) =>
+                          setState(() => _selectedDate = date),
+                      onTimeChanged: (time) =>
+                          setState(() => _selectedTime = time),
                     ),
                     SizedBox(height: 16),
-                    
+
                     // 账户选择器
                     FundSelector(
                       selectedFund: _selectedFund,
                       onChanged: (fund) => setState(() => _selectedFund = fund),
                     ),
-                    
+
                     // 描述输入
                     DescriptionInput(
                       controller: _descriptionController,
                     ),
                     SizedBox(height: 24),
-                    
+
                     // 按钮区域
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -173,9 +180,12 @@ class _AccountItemFormState extends State<AccountItemForm> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 final data = {
-                                  'amount': double.parse(_amountController.text),
+                                  'amount':
+                                      double.parse(_amountController.text),
                                   'description': _descriptionController.text,
-                                  'type': _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
+                                  'type': _transactionType == '支出'
+                                      ? 'EXPENSE'
+                                      : 'INCOME',
                                   'category': _selectedCategory,
                                   'accountDate': _formattedDateTime,
                                   'fundId': _selectedFund?['id'],
@@ -187,14 +197,17 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                 _saveTransaction(data);
                               }
                             },
-                            icon: Icon(Icons.save_outlined, color: Colors.white, size: 18),
+                            icon: Icon(Icons.save_outlined,
+                                color: Colors.white, size: 18),
                             label: Text(
                               '保存',
-                              style: TextStyle(color: Colors.white, fontSize: 14),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 14),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: themeColor,
-                              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 4),
                               minimumSize: Size(60, 36),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -207,13 +220,15 @@ class _AccountItemFormState extends State<AccountItemForm> {
                           flex: 1,
                           child: OutlinedButton.icon(
                             onPressed: _saveAndContinue,
-                            icon: Icon(Icons.add_circle_outline, color: themeColor, size: 18),
+                            icon: Icon(Icons.add_circle_outline,
+                                color: themeColor, size: 18),
                             label: Text(
                               '再记一笔',
                               style: TextStyle(color: themeColor, fontSize: 14),
                             ),
                             style: OutlinedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 4),
                               minimumSize: Size(60, 36),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -237,8 +252,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   Future<void> _loadCategories() async {
     if (_selectedBook == null) return;
-    final provider = Provider.of<AccountItemProvider>(context, listen: false);
-    await provider.loadCategories(_selectedBook!['id']);
+    await _provider.loadCategories(context, _selectedBook!['id']);
   }
 
   Future<void> _loadFundList() async {
@@ -255,18 +269,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
     if (!mounted) return;
-    final provider = Provider.of<AccountItemProvider>(context, listen: false);
     try {
-      await provider.saveTransaction(data);
+      await _provider.saveTransaction(context, data);
       if (!mounted) return;
       // 返回 true 表示数据已更新，需要刷新列表
       Navigator.pop(context, true);
     } catch (e) {
-      // 处理错误情况
+      // ApiErrorHandler 已经处理了错误提示，这里只需要处理其他逻辑
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('保存失败：${e.toString()}')),
-      );
     }
   }
 
@@ -285,10 +295,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
         await _saveTransaction(data);
         _resetForm();
       } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存失败：${e.toString()}')),
-        );
+        // ApiErrorHandler 已经处理了错误提示，这里不需要重复处理
       }
     }
   }

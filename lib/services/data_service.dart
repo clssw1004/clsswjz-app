@@ -1,4 +1,5 @@
 import 'api_service.dart';
+import 'package:flutter/material.dart';
 
 class DataService {
   // 单例模式
@@ -25,11 +26,15 @@ class DataService {
   }
 
   // 获取分类列表
-  Future<List<String>> fetchCategories(String accountBookId,
-      {bool forceRefresh = false}) async {
+  Future<List<String>> fetchCategories(
+    BuildContext context,
+    String accountBookId, {
+    bool forceRefresh = false,
+  }) async {
     try {
       if (_cachedCategories == null || forceRefresh) {
-        _cachedCategories = await ApiService.fetchCategories(accountBookId);
+        _cachedCategories =
+            await ApiService.fetchCategories(context, accountBookId);
       }
       return _cachedCategories ?? [];
     } catch (e) {
@@ -57,5 +62,17 @@ class DataService {
       print('Error in fetchFundList: $e');
       return [];
     }
+  }
+
+  Future<void> refreshData(BuildContext context) async {
+    await Future.wait([
+      fetchAccountBooks(forceRefresh: true),
+      if (_cachedBooks?.isNotEmpty ?? false)
+        fetchCategories(
+          context,
+          _cachedBooks!.first['id'],
+          forceRefresh: true,
+        ),
+    ]);
   }
 }

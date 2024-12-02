@@ -32,12 +32,12 @@ class AccountItemProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> loadCategories(String bookId) async {
+  Future<void> loadCategories(BuildContext context, String bookId) async {
     try {
-      _categories = await _dataService.fetchCategories(bookId, forceRefresh: true);
+      _categories = await _dataService.fetchCategories(context, bookId,
+          forceRefresh: true);
       _updateDisplayCategories();
     } catch (e) {
-      print('Error loading categories: $e');
       _categories = [];
       _displayCategories = [];
     }
@@ -47,24 +47,23 @@ class AccountItemProvider extends ChangeNotifier {
     try {
       _fundList = await _dataService.fetchFundList(bookId);
     } catch (e) {
-      print('Error loading fund list: $e');
       _fundList = [];
     }
   }
 
-  Future<void> saveTransaction(Map<String, dynamic> data) async {
-    await ApiService.saveAccountItem(data);
+  Future<void> saveTransaction(
+      BuildContext context, Map<String, dynamic> data) async {
+    await ApiService.saveAccountItem(context, data);
     notifyListeners();
   }
 
-  Future<void> setSelectedBook(Map<String, dynamic>? book) async {
+  Future<void> setSelectedBook(
+      BuildContext context, Map<String, dynamic>? book) async {
     _selectedBook = book;
     if (book != null) {
       try {
-        await Future.wait([
-          loadCategories(book['id']),
-          loadFundList(book['id'])
-        ]);
+        await Future.wait(
+            [loadCategories(context, book['id']), loadFundList(book['id'])]);
         notifyListeners();
       } catch (e) {
         print('Error loading book data: $e');

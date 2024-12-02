@@ -1,6 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import '../utils/api_error_handler.dart';
+import '../utils/api_exception.dart';
 
 class ApiService {
   static String _baseUrl = 'http://192.168.2.199:3000';
@@ -30,48 +33,65 @@ class ApiService {
     return statusCode == 200 || statusCode == 201;
   }
 
-  static Future<List<String>> fetchCategories(String accountBookId) async {
-    final uri = Uri.parse('$_baseUrl/api/account/category').replace(
-      queryParameters: {'accountBookId': accountBookId},
-    );
+  static Future<List<String>> fetchCategories(
+    BuildContext context,
+    String accountBookId,
+  ) async {
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final uri = Uri.parse('$_baseUrl/api/account/category').replace(
+        queryParameters: {'accountBookId': accountBookId},
+      );
 
-    final response = await http.get(
-      uri,
-      headers: _getHeaders(),
-    );
+      final response = await http.get(
+        uri,
+        headers: _getHeaders(),
+      );
 
-    if (_isSuccessStatusCode(response.statusCode)) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((category) => category['name'].toString()).toList();
-    } else {
-      throw Exception('Failed to load categories');
-    }
+      if (_isSuccessStatusCode(response.statusCode)) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((category) => category['name'].toString()).toList();
+      } else {
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: response.body,
+          message: 'Failed to load categories',
+        );
+      }
+    });
   }
 
   static Future<void> saveAccountItem(
+    BuildContext context,
     Map<String, dynamic> data,
   ) async {
-    final Uri uri;
-    final http.Response response;
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final Uri uri;
+      final http.Response response;
 
-    if (data['id'] != null) {
-      uri = Uri.parse('$_baseUrl/api/account/item/${data['id']}');
-      response = await http.patch(
-        uri,
-        headers: _getHeaders(needsContentType: true),
-        body: json.encode(data),
-      );
-    } else {
-      uri = Uri.parse('$_baseUrl/api/account/item');
-      response = await http.post(
-        uri,
-        headers: _getHeaders(needsContentType: true),
-        body: json.encode(data),
-      );
-    }
-    if (!_isSuccessStatusCode(response.statusCode)) {
-      throw Exception('Failed to save transaction');
-    }
+      if (data['id'] != null) {
+        uri = Uri.parse('$_baseUrl/api/account/item/${data['id']}');
+        response = await http.patch(
+          uri,
+          headers: _getHeaders(needsContentType: true),
+          body: json.encode(data),
+        );
+      } else {
+        uri = Uri.parse('$_baseUrl/api/account/item');
+        response = await http.post(
+          uri,
+          headers: _getHeaders(needsContentType: true),
+          body: json.encode(data),
+        );
+      }
+
+      if (!_isSuccessStatusCode(response.statusCode)) {
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: response.body,
+          message: 'Failed to save transaction',
+        );
+      }
+    });
   }
 
   static Future<List<Map<String, dynamic>>> fetchAccountItems({

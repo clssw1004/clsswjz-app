@@ -116,6 +116,7 @@ class AccountItemListState extends State<AccountItemList> {
 
     try {
       final categories = await _dataService.fetchCategories(
+        context,
         _selectedBook!['id'],
         forceRefresh: true,
       );
@@ -125,15 +126,11 @@ class AccountItemListState extends State<AccountItemList> {
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('获取分类失败: $e')),
-      );
     }
   }
 
   Future<void> _loadAccountItems() async {
-    if (_selectedBook == null || !mounted) return;
-
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -144,6 +141,7 @@ class AccountItemListState extends State<AccountItemList> {
         startDate: _startDate,
         endDate: _endDate,
       );
+
       if (!mounted) return;
       setState(() {
         _accountItems = items;
@@ -152,9 +150,6 @@ class AccountItemListState extends State<AccountItemList> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('加载账目失败: $e')),
-      );
     }
   }
 
