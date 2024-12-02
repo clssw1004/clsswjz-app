@@ -17,12 +17,12 @@ class UserCard extends StatefulWidget {
 
 class _UserCardState extends State<UserCard> {
   Future<void> _navigateToUserInfo() async {
-    final result = await Navigator.push<bool>(
+    final needsRefresh = await Navigator.push<bool>(
       context,
       MaterialPageRoute(builder: (context) => UserInfoPage()),
     );
 
-    if (result == true && widget.onUserInfoUpdated != null) {
+    if (needsRefresh == true && mounted && widget.onUserInfoUpdated != null) {
       widget.onUserInfoUpdated!();
     }
   }

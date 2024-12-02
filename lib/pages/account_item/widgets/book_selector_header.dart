@@ -36,75 +36,59 @@ class BookSelectorHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final currentUserId = UserService.getUserInfo()?['userId'];
-    final isShared =
-        selectedBook != null && selectedBook!['createdBy'] != currentUserId;
 
     return Card(
-      margin: EdgeInsets.fromLTRB(16, 8, 16, 16),
+      margin: EdgeInsets.all(16),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: colorScheme.outlineVariant),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withOpacity(0.5),
+        ),
       ),
       child: InkWell(
         onTap: () => _showBookSelector(context),
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
+        child: Container(
           padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: colorScheme.primaryContainer,
+                backgroundColor: colorScheme.primary.withOpacity(0.1),
+                radius: 24,
                 child: Icon(
-                  _getBookIcon(selectedBook),
-                  color: colorScheme.onPrimaryContainer,
+                  Icons.account_balance_wallet,
+                  color: colorScheme.primary,
                   size: 20,
                 ),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          selectedBook?['name'] ?? '请选择账本',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        if (isShared) ...[
-                          SizedBox(width: 8),
-                          Icon(
-                            Icons.people_outline,
-                            size: 16,
-                            color: colorScheme.primary,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            '共享自${selectedBook!['fromName'] ?? '未知用户'}',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colorScheme.primary,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    if (selectedBook?['description'] != null &&
-                        selectedBook!['description'].isNotEmpty)
-                      Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Text(
-                          selectedBook!['description'],
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    Text(
+                      selectedBook?['name'] ?? '选择账本',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
                       ),
+                    ),
+                    if (selectedBook?['description'] != null) ...[
+                      SizedBox(height: 4),
+                      Text(
+                        selectedBook!['description'],
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../services/api_service.dart';
 import '../../utils/api_error_handler.dart';
@@ -16,10 +17,64 @@ class _UserInfoPageState extends State<UserInfoPage> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
 
+  // 添加焦点节点
+  final _nicknameFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _phoneFocus = FocusNode();
+
+  // 添加初始值记录
+  String? _initialNickname;
+  String? _initialEmail;
+  String? _initialPhone;
+
   @override
   void initState() {
     super.initState();
     _loadUserInfo();
+    _setupFocusListeners();
+  }
+
+  void _setupFocusListeners() {
+    _nicknameFocus.addListener(() {
+      if (!_nicknameFocus.hasFocus) {
+        final newValue = _nicknameController.text.trim();
+        if (newValue.isNotEmpty && newValue != _initialNickname) {
+          _handleNicknameSubmitted(newValue);
+        }
+      }
+    });
+
+    _emailFocus.addListener(() {
+      if (!_emailFocus.hasFocus) {
+        final newValue = _emailController.text.trim();
+        if (newValue != _initialEmail && newValue.isNotEmpty) {
+          if (_isValidEmail(newValue)) {
+            _handleEmailSubmitted(newValue);
+          }
+        }
+      }
+    });
+
+    _phoneFocus.addListener(() {
+      if (!_phoneFocus.hasFocus) {
+        final newValue = _phoneController.text.trim();
+        if (newValue != _initialPhone && newValue.isNotEmpty) {
+          if (_isValidPhone(newValue)) {
+            _handlePhoneSubmitted(newValue);
+          }
+        }
+      }
+    });
+  }
+
+  bool _isValidEmail(String? email) {
+    if (email == null || email.isEmpty) return true;
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  bool _isValidPhone(String? phone) {
+    if (phone == null || phone.isEmpty) return true;
+    return RegExp(r'^\d{11}$').hasMatch(phone);
   }
 
   Future<void> _loadUserInfo() async {
@@ -31,9 +86,14 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       setState(() {
         _userInfo = userInfo;
-        _nicknameController.text = userInfo['nickname'] ?? '';
-        _emailController.text = userInfo['email'] ?? '';
-        _phoneController.text = userInfo['phone'] ?? '';
+        // 设置初始值
+        _initialNickname = userInfo['nickname'];
+        _initialEmail = userInfo['email'];
+        _initialPhone = userInfo['phone'];
+
+        _nicknameController.text = _initialNickname ?? '';
+        _emailController.text = _initialEmail ?? '';
+        _phoneController.text = _initialPhone ?? '';
         _isLoading = false;
       });
     } catch (e) {
@@ -102,20 +162,23 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text('用户信息')),
+        appBar: AppBar(
+          title: Text('用户信息'),
+          centerTitle: true,
+          elevation: 0,
+          backgroundColor: colorScheme.surface,
+          foregroundColor: colorScheme.onSurface,
+        ),
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return GestureDetector(
       onTap: () {
-        // 点击空白处时，保存当前输入框的值并失去焦点
         final currentFocus = FocusScope.of(context);
         if (currentFocus.hasFocus) {
-          // 在失去焦点前保存当前输入框的值
           final focusedChild = currentFocus.focusedChild;
           if (focusedChild != null) {
-            // 根据当前焦点的输入框保存相应的值
             if (_nicknameController.text != _userInfo?['nickname']) {
               _handleNicknameSubmitted(_nicknameController.text);
             } else if (_emailController.text != _userInfo?['email']) {
@@ -128,125 +191,270 @@ class _UserInfoPageState extends State<UserInfoPage> {
         }
       },
       child: Scaffold(
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
-          title: Text('用户信息'),
+          title: Text(
+            '用户信息',
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+          ),
+          centerTitle: true,
+          elevation: 0,
+          backgroundColor: colorScheme.surface,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: colorScheme.onSurface,
+            ),
+            tooltip: '返回',
+            onPressed: () {
+              // 检查是否有未保存的更改
+              final hasNicknameChanges =
+                  _nicknameController.text.trim() != _initialNickname;
+              final hasEmailChanges =
+                  _emailController.text.trim() != _initialEmail;
+              final hasPhoneChanges =
+                  _phoneController.text.trim() != _initialPhone;
+
+              // 如果有未保存的更改，先保存
+              if (hasNicknameChanges || hasEmailChanges || hasPhoneChanges) {
+                final currentFocus = FocusScope.of(context);
+                if (currentFocus.hasFocus) {
+                  currentFocus.unfocus();
+                }
+              }
+
+              // 延迟返回，确保所有更改都已保存
+              Future.delayed(Duration(milliseconds: 100), () {
+                if (mounted) {
+                  Navigator.of(context).pop(true);
+                }
+              });
+            },
+          ),
+          systemOverlayStyle: theme.brightness == Brightness.dark
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark,
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(1),
+            child: Divider(
+              height: 1,
+              thickness: 0.5,
+              color: colorScheme.outlineVariant.withOpacity(0.5),
+            ),
+          ),
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInfoCard(
-                title: '基本信息',
-                children: [
-                  _buildReadOnlyField(
-                    label: '用户名',
-                    value: _userInfo?['username'] ?? '',
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: _nicknameController,
-                    decoration: InputDecoration(
-                      labelText: '昵称',
-                      border: OutlineInputBorder(),
-                    ),
-                    onEditingComplete: () =>
-                        _handleNicknameSubmitted(_nicknameController.text),
-                    onFieldSubmitted: _handleNicknameSubmitted,
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              _buildInfoCard(
-                title: '联系方式',
-                children: [
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: '邮箱',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    onEditingComplete: () =>
-                        _handleEmailSubmitted(_emailController.text),
-                    onFieldSubmitted: _handleEmailSubmitted,
-                  ),
-                  SizedBox(height: 16),
-                  TextFormField(
-                    controller: _phoneController,
-                    decoration: InputDecoration(
-                      labelText: '手机号',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.phone,
-                    onEditingComplete: () =>
-                        _handlePhoneSubmitted(_phoneController.text),
-                    onFieldSubmitted: _handlePhoneSubmitted,
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              _buildInfoCard(
-                title: '其他信息',
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildReadOnlyField(
-                          label: '邀请码',
-                          value: _userInfo?['inviteCode'] ?? '',
+        body: Column(
+          children: [
+            Expanded(
+              child: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.fromLTRB(24, 24, 24, 32),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        border: Border(
+                          bottom: BorderSide(
+                            color: colorScheme.outlineVariant.withOpacity(0.2),
+                          ),
                         ),
                       ),
-                      SizedBox(width: 16),
-                      OutlinedButton(
-                        onPressed: _resetInviteCode,
-                        child: Text('重置'),
+                      child: Column(
+                        children: [
+                          Hero(
+                            tag: 'user_avatar',
+                            child: CircleAvatar(
+                              radius: 36,
+                              backgroundColor: colorScheme.primaryContainer,
+                              child: Text(
+                                _userInfo?['nickname']?[0] ??
+                                    _userInfo?['username'][0] ??
+                                    '',
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  color: colorScheme.onPrimaryContainer,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            _userInfo?['username'] ?? '',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                  SizedBox(height: 16),
-                  _buildReadOnlyField(
-                    label: '注册时间',
-                    value: _userInfo?['createdAt'] != null
-                        ? DateFormat('yyyy-MM-dd HH:mm:ss')
-                            .format(DateTime.parse(_userInfo!['createdAt']))
-                        : '',
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(24, 8, 24, 24),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        _buildTextField(
+                          controller: _nicknameController,
+                          label: '昵称',
+                          focusNode: _nicknameFocus,
+                          validator: (value) {
+                            if (value?.isEmpty ?? true) return '昵称不能为空';
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 24),
+                        _buildTextField(
+                          controller: _emailController,
+                          label: '邮箱',
+                          keyboardType: TextInputType.emailAddress,
+                          focusNode: _emailFocus,
+                          validator: (value) {
+                            if (value?.isNotEmpty ?? false) {
+                              if (!_isValidEmail(value)) return '邮箱格式不正确';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 24),
+                        _buildTextField(
+                          controller: _phoneController,
+                          label: '手机号',
+                          keyboardType: TextInputType.phone,
+                          focusNode: _phoneFocus,
+                          validator: (value) {
+                            if (value?.isNotEmpty ?? false) {
+                              if (!_isValidPhone(value)) return '手机号格式不正确';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 24),
+                        _buildInviteCodeField(
+                          value: _userInfo?['inviteCode'] ?? '',
+                          onReset: _resetInviteCode,
+                        ),
+                        SizedBox(height: 24),
+                        _buildReadOnlyField(
+                          label: '注册时间',
+                          value: _userInfo?['createdAt'] != null
+                              ? DateFormat('yyyy-MM-dd HH:mm:ss').format(
+                                  DateTime.parse(_userInfo!['createdAt']))
+                              : '',
+                        ),
+                      ]),
+                    ),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            Container(
+              padding: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                border: Border(
+                  top: BorderSide(
+                    color: colorScheme.outlineVariant.withOpacity(0.2),
+                  ),
+                ),
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _handleLogout,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.errorContainer,
+                    foregroundColor: colorScheme.onErrorContainer,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    '退出登录',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onErrorContainer,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoCard({
-    required String title,
-    required List<Widget> children,
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    TextInputType? keyboardType,
+    FocusNode? focusNode,
+    String? Function(String?)? validator,
+    bool readOnly = false,
   }) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: Theme.of(context).colorScheme.outlineVariant,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return TextFormField(
+      controller: controller,
+      focusNode: focusNode,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: theme.textTheme.bodyMedium?.copyWith(
+          color: readOnly
+              ? colorScheme.onSurfaceVariant
+              : colorScheme.onSurfaceVariant,
         ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            SizedBox(height: 16),
-            ...children,
-          ],
+        floatingLabelStyle: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w500,
         ),
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.outline.withOpacity(0.5),
+          ),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.outline.withOpacity(0.5),
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.primary,
+            width: 1.5,
+          ),
+        ),
+        errorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.error,
+          ),
+        ),
+        focusedErrorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.error,
+            width: 1.5,
+          ),
+        ),
+        errorStyle: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.error,
+        ),
+        contentPadding: EdgeInsets.only(bottom: 4),
+        filled: readOnly,
+        fillColor:
+            readOnly ? colorScheme.surfaceVariant.withOpacity(0.5) : null,
       ),
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: readOnly ? colorScheme.onSurfaceVariant : colorScheme.onSurface,
+      ),
+      keyboardType: keyboardType,
+      readOnly: readOnly,
+      validator: validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
 
@@ -254,22 +462,95 @@ class _UserInfoPageState extends State<UserInfoPage> {
     required String label,
     required String value,
   }) {
-    return TextFormField(
-      initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(),
-      ),
+    return _buildTextField(
+      controller: TextEditingController(text: value),
+      label: label,
       readOnly: true,
-      enabled: false,
+    );
+  }
+
+  Widget _buildInviteCodeField({
+    required String value,
+    required VoidCallback onReset,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _buildReadOnlyField(
+            label: '邀请码',
+            value: value,
+          ),
+        ),
+        SizedBox(width: 16),
+        TextButton(
+          onPressed: onReset,
+          style: TextButton.styleFrom(
+            foregroundColor: colorScheme.primary,
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            minimumSize: Size(0, 32),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(
+            '重置',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   @override
   void dispose() {
+    _nicknameFocus.dispose();
+    _emailFocus.dispose();
+    _phoneFocus.dispose();
     _nicknameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('确认退出'),
+        content: Text('确定要退出登录吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+            ),
+            child: Text('退出'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await UserService.logout();
+      if (!mounted) return;
+
+      // 清除导航栈并跳转到登录页
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/login',
+        (route) => false,
+      );
+    }
   }
 }

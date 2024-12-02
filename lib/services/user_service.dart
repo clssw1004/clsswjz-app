@@ -7,8 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserService {
   static const String _sessionFileName = 'user_session.json';
   static Map<String, dynamic>? _cachedUserInfo;
-  static const String _tokenKey = 'token';
-  static const String _userInfoKey = 'userInfo';
   static const String _currentAccountBookKey = 'currentAccountBook';
 
   // 获取本地存储文件

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
@@ -100,83 +101,135 @@ class AccountItemListState extends State<AccountItemList> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: Text('账目列表'),
+        title: Text(
+          '账目列表',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: colorScheme.surface,
         actions: [
           IconButton(
             icon: Icon(
-                _isFilterExpanded ? Icons.filter_list_off : Icons.filter_list),
+              _isFilterExpanded ? Icons.filter_list_off : Icons.filter_list,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            tooltip: _isFilterExpanded ? '收起筛选' : '展开筛选',
             onPressed: () {
               setState(() => _isFilterExpanded = !_isFilterExpanded);
             },
           ),
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: Icon(
+              Icons.refresh,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            tooltip: '刷新',
             onPressed: _loadAccountItems,
           ),
         ],
+        systemOverlayStyle: theme.brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
       ),
-      body: Column(
-        children: [
-          BookSelectorHeader(
-            selectedBook: _selectedBook,
-            books: _accountBooks,
-            onBookSelected: _onBookSelected,
-          ),
-          FilterSection(
-            isExpanded: _isFilterExpanded,
-            selectedType: _selectedType,
-            selectedCategories: _selectedCategories,
-            minAmount: _minAmount,
-            maxAmount: _maxAmount,
-            startDate: _startDate,
-            endDate: _endDate,
-            categories: _categories,
-            onTypeChanged: (type) {
-              setState(() => _selectedType = type);
-              _loadAccountItems();
-            },
-            onCategoriesChanged: (categories) {
-              setState(() => _selectedCategories = categories);
-              _loadAccountItems();
-            },
-            onMinAmountChanged: (amount) {
-              setState(() => _minAmount = amount);
-              _loadAccountItems();
-            },
-            onMaxAmountChanged: (amount) {
-              setState(() => _maxAmount = amount);
-              _loadAccountItems();
-            },
-            onStartDateChanged: (date) {
-              setState(() => _startDate = date);
-              _loadAccountItems();
-            },
-            onEndDateChanged: (date) {
-              setState(() => _endDate = date);
-              _loadAccountItems();
-            },
-            onClearFilter: () {
-              setState(() {
-                _selectedType = null;
-                _selectedCategories = [];
-                _minAmount = null;
-                _maxAmount = null;
-                _startDate = null;
-                _endDate = null;
-              });
-              _loadAccountItems();
-            },
-          ),
-          Expanded(
-            child: _buildAccountItemList(),
-          ),
-        ],
-      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                BookSelectorHeader(
+                  selectedBook: _selectedBook,
+                  books: _accountBooks,
+                  onBookSelected: _onBookSelected,
+                ),
+                FilterSection(
+                  isExpanded: _isFilterExpanded,
+                  selectedType: _selectedType,
+                  selectedCategories: _selectedCategories,
+                  minAmount: _minAmount,
+                  maxAmount: _maxAmount,
+                  startDate: _startDate,
+                  endDate: _endDate,
+                  categories: _categories,
+                  onTypeChanged: (type) {
+                    setState(() => _selectedType = type);
+                    _loadAccountItems();
+                  },
+                  onCategoriesChanged: (categories) {
+                    setState(() => _selectedCategories = categories);
+                    _loadAccountItems();
+                  },
+                  onMinAmountChanged: (amount) {
+                    setState(() => _minAmount = amount);
+                    _loadAccountItems();
+                  },
+                  onMaxAmountChanged: (amount) {
+                    setState(() => _maxAmount = amount);
+                    _loadAccountItems();
+                  },
+                  onStartDateChanged: (date) {
+                    setState(() => _startDate = date);
+                    _loadAccountItems();
+                  },
+                  onEndDateChanged: (date) {
+                    setState(() => _endDate = date);
+                    _loadAccountItems();
+                  },
+                  onClearFilter: () {
+                    setState(() {
+                      _selectedType = null;
+                      _selectedCategories = [];
+                      _minAmount = null;
+                      _maxAmount = null;
+                      _startDate = null;
+                      _endDate = null;
+                    });
+                    _loadAccountItems();
+                  },
+                ),
+                Expanded(
+                  child: _accountItems.isEmpty
+                      ? _buildEmptyView(colorScheme)
+                      : ListView.builder(
+                          padding: EdgeInsets.only(bottom: 80),
+                          itemCount:
+                              _accountItems.length + _getDateHeaders().length,
+                          itemBuilder: (context, index) {
+                            final dateHeaders = _getDateHeaders();
+                            final headerIndex =
+                                _getHeaderIndexForPosition(index);
+
+                            if (headerIndex != -1) {
+                              // 渲染日期头部
+                              return _buildDateHeader(
+                                  context, dateHeaders[headerIndex]);
+                            }
+
+                            // 渲染账目项
+                            final itemIndex = _getItemIndexForPosition(index);
+                            return _buildAccountItem(
+                              context,
+                              _accountItems[itemIndex],
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
       floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
           ? FloatingActionButton(
               onPressed: _addNewRecord,
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              elevation: 2,
+              tooltip: '新增记录',
               child: Icon(Icons.add),
             )
           : null,
@@ -281,87 +334,142 @@ class AccountItemListState extends State<AccountItemList> {
     }
   }
 
-  Widget _buildAccountItemList() {
-    if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
-    }
-
-    final groupedItems = _groupItemsByDate();
-    final dates = groupedItems.keys.toList()..sort((a, b) => b.compareTo(a));
-
-    if (dates.isEmpty) {
-      return Center(
-        child: Text('暂无数据'),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: dates.length,
-      itemBuilder: (context, index) {
-        final date = dates[index];
-        final items = groupedItems[date]!;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Text(
-                date,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
-                ),
-              ),
+  Widget _buildEmptyView(ColorScheme colorScheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.receipt_long_outlined,
+            size: 64,
+            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          ),
+          SizedBox(height: 16),
+          Text(
+            '暂无账目记录',
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 16,
             ),
-            ...items.map((item) => _buildAccountItem(item)).toList(),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildAccountItem(Map<String, dynamic> item) {
+  List<String> _getDateHeaders() {
+    final headers = <String>{};
+    for (var item in _accountItems) {
+      final date = DateTime.parse(item['accountDate']);
+      headers.add(DateFormat('yyyy-MM-dd').format(date));
+    }
+    return headers.toList()..sort((a, b) => b.compareTo(a));
+  }
+
+  int _getHeaderIndexForPosition(int position) {
+    final headers = _getDateHeaders();
+    int itemCount = 0;
+    for (int i = 0; i < headers.length; i++) {
+      if (position == itemCount) {
+        return i;
+      }
+      itemCount += 1 + _getItemsForDate(headers[i]).length;
+    }
+    return -1;
+  }
+
+  int _getItemIndexForPosition(int position) {
+    final headers = _getDateHeaders();
+    int itemCount = 0;
+    int itemIndex = 0;
+    for (String header in headers) {
+      itemCount++; // 头部
+      final items = _getItemsForDate(header);
+      if (position < itemCount + items.length) {
+        return itemIndex + (position - itemCount);
+      }
+      itemCount += items.length;
+      itemIndex += items.length;
+    }
+    return itemIndex;
+  }
+
+  List<Map<String, dynamic>> _getItemsForDate(String date) {
+    return _accountItems.where((item) {
+      final itemDate =
+          DateFormat('yyyy-MM-dd').format(DateTime.parse(item['accountDate']));
+      return itemDate == date;
+    }).toList();
+  }
+
+  Widget _buildDateHeader(BuildContext context, String date) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Text(
+        _formatDateHeader(date),
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  String _formatDateHeader(String date) {
+    final now = DateTime.now();
+    final today = DateFormat('yyyy-MM-dd').format(now);
+    final yesterday =
+        DateFormat('yyyy-MM-dd').format(now.subtract(Duration(days: 1)));
+
+    if (date == today) {
+      return '今天';
+    } else if (date == yesterday) {
+      return '昨天';
+    }
+    return DateFormat('MM月dd日').format(DateTime.parse(date));
+  }
+
+  Widget _buildAccountItem(BuildContext context, Map<String, dynamic> item) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isExpense = item['type'] == 'EXPENSE';
-    final currencySymbol = _selectedBook?['currencySymbol'] ?? '¥';
+    final currencySymbol = item['currencySymbol'] ?? '¥';
+
+    // 定义收支颜色
+    final typeColor = isExpense
+        ? Color(0xFFE53935) // Material Red 600
+        : Color(0xFF43A047); // Material Green 600
 
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withOpacity(0.5),
+        ),
+      ),
       child: InkWell(
         onTap: () => _editRecord(item),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          height: 88,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: EdgeInsets.all(16),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 8,
+                height: 8,
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Center(
-                  child: Text(
-                    isExpense ? '支' : '收',
-                    style: TextStyle(
-                      color: isExpense ? Colors.red[700] : Colors.green[700],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  color: typeColor,
+                  shape: BoxShape.circle,
                 ),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: 16),
               Expanded(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
@@ -369,12 +477,9 @@ class AccountItemListState extends State<AccountItemList> {
                         Expanded(
                           child: Text(
                             '$currencySymbol${item['amount'].toString()}',
-                            style: TextStyle(
-                              color: isExpense
-                                  ? Colors.red[700]
-                                  : Colors.green[700],
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: typeColor,
                               fontWeight: FontWeight.w600,
-                              fontSize: 16,
                             ),
                           ),
                         ),
@@ -384,18 +489,14 @@ class AccountItemListState extends State<AccountItemList> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer,
+                            color: colorScheme.surfaceVariant,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             item['category'].toString(),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.w500,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -403,16 +504,35 @@ class AccountItemListState extends State<AccountItemList> {
                     SizedBox(height: 4),
                     Row(
                       children: [
+                        if (item['fundName'] != null) ...[
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  colorScheme.primaryContainer.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              item['fundName'],
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                        ],
                         Expanded(
                           child: Text(
                             item['description']?.isNotEmpty == true
                                 ? item['description']
                                 : '无备注',
-                            style: TextStyle(
+                            style: theme.textTheme.bodySmall?.copyWith(
                               color: item['description']?.isNotEmpty == true
-                                  ? Colors.grey[600]
-                                  : Colors.grey[400],
-                              fontSize: 13,
+                                  ? colorScheme.onSurfaceVariant
+                                  : colorScheme.outline,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -421,9 +541,8 @@ class AccountItemListState extends State<AccountItemList> {
                         Text(
                           DateFormat('HH:mm')
                               .format(DateTime.parse(item['accountDate'])),
-                          style: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 12,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
