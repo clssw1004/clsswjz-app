@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import 'account_book_info.dart';
+import 'account_book/widgets/book_info.dart';
 
 class AccountBookList extends StatefulWidget {
   @override
@@ -42,14 +42,14 @@ class _AccountBookListState extends State<AccountBookList> {
     final updatedAccountBook = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
-        builder: (context) => AccountBookInfo(accountBook: accountBook),
+        builder: (context) => BookInfo(accountBook: accountBook),
       ),
     );
 
     if (updatedAccountBook != null) {
-      // 更新列表中的账本数据
       setState(() {
-        final index = _accountBooks.indexWhere((book) => book['id'] == updatedAccountBook['id']);
+        final index = _accountBooks
+            .indexWhere((book) => book['id'] == updatedAccountBook['id']);
         if (index != -1) {
           _accountBooks[index] = updatedAccountBook;
         }

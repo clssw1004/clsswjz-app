@@ -18,7 +18,6 @@ class MemberList extends StatelessWidget {
 
   void _updateMemberPermission(int index, String permission, bool value) {
     if (!isEditing) return;
-
     final updatedMembers = List<dynamic>.from(members);
     updatedMembers[index] = Map<String, dynamic>.from(updatedMembers[index]);
     updatedMembers[index][permission] = value;
@@ -35,6 +34,7 @@ class MemberList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,13 +42,15 @@ class MemberList extends StatelessWidget {
         if (isEditing)
           Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: ElevatedButton.icon(
+            child: FilledButton.icon(
               onPressed: onAddMember,
-              icon: Icon(Icons.person_add_outlined),
+              icon: Icon(Icons.person_add_outlined, size: 18),
               label: Text('添加成员'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primaryContainer,
-                foregroundColor: theme.colorScheme.onPrimaryContainer,
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.primaryContainer,
+                foregroundColor: colorScheme.onPrimaryContainer,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                minimumSize: Size(120, 36),
               ),
             ),
           ),
@@ -60,105 +62,89 @@ class MemberList extends StatelessWidget {
             final member = members[index];
             final isCreator = member['userId'] == createdBy;
 
-            return Dismissible(
-              key: Key(member['userId']),
-              direction: isEditing && !isCreator
-                  ? DismissDirection.endToStart
-                  : DismissDirection.none,
-              background: Container(
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.only(right: 16),
-                color: theme.colorScheme.error,
-                child: Icon(
-                  Icons.delete_outline,
-                  color: theme.colorScheme.onError,
+            return Card(
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: colorScheme.outlineVariant,
+                  width: 1,
                 ),
               ),
-              confirmDismiss: (direction) async {
-                return await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('确认删除'),
-                    content: Text('确定要移除该成员吗？'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: Text('取消'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: Text(
-                          '删除',
-                          style: TextStyle(color: theme.colorScheme.error),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              onDismissed: (direction) => _removeMember(index),
-              child: Card(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: isCreator
-                            ? theme.colorScheme.primary.withOpacity(0.1)
-                            : theme.colorScheme.surfaceContainerHighest,
-                        child: Text(
-                          member['nickname']?[0].toUpperCase() ?? '?',
-                          style: TextStyle(
-                            color: isCreator
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.onSurfaceVariant,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    dense: true,
+                    title: Row(
+                      children: [
+                        Text(
+                          member['nickname'] ?? '未知用户',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-                      title: Text(member['nickname'] ?? '未知用户'),
-                      subtitle: isCreator ? Text('创建者') : null,
-                      trailing: isEditing && !isCreator
-                          ? IconButton(
-                              icon: Icon(Icons.remove_circle_outline),
-                              color: theme.colorScheme.error,
-                              onPressed: () => _removeMember(index),
-                            )
-                          : null,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildPermissionSection(
-                            context,
-                            index,
-                            member,
-                            '账本权限',
-                            {
-                              'canViewBook': '查看',
-                              'canEditBook': '编辑',
-                              'canDeleteBook': '删除',
-                            },
-                          ),
-                          SizedBox(height: 12),
-                          _buildPermissionSection(
-                            context,
-                            index,
-                            member,
-                            '账目权限',
-                            {
-                              'canViewItem': '查看',
-                              'canEditItem': '编辑',
-                              'canDeleteItem': '删除',
-                            },
+                        if (isCreator) ...[
+                          SizedBox(width: 8),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '创建者',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: colorScheme.primary,
+                              ),
+                            ),
                           ),
                         ],
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                    trailing: isEditing && !isCreator
+                        ? IconButton(
+                            icon: Icon(Icons.remove_circle_outline, size: 18),
+                            color: colorScheme.error,
+                            onPressed: () => _removeMember(index),
+                          )
+                        : null,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildPermissionSection(
+                          context,
+                          index,
+                          member,
+                          '账本权限',
+                          {
+                            'canViewBook': '查看',
+                            'canEditBook': '编辑',
+                            'canDeleteBook': '删除',
+                          },
+                        ),
+                        SizedBox(height: 8),
+                        _buildPermissionSection(
+                          context,
+                          index,
+                          member,
+                          '账目权限',
+                          {
+                            'canViewItem': '查看',
+                            'canEditItem': '编辑',
+                            'canDeleteItem': '删除',
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -174,20 +160,22 @@ class MemberList extends StatelessWidget {
     String title,
     Map<String, String> permissionMap,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
-        SizedBox(height: 8),
+        SizedBox(height: 4),
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: 4,
+          runSpacing: 4,
           children: permissionMap.entries.map((entry) {
             return _buildPermissionButton(
               context,
@@ -210,6 +198,7 @@ class MemberList extends StatelessWidget {
     String permission,
   ) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isEnabled = member[permission] == true;
 
     return InkWell(
@@ -217,16 +206,16 @@ class MemberList extends StatelessWidget {
           ? () => _updateMemberPermission(index, permission, !isEnabled)
           : null,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           color: isEnabled
-              ? theme.colorScheme.primary.withOpacity(0.15)
-              : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              ? colorScheme.primary.withOpacity(0.1)
+              : colorScheme.surfaceVariant.withOpacity(0.5),
           border: Border.all(
             color: isEnabled
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.3),
+                ? colorScheme.primary
+                : colorScheme.outline.withOpacity(0.3),
             width: 1,
           ),
         ),
@@ -235,20 +224,19 @@ class MemberList extends StatelessWidget {
           children: [
             if (isEnabled)
               Padding(
-                padding: EdgeInsets.only(right: 4),
+                padding: EdgeInsets.only(right: 2),
                 child: Icon(
-                  Icons.check_circle,
-                  size: 14,
-                  color: theme.colorScheme.primary,
+                  Icons.check,
+                  size: 12,
+                  color: colorScheme.primary,
                 ),
               ),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
+              style: theme.textTheme.labelSmall?.copyWith(
                 color: isEnabled
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant.withOpacity(0.8),
                 fontWeight: isEnabled ? FontWeight.w500 : FontWeight.normal,
               ),
             ),

@@ -26,7 +26,8 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.accountBook['name']);
-    _descriptionController = TextEditingController(text: widget.accountBook['description']);
+    _descriptionController =
+        TextEditingController(text: widget.accountBook['description']);
     _currencySymbol = widget.accountBook['currencySymbol'] ?? '¥';
     _members = List<dynamic>.from(widget.accountBook['members'] ?? []);
   }
@@ -43,6 +44,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
 
     try {
       final response = await ApiService.updateAccountBook(
+        context,
         widget.accountBook['id'],
         {
           'name': _nameController.text,
@@ -63,7 +65,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
         };
 
         setState(() => _isEditing = false);
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('保存成功')),
         );
@@ -73,9 +75,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
         throw Exception(response['message']);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('保存失败：$e')),
-      );
+      if (!mounted) return;
     } finally {
       setState(() => _isSaving = false);
     }
@@ -109,10 +109,12 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_isEditing) {
+    return PopScope(
+      canPop: !_isEditing,
+      onPopInvoked: (didPop) async {
+        if (!didPop) {
           final shouldPop = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
@@ -133,10 +135,10 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
               ],
             ),
           );
-          return shouldPop ?? false;
+          if (shouldPop ?? false) {
+            Navigator.pop(context, widget.accountBook);
+          }
         }
-        Navigator.pop(context, widget.accountBook);
-        return false;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -144,7 +146,8 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
           actions: [
             if (!_isEditing)
               IconButton(
-                icon: Icon(Icons.edit),
+                icon: Icon(Icons.edit_outlined),
+                tooltip: '编辑',
                 onPressed: () => setState(() => _isEditing = true),
               )
             else ...[
@@ -155,17 +158,23 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                     child: SizedBox(
                       width: 24,
                       height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                      ),
                     ),
                   ),
                 )
               else ...[
                 IconButton(
                   icon: Icon(Icons.close),
+                  tooltip: '取消',
                   onPressed: () => setState(() => _isEditing = false),
                 ),
                 IconButton(
                   icon: Icon(Icons.check),
+                  tooltip: '保存',
                   onPressed: _saveChanges,
                 ),
               ],
@@ -173,47 +182,95 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
           ],
         ),
         body: ListView(
+          padding: EdgeInsets.symmetric(vertical: 8),
           children: [
             Card(
-              margin: EdgeInsets.all(16),
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: colorScheme.outlineVariant),
+              ),
               child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (_isEditing) ...[
-                      TextField(
+                      TextFormField(
                         controller: _nameController,
                         decoration: InputDecoration(
                           labelText: '账本名称',
-                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: colorScheme.primary),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: colorScheme.outline),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: colorScheme.outline),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: colorScheme.primary),
+                          ),
                         ),
                       ),
                       SizedBox(height: 16),
-                      TextField(
+                      TextFormField(
                         controller: _descriptionController,
                         decoration: InputDecoration(
                           labelText: '账本描述',
-                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: colorScheme.primary),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: colorScheme.outline),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: colorScheme.outline),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: colorScheme.primary),
+                          ),
                         ),
-                        maxLines: null,
+                        maxLines: 3,
                       ),
                     ] else ...[
                       Text(
                         _nameController.text,
-                        style: theme.textTheme.titleLarge,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       if (_descriptionController.text.isNotEmpty) ...[
                         SizedBox(height: 8),
-                        Text(_descriptionController.text),
+                        Text(
+                          _descriptionController.text,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                       ],
                     ],
                     SizedBox(height: 16),
                     Row(
                       children: [
-                        Text('币种：'),
+                        Text(
+                          '币种：',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                         SizedBox(width: 8),
-                        Text(_currencySymbol),
+                        Text(
+                          _currencySymbol,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -221,13 +278,15 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Text(
                 '成员管理',
-                style: theme.textTheme.titleMedium,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-            SizedBox(height: 8),
             MemberList(
               members: _members,
               createdBy: widget.accountBook['createdBy'],
@@ -285,7 +344,6 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
 
   @override
   Widget build(BuildContext context) {
-
     return AlertDialog(
       title: Text('添加成员'),
       content: Column(
@@ -330,10 +388,11 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
           child: Text('取消'),
         ),
         TextButton(
-          onPressed: () => Navigator.pop(context, _searchResults.isNotEmpty ? _searchResults[0] : null),
+          onPressed: () => Navigator.pop(
+              context, _searchResults.isNotEmpty ? _searchResults[0] : null),
           child: Text('添加'),
         ),
       ],
     );
   }
-} 
+}

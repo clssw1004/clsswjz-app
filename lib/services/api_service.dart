@@ -6,7 +6,7 @@ import '../utils/api_error_handler.dart';
 import '../utils/api_exception.dart';
 
 class ApiService {
-  static String _baseUrl = 'http://192.168.2.199:3000';
+  static String _baseUrl = 'http://192.168.2.147:3000';
   static String? _token;
 
   static void setToken(String token) {
@@ -53,7 +53,7 @@ class ApiService {
       } else {
         throw ApiException(
           statusCode: response.statusCode,
-          body: response.body,
+          body: '$uri: ${response.body}',
           message: 'Failed to load categories',
         );
       }
@@ -122,13 +122,18 @@ class ApiService {
       final List<dynamic> data = json.decode(response.body);
       return data.map((item) => Map<String, dynamic>.from(item)).toList();
     } else {
-      throw Exception('Failed to load account items');
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Failed to load account items',
+      );
     }
   }
 
   static Future<List<Map<String, dynamic>>> fetchAccountBooks() async {
+    final uri = Uri.parse('$_baseUrl/api/account/book');
     final response = await http.get(
-      Uri.parse('$_baseUrl/api/account/book'),
+      uri,
       headers: _getHeaders(),
     );
 
@@ -136,14 +141,19 @@ class ApiService {
       final List<dynamic> data = json.decode(response.body);
       return data.map((book) => Map<String, dynamic>.from(book)).toList();
     } else {
-      throw Exception('Failed to load account books');
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Failed to load account books',
+      );
     }
   }
 
   static Future<Map<String, dynamic>> login(
       String username, String password) async {
+    final uri = Uri.parse('$_baseUrl/api/auth/login');
     final response = await http.post(
-      Uri.parse('$_baseUrl/api/auth/login'),
+      uri,
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'username': username,
@@ -164,13 +174,18 @@ class ApiService {
         },
       };
     } else {
-      throw Exception('Login failed');
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Login failed',
+      );
     }
   }
 
   static Future<void> createAccountBook(String name, String description) async {
+    final uri = Uri.parse('$_baseUrl/api/account/book');
     final response = await http.post(
-      Uri.parse('$_baseUrl/api/account/book'),
+      uri,
       headers: _getHeaders(needsContentType: true),
       body: json.encode({
         'name': name,
@@ -179,7 +194,11 @@ class ApiService {
     );
 
     if (!_isSuccessStatusCode(response.statusCode)) {
-      throw Exception('Failed to create account book');
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Failed to create account book',
+      );
     }
   }
 
@@ -193,8 +212,9 @@ class ApiService {
     required String email,
     String? nickname,
   }) async {
+    final uri = Uri.parse('$_baseUrl/api/users/register');
     final response = await http.post(
-      Uri.parse('$_baseUrl/api/users/register'),
+      uri,
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'username': username,
@@ -205,7 +225,11 @@ class ApiService {
     );
 
     if (!_isSuccessStatusCode(response.statusCode)) {
-      throw Exception('Registration failed');
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Registration failed',
+      );
     }
   }
 
@@ -234,8 +258,9 @@ class ApiService {
 
   static Future<List<Map<String, dynamic>>> fetchFundList(
       String accountBookId) async {
+    final uri = Uri.parse('$_baseUrl/api/account/fund/listByAccountBookId');
     final response = await http.post(
-      Uri.parse('$_baseUrl/api/account/fund/listByAccountBookId'),
+      uri,
       headers: _getHeaders(needsContentType: true),
       body: json.encode({
         'accountBookId': accountBookId,
@@ -246,7 +271,11 @@ class ApiService {
       final List<dynamic> data = json.decode(response.body);
       return data.map((fund) => Map<String, dynamic>.from(fund)).toList();
     } else {
-      throw Exception('Failed to load fund list');
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Failed to load fund list',
+      );
     }
   }
 
@@ -254,10 +283,14 @@ class ApiService {
   /// [bookId] 账本ID
   /// [data] 更新的数据，包含 name, description, currencySymbol, members 等字段
   static Future<Map<String, dynamic>> updateAccountBook(
-      String bookId, Map<String, dynamic> data) async {
-    try {
+    BuildContext context,
+    String bookId,
+    Map<String, dynamic> data,
+  ) async {
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final uri = Uri.parse('$_baseUrl/api/account/book/$bookId');
       final response = await http.patch(
-        Uri.parse('$_baseUrl/api/account/book/$bookId'),
+        uri,
         headers: _getHeaders(needsContentType: true),
         body: json.encode({
           'id': bookId,
@@ -285,16 +318,35 @@ class ApiService {
           'message': '更新成功',
         };
       } else {
-        return {
-          'code': response.statusCode,
-          'message': '更新失败',
-        };
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: '$uri: ${response.body}',
+          message: 'Failed to update account book',
+        );
       }
-    } catch (e) {
-      return {
-        'code': -1,
-        'message': '更新失败：$e',
-      };
-    }
+    });
+  }
+
+  static Future<Map<String, dynamic>> getUserByInviteCode(
+    BuildContext context,
+    String code,
+  ) async {
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final uri = Uri.parse('$_baseUrl/api/users/invite/$code');
+      final response = await http.get(
+        uri,
+        headers: _getHeaders(),
+      );
+
+      if (_isSuccessStatusCode(response.statusCode)) {
+        return json.decode(response.body);
+      } else {
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: '$uri: ${response.body}',
+          message: 'Failed to get user by invite code',
+        );
+      }
+    });
   }
 }
