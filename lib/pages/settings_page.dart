@@ -5,6 +5,7 @@ import './settings/widgets/theme_mode_selector.dart';
 import './settings/widgets/theme_color_selector.dart';
 import './settings/widgets/create_account_book_item.dart';
 import './settings/widgets/logout_button.dart';
+import './settings/widgets/developer_mode_selector.dart';
 
 class SettingsPage extends StatelessWidget {
   final Map<String, dynamic> userInfo;
@@ -33,6 +34,8 @@ class SettingsPage extends StatelessWidget {
                 ThemeColorSelector(),
                 Divider(),
                 CreateAccountBookItem(dataService: _dataService),
+                Divider(),
+                DeveloperModeSelector(),
                 Divider(),
               ],
             ),

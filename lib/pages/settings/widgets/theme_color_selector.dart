@@ -29,7 +29,7 @@ class ThemeColorSelector extends StatelessWidget {
   void _showThemeColorPicker(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     showDialog(
       context: context,
       builder: (context) {
@@ -53,7 +53,7 @@ class ThemeColorSelector extends StatelessWidget {
           content: Consumer<ThemeProvider>(
             builder: (context, themeProvider, _) {
               return SingleChildScrollView(
-                child: Container(
+                child: SizedBox(
                   width: double.maxFinite,
                   child: Wrap(
                     spacing: 12,
@@ -73,7 +73,9 @@ class ThemeColorSelector extends StatelessWidget {
                             color: color,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? colorScheme.onPrimary : Colors.transparent,
+                              color: isSelected
+                                  ? colorScheme.onPrimary
+                                  : Colors.transparent,
                               width: 3,
                             ),
                             boxShadow: [
@@ -99,4 +101,4 @@ class ThemeColorSelector extends StatelessWidget {
       },
     );
   }
-} 
+}

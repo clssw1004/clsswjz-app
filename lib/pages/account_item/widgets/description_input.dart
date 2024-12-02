@@ -12,7 +12,7 @@ class DescriptionInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -44,7 +44,7 @@ class DescriptionInput extends StatelessWidget {
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             filled: true,
-            fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+            fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
           ),
           maxLines: 3,
           style: theme.textTheme.bodyMedium?.copyWith(
@@ -54,4 +54,4 @@ class DescriptionInput extends StatelessWidget {
       ],
     );
   }
-} 
+}

@@ -13,7 +13,7 @@ Future<Map<String, dynamic>?> _initializeApp() async {
     final hasSession = await UserService.hasValidSession();
     if (hasSession) {
       await UserService.initializeSession();
-      return await UserService.getUserInfo();
+      return UserService.getUserInfo();
     }
     return null;
   } catch (e) {
@@ -26,7 +26,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
-  
+
   runApp(
     MultiProvider(
       providers: [
@@ -75,7 +75,7 @@ void main() async {
                     ),
                   );
                 }
-                return snapshot.data != null 
+                return snapshot.data != null
                     ? HomePage(userInfo: snapshot.data!)
                     : LoginPage();
               },
@@ -86,5 +86,3 @@ void main() async {
     ),
   );
 }
-
-

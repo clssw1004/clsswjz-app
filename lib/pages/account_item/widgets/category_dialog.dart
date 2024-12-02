@@ -16,14 +16,13 @@ class CategoryDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final TextEditingController _controller = TextEditingController();
-    
+    final TextEditingController controller = TextEditingController();
+
     return AlertDialog(
       title: Text(
-        '选择分类', 
-        style: theme.textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.bold
-        ),
+        '选择分类',
+        style:
+            theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
       ),
       content: Container(
         width: double.maxFinite,
@@ -34,14 +33,14 @@ class CategoryDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: _controller,
+              controller: controller,
               decoration: InputDecoration(
                 hintText: '输入新分类',
                 suffixIcon: IconButton(
                   icon: Icon(Icons.add, color: colorScheme.primary),
                   onPressed: () {
-                    if (_controller.text.isNotEmpty) {
-                      onSelected(_controller.text.trim());
+                    if (controller.text.isNotEmpty) {
+                      onSelected(controller.text.trim());
                     }
                   },
                 ),
@@ -69,7 +68,7 @@ class CategoryDialog extends StatelessWidget {
               child: Theme(
                 data: Theme.of(context).copyWith(
                   scrollbarTheme: ScrollbarThemeData(
-                    thumbColor: MaterialStateProperty.all(colorScheme.primary),
+                    thumbColor: WidgetStateProperty.all(colorScheme.primary),
                   ),
                 ),
                 child: Scrollbar(
@@ -84,14 +83,14 @@ class CategoryDialog extends StatelessWidget {
                           label: Text(
                             category,
                             style: TextStyle(
-                              color: isSelected 
-                                  ? colorScheme.onPrimary 
+                              color: isSelected
+                                  ? colorScheme.onPrimary
                                   : colorScheme.onSurface,
                             ),
                           ),
                           selected: isSelected,
                           selectedColor: colorScheme.primary,
-                          backgroundColor: colorScheme.surfaceVariant,
+                          backgroundColor: colorScheme.surfaceContainerHighest,
                           onSelected: (_) => onSelected(category),
                         );
                       }).toList(),
@@ -105,4 +104,4 @@ class CategoryDialog extends StatelessWidget {
       ),
     );
   }
-} 
+}

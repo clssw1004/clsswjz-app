@@ -16,7 +16,7 @@ class FundSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Consumer<AccountItemProvider>(
       builder: (context, provider, _) {
         return Container(
@@ -29,15 +29,16 @@ class FundSelector extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              backgroundColor: colorScheme.surfaceVariant.withOpacity(0.5),
+              backgroundColor:
+                  colorScheme.surfaceContainerHighest.withOpacity(0.5),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.account_balance_wallet,
                   size: 20,
-                  color: selectedFund != null 
-                      ? colorScheme.primary 
+                  color: selectedFund != null
+                      ? colorScheme.primary
                       : colorScheme.onSurfaceVariant,
                 ),
                 SizedBox(width: 8),
@@ -45,7 +46,7 @@ class FundSelector extends StatelessWidget {
                   child: Text(
                     selectedFund?['fundName'] ?? '选择账户',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: selectedFund != null 
+                      color: selectedFund != null
                           ? colorScheme.onSurface
                           : colorScheme.onSurfaceVariant,
                     ),
@@ -66,11 +67,13 @@ class FundSelector extends StatelessWidget {
   void _showFundSelector(BuildContext context, AccountItemProvider provider) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isExpense = provider.transactionType == 'EXPENSE';
-    final availableFunds = provider.fundList.where((fund) =>
-        isExpense ? fund['fundOut'] == true : fund['fundIn'] == true).toList();
+    final availableFunds = provider.fundList
+        .where((fund) =>
+            isExpense ? fund['fundOut'] == true : fund['fundIn'] == true)
+        .toList();
 
     showDialog(
       context: context,
@@ -106,14 +109,17 @@ class FundSelector extends StatelessWidget {
                         title: Text(
                           fund['fundName'],
                           style: TextStyle(
-                            color: isSelected 
-                                ? colorScheme.primary 
+                            color: isSelected
+                                ? colorScheme.primary
                                 : (isDark ? Colors.white : Colors.grey[800]),
-                            fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                            fontWeight: isSelected
+                                ? FontWeight.w500
+                                : FontWeight.normal,
                           ),
                         ),
                         selected: isSelected,
-                        selectedTileColor: colorScheme.primary.withOpacity(0.12),
+                        selectedTileColor:
+                            colorScheme.primary.withOpacity(0.12),
                         onTap: () {
                           onChanged(fund);
                           Navigator.pop(context);
@@ -126,4 +132,4 @@ class FundSelector extends StatelessWidget {
       },
     );
   }
-} 
+}

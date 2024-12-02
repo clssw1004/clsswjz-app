@@ -17,7 +17,7 @@ class BookHeader extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(0.5),
+        color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: colorScheme.outlineVariant,
@@ -45,4 +45,4 @@ class BookHeader extends StatelessWidget {
       ),
     );
   }
-} 
+}

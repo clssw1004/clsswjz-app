@@ -19,21 +19,18 @@ class DateTimeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(0.5),
+        color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
           Expanded(
             child: OutlinedButton.icon(
-              icon: Icon(
-                Icons.calendar_today, 
-                color: colorScheme.primary, 
-                size: 18
-              ),
+              icon: Icon(Icons.calendar_today,
+                  color: colorScheme.primary, size: 18),
               label: Text(
                 DateFormat('yyyy年MM月dd日').format(selectedDate),
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -55,11 +52,8 @@ class DateTimeSelector extends StatelessWidget {
           SizedBox(width: 8),
           Expanded(
             child: OutlinedButton.icon(
-              icon: Icon(
-                Icons.access_time, 
-                color: colorScheme.primary, 
-                size: 18
-              ),
+              icon:
+                  Icon(Icons.access_time, color: colorScheme.primary, size: 18),
               label: Text(
                 '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}',
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -86,7 +80,7 @@ class DateTimeSelector extends StatelessWidget {
   Future<void> _selectDate(BuildContext context) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
@@ -107,7 +101,7 @@ class DateTimeSelector extends StatelessWidget {
         );
       },
     );
-    
+
     if (picked != null) {
       onDateChanged(picked);
     }
@@ -116,7 +110,7 @@ class DateTimeSelector extends StatelessWidget {
   Future<void> _selectTime(BuildContext context) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: selectedTime,
@@ -126,11 +120,11 @@ class DateTimeSelector extends StatelessWidget {
             colorScheme: colorScheme,
             timePickerTheme: TimePickerThemeData(
               backgroundColor: colorScheme.surface,
-              hourMinuteColor: colorScheme.surfaceVariant,
+              hourMinuteColor: colorScheme.surfaceContainerHighest,
               hourMinuteTextColor: colorScheme.onSurface,
-              dayPeriodColor: colorScheme.surfaceVariant,
+              dayPeriodColor: colorScheme.surfaceContainerHighest,
               dayPeriodTextColor: colorScheme.onSurface,
-              dialBackgroundColor: colorScheme.surfaceVariant,
+              dialBackgroundColor: colorScheme.surfaceContainerHighest,
               dialHandColor: colorScheme.primary,
               dialTextColor: colorScheme.onSurface,
               entryModeIconColor: colorScheme.onSurfaceVariant,
@@ -140,9 +134,9 @@ class DateTimeSelector extends StatelessWidget {
         );
       },
     );
-    
+
     if (picked != null) {
       onTimeChanged(picked);
     }
   }
-} 
+}

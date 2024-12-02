@@ -33,8 +33,9 @@ class AccountItemListState extends State<AccountItemList> {
   static const double _filterButtonRadius = 8.0;
   static const double _filterIconSize = 18.0;
   static const double _filterFontSize = 13.0;
-  static const EdgeInsets _filterButtonPadding = EdgeInsets.symmetric(horizontal: 12, vertical: 0);
-  
+  static const EdgeInsets _filterButtonPadding =
+      EdgeInsets.symmetric(horizontal: 12, vertical: 0);
+
   // 获取统一的按钮样式
   ButtonStyle _getFilterButtonStyle(Color themeColor, bool isSelected) {
     return OutlinedButton.styleFrom(
@@ -113,7 +114,6 @@ class AccountItemListState extends State<AccountItemList> {
   Future<void> _loadCategories() async {
     if (_selectedBook == null || !mounted) return;
 
-
     try {
       final categories = await _dataService.fetchCategories(
         _selectedBook!['id'],
@@ -163,7 +163,7 @@ class AccountItemListState extends State<AccountItemList> {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
         final themeColor = themeProvider.themeColor;
-        
+
         return AnimatedContainer(
           duration: Duration(milliseconds: 300),
           height: _isFilterExpanded ? 216 : 0,
@@ -192,17 +192,19 @@ class AccountItemListState extends State<AccountItemList> {
                         ),
                       ),
                       TextButton(
-                        onPressed: _hasAnyFilter() ? () {
-                          setState(() {
-                            _selectedType = null;
-                            _selectedCategories.clear();
-                            _minAmount = null;
-                            _maxAmount = null;
-                            _startDate = null;
-                            _endDate = null;
-                          });
-                          _loadAccountItems();
-                        } : null,
+                        onPressed: _hasAnyFilter()
+                            ? () {
+                                setState(() {
+                                  _selectedType = null;
+                                  _selectedCategories.clear();
+                                  _minAmount = null;
+                                  _maxAmount = null;
+                                  _startDate = null;
+                                  _endDate = null;
+                                });
+                                _loadAccountItems();
+                              }
+                            : null,
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.symmetric(horizontal: 8),
                           minimumSize: Size(0, 32),
@@ -212,14 +214,15 @@ class AccountItemListState extends State<AccountItemList> {
                           '清空筛选',
                           style: TextStyle(
                             fontSize: 13,
-                            color: _hasAnyFilter() ? themeColor : Colors.grey[400],
+                            color:
+                                _hasAnyFilter() ? themeColor : Colors.grey[400],
                           ),
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 8),
-                  
+
                   // 类型和分类选择
                   Row(
                     children: [
@@ -233,7 +236,9 @@ class AccountItemListState extends State<AccountItemList> {
                       SizedBox(width: 8),
                       _buildFilterButton(
                         icon: Icons.category_outlined,
-                        label: _selectedCategories.isEmpty ? '选择分类' : '已选${_selectedCategories.length}个',
+                        label: _selectedCategories.isEmpty
+                            ? '选择分类'
+                            : '已选${_selectedCategories.length}个',
                         onPressed: () => _showCategorySelector(context),
                         isSelected: _selectedCategories.isNotEmpty,
                         themeColor: themeColor,
@@ -241,7 +246,7 @@ class AccountItemListState extends State<AccountItemList> {
                     ],
                   ),
                   SizedBox(height: 8),
-                  
+
                   // 金额范围
                   Row(
                     children: [
@@ -263,13 +268,15 @@ class AccountItemListState extends State<AccountItemList> {
                     ],
                   ),
                   SizedBox(height: 8),
-                  
+
                   // 日期范围
                   Row(
                     children: [
                       _buildFilterButton(
                         icon: Icons.calendar_today,
-                        label: _startDate == null ? '开始日期' : DateFormat('yyyy-MM-dd').format(_startDate!),
+                        label: _startDate == null
+                            ? '开始日期'
+                            : DateFormat('yyyy-MM-dd').format(_startDate!),
                         onPressed: () async {
                           final date = await _selectDate(context);
                           if (date != null) {
@@ -283,7 +290,9 @@ class AccountItemListState extends State<AccountItemList> {
                       SizedBox(width: 8),
                       _buildFilterButton(
                         icon: Icons.calendar_today,
-                        label: _endDate == null ? '结束日期' : DateFormat('yyyy-MM-dd').format(_endDate!),
+                        label: _endDate == null
+                            ? '结束日期'
+                            : DateFormat('yyyy-MM-dd').format(_endDate!),
                         onPressed: () async {
                           final date = await _selectDate(context);
                           if (date != null) {
@@ -497,10 +506,8 @@ class AccountItemListState extends State<AccountItemList> {
                                                   isExpense ? '支' : '收',
                                                   style: TextStyle(
                                                     color: isExpense
-                                                        ? Colors
-                                                            .red[700]
-                                                        : Colors
-                                                            .green[700],
+                                                        ? Colors.red[700]
+                                                        : Colors.green[700],
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -549,9 +556,13 @@ class AccountItemListState extends State<AccountItemList> {
                                                                   .circular(12),
                                                         ),
                                                         child: Text(
-                                                          item['category'].toString().length > 4 
+                                                          item['category']
+                                                                      .toString()
+                                                                      .length >
+                                                                  4
                                                               ? '${item['category'].toString().substring(0, 4)}...'
-                                                              : item['category'].toString(),
+                                                              : item['category']
+                                                                  .toString(),
                                                           style: TextStyle(
                                                             fontSize: 12,
                                                             color: themeColor,
@@ -645,7 +656,7 @@ class AccountItemListState extends State<AccountItemList> {
         ),
       ),
     );
-    
+
     if (result == true) {
       _loadAccountItems();
     }
@@ -663,7 +674,7 @@ class AccountItemListState extends State<AccountItemList> {
         ),
       ),
     );
-    
+
     if (result == true) {
       _loadAccountItems();
     }
@@ -751,23 +762,19 @@ class AccountItemListState extends State<AccountItemList> {
                   color: Colors.black87,
                 ),
               ),
-              content: Container(
+              content: SizedBox(
                 width: double.maxFinite,
                 child: Wrap(
                   spacing: 6,
                   runSpacing: 6,
                   children: [
                     _buildTypeOption('', '全部', themeColor),
-                    _buildTypeOption(
-                        'EXPENSE', '支出', themeColor),
-                    _buildTypeOption(
-                        'INCOME', '收入', themeColor),
+                    _buildTypeOption('EXPENSE', '支出', themeColor),
+                    _buildTypeOption('INCOME', '收入', themeColor),
                   ],
                 ),
               ),
-              actions: [
-
-              ],
+              actions: [],
             );
           },
         );
@@ -808,47 +815,56 @@ class AccountItemListState extends State<AccountItemList> {
                     spacing: 8,
                     runSpacing: 8,
                     alignment: WrapAlignment.start,
-                    children: _categories.map((category) =>
-                      StatefulBuilder(
-                        builder: (context, setStateDialog) {
-                          final isSelected = _selectedCategories.contains(category);
-                          return IntrinsicWidth(
-                            child: Material(
-                              color: isSelected ? themeColor : Colors.grey[200],
-                              borderRadius: BorderRadius.circular(16),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                                onTap: () {
-                                  setStateDialog(() {
-                                    if (isSelected) {
-                                      _selectedCategories.remove(category);
-                                    } else {
-                                      _selectedCategories.add(category);
-                                    }
-                                  });
-                                  setState(() {});
-                                  _loadAccountItems();
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  child: Text(
-                                    category,
-                                    style: TextStyle(
-                                      color: isSelected ? Colors.white : Colors.black87,
-                                      fontSize: 13,
-                                      fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                    children: _categories
+                        .map(
+                          (category) => StatefulBuilder(
+                            builder: (context, setStateDialog) {
+                              final isSelected =
+                                  _selectedCategories.contains(category);
+                              return IntrinsicWidth(
+                                child: Material(
+                                  color: isSelected
+                                      ? themeColor
+                                      : Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                    onTap: () {
+                                      setStateDialog(() {
+                                        if (isSelected) {
+                                          _selectedCategories.remove(category);
+                                        } else {
+                                          _selectedCategories.add(category);
+                                        }
+                                      });
+                                      setState(() {});
+                                      _loadAccountItems();
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      child: Text(
+                                        category,
+                                        style: TextStyle(
+                                          color: isSelected
+                                              ? Colors.white
+                                              : Colors.black87,
+                                          fontSize: 13,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w500
+                                              : FontWeight.normal,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ).toList(),
+                              );
+                            },
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
               ),
@@ -870,8 +886,7 @@ class AccountItemListState extends State<AccountItemList> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () =>
-                      Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(context).pop(),
                   child: Text(
                     '关闭',
                     style: TextStyle(
@@ -965,11 +980,11 @@ class AccountItemListState extends State<AccountItemList> {
 
   bool _hasAnyFilter() {
     return _selectedType != null ||
-           _selectedCategories.isNotEmpty ||
-           _minAmount != null ||
-           _maxAmount != null ||
-           _startDate != null ||
-           _endDate != null;
+        _selectedCategories.isNotEmpty ||
+        _minAmount != null ||
+        _maxAmount != null ||
+        _startDate != null ||
+        _endDate != null;
   }
 
   void _onMinAmountChanged(String value) {

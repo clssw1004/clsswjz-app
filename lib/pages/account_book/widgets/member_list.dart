@@ -62,8 +62,8 @@ class MemberList extends StatelessWidget {
 
             return Dismissible(
               key: Key(member['userId']),
-              direction: isEditing && !isCreator 
-                  ? DismissDirection.endToStart 
+              direction: isEditing && !isCreator
+                  ? DismissDirection.endToStart
                   : DismissDirection.none,
               background: Container(
                 alignment: Alignment.centerRight,
@@ -104,13 +104,13 @@ class MemberList extends StatelessWidget {
                   children: [
                     ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: isCreator 
+                        backgroundColor: isCreator
                             ? theme.colorScheme.primary.withOpacity(0.1)
-                            : theme.colorScheme.surfaceVariant,
+                            : theme.colorScheme.surfaceContainerHighest,
                         child: Text(
                           member['nickname']?[0].toUpperCase() ?? '?',
                           style: TextStyle(
-                            color: isCreator 
+                            color: isCreator
                                 ? theme.colorScheme.primary
                                 : theme.colorScheme.onSurfaceVariant,
                           ),
@@ -213,14 +213,16 @@ class MemberList extends StatelessWidget {
     final isEnabled = member[permission] == true;
 
     return InkWell(
-      onTap: isEditing ? () => _updateMemberPermission(index, permission, !isEnabled) : null,
+      onTap: isEditing
+          ? () => _updateMemberPermission(index, permission, !isEnabled)
+          : null,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           color: isEnabled
               ? theme.colorScheme.primary.withOpacity(0.15)
-              : theme.colorScheme.surfaceVariant.withOpacity(0.5),
+              : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
           border: Border.all(
             color: isEnabled
                 ? theme.colorScheme.primary
