@@ -37,8 +37,6 @@ class _BookInfoState extends State<BookInfo> {
   }
 
   IconData _getBookIcon(Map<String, dynamic> book) {
-    if (book == null) return BookIcons.defaultIcon;
-
     final String? iconString = book['icon']?.toString();
     if (iconString == null || iconString.isEmpty) {
       return BookIcons.defaultIcon;

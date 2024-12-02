@@ -1,72 +1,94 @@
 import 'package:flutter/material.dart';
+import '../../user/user_info_page.dart';
 
-class UserCard extends StatelessWidget {
+class UserCard extends StatefulWidget {
   final Map<String, dynamic> userInfo;
+  final VoidCallback? onUserInfoUpdated;
 
   const UserCard({
     Key? key,
     required this.userInfo,
+    this.onUserInfoUpdated,
   }) : super(key: key);
 
   @override
+  State<UserCard> createState() => _UserCardState();
+}
+
+class _UserCardState extends State<UserCard> {
+  Future<void> _navigateToUserInfo() async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (context) => UserInfoPage()),
+    );
+
+    if (result == true && widget.onUserInfoUpdated != null) {
+      widget.onUserInfoUpdated!();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final themeColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Card(
       margin: EdgeInsets.all(16),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Theme.of(context).dividerColor),
+        side: BorderSide(color: colorScheme.outlineVariant),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Row(
-          children: [
-            _buildAvatar(themeColor, userInfo['nickname'] ?? ''),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    userInfo['nickname'] ?? userInfo['username'] ?? '',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.white : Colors.grey[800],
-                    ),
+      child: InkWell(
+        onTap: _navigateToUserInfo,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: colorScheme.primaryContainer,
+                radius: 24,
+                child: Text(
+                  widget.userInfo['nickname']?[0] ??
+                      widget.userInfo['username'][0],
+                  style: TextStyle(
+                    color: colorScheme.onPrimaryContainer,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
                   ),
-                  SizedBox(height: 4),
-                  Text(
-                    userInfo['username'] ?? '',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDark ? Colors.white70 : Colors.grey[600],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.userInfo['nickname'] ??
+                          widget.userInfo['username'],
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      widget.userInfo['username'],
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-
-  Widget _buildAvatar(Color themeColor, String nickname) {
-    return CircleAvatar(
-      radius: 30,
-      backgroundColor: themeColor.withOpacity(0.1),
-      child: Text(
-        nickname.isNotEmpty ? nickname[0].toUpperCase() : '?',
-        style: TextStyle(
-          fontSize: 24,
-          color: themeColor,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-} 
+}

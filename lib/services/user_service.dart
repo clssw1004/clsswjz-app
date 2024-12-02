@@ -2,10 +2,14 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import 'api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
   static const String _sessionFileName = 'user_session.json';
   static Map<String, dynamic>? _cachedUserInfo;
+  static const String _tokenKey = 'token';
+  static const String _userInfoKey = 'userInfo';
+  static const String _currentAccountBookKey = 'currentAccountBook';
 
   // 获取本地存储文件
   static Future<File> get _sessionFile async {
@@ -91,6 +95,34 @@ class UserService {
       ApiService.clearToken(); // 需要在 ApiService 中添加这个方法
     } catch (e) {
       print('退出登录失败: $e');
+    }
+  }
+
+  // 添加账本相关方法
+  static Future<void> setCurrentAccountBookId(String bookId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_currentAccountBookKey, bookId);
+  }
+
+  static Future<String?> getCurrentAccountBookId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_currentAccountBookKey);
+  }
+
+  // 更新缓存的用户信息
+  static Future<void> updateUserInfo(Map<String, dynamic> newInfo) async {
+    if (_cachedUserInfo != null) {
+      _cachedUserInfo = {
+        ..._cachedUserInfo!,
+        ...newInfo,
+      };
+      // 同时更新本地存储
+      final sessionData = await getUserSession();
+      if (sessionData != null) {
+        sessionData['userInfo'] = _cachedUserInfo;
+        final file = await _sessionFile;
+        await file.writeAsString(json.encode(sessionData));
+      }
     }
   }
 }

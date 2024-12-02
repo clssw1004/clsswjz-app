@@ -1,5 +1,6 @@
 import 'api_service.dart';
 import 'package:flutter/material.dart';
+import 'user_service.dart';
 
 class DataService {
   // 单例模式
@@ -50,8 +51,30 @@ class DataService {
   }
 
   // 获取默认账本
-  Map<String, dynamic>? getDefaultBook() {
-    return _cachedBooks?.isNotEmpty == true ? _cachedBooks!.first : null;
+  Future<Map<String, dynamic>?> getDefaultBook() async {
+    if (_cachedBooks?.isEmpty ?? true) return null;
+
+    // 获取保存的账本ID
+    final savedBookId = await UserService.getCurrentAccountBookId();
+    if (savedBookId != null) {
+      // 尝试找到保存的账本
+      final savedBook = _cachedBooks!.firstWhere(
+        (book) => book['id'] == savedBookId,
+        orElse: () => _getFirstOwnedBook() ?? _cachedBooks!.first,
+      );
+      return savedBook;
+    }
+
+    // 如果没有保存的账本ID，返回第一个本人的账本或第一个可用账本
+    return _getFirstOwnedBook() ?? _cachedBooks!.first;
+  }
+
+  Map<String, dynamic>? _getFirstOwnedBook() {
+    final currentUserId = UserService.getUserInfo()?['userId'];
+    return _cachedBooks?.firstWhere(
+      (book) => book['createdBy'] == currentUserId,
+      orElse: () => _cachedBooks!.first,
+    );
   }
 
   Future<List<Map<String, dynamic>>> fetchFundList(String bookId) async {

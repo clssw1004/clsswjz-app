@@ -244,7 +244,7 @@ class ApiService {
     final url = Uri.parse('$_baseUrl/api/account/item/$id');
     final response = await http.delete(
       url,
-      headers: await _getHeaders(),
+      headers: _getHeaders(),
     );
 
     if (response.statusCode != 200) {
@@ -355,5 +355,72 @@ class ApiService {
         );
       }
     });
+  }
+
+  // 获取当前用户信息
+  static Future<Map<String, dynamic>> getLoginUserInfo() async {
+    final uri = Uri.parse('$_baseUrl/api/users/current');
+    final response = await http.get(
+      uri,
+      headers: _getHeaders(),
+    );
+
+    if (_isSuccessStatusCode(response.statusCode)) {
+      return json.decode(response.body);
+    } else {
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Failed to get user info',
+      );
+    }
+  }
+
+  // 保存用户信息
+  static Future<Map<String, dynamic>> saveUserInfo({
+    String? nickname,
+    String? email,
+    String? phone,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/api/users/current');
+    final response = await http.put(
+      uri,
+      headers: _getHeaders(needsContentType: true),
+      body: json.encode({
+        if (nickname != null) 'nickname': nickname,
+        if (email != null) 'email': email,
+        if (phone != null) 'phone': phone,
+      }),
+    );
+
+    if (_isSuccessStatusCode(response.statusCode)) {
+      return json.decode(response.body);
+    } else {
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Failed to save user info',
+      );
+    }
+  }
+
+  // 重置邀请码
+  static Future<String> resetInviteCode() async {
+    final uri = Uri.parse('$_baseUrl/api/users/invite/reset');
+    final response = await http.put(
+      uri,
+      headers: _getHeaders(),
+    );
+
+    if (_isSuccessStatusCode(response.statusCode)) {
+      final data = json.decode(response.body);
+      return data['inviteCode'];
+    } else {
+      throw ApiException(
+        statusCode: response.statusCode,
+        body: '$uri: ${response.body}',
+        message: 'Failed to reset invite code',
+      );
+    }
   }
 }

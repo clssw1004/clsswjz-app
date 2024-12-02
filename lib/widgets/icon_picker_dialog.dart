@@ -39,7 +39,7 @@ class IconPickerDialog extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? colorScheme.primaryContainer
-                        : colorScheme.surfaceVariant,
+                        : colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isSelected

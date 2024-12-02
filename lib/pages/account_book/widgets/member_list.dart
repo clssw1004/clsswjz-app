@@ -248,7 +248,7 @@ class _MemberListState extends State<MemberList> {
           borderRadius: BorderRadius.circular(12),
           color: isEnabled
               ? colorScheme.primary.withOpacity(0.1)
-              : colorScheme.surfaceVariant.withOpacity(0.5),
+              : colorScheme.surfaceContainerHighest.withOpacity(0.5),
           border: Border.all(
             color: isEnabled
                 ? colorScheme.primary

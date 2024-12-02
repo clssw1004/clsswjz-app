@@ -6,15 +6,35 @@ import './settings/widgets/theme_color_selector.dart';
 import './settings/widgets/create_account_book_item.dart';
 import './settings/widgets/logout_button.dart';
 import './settings/widgets/developer_mode_selector.dart';
+import '../services/user_service.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   final Map<String, dynamic> userInfo;
-  final _dataService = DataService();
 
-  SettingsPage({
+  const SettingsPage({
     Key? key,
     required this.userInfo,
   }) : super(key: key);
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  late Map<String, dynamic> _userInfo;
+  final _dataService = DataService();
+
+  @override
+  void initState() {
+    super.initState();
+    _userInfo = widget.userInfo;
+  }
+
+  void _refreshUserInfo() {
+    setState(() {
+      _userInfo = UserService.getUserInfo() ?? _userInfo;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +48,10 @@ class SettingsPage extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                UserCard(userInfo: userInfo),
+                UserCard(
+                  userInfo: _userInfo,
+                  onUserInfoUpdated: _refreshUserInfo,
+                ),
                 Divider(),
                 ThemeModeSelector(),
                 ThemeColorSelector(),
