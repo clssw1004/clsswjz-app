@@ -6,6 +6,8 @@ import './settings/widgets/theme_color_selector.dart';
 import './settings/widgets/create_account_book_item.dart';
 import './settings/widgets/developer_mode_selector.dart';
 import '../services/user_service.dart';
+import './settings/category_management_page.dart';
+import '../widgets/app_bar_factory.dart';
 
 class SettingsPage extends StatefulWidget {
   final Map<String, dynamic> userInfo;
@@ -40,11 +42,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('设置'),
-        elevation: 0,
-        backgroundColor: theme.colorScheme.surface,
-        foregroundColor: theme.colorScheme.onSurface,
+      appBar: AppBarFactory.buildAppBar(
+        context: context,
+        title: '设置',
       ),
       body: ListView(
         children: [
@@ -67,6 +67,19 @@ class _SettingsPageState extends State<SettingsPage> {
             title: '账本管理',
             children: [
               CreateAccountBookItem(dataService: _dataService),
+              ListTile(
+                leading: Icon(Icons.category_outlined),
+                title: Text('分类管理'),
+                trailing: Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CategoryManagementPage(),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
           SizedBox(height: 16),

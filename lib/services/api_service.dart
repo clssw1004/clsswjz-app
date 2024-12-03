@@ -39,7 +39,7 @@ class ApiService {
     return statusCode == 200 || statusCode == 201;
   }
 
-  static Future<List<String>> fetchCategories(
+  static Future<List<Map<String, dynamic>>> fetchCategories(
     BuildContext context,
     String accountBookId,
   ) async {
@@ -55,7 +55,9 @@ class ApiService {
 
       if (_isSuccessStatusCode(response.statusCode)) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((category) => category['name'].toString()).toList();
+        return data
+            .map((category) => Map<String, dynamic>.from(category))
+            .toList();
       } else {
         throw ApiException(
           statusCode: response.statusCode,
@@ -488,22 +490,58 @@ class ApiService {
     });
   }
 
-  static Future<Map<String, dynamic>?> fetchShopByCode(
+  static Future<Map<String, dynamic>> createCategory(
     BuildContext context,
+    String name,
     String accountBookId,
-    String shopCode,
   ) async {
-    try {
-      final response = await _dio.get(
-        '/api/shops/$shopCode',
-        queryParameters: {
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final uri = Uri.parse('$_baseUrl/api/account/category');
+      final response = await http.post(
+        uri,
+        headers: _getHeaders(needsContentType: true),
+        body: json.encode({
+          'name': name,
           'accountBookId': accountBookId,
-        },
+        }),
       );
-      return response.data;
-    } catch (e) {
-      ApiErrorHandler.handleError(context, e);
-      return null;
-    }
+
+      if (_isSuccessStatusCode(response.statusCode)) {
+        return Map<String, dynamic>.from(json.decode(response.body));
+      } else {
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: '$uri: ${response.body}',
+          message: '创建分类失败',
+        );
+      }
+    });
+  }
+
+  static Future<Map<String, dynamic>> updateCategory(
+    BuildContext context,
+    String id,
+    String name,
+  ) async {
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final uri = Uri.parse('$_baseUrl/api/account/category/$id');
+      final response = await http.patch(
+        uri,
+        headers: _getHeaders(needsContentType: true),
+        body: json.encode({
+          'name': name,
+        }),
+      );
+
+      if (_isSuccessStatusCode(response.statusCode)) {
+        return Map<String, dynamic>.from(json.decode(response.body));
+      } else {
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: '$uri: ${response.body}',
+          message: '更新分类失败',
+        );
+      }
+    });
   }
 }

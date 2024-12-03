@@ -5,8 +5,8 @@ import '../../../services/api_service.dart';
 class AccountItemProvider extends ChangeNotifier {
   final _dataService = DataService();
 
-  List<String> _categories = [];
-  List<String> _displayCategories = [];
+  List<Map<String, dynamic>> _categories = [];
+  List<Map<String, dynamic>> _displayCategories = [];
   List<Map<String, dynamic>> _accountBooks = [];
   List<Map<String, dynamic>> _fundList = [];
   Map<String, dynamic>? _selectedBook;
@@ -14,8 +14,8 @@ class AccountItemProvider extends ChangeNotifier {
   String _transactionType = 'EXPENSE';
 
   // Getters
-  List<String> get categories => _categories;
-  List<String> get displayCategories => _displayCategories;
+  List<Map<String, dynamic>> get categories => _categories;
+  List<Map<String, dynamic>> get displayCategories => _displayCategories;
   Map<String, dynamic>? get selectedBook => _selectedBook;
   List<Map<String, dynamic>> get fundList => _fundList;
   List<Map<String, dynamic>> get accountBooks => _accountBooks;
@@ -83,9 +83,11 @@ class AccountItemProvider extends ChangeNotifier {
       _displayCategories = List.from(_categories);
     } else {
       if (_selectedCategory != null &&
-          !_categories.take(maxButtons - 1).contains(_selectedCategory)) {
+          !_categories
+              .take(maxButtons - 1)
+              .any((c) => c['name'] == _selectedCategory)) {
         final initialCategories = _categories.take(maxButtons - 2).toList();
-        initialCategories.add(_selectedCategory!);
+        initialCategories.add({'name': _selectedCategory!});
         _displayCategories = initialCategories;
       } else {
         _displayCategories = _categories.take(maxButtons - 1).toList();
@@ -105,9 +107,10 @@ class AccountItemProvider extends ChangeNotifier {
   }
 
   void updateDisplayCategories(String newCategory) {
-    final List<String> updatedList = List.from(_displayCategories);
+    final List<Map<String, dynamic>> updatedList =
+        List.from(_displayCategories);
     if (updatedList.length >= 11) {
-      updatedList[10] = newCategory; // 替换最后一个显示的分类
+      updatedList[10] = {'name': newCategory}; // 替换最后一个显示的分类
     }
     _displayCategories = updatedList;
     notifyListeners();

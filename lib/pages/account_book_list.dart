@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../services/api_service.dart';
 import '../utils/message_helper.dart';
 import '../constants/book_icons.dart';
 import 'account_book/widgets/book_info.dart';
 import '../services/user_service.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
+import '../widgets/app_bar_factory.dart';
 
 class AccountBookList extends StatefulWidget {
   @override
@@ -93,38 +91,26 @@ class _AccountBookListState extends State<AccountBookList> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          '账本管理',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
-        iconTheme: IconThemeData(
-          color: colorScheme.onSurface,
-        ),
+      extendBodyBehindAppBar: true,
+      appBar: AppBarFactory.buildAppBar(
+        context: context,
+        title: '账本管理',
         actions: [
           IconButton(
             icon: Icon(Icons.add),
             tooltip: '新建账本',
-            color: colorScheme.onSurface,
             onPressed: () {
-              Navigator.pushNamed(context, '/create-account-book').then((_) {
-                _fetchAccountBooks();
-              });
+              Navigator.pushNamed(context, '/create-account-book')
+                  .then((_) => _fetchAccountBooks());
             },
           ),
         ],
-        systemOverlayStyle: theme.brightness == Brightness.dark
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
       ),
-      body: RefreshIndicator(
-        onRefresh: _fetchAccountBooks,
-        child: _buildContent(),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _fetchAccountBooks,
+          child: _buildContent(),
+        ),
       ),
     );
   }

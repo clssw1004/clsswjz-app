@@ -4,6 +4,7 @@ import '../../../utils/message_helper.dart';
 import '../../../constants/book_icons.dart';
 import '../../../widgets/icon_picker_dialog.dart';
 import 'member_list.dart';
+import '../../../widgets/app_bar_factory.dart';
 
 class BookInfo extends StatefulWidget {
   final Map<String, dynamic> accountBook;
@@ -148,31 +149,9 @@ class _BookInfoState extends State<BookInfo> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('账本详情'),
-        actions: [
-          if (_isSaving)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(colorScheme.primary),
-                  ),
-                ),
-              ),
-            )
-          else
-            IconButton(
-              icon: Icon(Icons.check),
-              tooltip: '保存',
-              onPressed: _saveChanges,
-            ),
-        ],
+      appBar: AppBarFactory.buildAppBar(
+        context: context,
+        title: '账本详情',
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(vertical: 8),

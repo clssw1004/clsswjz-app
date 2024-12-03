@@ -50,24 +50,6 @@ class _ShopSelectorState extends State<ShopSelector> {
           orElse: () => {'name': '', 'shopCode': widget.selectedShop},
         );
         _selectedShopName = selectedShop['name'];
-
-        if (_selectedShopName?.isEmpty ?? true) {
-          try {
-            final shopInfo = await ApiService.fetchShopByCode(
-              context,
-              widget.accountBookId,
-              widget.selectedShop!,
-            );
-            if (shopInfo != null) {
-              _selectedShopName = shopInfo['name'];
-              if (!_shops.any((s) => s['shopCode'] == shopInfo['shopCode'])) {
-                _shops = [shopInfo, ..._shops];
-              }
-            }
-          } catch (e) {
-            print('Failed to fetch shop info: $e');
-          }
-        }
       }
 
       setState(() {});

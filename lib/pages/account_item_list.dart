@@ -9,6 +9,7 @@ import 'account_item/providers/account_item_provider.dart';
 import 'account_item/widgets/book_selector_header.dart';
 import 'account_item/widgets/filter_section.dart';
 import '../services/user_service.dart';
+import '../widgets/app_bar_factory.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
@@ -108,39 +109,16 @@ class AccountItemListState extends State<AccountItemList> {
 
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          appBar: AppBar(
-            title: Text(
-              '账目列表',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-            ),
-            centerTitle: true,
-            elevation: 0,
-            backgroundColor: Theme.of(context).colorScheme.surface,
+          appBar: AppBarFactory.buildAppBar(
+            context: context,
+            title: '账目列表',
             actions: [
               IconButton(
-                icon: Icon(
-                  _isFilterExpanded ? Icons.filter_list_off : Icons.filter_list,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                tooltip: _isFilterExpanded ? '收起筛选' : '展开筛选',
-                onPressed: () {
-                  setState(() => _isFilterExpanded = !_isFilterExpanded);
-                },
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.refresh,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                tooltip: '刷新',
-                onPressed: _loadAccountItems,
+                icon: Icon(Icons.add),
+                tooltip: '新增账目',
+                onPressed: _addNewItem,
               ),
             ],
-            systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
-                ? SystemUiOverlayStyle.light
-                : SystemUiOverlayStyle.dark,
           ),
           body: _isLoading
               ? Center(child: CircularProgressIndicator())
@@ -334,7 +312,7 @@ class AccountItemListState extends State<AccountItemList> {
       );
       if (!mounted) return;
       setState(() {
-        _categories = categories;
+        _categories = categories.map((c) => c['name'].toString()).toList();
         _selectedCategories
             .removeWhere((category) => !categories.contains(category));
       });
@@ -596,5 +574,22 @@ class AccountItemListState extends State<AccountItemList> {
         ),
       ),
     );
+  }
+
+  void _addNewItem() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          create: (_) => AccountItemProvider(),
+          child: AccountItemForm(
+            initialBook: _selectedBook,
+          ),
+        ),
+      ),
+    );
+
+    if (result == true) {
+      _loadAccountItems();
+    }
   }
 }

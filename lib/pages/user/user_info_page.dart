@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../services/api_service.dart';
 import '../../utils/api_error_handler.dart';
 import '../../services/user_service.dart';
+import '../../widgets/app_bar_factory.dart';
 
 class UserInfoPage extends StatefulWidget {
   @override
@@ -162,12 +163,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('用户信息'),
-          centerTitle: true,
-          elevation: 0,
-          backgroundColor: colorScheme.surface,
-          foregroundColor: colorScheme.onSurface,
+        appBar: AppBarFactory.buildAppBar(
+          context: context,
+          title: '用户信息',
         ),
         body: Center(child: CircularProgressIndicator()),
       );
@@ -192,58 +190,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
       },
       child: Scaffold(
         backgroundColor: colorScheme.surface,
-        appBar: AppBar(
-          title: Text(
-            '用户信息',
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
-          ),
-          centerTitle: true,
-          elevation: 0,
-          backgroundColor: colorScheme.surface,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: colorScheme.onSurface,
-            ),
-            tooltip: '返回',
-            onPressed: () {
-              // 检查是否有未保存的更改
-              final hasNicknameChanges =
-                  _nicknameController.text.trim() != _initialNickname;
-              final hasEmailChanges =
-                  _emailController.text.trim() != _initialEmail;
-              final hasPhoneChanges =
-                  _phoneController.text.trim() != _initialPhone;
-
-              // 如果有未保存的更改，先保存
-              if (hasNicknameChanges || hasEmailChanges || hasPhoneChanges) {
-                final currentFocus = FocusScope.of(context);
-                if (currentFocus.hasFocus) {
-                  currentFocus.unfocus();
-                }
-              }
-
-              // 延迟返回，确保所有更改都已保存
-              Future.delayed(Duration(milliseconds: 100), () {
-                if (mounted) {
-                  Navigator.of(context).pop(true);
-                }
-              });
-            },
-          ),
-          systemOverlayStyle: theme.brightness == Brightness.dark
-              ? SystemUiOverlayStyle.light
-              : SystemUiOverlayStyle.dark,
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(1),
-            child: Divider(
-              height: 1,
-              thickness: 0.5,
-              color: colorScheme.outlineVariant.withOpacity(0.5),
-            ),
-          ),
+        appBar: AppBarFactory.buildAppBar(
+          context: context,
+          title: '用户信息',
         ),
         body: Column(
           children: [

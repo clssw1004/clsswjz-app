@@ -80,10 +80,13 @@ class CategorySelector extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => CategoryDialog(
-        categories: provider.categories,
+        categories:
+            provider.categories.map((e) => e['name'].toString()).toList(),
         selectedCategory: selectedCategory,
         onSelected: (category) {
-          if (!provider.displayCategories.take(11).contains(category)) {
+          if (!provider.displayCategories
+              .take(11)
+              .any((c) => c['name'] == category)) {
             provider.updateDisplayCategories(category);
           }
           onChanged(category);

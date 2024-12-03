@@ -10,7 +10,7 @@ class DataService {
 
   // 缓存数据
   List<Map<String, dynamic>>? _cachedBooks;
-  List<String>? _cachedCategories;
+  List<Map<String, dynamic>>? _cachedCategories;
 
   // 获取账本列表
   Future<List<Map<String, dynamic>>> fetchAccountBooks(
@@ -27,7 +27,7 @@ class DataService {
   }
 
   // 获取分类列表
-  Future<List<String>> fetchCategories(
+  Future<List<Map<String, dynamic>>> fetchCategories(
     BuildContext context,
     String accountBookId, {
     bool forceRefresh = false,
@@ -37,7 +37,7 @@ class DataService {
         _cachedCategories =
             await ApiService.fetchCategories(context, accountBookId);
       }
-      return _cachedCategories ?? [];
+      return List<Map<String, dynamic>>.from(_cachedCategories ?? []);
     } catch (e) {
       print('获取分类失败: $e');
       rethrow;

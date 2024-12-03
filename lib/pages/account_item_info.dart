@@ -12,6 +12,7 @@ import './account_item/providers/account_item_provider.dart';
 import 'package:intl/intl.dart';
 import '../utils/message_helper.dart';
 import './account_item/widgets/shop_selector.dart';
+import '../widgets/app_bar_factory.dart';
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -112,8 +113,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
         builder: (context, themeProvider, _) {
           return Scaffold(
             resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              title: Text(_recordId == null ? '新增记录' : '编辑记录'),
+            appBar: AppBarFactory.buildAppBar(
+              context: context,
+              title: _recordId == null ? '记一笔' : '编辑记录',
             ),
             body: SafeArea(
               child: Column(
