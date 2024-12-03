@@ -6,11 +6,13 @@ import './category_dialog.dart';
 class CategorySelector extends StatelessWidget {
   final String? selectedCategory;
   final ValueChanged<String> onChanged;
+  final bool isRequired;
 
   const CategorySelector({
     Key? key,
     this.selectedCategory,
     required this.onChanged,
+    this.isRequired = false,
   }) : super(key: key);
 
   @override
@@ -44,7 +46,7 @@ class CategorySelector extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: () => _showCategoryDialog(context, provider),
                   child: Text(
-                    selectedCategory ?? '选择分类',
+                    selectedCategory ?? '选择分类${isRequired ? ' *' : ''}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: selectedCategory != null
                           ? colorScheme.onSurface

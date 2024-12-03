@@ -486,4 +486,23 @@ class ApiService {
       }
     });
   }
+
+  static Future<Map<String, dynamic>?> fetchShopByCode(
+    BuildContext context,
+    String accountBookId,
+    String shopCode,
+  ) async {
+    try {
+      final response = await _dio.get(
+        '/api/shops/$shopCode',
+        queryParameters: {
+          'accountBookId': accountBookId,
+        },
+      );
+      return response.data;
+    } catch (e) {
+      ApiErrorHandler.handleError(context, e);
+      return null;
+    }
+  }
 }

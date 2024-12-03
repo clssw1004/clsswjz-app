@@ -6,12 +6,16 @@ class FundSelector extends StatefulWidget {
   final Map<String, dynamic>? selectedFund;
   final ValueChanged<Map<String, dynamic>?> onChanged;
   final String accountBookId;
+  final bool isRequired;
+  final VoidCallback? onTap;
 
   const FundSelector({
     Key? key,
     this.selectedFund,
     required this.onChanged,
     required this.accountBookId,
+    this.isRequired = false,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -63,6 +67,8 @@ class _FundSelectorState extends State<FundSelector> {
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () async {
+                    widget.onTap?.call();
+
                     if (fundList.isEmpty) return;
 
                     final result = await showDialog<Map<String, dynamic>>(
@@ -123,7 +129,7 @@ class _FundSelectorState extends State<FundSelector> {
                     }
                   },
                   child: Text(
-                    widget.selectedFund?['fundName'] ?? '选择账户',
+                    '${widget.selectedFund?['fundName'] ?? '选择账户'}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: widget.selectedFund != null
                           ? colorScheme.onSurface

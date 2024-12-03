@@ -5,12 +5,16 @@ class AmountInput extends StatefulWidget {
   final double? initialValue;
   final ValueChanged<double> onChanged;
   final String type;
+  final FocusNode? focusNode;
+  final TextEditingController controller;
 
   const AmountInput({
     Key? key,
     this.initialValue,
     required this.onChanged,
     required this.type,
+    this.focusNode,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -18,14 +22,12 @@ class AmountInput extends StatefulWidget {
 }
 
 class _AmountInputState extends State<AmountInput> {
-  late final TextEditingController _controller;
-
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: widget.initialValue?.toStringAsFixed(2) ?? '',
-    );
+    if (widget.initialValue != null && widget.controller.text.isEmpty) {
+      widget.controller.text = widget.initialValue!.toStringAsFixed(2);
+    }
   }
 
   @override
@@ -61,18 +63,12 @@ class _AmountInputState extends State<AmountInput> {
             child: SizedBox(
               height: 48,
               child: TextFormField(
-                controller: _controller,
-                keyboardType: TextInputType.numberWithOptions(
+                controller: widget.controller,
+                keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                   signed: false,
                 ),
                 textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.transactionAmount],
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp(r'^\d*\.?\d{0,2}'),
-                  ),
-                ],
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: typeColor,
                   fontWeight: FontWeight.w500,
@@ -96,27 +92,22 @@ class _AmountInputState extends State<AmountInput> {
                   if (value == null || value.isEmpty) {
                     return '请输入金额';
                   }
+                  try {
+                    final amount = double.parse(value);
+                    if (amount <= 0) {
+                      return '金额必须大于0';
+                    }
+                  } catch (e) {
+                    return '请输入有效金额';
+                  }
                   return null;
                 },
-                onChanged: (value) {
-                  final amount = double.tryParse(value) ?? 0.0;
-                  widget.onChanged(amount);
-                },
-                onFieldSubmitted: (value) {
-                  final parsedValue = double.tryParse(value) ?? 0.0;
-                  _controller.text = parsedValue.toStringAsFixed(2);
-                },
+                focusNode: widget.focusNode,
               ),
             ),
           ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }

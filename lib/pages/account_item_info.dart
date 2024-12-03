@@ -41,6 +41,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
   Map<String, dynamic>? _selectedBook;
   String? _recordId;
   String? _selectedShop;
+  String? _selectedShopName;
 
   @override
   void initState() {
@@ -69,7 +70,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
           _provider.setTransactionType(_transactionType);
           _amountController.text = widget.initialData!['amount'].toString();
           _selectedCategory = widget.initialData!['category'];
-          _selectedShop = widget.initialData!['shop'];
+          _selectedShop = widget.initialData!['shopCode'];
+          _selectedShopName = widget.initialData!['shop'];
           _descriptionController.text =
               widget.initialData!['description'] ?? '';
 
@@ -94,6 +96,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   @override
   void dispose() {
+    _amountFocusNode.dispose();
     _provider.dispose();
     _amountController.dispose();
     _descriptionController.dispose();
@@ -108,13 +111,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
           return Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               title: Text(_recordId == null ? '新增记录' : '编辑记录'),
             ),
             body: SafeArea(
               child: Column(
                 children: [
-                  // 优化账本头部，减小高度和内边距
+                  // 账本头部
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
@@ -129,71 +133,86 @@ class _AccountItemFormState extends State<AccountItemForm> {
                   ),
                   // 主要内容区域
                   Expanded(
-                    child: Form(
-                      key: _formKey,
-                      child: CustomScrollView(
-                        slivers: [
-                          SliverPadding(
-                            padding:
-                                EdgeInsets.fromLTRB(16, 12, 16, 16), // 减小顶部内边距
-                            sliver: SliverList(
-                              delegate: SliverChildListDelegate([
-                                TypeSelector(
-                                  value: _transactionType,
-                                  onChanged: (value) {
-                                    setState(() => _transactionType = value);
-                                    _provider.setTransactionType(value);
-                                  },
-                                ),
-                                SizedBox(height: 12),
-                                AmountInput(
-                                  initialValue: widget.initialData != null
-                                      ? double.parse(widget
-                                          .initialData!['amount']
-                                          .toString())
-                                      : null,
-                                  onChanged: (value) =>
-                                      _amountController.text = value.toString(),
-                                  type: _transactionType,
-                                ),
-                                SizedBox(height: 12),
-                                CategorySelector(
-                                  selectedCategory: _selectedCategory,
-                                  onChanged: (category) => setState(
-                                      () => _selectedCategory = category),
-                                ),
-                                SizedBox(height: 12),
-                                DateTimeSelector(
-                                  selectedDate: _selectedDate,
-                                  selectedTime: _selectedTime,
-                                  onDateChanged: (date) =>
-                                      setState(() => _selectedDate = date),
-                                  onTimeChanged: (time) =>
-                                      setState(() => _selectedTime = time),
-                                ),
-                                SizedBox(height: 8),
-                                ShopSelector(
-                                  selectedShop: _selectedShop,
-                                  accountBookId: _selectedBook?['id'] ?? '',
-                                  onChanged: (shop) =>
-                                      setState(() => _selectedShop = shop),
-                                ),
-                                SizedBox(height: 8),
-                                FundSelector(
-                                  selectedFund: _selectedFund,
-                                  accountBookId: _selectedBook?['id'] ?? '',
-                                  onChanged: (fund) =>
-                                      setState(() => _selectedFund = fund),
-                                ),
-                                SizedBox(height: 8),
-                                DescriptionInput(
-                                  controller: _descriptionController,
-                                ),
-                                SizedBox(height: 16),
-                              ]),
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
+                              child: Column(
+                                children: [
+                                  TypeSelector(
+                                    value: _transactionType,
+                                    onChanged: (value) {
+                                      setState(() => _transactionType = value);
+                                      _provider.setTransactionType(value);
+                                    },
+                                  ),
+                                  SizedBox(height: 12),
+                                  AmountInput(
+                                    initialValue: widget.initialData != null
+                                        ? double.parse(widget
+                                            .initialData!['amount']
+                                            .toString())
+                                        : null,
+                                    onChanged: (value) => _amountController
+                                        .text = value.toString(),
+                                    type: _transactionType,
+                                    focusNode: _amountFocusNode,
+                                    controller: _amountController,
+                                  ),
+                                  SizedBox(height: 12),
+                                  CategorySelector(
+                                    selectedCategory: _selectedCategory,
+                                    onChanged: (category) => setState(
+                                        () => _selectedCategory = category),
+                                    isRequired: true,
+                                  ),
+                                  SizedBox(height: 12),
+                                  DateTimeSelector(
+                                    selectedDate: _selectedDate,
+                                    selectedTime: _selectedTime,
+                                    onDateChanged: (date) =>
+                                        setState(() => _selectedDate = date),
+                                    onTimeChanged: (time) =>
+                                        setState(() => _selectedTime = time),
+                                  ),
+                                  SizedBox(height: 8),
+                                  ShopSelector(
+                                    selectedShop: _selectedShop,
+                                    accountBookId: _selectedBook?['id'] ?? '',
+                                    onTap: () {
+                                      _amountFocusNode.unfocus();
+                                    },
+                                    onChanged: (shop) {
+                                      print('Selected shop changed: $shop');
+                                      setState(() {
+                                        _selectedShopName = shop;
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(height: 8),
+                                  FundSelector(
+                                    selectedFund: _selectedFund,
+                                    accountBookId: _selectedBook?['id'] ?? '',
+                                    onTap: () {
+                                      _amountFocusNode.unfocus();
+                                    },
+                                    onChanged: (fund) =>
+                                        setState(() => _selectedFund = fund),
+                                    isRequired: true,
+                                  ),
+                                  SizedBox(height: 8),
+                                  DescriptionInput(
+                                    controller: _descriptionController,
+                                  ),
+                                  SizedBox(height: 16),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -209,65 +228,39 @@ class _AccountItemFormState extends State<AccountItemForm> {
                         ),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: FilledButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _saveTransaction({
-                                  'amount':
-                                      double.parse(_amountController.text),
-                                  'description': _descriptionController.text,
-                                  'type': _transactionType == '支出'
-                                      ? 'EXPENSE'
-                                      : 'INCOME',
-                                  'category': _selectedCategory,
-                                  'accountDate': _formattedDateTime,
-                                  'fundId': _selectedFund?['id'],
-                                  'accountBookId': _selectedBook?['id'],
-                                  if (_recordId != null) 'id': _recordId,
-                                  'shop': _selectedShop,
-                                });
-                              }
-                            },
-                            style: FilledButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.save_outlined, size: 18),
-                                SizedBox(width: 8),
-                                Text('保存'),
-                              ],
-                            ),
-                          ),
+                    child: FilledButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          final amount =
+                              double.tryParse(_amountController.text) ?? 0.0;
+                          _saveTransaction({
+                            'amount': amount,
+                            'description': _descriptionController.text.trim(),
+                            'type':
+                                _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
+                            'category': _selectedCategory,
+                            'accountDate': _formattedDateTime,
+                            'fundId': _selectedFund?['id'],
+                            'accountBookId': _selectedBook?['id'],
+                            if (_recordId != null) 'id': _recordId,
+                            'shop': _selectedShopName,
+                          });
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: FilledButton.tonal(
-                            onPressed: _saveAndContinue,
-                            style: FilledButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.add_circle_outline, size: 18),
-                                SizedBox(width: 8),
-                                Text('再记一笔'),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.save_outlined, size: 18),
+                          SizedBox(width: 8),
+                          Text('保存'),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -297,40 +290,43 @@ class _AccountItemFormState extends State<AccountItemForm> {
   }
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
+    print('Saving transaction with shop: $_selectedShop');
     if (!mounted) return;
     try {
-      await _provider.saveTransaction(context, data);
-      if (!mounted) return;
+      // 验证必填字段
+      if (data['amount'] == 0.0) {
+        MessageHelper.showError(context, message: '请输入金额');
+        return;
+      }
+      if (data['category'] == null) {
+        MessageHelper.showError(context, message: '请选择分类');
+        return;
+      }
+      if (data['fundId'] == null) {
+        MessageHelper.showError(context, message: '请选择账户');
+        return;
+      }
+      if (data['accountBookId'] == null) {
+        MessageHelper.showError(context, message: '请选择账本');
+        return;
+      }
 
-      MessageHelper.showSuccess(
-        context,
-        message: '保存成功',
-      );
+      // 收起键盘
+      FocusScope.of(context).unfocus();
+
+      // 修改保存数据的结构
+      final saveData = {
+        ...data,
+        'shop': _selectedShopName,
+      };
+
+      await _provider.saveTransaction(context, saveData);
+      if (!mounted) return;
 
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
-    }
-  }
-
-  Future<void> _saveAndContinue() async {
-    if (_formKey.currentState!.validate()) {
-      final data = {
-        'amount': double.parse(_amountController.text),
-        'description': _descriptionController.text,
-        'type': _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
-        'category': _selectedCategory,
-        'accountDate': _formattedDateTime,
-        'fundId': _selectedFund?['id'],
-        'accountBookId': _selectedBook?['id'],
-        'shop': _selectedShop,
-      };
-      try {
-        await _saveTransaction(data);
-        _resetForm();
-      } catch (e) {
-        // ApiErrorHandler 已经处理了错误提示，这里不需要重复处理
-      }
+      MessageHelper.showError(context, message: e.toString());
     }
   }
 
@@ -340,8 +336,37 @@ class _AccountItemFormState extends State<AccountItemForm> {
       _descriptionController.clear();
       _selectedCategory = null;
       _selectedShop = null;
+      _selectedFund = null; // 也重置账户选择
       _selectedDate = DateTime.now();
       _selectedTime = TimeOfDay.now();
     });
   }
+
+  void _resetFormForContinue() {
+    setState(() {
+      _amountController.clear();
+      _descriptionController.clear();
+      _selectedCategory = null;
+      _selectedShop = null;
+      _selectedFund = null;
+      _selectedDate = DateTime.now();
+      _selectedTime = TimeOfDay.now();
+      // 不重置 _selectedBook 和 _transactionType
+    });
+
+    // 只在重置后立即聚焦一次，不保持焦点
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (mounted) {
+        FocusScope.of(context).requestFocus(_amountFocusNode);
+        // 聚焦后立即释放焦点，这样点击其他地方时不会再次聚焦
+        Future.delayed(Duration(milliseconds: 100), () {
+          if (mounted) {
+            _amountFocusNode.unfocus();
+          }
+        });
+      }
+    });
+  }
+
+  final _amountFocusNode = FocusNode();
 }

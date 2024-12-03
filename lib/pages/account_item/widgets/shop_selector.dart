@@ -6,12 +6,14 @@ class ShopSelector extends StatefulWidget {
   final String? selectedShop;
   final String accountBookId;
   final ValueChanged<String?> onChanged;
+  final VoidCallback? onTap;
 
   const ShopSelector({
     Key? key,
     this.selectedShop,
     required this.accountBookId,
     required this.onChanged,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -21,6 +23,7 @@ class ShopSelector extends StatefulWidget {
 class _ShopSelectorState extends State<ShopSelector> {
   List<Map<String, dynamic>> _shops = [];
   bool _isLoading = false;
+  String? _selectedShopName;
 
   @override
   void initState() {
@@ -28,10 +31,45 @@ class _ShopSelectorState extends State<ShopSelector> {
     _loadShops();
   }
 
+  @override
+  void didUpdateWidget(ShopSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedShop != widget.selectedShop) {
+      _loadShops();
+    }
+  }
+
   Future<void> _loadShops() async {
     setState(() => _isLoading = true);
     try {
       _shops = await ApiService.fetchShops(context, widget.accountBookId);
+
+      if (widget.selectedShop != null) {
+        final selectedShop = _shops.firstWhere(
+          (shop) => shop['shopCode'] == widget.selectedShop,
+          orElse: () => {'name': '', 'shopCode': widget.selectedShop},
+        );
+        _selectedShopName = selectedShop['name'];
+
+        if (_selectedShopName?.isEmpty ?? true) {
+          try {
+            final shopInfo = await ApiService.fetchShopByCode(
+              context,
+              widget.accountBookId,
+              widget.selectedShop!,
+            );
+            if (shopInfo != null) {
+              _selectedShopName = shopInfo['name'];
+              if (!_shops.any((s) => s['shopCode'] == shopInfo['shopCode'])) {
+                _shops = [shopInfo, ..._shops];
+              }
+            }
+          } catch (e) {
+            print('Failed to fetch shop info: $e');
+          }
+        }
+      }
+
       setState(() {});
     } catch (e) {
       if (mounted) {
@@ -43,11 +81,11 @@ class _ShopSelectorState extends State<ShopSelector> {
   }
 
   Future<void> _showShopDialog() async {
-    final result = await showDialog<String>(
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => _ShopDialog(
         shops: _shops,
-        selectedShop: widget.selectedShop,
+        selectedShopCode: widget.selectedShop,
         accountBookId: widget.accountBookId,
         onShopsUpdated: (shops) {
           setState(() => _shops = shops);
@@ -56,7 +94,10 @@ class _ShopSelectorState extends State<ShopSelector> {
     );
 
     if (result != null) {
-      widget.onChanged(result);
+      widget.onChanged(result['name']);
+      setState(() {
+        _selectedShopName = result['name'];
+      });
     }
   }
 
@@ -87,11 +128,14 @@ class _ShopSelectorState extends State<ShopSelector> {
           Expanded(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: _showShopDialog,
+              onTap: () {
+                widget.onTap?.call();
+                _showShopDialog();
+              },
               child: Text(
-                widget.selectedShop ?? '选择商家',
+                _selectedShopName ?? '选择商家',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: widget.selectedShop != null
+                  color: _selectedShopName != null
                       ? colorScheme.onSurface
                       : colorScheme.onSurfaceVariant,
                 ),
@@ -120,14 +164,14 @@ class _ShopSelectorState extends State<ShopSelector> {
 
 class _ShopDialog extends StatefulWidget {
   final List<Map<String, dynamic>> shops;
-  final String? selectedShop;
+  final String? selectedShopCode;
   final String accountBookId;
   final ValueChanged<List<Map<String, dynamic>>> onShopsUpdated;
 
   const _ShopDialog({
     Key? key,
     required this.shops,
-    this.selectedShop,
+    this.selectedShopCode,
     required this.accountBookId,
     required this.onShopsUpdated,
   }) : super(key: key);
@@ -139,7 +183,6 @@ class _ShopDialog extends StatefulWidget {
 class _ShopDialogState extends State<_ShopDialog> {
   final _searchController = TextEditingController();
   String _searchText = '';
-  bool _isCreating = false;
 
   @override
   void dispose() {
@@ -155,30 +198,6 @@ class _ShopDialogState extends State<_ShopDialog> {
             .toLowerCase()
             .contains(_searchText.toLowerCase()))
         .toList();
-  }
-
-  Future<void> _createShop(String name) async {
-    if (_isCreating) return;
-    setState(() => _isCreating = true);
-
-    try {
-      final newShop = await ApiService.createShop(
-        context,
-        name,
-        widget.accountBookId,
-      );
-      final updatedShops = [...widget.shops, newShop];
-      widget.onShopsUpdated(updatedShops);
-      if (mounted) {
-        Navigator.pop(context, newShop['name']);
-      }
-    } catch (e) {
-      if (mounted) {
-        MessageHelper.showError(context, message: e.toString());
-      }
-    } finally {
-      setState(() => _isCreating = false);
-    }
   }
 
   @override
@@ -244,12 +263,13 @@ class _ShopDialogState extends State<_ShopDialog> {
                 itemCount: _filteredShops.length,
                 itemBuilder: (context, index) {
                   final shop = _filteredShops[index];
-                  final isSelected = shop['name'] == widget.selectedShop;
+                  final isSelected =
+                      shop['shopCode'] == widget.selectedShopCode;
 
                   return ListTile(
                     contentPadding: EdgeInsets.symmetric(horizontal: 8),
                     title: Text(
-                      shop['name'],
+                      shop['name'] ?? '',
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: isSelected
                             ? colorScheme.primary
@@ -263,7 +283,7 @@ class _ShopDialogState extends State<_ShopDialog> {
                       color: isSelected ? colorScheme.primary : null,
                       size: 20,
                     ),
-                    onTap: () => Navigator.pop(context, shop['name']),
+                    onTap: () => Navigator.pop(context, shop),
                   );
                 },
               ),
@@ -273,20 +293,9 @@ class _ShopDialogState extends State<_ShopDialog> {
               Padding(
                 padding: EdgeInsets.only(top: 16),
                 child: ElevatedButton.icon(
-                  onPressed:
-                      _isCreating ? null : () => _createShop(_searchText),
-                  icon: _isCreating
-                      ? SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              colorScheme.onPrimary,
-                            ),
-                          ),
-                        )
-                      : Icon(Icons.add, size: 18),
+                  onPressed: () =>
+                      Navigator.pop(context, {'name': _searchText}),
+                  icon: Icon(Icons.add, size: 18),
                   label: Text('添加"$_searchText"'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
