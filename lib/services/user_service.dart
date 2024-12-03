@@ -1,18 +1,65 @@
-import 'dart:io';
+import 'package:path/path.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:convert';
-import 'package:path_provider/path_provider.dart';
 import 'api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:universal_html/html.dart' as html;
 
 class UserService {
-  static const String _sessionFileName = 'user_session.json';
+  static Database? _database;
   static Map<String, dynamic>? _cachedUserInfo;
   static const String _currentAccountBookKey = 'currentAccountBook';
+  static const String _sessionKey = 'user_session';
 
-  // 获取本地存储文件
-  static Future<File> get _sessionFile async {
-    final directory = await getApplicationDocumentsDirectory();
-    return File('${directory.path}/$_sessionFileName');
+  // Web 平台的存储实现
+  static Future<void> _saveToWeb(Map<String, dynamic> data) async {
+    html.window.localStorage[_sessionKey] = jsonEncode(data);
+  }
+
+  static Future<Map<String, dynamic>?> _loadFromWeb() async {
+    final data = html.window.localStorage[_sessionKey];
+    if (data != null) {
+      return jsonDecode(data);
+    }
+    return null;
+  }
+
+  static Future<void> _clearWeb() async {
+    html.window.localStorage.remove(_sessionKey);
+  }
+
+  // 初始化数据库
+  static Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDatabase();
+    return _database!;
+  }
+
+  static Future<Database> _initDatabase() async {
+    if (kIsWeb) {
+      // Web 平台初始化
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
+
+    final dbPath = kIsWeb ? '' : await getDatabasesPath();
+    final path = kIsWeb ? 'user_data.db' : join(dbPath, 'user_data.db');
+
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute('''
+          CREATE TABLE user_session(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT,
+            user_info TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        ''');
+      },
+    );
   }
 
   // 检查是否有有效的会话
@@ -40,12 +87,20 @@ class UserService {
     String token,
     Map<String, dynamic> userInfo,
   ) async {
-    final file = await _sessionFile;
-    final sessionData = {
-      'token': token,
-      'userInfo': userInfo,
-    };
-    await file.writeAsString(json.encode(sessionData));
+    if (kIsWeb) {
+      await _saveToWeb({
+        'token': token,
+        'userInfo': userInfo,
+      });
+    } else {
+      final db = await database;
+      await db.delete('user_session');
+      await db.insert('user_session', {
+        'token': token,
+        'user_info': jsonEncode(userInfo),
+      });
+    }
+
     _cachedUserInfo = userInfo;
     ApiService.setToken(token);
   }
@@ -53,12 +108,31 @@ class UserService {
   // 获取用户会话信息
   static Future<Map<String, dynamic>?> getUserSession() async {
     try {
-      final file = await _sessionFile;
-      if (await file.exists()) {
-        final sessionData = json.decode(await file.readAsString());
-        ApiService.setToken(sessionData['token']);
-        _cachedUserInfo = sessionData['userInfo'];
-        return sessionData;
+      if (kIsWeb) {
+        final sessionData = await _loadFromWeb();
+        if (sessionData != null) {
+          ApiService.setToken(sessionData['token']);
+          _cachedUserInfo = sessionData['userInfo'];
+          return sessionData;
+        }
+      } else {
+        final db = await database;
+        final List<Map<String, dynamic>> results = await db.query(
+          'user_session',
+          orderBy: 'created_at DESC',
+          limit: 1,
+        );
+
+        if (results.isNotEmpty) {
+          final sessionData = {
+            'token': results.first['token'],
+            'userInfo': jsonDecode(results.first['user_info']),
+          };
+
+          ApiService.setToken(sessionData['token']);
+          _cachedUserInfo = sessionData['userInfo'];
+          return sessionData;
+        }
       }
     } catch (e) {
       print('获取用户会话失败: $e');
@@ -69,9 +143,8 @@ class UserService {
   // 刷新会话
   static Future<void> refreshSession() async {
     try {
-      final file = await _sessionFile;
-      if (await file.exists()) {
-        final sessionData = json.decode(await file.readAsString());
+      final sessionData = await getUserSession();
+      if (sessionData != null) {
         await saveUserSession(
           sessionData['token'],
           sessionData['userInfo'],
@@ -85,18 +158,20 @@ class UserService {
   // 退出登录
   static Future<void> logout() async {
     try {
-      final file = await _sessionFile;
-      if (await file.exists()) {
-        await file.delete();
+      if (kIsWeb) {
+        await _clearWeb();
+      } else {
+        final db = await database;
+        await db.delete('user_session');
       }
       _cachedUserInfo = null;
-      ApiService.clearToken(); // 需要在 ApiService 中添加这个方法
+      ApiService.clearToken();
     } catch (e) {
       print('退出登录失败: $e');
     }
   }
 
-  // 添加账本相关方法
+  // 账本相关方法保持不变
   static Future<void> setCurrentAccountBookId(String bookId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_currentAccountBookKey, bookId);
@@ -114,12 +189,17 @@ class UserService {
         ..._cachedUserInfo!,
         ...newInfo,
       };
-      // 同时更新本地存储
+
+      // 更新数据库中的用户信息
       final sessionData = await getUserSession();
       if (sessionData != null) {
-        sessionData['userInfo'] = _cachedUserInfo;
-        final file = await _sessionFile;
-        await file.writeAsString(json.encode(sessionData));
+        final db = await database;
+        await db.update(
+          'user_session',
+          {'user_info': jsonEncode(_cachedUserInfo)},
+          where: 'token = ?',
+          whereArgs: [sessionData['token']],
+        );
       }
     }
   }

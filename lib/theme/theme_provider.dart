@@ -38,19 +38,19 @@ class ThemeProvider extends ChangeNotifier {
       colorScheme: colorScheme,
       primaryColor: color,
       brightness: brightness,
-      
+
       // 背景色
       scaffoldBackgroundColor: isDark ? Color(0xFF121212) : Colors.white,
-      
+
       // 卡片主题
       cardTheme: CardTheme(
         color: isDark ? Color(0xFF1E1E1E) : Colors.white,
         elevation: 0,
       ),
-      
+
       // 分割线颜色
       dividerColor: isDark ? Colors.white12 : Colors.black12,
-      
+
       // 文字主题
       textTheme: TextTheme(
         titleLarge: TextStyle(
@@ -72,13 +72,13 @@ class ThemeProvider extends ChangeNotifier {
           fontSize: 14,
         ),
       ),
-      
+
       // 图标主题
       iconTheme: IconThemeData(
         color: isDark ? Colors.white70 : Colors.black87,
         size: 24,
       ),
-      
+
       // 输入框主题
       inputDecorationTheme: InputDecorationTheme(
         fillColor: isDark ? Colors.white10 : Colors.grey[100],
@@ -100,20 +100,20 @@ class ThemeProvider extends ChangeNotifier {
           borderSide: BorderSide(color: color),
         ),
       ),
-      
+
       // 按钮主题
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           foregroundColor: Colors.white,
           elevation: 0,
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
         ),
       ),
-      
+
       // 对话框主题
       dialogTheme: DialogTheme(
         backgroundColor: isDark ? Color(0xFF2C2C2C) : Colors.white,
@@ -122,7 +122,7 @@ class ThemeProvider extends ChangeNotifier {
           borderRadius: BorderRadius.circular(16),
         ),
       ),
-      
+
       // 列表瓦片主题
       listTileTheme: ListTileThemeData(
         iconColor: isDark ? Colors.white70 : Colors.black87,
@@ -130,14 +130,14 @@ class ThemeProvider extends ChangeNotifier {
         selectedColor: color,
         selectedTileColor: color.withOpacity(0.1),
       ),
-      
+
       // 底部导航栏主题
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: isDark ? Color(0xFF1E1E1E) : Colors.white,
         selectedItemColor: color,
         unselectedItemColor: isDark ? Colors.white60 : Colors.black54,
       ),
-      
+
       // AppBar主题
       appBarTheme: AppBarTheme(
         backgroundColor: isDark ? Color(0xFF1E1E1E) : color,
@@ -145,6 +145,18 @@ class ThemeProvider extends ChangeNotifier {
         elevation: 0,
         iconTheme: IconThemeData(
           color: isDark ? Colors.white : Colors.white,
+        ),
+      ),
+
+      // 按钮主题
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: color,
+          side: BorderSide(color: color),
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
       ),
     );

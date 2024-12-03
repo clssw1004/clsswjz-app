@@ -101,138 +101,150 @@ class AccountItemListState extends State<AccountItemList> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 根据屏幕宽度调整布局
+        final isWideScreen = constraints.maxWidth > 600;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          '账目列表',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: colorScheme.surface,
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isFilterExpanded ? Icons.filter_list_off : Icons.filter_list,
-              color: colorScheme.onSurfaceVariant,
+        return Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          appBar: AppBar(
+            title: Text(
+              '账目列表',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
             ),
-            tooltip: _isFilterExpanded ? '收起筛选' : '展开筛选',
-            onPressed: () {
-              setState(() => _isFilterExpanded = !_isFilterExpanded);
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.refresh,
-              color: colorScheme.onSurfaceVariant,
-            ),
-            tooltip: '刷新',
-            onPressed: _loadAccountItems,
-          ),
-        ],
-        systemOverlayStyle: theme.brightness == Brightness.dark
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                BookSelectorHeader(
-                  selectedBook: _selectedBook,
-                  books: _accountBooks,
-                  onBookSelected: _onBookSelected,
+            centerTitle: true,
+            elevation: 0,
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  _isFilterExpanded ? Icons.filter_list_off : Icons.filter_list,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
-                FilterSection(
-                  isExpanded: _isFilterExpanded,
-                  selectedType: _selectedType,
-                  selectedCategories: _selectedCategories,
-                  minAmount: _minAmount,
-                  maxAmount: _maxAmount,
-                  startDate: _startDate,
-                  endDate: _endDate,
-                  categories: _categories,
-                  onTypeChanged: (type) {
-                    setState(() => _selectedType = type);
-                    _loadAccountItems();
-                  },
-                  onCategoriesChanged: (categories) {
-                    setState(() => _selectedCategories = categories);
-                    _loadAccountItems();
-                  },
-                  onMinAmountChanged: (amount) {
-                    setState(() => _minAmount = amount);
-                    _loadAccountItems();
-                  },
-                  onMaxAmountChanged: (amount) {
-                    setState(() => _maxAmount = amount);
-                    _loadAccountItems();
-                  },
-                  onStartDateChanged: (date) {
-                    setState(() => _startDate = date);
-                    _loadAccountItems();
-                  },
-                  onEndDateChanged: (date) {
-                    setState(() => _endDate = date);
-                    _loadAccountItems();
-                  },
-                  onClearFilter: () {
-                    setState(() {
-                      _selectedType = null;
-                      _selectedCategories = [];
-                      _minAmount = null;
-                      _maxAmount = null;
-                      _startDate = null;
-                      _endDate = null;
-                    });
-                    _loadAccountItems();
-                  },
+                tooltip: _isFilterExpanded ? '收起筛选' : '展开筛选',
+                onPressed: () {
+                  setState(() => _isFilterExpanded = !_isFilterExpanded);
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.refresh,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
-                Expanded(
-                  child: _accountItems.isEmpty
-                      ? _buildEmptyView(colorScheme)
-                      : ListView.builder(
-                          padding: EdgeInsets.only(bottom: 80),
-                          itemCount:
-                              _accountItems.length + _getDateHeaders().length,
-                          itemBuilder: (context, index) {
-                            final dateHeaders = _getDateHeaders();
-                            final headerIndex =
-                                _getHeaderIndexForPosition(index);
+                tooltip: '刷新',
+                onPressed: _loadAccountItems,
+              ),
+            ],
+            systemOverlayStyle: Theme.of(context).brightness == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
+          ),
+          body: _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    BookSelectorHeader(
+                      selectedBook: _selectedBook,
+                      books: _accountBooks,
+                      onBookSelected: _onBookSelected,
+                    ),
+                    FilterSection(
+                      isExpanded: _isFilterExpanded,
+                      selectedType: _selectedType,
+                      selectedCategories: _selectedCategories,
+                      minAmount: _minAmount,
+                      maxAmount: _maxAmount,
+                      startDate: _startDate,
+                      endDate: _endDate,
+                      categories: _categories,
+                      onTypeChanged: (type) {
+                        setState(() => _selectedType = type);
+                        _loadAccountItems();
+                      },
+                      onCategoriesChanged: (categories) {
+                        setState(() => _selectedCategories = categories);
+                        _loadAccountItems();
+                      },
+                      onMinAmountChanged: (amount) {
+                        setState(() => _minAmount = amount);
+                        _loadAccountItems();
+                      },
+                      onMaxAmountChanged: (amount) {
+                        setState(() => _maxAmount = amount);
+                        _loadAccountItems();
+                      },
+                      onStartDateChanged: (date) {
+                        setState(() => _startDate = date);
+                        _loadAccountItems();
+                      },
+                      onEndDateChanged: (date) {
+                        setState(() => _endDate = date);
+                        _loadAccountItems();
+                      },
+                      onClearFilter: () {
+                        setState(() {
+                          _selectedType = null;
+                          _selectedCategories = [];
+                          _minAmount = null;
+                          _maxAmount = null;
+                          _startDate = null;
+                          _endDate = null;
+                        });
+                        _loadAccountItems();
+                      },
+                    ),
+                    Expanded(
+                      child: _accountItems.isEmpty
+                          ? _buildEmptyView(Theme.of(context).colorScheme)
+                          : ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(
+                                parent: BouncingScrollPhysics(),
+                              ),
+                              padding: EdgeInsets.only(
+                                bottom: 80,
+                                left: isWideScreen ? 32 : 16,
+                                right: isWideScreen ? 32 : 16,
+                              ),
+                              itemCount: _accountItems.length +
+                                  _getDateHeaders().length,
+                              itemBuilder: (context, index) {
+                                final dateHeaders = _getDateHeaders();
+                                final headerIndex =
+                                    _getHeaderIndexForPosition(index);
 
-                            if (headerIndex != -1) {
-                              // 渲染日期头部
-                              return _buildDateHeader(
-                                  context, dateHeaders[headerIndex]);
-                            }
+                                if (headerIndex != -1) {
+                                  // 渲染日期头部
+                                  return _buildDateHeader(
+                                      context, dateHeaders[headerIndex]);
+                                }
 
-                            // 渲染账目项
-                            final itemIndex = _getItemIndexForPosition(index);
-                            return _buildAccountItem(
-                              context,
-                              _accountItems[itemIndex],
-                            );
-                          },
-                        ),
+                                // 渲染账目项
+                                final itemIndex =
+                                    _getItemIndexForPosition(index);
+                                return _buildAccountItem(
+                                  context,
+                                  _accountItems[itemIndex],
+                                );
+                              },
+                            ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-      floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
-          ? FloatingActionButton(
-              onPressed: _addNewRecord,
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-              elevation: 2,
-              tooltip: '新增记录',
-              child: Icon(Icons.add),
-            )
-          : null,
+          floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
+              ? FloatingActionButton(
+                  onPressed: _addNewRecord,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  elevation: 2,
+                  tooltip: '新增记录',
+                  child: Icon(Icons.add),
+                )
+              : null,
+        );
+      },
     );
   }
 
@@ -360,8 +372,17 @@ class AccountItemListState extends State<AccountItemList> {
   List<String> _getDateHeaders() {
     final headers = <String>{};
     for (var item in _accountItems) {
-      final date = DateTime.parse(item['accountDate']);
-      headers.add(DateFormat('yyyy-MM-dd').format(date));
+      try {
+        final dateStr = item['accountDate'];
+        if (dateStr != null) {
+          // 统一处理时区问题
+          final date = DateTime.parse(dateStr).toLocal();
+          headers.add(DateFormat('yyyy-MM-dd').format(date));
+        }
+      } catch (e) {
+        print('日期解析错误: ${item['accountDate']} - $e');
+        continue;
+      }
     }
     return headers.toList()..sort((a, b) => b.compareTo(a));
   }
@@ -489,7 +510,7 @@ class AccountItemListState extends State<AccountItemList> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: colorScheme.surfaceVariant,
+                            color: colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -519,6 +540,26 @@ class AccountItemListState extends State<AccountItemList> {
                               item['fundName'],
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                        ],
+                        if (item['shop'] != null) ...[
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.tertiaryContainer
+                                  .withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              item['shop'],
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onTertiaryContainer,
                               ),
                             ),
                           ),

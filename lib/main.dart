@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import "pages/login_page.dart";
 import 'pages/home_page.dart';
@@ -8,6 +10,7 @@ import 'services/user_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'pages/account_book_list.dart';
 import 'pages/create_account_book_page.dart';
+import 'package:flutter/services.dart';
 
 Future<Map<String, dynamic>?> _initializeApp() async {
   try {
@@ -27,6 +30,23 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
+
+  if (!kIsWeb && Platform.isAndroid) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.dark,
+        statusBarColor: Colors.transparent,
+      ),
+    );
+
+    // 启用 Android 返回手势
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: [SystemUiOverlay.top],
+    );
+  }
 
   runApp(
     MultiProvider(

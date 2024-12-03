@@ -2,15 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/account_item_provider.dart';
 
-class FundSelector extends StatelessWidget {
+class FundSelector extends StatefulWidget {
   final Map<String, dynamic>? selectedFund;
-  final ValueChanged<Map<String, dynamic>> onChanged;
+  final ValueChanged<Map<String, dynamic>?> onChanged;
+  final String accountBookId;
 
   const FundSelector({
     Key? key,
     this.selectedFund,
     required this.onChanged,
+    required this.accountBookId,
   }) : super(key: key);
+
+  @override
+  State<FundSelector> createState() => _FundSelectorState();
+}
+
+class _FundSelectorState extends State<FundSelector> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final provider =
+            Provider.of<AccountItemProvider>(context, listen: false);
+        provider.loadFundList(widget.accountBookId);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,114 +38,115 @@ class FundSelector extends StatelessWidget {
 
     return Consumer<AccountItemProvider>(
       builder: (context, provider, _) {
+        final fundList = provider.fundList;
+
         return Container(
-          margin: EdgeInsets.only(bottom: 16),
-          child: OutlinedButton(
-            onPressed: () => _showFundSelector(context, provider),
-            style: OutlinedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              side: BorderSide(color: colorScheme.outlineVariant),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          height: 48,
+          padding: EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: colorScheme.outlineVariant.withOpacity(0.5),
               ),
-              backgroundColor:
-                  colorScheme.surfaceContainerHighest.withOpacity(0.5),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.account_balance_wallet,
-                  size: 20,
-                  color: selectedFund != null
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
-                ),
-                SizedBox(width: 8),
-                Expanded(
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.account_balance_outlined,
+                size: 18,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () async {
+                    if (fundList.isEmpty) return;
+
+                    final result = await showDialog<Map<String, dynamic>>(
+                      context: context,
+                      builder: (context) => Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        surfaceTintColor: colorScheme.surface,
+                        child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                '选择账户',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: colorScheme.onSurface,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 16),
+                              ...fundList.map(
+                                (fund) => ListTile(
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 8),
+                                  title: Text(
+                                    fund['fundName'] ?? '',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: fund['id'] ==
+                                              widget.selectedFund?['id']
+                                          ? colorScheme.primary
+                                          : colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  leading: Icon(
+                                    fund['id'] == widget.selectedFund?['id']
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    size: 20,
+                                    color:
+                                        fund['id'] == widget.selectedFund?['id']
+                                            ? colorScheme.primary
+                                            : null,
+                                  ),
+                                  onTap: () => Navigator.pop(context, fund),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+
+                    if (result != null) {
+                      widget.onChanged(result);
+                    }
+                  },
                   child: Text(
-                    selectedFund?['fundName'] ?? '选择账户',
+                    widget.selectedFund?['fundName'] ?? '选择账户',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: selectedFund != null
+                      color: widget.selectedFund != null
                           ? colorScheme.onSurface
                           : colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                Icon(
-                  Icons.arrow_drop_down,
-                  color: colorScheme.onSurfaceVariant,
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.chevron_right,
+                  size: 18,
                 ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showFundSelector(BuildContext context, AccountItemProvider provider) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isExpense = provider.transactionType == 'EXPENSE';
-    final availableFunds = provider.fundList
-        .where((fund) =>
-            isExpense ? fund['fundOut'] == true : fund['fundIn'] == true)
-        .toList();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            '选择账户',
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.grey[800],
-            ),
-          ),
-          content: Container(
-            width: double.maxFinite,
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.6,
-            ),
-            child: availableFunds.isEmpty
-                ? Center(
-                    child: Text(
-                      '没有可用的${isExpense ? '支出' : '收入'}账户',
-                      style: TextStyle(
-                        color: isDark ? Colors.white60 : Colors.grey[600],
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: availableFunds.length,
-                    itemBuilder: (context, index) {
-                      final fund = availableFunds[index];
-                      final isSelected = selectedFund?['id'] == fund['id'];
-                      return ListTile(
-                        title: Text(
-                          fund['fundName'],
-                          style: TextStyle(
-                            color: isSelected
-                                ? colorScheme.primary
-                                : (isDark ? Colors.white : Colors.grey[800]),
-                            fontWeight: isSelected
-                                ? FontWeight.w500
-                                : FontWeight.normal,
-                          ),
-                        ),
-                        selected: isSelected,
-                        selectedTileColor:
-                            colorScheme.primary.withOpacity(0.12),
-                        onTap: () {
-                          onChanged(fund);
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
+                onPressed: fundList.isEmpty ? null : () {},
+                color: colorScheme.onSurfaceVariant,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints(
+                  minWidth: 32,
+                  minHeight: 32,
+                ),
+              ),
+            ],
           ),
         );
       },

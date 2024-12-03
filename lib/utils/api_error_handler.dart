@@ -41,13 +41,18 @@ class ApiErrorHandler {
 
   // 包装 API 调用的辅助方法
   static Future<T> wrapRequest<T>(
-    BuildContext context,
-    Future<T> Function() apiCall,
+    BuildContext? context,
+    Future<T> Function() request,
   ) async {
     try {
-      return await apiCall();
+      return await request();
     } catch (e) {
-      await handleError(context, e);
+      if (context != null && context.mounted) {
+        MessageHelper.showError(
+          context,
+          message: e.toString(),
+        );
+      }
       rethrow;
     }
   }

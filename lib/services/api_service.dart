@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,14 @@ import '../utils/api_exception.dart';
 class ApiService {
   static String _baseUrl = 'http://192.168.2.147:3000';
   static String? _token;
+  static final Dio _dio = Dio(BaseOptions(
+    baseUrl: _baseUrl,
+    validateStatus: (status) => status! >= 200 && status < 300,
+  ));
 
   static void setToken(String token) {
     _token = token;
+    _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
   static Map<String, String> _getHeaders({bool needsContentType = false}) {
@@ -422,5 +428,62 @@ class ApiService {
         message: 'Failed to reset invite code',
       );
     }
+  }
+
+  // 获取商家列表
+  static Future<List<Map<String, dynamic>>> fetchShops(
+    BuildContext context,
+    String accountBookId,
+  ) async {
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final uri = Uri.parse('$_baseUrl/api/account/shop').replace(
+        queryParameters: {'accountBookId': accountBookId},
+      );
+
+      final response = await http.get(
+        uri,
+        headers: _getHeaders(),
+      );
+
+      if (_isSuccessStatusCode(response.statusCode)) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((shop) => Map<String, dynamic>.from(shop)).toList();
+      } else {
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: '$uri: ${response.body}',
+          message: '获取商家列表失败',
+        );
+      }
+    });
+  }
+
+  // 创建商家
+  static Future<Map<String, dynamic>> createShop(
+    BuildContext context,
+    String name,
+    String accountBookId,
+  ) async {
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final uri = Uri.parse('$_baseUrl/api/account/shop');
+      final response = await http.post(
+        uri,
+        headers: _getHeaders(needsContentType: true),
+        body: json.encode({
+          'name': name,
+          'accountBookId': accountBookId,
+        }),
+      );
+
+      if (_isSuccessStatusCode(response.statusCode)) {
+        return Map<String, dynamic>.from(json.decode(response.body));
+      } else {
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: '$uri: ${response.body}',
+          message: '创建商家失败',
+        );
+      }
+    });
   }
 }

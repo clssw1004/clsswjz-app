@@ -15,97 +15,62 @@ class CategorySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = Theme.of(context).primaryColor;
-    final provider = Provider.of<AccountItemProvider>(context);
-    final displayCategories = provider.displayCategories.take(11).toList();
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            ...displayCategories.map((category) {
-              final isSelected = selectedCategory == category;
-              return SizedBox(
-                width: 85,
-                child: Material(
-                  color: isSelected ? themeColor.withOpacity(0.12) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                  child: InkWell(
-                    onTap: () => onChanged(category),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: isSelected ? themeColor : Colors.grey[400]!,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        category,
-                        style: TextStyle(
-                          color: isSelected ? themeColor : Colors.grey[700],
-                          fontSize: 14,
-                          fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-            // 更多按钮
-            SizedBox(
-              width: 85,
-              child: Material(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-                child: InkWell(
-                  onTap: () => _showCategoryDialog(context, provider),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: themeColor.withOpacity(0.5)),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.more_horiz,
-                          size: 16,
-                          color: themeColor,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          '全部',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: themeColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+    return Container(
+      height: 48,
+      padding: EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: colorScheme.outlineVariant.withOpacity(0.5),
+          ),
         ),
-      ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.category_outlined,
+            size: 18,
+            color: colorScheme.onSurfaceVariant,
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Consumer<AccountItemProvider>(
+              builder: (context, provider, _) {
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _showCategoryDialog(context, provider),
+                  child: Text(
+                    selectedCategory ?? '选择分类',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: selectedCategory != null
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.chevron_right,
+              size: 18,
+            ),
+            onPressed: () {},
+            color: colorScheme.onSurfaceVariant,
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(
+              minWidth: 32,
+              minHeight: 32,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -125,4 +90,4 @@ class CategorySelector extends StatelessWidget {
       ),
     );
   }
-} 
+}

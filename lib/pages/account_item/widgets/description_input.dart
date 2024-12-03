@@ -13,45 +13,62 @@ class DescriptionInput extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '描述',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: colorScheme.onSurface,
+    return Container(
+      height: 64,
+      padding: EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: colorScheme.outlineVariant.withOpacity(0.5),
           ),
         ),
-        SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: '添加描述信息（选填）',
-            hintStyle: theme.textTheme.bodyMedium?.copyWith(
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: Icon(
+              Icons.description_outlined,
+              size: 18,
               color: colorScheme.onSurfaceVariant,
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.outline),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.outline),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.primary),
-            ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            filled: true,
-            fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
           ),
-          maxLines: 3,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface,
+          SizedBox(width: 12),
+          Expanded(
+            child: Theme(
+              data: theme.copyWith(
+                inputDecorationTheme: InputDecorationTheme(
+                  filled: false,
+                  fillColor: Colors.transparent,
+                ),
+              ),
+              child: TextField(
+                controller: controller,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+                decoration: InputDecoration(
+                  hintText: '添加备注',
+                  hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  filled: false,
+                  fillColor: Colors.transparent,
+                ),
+                textInputAction: TextInputAction.newline,
+                maxLines: 2,
+                minLines: 1,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

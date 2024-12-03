@@ -445,8 +445,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ),
         contentPadding: EdgeInsets.only(bottom: 4),
         filled: readOnly,
-        fillColor:
-            readOnly ? colorScheme.surfaceVariant.withOpacity(0.5) : null,
+        fillColor: readOnly
+            ? colorScheme.surfaceContainerHighest.withOpacity(0.5)
+            : null,
       ),
       style: theme.textTheme.bodyLarge?.copyWith(
         color: readOnly ? colorScheme.onSurfaceVariant : colorScheme.onSurface,

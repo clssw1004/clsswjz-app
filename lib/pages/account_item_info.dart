@@ -11,6 +11,7 @@ import './account_item/widgets/book_header.dart';
 import './account_item/providers/account_item_provider.dart';
 import 'package:intl/intl.dart';
 import '../utils/message_helper.dart';
+import './account_item/widgets/shop_selector.dart';
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -39,6 +40,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
   Map<String, dynamic>? _selectedFund;
   Map<String, dynamic>? _selectedBook;
   String? _recordId;
+  String? _selectedShop;
 
   @override
   void initState() {
@@ -67,6 +69,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
           _provider.setTransactionType(_transactionType);
           _amountController.text = widget.initialData!['amount'].toString();
           _selectedCategory = widget.initialData!['category'];
+          _selectedShop = widget.initialData!['shop'];
           _descriptionController.text =
               widget.initialData!['description'] ?? '';
 
@@ -99,7 +102,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Consumer<ThemeProvider>(
@@ -108,79 +111,111 @@ class _AccountItemFormState extends State<AccountItemForm> {
             appBar: AppBar(
               title: Text(_recordId == null ? '新增记录' : '编辑记录'),
             ),
-            body: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 账本头部
-                    BookHeader(book: _selectedBook),
-
-                    // 类型选择器
-                    TypeSelector(
-                      value: _transactionType,
-                      onChanged: (value) {
-                        setState(() => _transactionType = value);
-                        _provider.setTransactionType(value);
-                      },
+            body: SafeArea(
+              child: Column(
+                children: [
+                  // 优化账本头部，减小高度和内边距
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color:
+                              theme.colorScheme.outlineVariant.withOpacity(0.5),
+                        ),
+                      ),
                     ),
-                    SizedBox(height: 16),
-
-                    // 金额输入
-                    AmountInput(
-                      initialValue: widget.initialData != null
-                          ? double.parse(
-                              widget.initialData!['amount'].toString())
-                          : null,
-                      onChanged: (value) =>
-                          _amountController.text = value.toString(),
+                    child: BookHeader(book: _selectedBook),
+                  ),
+                  // 主要内容区域
+                  Expanded(
+                    child: Form(
+                      key: _formKey,
+                      child: CustomScrollView(
+                        slivers: [
+                          SliverPadding(
+                            padding:
+                                EdgeInsets.fromLTRB(16, 12, 16, 16), // 减小顶部内边距
+                            sliver: SliverList(
+                              delegate: SliverChildListDelegate([
+                                TypeSelector(
+                                  value: _transactionType,
+                                  onChanged: (value) {
+                                    setState(() => _transactionType = value);
+                                    _provider.setTransactionType(value);
+                                  },
+                                ),
+                                SizedBox(height: 12),
+                                AmountInput(
+                                  initialValue: widget.initialData != null
+                                      ? double.parse(widget
+                                          .initialData!['amount']
+                                          .toString())
+                                      : null,
+                                  onChanged: (value) =>
+                                      _amountController.text = value.toString(),
+                                  type: _transactionType,
+                                ),
+                                SizedBox(height: 12),
+                                CategorySelector(
+                                  selectedCategory: _selectedCategory,
+                                  onChanged: (category) => setState(
+                                      () => _selectedCategory = category),
+                                ),
+                                SizedBox(height: 12),
+                                DateTimeSelector(
+                                  selectedDate: _selectedDate,
+                                  selectedTime: _selectedTime,
+                                  onDateChanged: (date) =>
+                                      setState(() => _selectedDate = date),
+                                  onTimeChanged: (time) =>
+                                      setState(() => _selectedTime = time),
+                                ),
+                                SizedBox(height: 8),
+                                ShopSelector(
+                                  selectedShop: _selectedShop,
+                                  accountBookId: _selectedBook?['id'] ?? '',
+                                  onChanged: (shop) =>
+                                      setState(() => _selectedShop = shop),
+                                ),
+                                SizedBox(height: 8),
+                                FundSelector(
+                                  selectedFund: _selectedFund,
+                                  accountBookId: _selectedBook?['id'] ?? '',
+                                  onChanged: (fund) =>
+                                      setState(() => _selectedFund = fund),
+                                ),
+                                SizedBox(height: 8),
+                                DescriptionInput(
+                                  controller: _descriptionController,
+                                ),
+                                SizedBox(height: 16),
+                              ]),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 16),
-
-                    // 分类选择器
-                    CategorySelector(
-                      selectedCategory: _selectedCategory,
-                      onChanged: (category) =>
-                          setState(() => _selectedCategory = category),
+                  ),
+                  // 底部按钮区域
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      border: Border(
+                        top: BorderSide(
+                          color:
+                              theme.colorScheme.outlineVariant.withOpacity(0.1),
+                        ),
+                      ),
                     ),
-                    SizedBox(height: 16),
-
-                    // 日期时间选择器
-                    DateTimeSelector(
-                      selectedDate: _selectedDate,
-                      selectedTime: _selectedTime,
-                      onDateChanged: (date) =>
-                          setState(() => _selectedDate = date),
-                      onTimeChanged: (time) =>
-                          setState(() => _selectedTime = time),
-                    ),
-                    SizedBox(height: 16),
-
-                    // 账户选择器
-                    FundSelector(
-                      selectedFund: _selectedFund,
-                      onChanged: (fund) => setState(() => _selectedFund = fund),
-                    ),
-
-                    // 描述输入
-                    DescriptionInput(
-                      controller: _descriptionController,
-                    ),
-                    SizedBox(height: 24),
-
-                    // 按钮区域
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Row(
                       children: [
-                        SizedBox(width: 8),
                         Expanded(
-                          flex: 1,
-                          child: ElevatedButton.icon(
+                          child: FilledButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                final data = {
+                                _saveTransaction({
                                   'amount':
                                       double.parse(_amountController.text),
                                   'description': _descriptionController.text,
@@ -191,58 +226,51 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                   'accountDate': _formattedDateTime,
                                   'fundId': _selectedFund?['id'],
                                   'accountBookId': _selectedBook?['id'],
-                                };
-                                if (_recordId != null) {
-                                  data['id'] = _recordId;
-                                }
-                                _saveTransaction(data);
+                                  if (_recordId != null) 'id': _recordId,
+                                  'shop': _selectedShop,
+                                });
                               }
                             },
-                            icon: Icon(Icons.save_outlined,
-                                color: Colors.white, size: 18),
-                            label: Text(
-                              '保存',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 14),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: themeColor,
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 4),
-                              minimumSize: Size(60, 36),
+                            style: FilledButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.save_outlined, size: 18),
+                                SizedBox(width: 8),
+                                Text('保存'),
+                              ],
                             ),
                           ),
                         ),
                         SizedBox(width: 8),
                         Expanded(
-                          flex: 1,
-                          child: OutlinedButton.icon(
+                          child: FilledButton.tonal(
                             onPressed: _saveAndContinue,
-                            icon: Icon(Icons.add_circle_outline,
-                                color: themeColor, size: 18),
-                            label: Text(
-                              '再记一笔',
-                              style: TextStyle(color: themeColor, fontSize: 14),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 4),
-                              minimumSize: Size(60, 36),
+                            style: FilledButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              side: BorderSide(color: themeColor),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add_circle_outline, size: 18),
+                                SizedBox(width: 8),
+                                Text('再记一笔'),
+                              ],
                             ),
                           ),
                         ),
-                        SizedBox(width: 8),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
@@ -295,6 +323,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
         'accountDate': _formattedDateTime,
         'fundId': _selectedFund?['id'],
         'accountBookId': _selectedBook?['id'],
+        'shop': _selectedShop,
       };
       try {
         await _saveTransaction(data);
@@ -310,6 +339,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
       _amountController.clear();
       _descriptionController.clear();
       _selectedCategory = null;
+      _selectedShop = null;
       _selectedDate = DateTime.now();
       _selectedTime = TimeOfDay.now();
     });
