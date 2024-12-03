@@ -1,37 +1,106 @@
-import 'http/http_client.dart';
-import 'http/api_endpoints.dart';
-import 'package:flutter/material.dart';
-import 'http/retry_policy.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../data/http/api_endpoints.dart';
+import '../data/http/http_method.dart';
+import '../models/models.dart';
+import '../data/data_source_factory.dart';
+import '../data/data_source.dart';
 
 class ApiService {
-  static final HttpClient _client = HttpClient(
-    baseUrl: 'http://192.168.2.147:3000',
-    retryPolicy: RetryPolicy(maxAttempts: 3),
-  );
+  static final DataSource _dataSource =
+      DataSourceFactory.create(DataSourceType.http);
 
-  // 认证相关
-  static Future<Map<String, dynamic>> login(
-      String username, String password) async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.auth}/login',
-      method: HttpMethod.post,
-      data: {
-        'username': username,
-        'password': password,
-      },
+  // 账本相关
+  static Future<List<AccountBook>> getAccountBooks() {
+    return _dataSource.getAccountBooks();
+  }
+
+  static Future<AccountBook> createAccountBook(AccountBook book) {
+    return _dataSource.createAccountBook(book);
+  }
+
+  static Future<AccountBook> updateAccountBook(String id, AccountBook book) {
+    return _dataSource.updateAccountBook(id, book);
+  }
+
+  static Future<void> deleteAccountBook(String id) {
+    return _dataSource.deleteAccountBook(id);
+  }
+
+  // 账目相关
+  static Future<List<AccountItem>> getAccountItems(
+    String bookId, {
+    List<String>? categories,
+    String? type,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) {
+    return _dataSource.getAccountItems(
+      bookId,
+      categories: categories,
+      type: type,
+      startDate: startDate,
+      endDate: endDate,
     );
+  }
 
-    final token = response['access_token'];
-    _client.setToken(token);
-    return {
-      'token': token,
-      'userInfo': {
-        'userId': response['userId'],
-        'username': response['username'],
-        'nickname': response['nickname'],
-      },
-    };
+  static Future<AccountItem> createAccountItem(AccountItem item) {
+    return _dataSource.createAccountItem(item);
+  }
+
+  static Future<AccountItem> updateAccountItem(String id, AccountItem item) {
+    return _dataSource.updateAccountItem(id, item);
+  }
+
+  static Future<void> deleteAccountItem(String id) {
+    return _dataSource.deleteAccountItem(id);
+  }
+
+  // 分类相关
+  static Future<List<Category>> getCategories(String bookId) {
+    return _dataSource.getCategories(bookId);
+  }
+
+  static Future<Category> createCategory(Category category) {
+    return _dataSource.createCategory(category);
+  }
+
+  static Future<Category> updateCategory(String id, Category category) {
+    return _dataSource.updateCategory(id, category);
+  }
+
+  // 商家相关
+  static Future<List<Shop>> getShops(String bookId) {
+    return _dataSource.getShops(bookId);
+  }
+
+  static Future<Shop> createShop(Shop shop) {
+    return _dataSource.createShop(shop);
+  }
+
+  static Future<Shop> updateShop(String id, Shop shop) {
+    return _dataSource.updateShop(id, shop);
+  }
+
+  // 资金账户相关
+  static Future<List<Fund>> getFunds(String bookId) {
+    return _dataSource.getFunds(bookId);
+  }
+
+  static Future<Fund> createFund(Fund fund) {
+    return _dataSource.createFund(fund);
+  }
+
+  static Future<Fund> updateFund(String id, Fund fund) {
+    return _dataSource.updateFund(id, fund);
+  }
+
+  // 用户相关
+  static Future<Map<String, dynamic>> getUserByInviteCode(
+      String inviteCode) async {
+    final response = await _dataSource.request<Map<String, dynamic>>(
+      path: '${ApiEndpoints.users}/invite-code/$inviteCode',
+      method: HttpMethod.get,
+    );
+    return response;
   }
 
   static Future<void> register({
@@ -40,289 +109,28 @@ class ApiService {
     required String email,
     String? nickname,
   }) async {
-    await _client.request(
-      path: '${ApiEndpoints.users}/register',
+    await _dataSource.request<void>(
+      path: '${ApiEndpoints.auth}/register',
       method: HttpMethod.post,
       data: {
         'username': username,
         'password': password,
         'email': email,
-        'nickname': nickname ?? username,
-      },
-    );
-  }
-
-  // 用户相关
-  static Future<Map<String, dynamic>> getUserInfo() async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/current',
-      method: HttpMethod.get,
-    );
-    return response;
-  }
-
-  static Future<void> updateUserInfo({
-    String? nickname,
-    String? email,
-    String? phone,
-  }) async {
-    await _client.request(
-      path: '${ApiEndpoints.users}/current',
-      method: HttpMethod.put,
-      data: {
         if (nickname != null) 'nickname': nickname,
-        if (email != null) 'email': email,
-        if (phone != null) 'phone': phone,
       },
     );
   }
 
-  static Future<String> resetInviteCode() async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/invite/reset',
-      method: HttpMethod.put,
-    );
-    return response['inviteCode'];
+  static Future<Map<String, dynamic>> getUserInfo() {
+    return _dataSource.getUserInfo();
   }
 
-  // 账本相关
-  static Future<List<Map<String, dynamic>>> fetchAccountBooks() async {
-    final response = await _client.request<List<dynamic>>(
-      path: ApiEndpoints.accountBooks,
-      method: HttpMethod.get,
-    );
-    return response.map((book) => Map<String, dynamic>.from(book)).toList();
+  static Future<Map<String, dynamic>> updateUserInfo(
+      Map<String, dynamic> data) {
+    return _dataSource.updateUserInfo(data);
   }
 
-  static Future<void> createAccountBook({
-    required String name,
-    required String description,
-    required String currencySymbol,
-    required String icon,
-  }) async {
-    await _client.request(
-      path: ApiEndpoints.accountBooks,
-      method: HttpMethod.post,
-      data: {
-        'name': name,
-        'description': description,
-        'currencySymbol': currencySymbol,
-        'icon': icon,
-      },
-    );
-  }
-
-  static Future<Map<String, dynamic>> updateAccountBook(
-    BuildContext context,
-    String bookId,
-    Map<String, dynamic> data,
-  ) async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.accountBooks}/$bookId',
-      method: HttpMethod.patch,
-      data: {
-        'id': bookId,
-        'name': data['name'],
-        'description': data['description'],
-        'currencySymbol': data['currencySymbol'],
-        'icon': data['icon'],
-        'members': data['members']
-            ?.map((member) => {
-                  'userId': member['userId'],
-                  'canViewBook': member['canViewBook'] ?? false,
-                  'canEditBook': member['canEditBook'] ?? false,
-                  'canDeleteBook': member['canDeleteBook'] ?? false,
-                  'canViewItem': member['canViewItem'] ?? false,
-                  'canEditItem': member['canEditItem'] ?? false,
-                  'canDeleteItem': member['canDeleteItem'] ?? false,
-                })
-            .toList(),
-      },
-    );
-    return {'code': 0, 'data': response, 'message': '更新成功'};
-  }
-
-  // 账目相关
-  static Future<List<Map<String, dynamic>>> fetchAccountItems({
-    required String accountBookId,
-    List<String>? categories,
-    String? type,
-    DateTime? startDate,
-    DateTime? endDate,
-  }) async {
-    final response = await _client.request<List<dynamic>>(
-      path: '${ApiEndpoints.accountItems}/list',
-      method: HttpMethod.post,
-      data: {
-        'accountBookId': accountBookId,
-        if (categories?.isNotEmpty ?? false) 'categories': categories,
-        if (type != null) 'type': type,
-        if (startDate != null) 'startDate': startDate.toIso8601String(),
-        if (endDate != null) 'endDate': endDate.toIso8601String(),
-      },
-    );
-    return response.map((item) => Map<String, dynamic>.from(item)).toList();
-  }
-
-  static Future<void> saveAccountItem(
-    BuildContext context,
-    Map<String, dynamic> data,
-  ) async {
-    final String path = data['id'] != null
-        ? '${ApiEndpoints.accountItems}/${data['id']}'
-        : ApiEndpoints.accountItems;
-
-    await _client.request(
-      path: path,
-      method: data['id'] != null ? HttpMethod.patch : HttpMethod.post,
-      data: data,
-    );
-  }
-
-  // 分类相关
-  static Future<List<Map<String, dynamic>>> fetchCategories(
-    BuildContext context,
-    String accountBookId,
-  ) async {
-    final response = await _client.request<List<dynamic>>(
-      path: ApiEndpoints.categories,
-      method: HttpMethod.get,
-      queryParameters: {'accountBookId': accountBookId},
-    );
-    return response.map((item) => Map<String, dynamic>.from(item)).toList();
-  }
-
-  static Future<Map<String, dynamic>> createCategory(
-    BuildContext context,
-    String name,
-    String accountBookId,
-  ) async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: ApiEndpoints.categories,
-      method: HttpMethod.post,
-      data: {
-        'name': name,
-        'accountBookId': accountBookId,
-      },
-    );
-    return response;
-  }
-
-  static Future<Map<String, dynamic>> updateCategory(
-    BuildContext context,
-    String id,
-    String name,
-  ) async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.categories}/$id',
-      method: HttpMethod.patch,
-      data: {'name': name},
-    );
-    return response;
-  }
-
-  // 商家相关
-  static Future<List<Map<String, dynamic>>> fetchShops(
-    BuildContext context,
-    String accountBookId,
-  ) async {
-    final response = await _client.request<List<dynamic>>(
-      path: ApiEndpoints.shops,
-      method: HttpMethod.get,
-      queryParameters: {'accountBookId': accountBookId},
-    );
-    return response.map((shop) => Map<String, dynamic>.from(shop)).toList();
-  }
-
-  static Future<Map<String, dynamic>> createShop(
-    BuildContext context,
-    String name,
-    String accountBookId,
-  ) async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: ApiEndpoints.shops,
-      method: HttpMethod.post,
-      data: {
-        'name': name,
-        'accountBookId': accountBookId,
-      },
-    );
-    return response;
-  }
-
-  static Future<Map<String, dynamic>> updateShop(
-    BuildContext context,
-    String id,
-    String name,
-  ) async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.shops}/$id',
-      method: HttpMethod.patch,
-      data: {'name': name},
-    );
-    return response;
-  }
-
-  // 资金账户相关
-  static Future<List<Map<String, dynamic>>> fetchFundList(
-    String accountBookId,
-  ) async {
-    final response = await _client.request<List<dynamic>>(
-      path: '${ApiEndpoints.funds}/listByAccountBookId',
-      method: HttpMethod.post,
-      data: {'accountBookId': accountBookId},
-    );
-    return response.map((fund) => Map<String, dynamic>.from(fund)).toList();
-  }
-
-  // 用户��请相关
-  static Future<Map<String, dynamic>> getUserByInviteCode(
-    BuildContext context,
-    String code,
-  ) async {
-    final response = await _client.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/invite/$code',
-      method: HttpMethod.get,
-    );
-    return response;
-  }
-
-  // 系统配置相关
-  static Future<String> getApiHost() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('api_host') ?? _client.baseUrl;
-  }
-
-  static Future<void> setApiHost(String host) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('api_host', host);
-    _client.baseUrl = host;
-  }
-
-  // 工具方法
-  static void clearToken() {
-    _client.clearToken();
-  }
-
-  static void setToken(String token) {
-    _client.setToken(token);
-  }
-
-  // 用户相关
-  static Future<Map<String, dynamic>> getLoginUserInfo() async {
-    return getUserInfo(); // 复用现有方法
-  }
-
-  static Future<Map<String, dynamic>> saveUserInfo({
-    String? nickname,
-    String? email,
-    String? phone,
-  }) async {
-    await updateUserInfo(
-      nickname: nickname,
-      email: email,
-      phone: phone,
-    );
-    return getUserInfo();
+  static Future<String> resetInviteCode() {
+    return _dataSource.resetInviteCode();
   }
 }

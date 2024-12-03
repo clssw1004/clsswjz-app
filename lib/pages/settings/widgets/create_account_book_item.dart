@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../services/data_service.dart';
+import '../../../services/api_service.dart';
 
 class CreateAccountBookItem extends StatelessWidget {
-  final DataService _dataService;
-
-  const CreateAccountBookItem({
-    Key? key,
-    required DataService dataService,
-  }) : _dataService = dataService,
-        super(key: key);
+  const CreateAccountBookItem({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +26,7 @@ class CreateAccountBookItem extends StatelessWidget {
       ),
       onTap: () {
         Navigator.pushNamed(context, '/account-books').then((_) {
-          _dataService.fetchAccountBooks(forceRefresh: true);
+          ApiService.getAccountBooks();
         });
       },
       shape: RoundedRectangleBorder(
@@ -44,4 +38,4 @@ class CreateAccountBookItem extends StatelessWidget {
       splashColor: colorScheme.primaryContainer.withOpacity(0.12),
     );
   }
-} 
+}

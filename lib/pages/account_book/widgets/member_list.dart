@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../../services/api_service.dart';
+import '../../../models/models.dart';
 
 class MemberList extends StatefulWidget {
-  final List<dynamic> members;
-  final Function(List<dynamic>) onUpdate;
+  final List<Member> members;
   final String createdBy;
+  final ValueChanged<List<Member>> onUpdate;
   final String? currentUserId;
 
   const MemberList({
     Key? key,
     required this.members,
-    required this.onUpdate,
     required this.createdBy,
-    required this.currentUserId,
+    required this.onUpdate,
+    this.currentUserId,
   }) : super(key: key);
 
   @override
@@ -25,9 +26,19 @@ class _MemberListState extends State<MemberList> {
 
   void _updateMemberPermission(int index, String permission, bool value) {
     if (!isEditable) return;
-    final updatedMembers = List<dynamic>.from(widget.members);
-    updatedMembers[index] = Map<String, dynamic>.from(updatedMembers[index]);
-    updatedMembers[index][permission] = value;
+    final updatedMembers = List<Member>.from(widget.members);
+    final member = updatedMembers[index];
+    final updatedMember = member.copyWith(
+      canViewBook: permission == 'canViewBook' ? value : member.canViewBook,
+      canEditBook: permission == 'canEditBook' ? value : member.canEditBook,
+      canDeleteBook:
+          permission == 'canDeleteBook' ? value : member.canDeleteBook,
+      canViewItem: permission == 'canViewItem' ? value : member.canViewItem,
+      canEditItem: permission == 'canEditItem' ? value : member.canEditItem,
+      canDeleteItem:
+          permission == 'canDeleteItem' ? value : member.canDeleteItem,
+    );
+    updatedMembers[index] = updatedMember;
     widget.onUpdate(updatedMembers);
   }
 
@@ -56,7 +67,7 @@ class _MemberListState extends State<MemberList> {
     );
 
     if (shouldRemove ?? false) {
-      final updatedMembers = List<dynamic>.from(widget.members);
+      final updatedMembers = List<Member>.from(widget.members);
       updatedMembers.removeAt(index);
       widget.onUpdate(updatedMembers);
     }
@@ -100,7 +111,7 @@ class _MemberListState extends State<MemberList> {
           itemCount: widget.members.length,
           itemBuilder: (context, index) {
             final member = widget.members[index];
-            final isCreator = member['userId'] == widget.createdBy;
+            final isCreator = member.userId == widget.createdBy;
 
             return _buildMemberCard(
               context,
@@ -116,7 +127,7 @@ class _MemberListState extends State<MemberList> {
 
   Widget _buildMemberCard(
     BuildContext context,
-    Map<String, dynamic> member,
+    Member member,
     bool isCreator,
     int index,
   ) {
@@ -141,7 +152,7 @@ class _MemberListState extends State<MemberList> {
             title: Row(
               children: [
                 Text(
-                  member['nickname'] ?? '未知用户',
+                  member.nickname ?? '未知用户',
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.w500,
@@ -188,7 +199,7 @@ class _MemberListState extends State<MemberList> {
     );
   }
 
-  Widget _buildPermissionToggles(Map<String, dynamic> member, int index) {
+  Widget _buildPermissionToggles(Member member, int index) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -196,37 +207,37 @@ class _MemberListState extends State<MemberList> {
         _buildPermissionToggle(
           '查看账本',
           'canViewBook',
-          member['canViewBook'] ?? false,
+          member.canViewBook,
           index,
         ),
         _buildPermissionToggle(
           '编辑账本',
           'canEditBook',
-          member['canEditBook'] ?? false,
+          member.canEditBook,
           index,
         ),
         _buildPermissionToggle(
           '删除账本',
           'canDeleteBook',
-          member['canDeleteBook'] ?? false,
+          member.canDeleteBook,
           index,
         ),
         _buildPermissionToggle(
           '查看账目',
           'canViewItem',
-          member['canViewItem'] ?? false,
+          member.canViewItem,
           index,
         ),
         _buildPermissionToggle(
-          '编辑账目',
+          '编辑账',
           'canEditItem',
-          member['canEditItem'] ?? false,
+          member.canEditItem,
           index,
         ),
         _buildPermissionToggle(
           '删除账目',
           'canDeleteItem',
-          member['canDeleteItem'] ?? false,
+          member.canDeleteItem,
           index,
         ),
       ],
@@ -279,121 +290,77 @@ class _MemberListState extends State<MemberList> {
     );
   }
 
-  Future<void> _showAddMemberDialog(BuildContext context) async {
-    final controller = TextEditingController();
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+  Future<void> _showAddMemberDialog(BuildContext dialogContext) async {
+    if (!mounted) return;
 
+    // 添加邀请码输入对话框
+    final controller = TextEditingController();
     final inviteCode = await showDialog<String>(
-      context: context,
+      context: dialogContext,
       builder: (context) => AlertDialog(
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
         title: Text('添加成员'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: controller,
-              autofocus: true,
-              decoration: InputDecoration(
-                labelText: '邀请码',
-                filled: true,
-                fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: colorScheme.primary,
-                    width: 2,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              '通过邀请码添加成员',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: '邀请码',
+            hintText: '请输入邀请码',
+          ),
+          autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
             child: Text('取消'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
-            style: FilledButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
             child: Text('添加'),
           ),
         ],
       ),
     );
 
-    if (inviteCode == null || inviteCode.isEmpty) return;
+    if (inviteCode == null || inviteCode.isEmpty || !mounted) return;
 
     try {
-      // 通过邀请码获取用户信息
-      final userInfo =
-          await ApiService.getUserByInviteCode(context, inviteCode);
+      final userInfo = await ApiService.getUserByInviteCode(inviteCode);
+      if (!mounted) return;
 
-      // 检查用户是否已经是成员
-      final isAlreadyMember =
-          widget.members.any((m) => m['userId'] == userInfo['userId']);
+      final userId = userInfo['id'] as String?;
+      if (userId == null) throw '无效的用户信息';
+
+      final isAlreadyMember = widget.members.any((m) => m.userId == userId);
       if (isAlreadyMember) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(dialogContext).showSnackBar(
           SnackBar(content: Text('该用户已经是成员')),
         );
         return;
       }
 
       // 添加新成员
-      final newMember = {
-        'userId': userInfo['id'],
-        'nickname': userInfo['nickname'] ?? userInfo['username'],
-        'canViewBook': true,
-        'canEditBook': false,
-        'canDeleteBook': false,
-        'canViewItem': true,
-        'canEditItem': false,
-        'canDeleteItem': false,
-      };
+      final newMember = Member(
+        userId: userId,
+        nickname:
+            userInfo['nickname'] as String? ?? userInfo['username'] as String,
+        canViewBook: true,
+        canEditBook: false,
+        canDeleteBook: false,
+        canViewItem: true,
+        canEditItem: false,
+        canDeleteItem: false,
+      );
 
       final updatedMembers = [...widget.members, newMember];
       widget.onUpdate(updatedMembers);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(dialogContext).showSnackBar(
         SnackBar(content: Text('成员添加成功')),
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(dialogContext).showSnackBar(
         SnackBar(content: Text('添加成员失败：$e')),
       );
     }

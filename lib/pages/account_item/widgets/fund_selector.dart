@@ -30,7 +30,7 @@ class _FundSelectorState extends State<FundSelector> {
       if (mounted) {
         final provider =
             Provider.of<AccountItemProvider>(context, listen: false);
-        provider.loadFundList(widget.accountBookId);
+        provider.loadData();
       }
     });
   }

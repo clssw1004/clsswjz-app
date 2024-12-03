@@ -3,21 +3,19 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../pages/account_item_info.dart';
-import '../services/data_service.dart';
 import 'account_item/providers/account_item_provider.dart';
-import 'account_item/widgets/book_selector_header.dart';
 import 'account_item/widgets/filter_section.dart';
 import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
 import '../widgets/global_book_selector.dart';
+import '../utils/message_helper.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
-  AccountItemListState createState() => AccountItemListState();
+  State<AccountItemList> createState() => AccountItemListState();
 }
 
 class AccountItemListState extends State<AccountItemList> {
-  final _dataService = DataService();
   List<Map<String, dynamic>> _accountItems = [];
   List<Map<String, dynamic>> _accountBooks = [];
   List<String> _categories = [];
@@ -44,23 +42,25 @@ class AccountItemListState extends State<AccountItemList> {
       final savedBookId = await UserService.getCurrentAccountBookId();
 
       // 加载所有账本
-      final books = await _dataService.fetchAccountBooks(forceRefresh: true);
+      final books = await ApiService.getAccountBooks();
       if (!mounted) return;
 
+      final booksJson = books.map((book) => book.toJson()).toList();
       Map<String, dynamic>? defaultBook;
+
       if (savedBookId != null) {
         // 尝试找到保存的账本
-        defaultBook = books.firstWhere(
+        defaultBook = booksJson.firstWhere(
           (book) => book['id'] == savedBookId,
-          orElse: () => _getFirstOwnedBook(books) ?? books.first,
+          orElse: () => _getFirstOwnedBook(booksJson) ?? booksJson.first,
         );
       } else {
         // 如果没有保存的账本ID，使用第一个本人的账本或第一个可用账本
-        defaultBook = _getFirstOwnedBook(books) ?? books.first;
+        defaultBook = _getFirstOwnedBook(booksJson) ?? booksJson.first;
       }
 
       setState(() {
-        _accountBooks = books;
+        _accountBooks = booksJson;
         _selectedBook = defaultBook;
       });
 
@@ -72,9 +72,7 @@ class AccountItemListState extends State<AccountItemList> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('加载账本失败: $e')),
-      );
+      MessageHelper.showError(context, message: e.toString());
     }
   }
 
@@ -222,8 +220,8 @@ class AccountItemListState extends State<AccountItemList> {
     setState(() => _isLoading = true);
 
     try {
-      final items = await ApiService.fetchAccountItems(
-        accountBookId: _selectedBook!['id'],
+      final items = await ApiService.getAccountItems(
+        _selectedBook!['id'],
         categories: _selectedCategories,
         type: _selectedType,
         startDate: _startDate,
@@ -232,12 +230,13 @@ class AccountItemListState extends State<AccountItemList> {
 
       if (!mounted) return;
       setState(() {
-        _accountItems = items;
+        _accountItems = items.map((item) => item.toJson()).toList();
         _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
+      MessageHelper.showError(context, message: e.toString());
     }
   }
 
@@ -245,7 +244,7 @@ class AccountItemListState extends State<AccountItemList> {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(
-          create: (_) => AccountItemProvider(),
+          create: (_) => AccountItemProvider(selectedBook: _selectedBook),
           child: AccountItemForm(
             initialBook: _selectedBook,
           ),
@@ -262,7 +261,7 @@ class AccountItemListState extends State<AccountItemList> {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(
-          create: (_) => AccountItemProvider(),
+          create: (_) => AccountItemProvider(selectedBook: _selectedBook),
           child: AccountItemForm(
             initialData: record,
             initialBook: _selectedBook,
@@ -276,42 +275,16 @@ class AccountItemListState extends State<AccountItemList> {
     }
   }
 
-  Map<String, List<Map<String, dynamic>>> _groupItemsByDate() {
-    final groupedItems = <String, List<Map<String, dynamic>>>{};
-
-    for (var item in _accountItems) {
-      final date = DateTime.parse(item['accountDate']);
-      final dateStr = DateFormat('yyyy-MM-dd').format(date);
-
-      if (!groupedItems.containsKey(dateStr)) {
-        groupedItems[dateStr] = [];
-      }
-      groupedItems[dateStr]!.add(item);
-    }
-
-    return groupedItems;
-  }
-
   Future<void> _loadCategories() async {
-    if (_selectedBook == null || !mounted) return;
-
     try {
-      final categories = await _dataService.fetchCategories(
-        context,
-        _selectedBook!['id'],
-        forceRefresh: true,
-      );
+      final categories = await ApiService.getCategories(_selectedBook!['id']);
       if (!mounted) return;
       setState(() {
-        _categories = categories.map((c) => c['name'].toString()).toList();
-        _selectedCategories
-            .removeWhere((category) => !categories.contains(category));
+        _categories = categories.map((c) => c.name).toList();
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('加载分类失败: $e')),
-      );
+      MessageHelper.showError(context, message: e.toString());
     }
   }
 

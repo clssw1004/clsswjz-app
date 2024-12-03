@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../services/api_service.dart';
 import '../../utils/api_error_handler.dart';
 import '../../services/user_service.dart';
 import '../../widgets/app_bar_factory.dart';
+import '../../services/api_service.dart';
 
 class UserInfoPage extends StatefulWidget {
   @override
@@ -16,6 +16,7 @@ class UserInfoPageState extends State<UserInfoPage> {
   final _nicknameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  String? _inviteCode;
 
   // 添加焦点节点
   final _nicknameFocus = FocusNode();
@@ -81,19 +82,15 @@ class UserInfoPageState extends State<UserInfoPage> {
     try {
       final userInfo = await ApiErrorHandler.wrapRequest(
         context,
-        () => ApiService.getLoginUserInfo(),
+        () => ApiService.getUserInfo(),
       );
 
       setState(() {
         _userInfo = userInfo;
-        // 设置初始值
-        _initialNickname = userInfo['nickname'];
-        _initialEmail = userInfo['email'];
-        _initialPhone = userInfo['phone'];
-
-        _nicknameController.text = _initialNickname ?? '';
-        _emailController.text = _initialEmail ?? '';
-        _phoneController.text = _initialPhone ?? '';
+        _nicknameController.text = userInfo['nickname'] ?? '';
+        _emailController.text = userInfo['email'] ?? '';
+        _phoneController.text = userInfo['phone'] ?? '';
+        _inviteCode = userInfo['inviteCode'] ?? '';
         _isLoading = false;
       });
     } catch (e) {
@@ -101,19 +98,15 @@ class UserInfoPageState extends State<UserInfoPage> {
     }
   }
 
-  Future<void> _saveUserInfo({
-    String? nickname,
-    String? email,
-    String? phone,
-  }) async {
+  Future<void> _updateUserInfo() async {
     try {
       final updatedInfo = await ApiErrorHandler.wrapRequest(
         context,
-        () => ApiService.saveUserInfo(
-          nickname: nickname,
-          email: email,
-          phone: phone,
-        ),
+        () => ApiService.updateUserInfo({
+          'nickname': _nicknameController.text,
+          'email': _emailController.text,
+          'phone': _phoneController.text,
+        }),
       );
 
       setState(() => _userInfo = updatedInfo);
@@ -125,17 +118,17 @@ class UserInfoPageState extends State<UserInfoPage> {
 
   void _handleNicknameSubmitted(String value) {
     if (value.isEmpty || value == _userInfo?['nickname']) return;
-    _saveUserInfo(nickname: value);
+    _updateUserInfo();
   }
 
   void _handleEmailSubmitted(String value) {
     if (value == _userInfo?['email']) return;
-    _saveUserInfo(email: value);
+    _updateUserInfo();
   }
 
   void _handlePhoneSubmitted(String value) {
     if (value == _userInfo?['phone']) return;
-    _saveUserInfo(phone: value);
+    _updateUserInfo();
   }
 
   Future<void> _resetInviteCode() async {
@@ -145,11 +138,7 @@ class UserInfoPageState extends State<UserInfoPage> {
         () => ApiService.resetInviteCode(),
       );
 
-      setState(() {
-        if (_userInfo != null) {
-          _userInfo!['inviteCode'] = newInviteCode;
-        }
-      });
+      setState(() => _inviteCode = newInviteCode);
     } catch (e) {
       // 错误已由 ApiErrorHandler 处理
     }
@@ -498,7 +487,7 @@ class UserInfoPageState extends State<UserInfoPage> {
       await UserService.logout();
       if (!mounted) return;
 
-      // 清除导航��并跳转到登录页
+      // 清除导航并跳转到登录页
       Navigator.of(context).pushNamedAndRemoveUntil(
         '/login',
         (route) => false,

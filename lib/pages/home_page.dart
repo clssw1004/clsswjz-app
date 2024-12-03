@@ -3,18 +3,11 @@ import 'account_item_list.dart';
 import 'settings_page.dart';
 
 class HomePage extends StatefulWidget {
-  final Map<String, dynamic> userInfo;
-
-  const HomePage({
-    Key? key,
-    required this.userInfo,
-  }) : super(key: key);
-
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
   late final List<Widget> _pages;
@@ -25,7 +18,7 @@ class _HomePageState extends State<HomePage> {
     _pages = [
       AccountItemList(),
       Center(child: Text('统计')), // 待实现
-      SettingsPage(userInfo: widget.userInfo),
+      SettingsPage(),
     ];
   }
 

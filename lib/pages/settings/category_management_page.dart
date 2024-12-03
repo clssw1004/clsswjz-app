@@ -6,14 +6,15 @@ import '../../widgets/app_bar_factory.dart';
 import '../../widgets/dialog_factory.dart';
 import '../../widgets/list_item_card.dart';
 import '../../widgets/avatar_factory.dart';
+import '../../models/models.dart';
 
 class CategoryManagementPage extends StatefulWidget {
   @override
-  _CategoryManagementPageState createState() => _CategoryManagementPageState();
+  State<CategoryManagementPage> createState() => CategoryManagementPageState();
 }
 
-class _CategoryManagementPageState extends State<CategoryManagementPage> {
-  List<Map<String, dynamic>> _categories = [];
+class CategoryManagementPageState extends State<CategoryManagementPage> {
+  List<Category> _categories = [];
   bool _isLoading = true;
   String? _currentAccountBookId;
 
@@ -24,79 +25,72 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
   }
 
   Future<void> _loadData() async {
+    final currentContext = context;
+    if (!mounted) return;
     setState(() => _isLoading = true);
+
     try {
       _currentAccountBookId = await UserService.getCurrentAccountBookId();
+      if (!mounted) return;
+
       if (_currentAccountBookId == null) {
         throw '未选择默认账本';
       }
 
-      final categories = await ApiService.fetchCategories(
-        context,
-        _currentAccountBookId!,
-      );
+      final categories = await ApiService.getCategories(_currentAccountBookId!);
+      setState(() => _categories = categories);
 
-      setState(() {
-        _categories = categories;
-        _isLoading = false;
-      });
+      if (!mounted) return;
+      setState(() => _isLoading = false);
     } catch (e) {
-      if (mounted) {
-        MessageHelper.showError(context, message: e.toString());
-        setState(() => _isLoading = false);
-      }
+      if (!mounted) return;
+      MessageHelper.showError(currentContext, message: e.toString());
+      setState(() => _isLoading = false);
     }
   }
 
   Future<void> _createCategory() async {
     final name = await _showNameDialog(context);
-    if (name == null || name.isEmpty) return;
+    if (name == null || name.isEmpty || !mounted) return;
 
     try {
-      await ApiService.createCategory(
-        context,
-        name,
-        _currentAccountBookId!,
+      final category = Category(
+        id: '', // 由后端生成
+        name: name,
+        accountBookId: _currentAccountBookId!,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
-      await _loadData(); // 重新加载列表
-      if (mounted) {
-        MessageHelper.showSuccess(context, message: '创建成功');
-      }
+
+      await ApiService.createCategory(category);
+      await _loadData();
+      if (!mounted) return;
+      MessageHelper.showSuccess(context, message: '创建成功');
     } catch (e) {
-      if (mounted) {
-        MessageHelper.showError(context, message: e.toString());
-      }
+      if (!mounted) return;
+      MessageHelper.showError(context, message: e.toString());
     }
   }
 
-  Future<void> _updateCategory(String oldName, String newName) async {
-    if (oldName == newName) return;
-
+  Future<void> _updateCategory(Category category, String newName) async {
     try {
-      final category = _categories.firstWhere(
-        (c) => c['name'] == oldName,
-        orElse: () => throw '未找到分类',
+      final updatedCategory = category.copyWith(
+        name: newName,
+        updatedAt: DateTime.now(),
       );
-      await ApiService.updateCategory(
-        context,
-        category['id'],
-        newName,
-      );
+
+      await ApiService.updateCategory(category.id, updatedCategory);
       await _loadData();
-      if (mounted) {
-        MessageHelper.showSuccess(context, message: '更新成功');
-      }
+      if (!mounted) return;
+      MessageHelper.showSuccess(context, message: '更新成功');
     } catch (e) {
-      if (mounted) {
-        MessageHelper.showError(context, message: e.toString());
-      }
+      if (!mounted) return;
+      MessageHelper.showError(context, message: e.toString());
     }
   }
 
   Future<String?> _showNameDialog(BuildContext context, [String? initialName]) {
     final controller = TextEditingController(text: initialName);
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return DialogFactory.showFormDialog<String>(
       context: context,
@@ -158,19 +152,20 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                   return Column(
                     children: [
                       ListItemCard(
-                        title: category['name'],
+                        title: category.name,
                         onTap: () async {
+                          final currentContext = context;
                           final newName = await _showNameDialog(
-                            context,
-                            category['name'],
+                            currentContext,
+                            category.name,
                           );
                           if (newName != null && newName.isNotEmpty) {
-                            await _updateCategory(category['name'], newName);
+                            await _updateCategory(category, newName);
                           }
                         },
                         leading: AvatarFactory.buildCircleAvatar(
                           context: context,
-                          text: category['name'],
+                          text: category.name,
                         ),
                         trailing: Icon(
                           Icons.edit_outlined,

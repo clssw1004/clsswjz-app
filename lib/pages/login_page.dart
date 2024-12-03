@@ -1,52 +1,43 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import '../pages/register_page.dart';
 import '../services/user_service.dart';
 import '../utils/message_helper.dart';
 
 class LoginPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
 
-      try {
-        final loginResult = await ApiService.login(
-          _usernameController.text,
-          _passwordController.text,
-        );
+    setState(() => _isLoading = true);
 
-        await UserService.saveUserSession(
-          loginResult['token'],
-          loginResult['userInfo'],
-        );
+    try {
+      final loginResult = await AuthService.login(
+        _usernameController.text,
+        _passwordController.text,
+      );
 
-        if (!mounted) return;
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          '/home',
-          (route) => false,
-          arguments: loginResult['userInfo'],
-        );
-      } catch (e) {
-        if (!mounted) return;
-        MessageHelper.showError(
-          context,
-          message: '登录失败，请检查用户名和密码',
-        );
-      } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
-      }
+      await UserService.saveUserSession(
+        loginResult['token'],
+        loginResult['userInfo'],
+      );
+
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      if (!mounted) return;
+      MessageHelper.showError(context, message: e.toString());
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -129,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                             AlwaysStoppedAnimation<Color>(colorScheme.primary),
                       )
                     : FilledButton(
-                        onPressed: _login,
+                        onPressed: _handleLogin,
                         style: FilledButton.styleFrom(
                           minimumSize: Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(

@@ -9,10 +9,10 @@ import '../widgets/list_item_card.dart';
 
 class AccountBookList extends StatefulWidget {
   @override
-  _AccountBookListState createState() => _AccountBookListState();
+  State<AccountBookList> createState() => AccountBookListState();
 }
 
-class _AccountBookListState extends State<AccountBookList> {
+class AccountBookListState extends State<AccountBookList> {
   List<dynamic> _accountBooks = [];
   bool _isLoading = true;
   String? _error;
@@ -30,9 +30,9 @@ class _AccountBookListState extends State<AccountBookList> {
     });
 
     try {
-      final books = await ApiService.fetchAccountBooks();
+      final books = await ApiService.getAccountBooks();
       setState(() {
-        _accountBooks = books;
+        _accountBooks = books.map((book) => book.toJson()).toList();
         _isLoading = false;
       });
     } catch (e) {

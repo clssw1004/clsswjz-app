@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../theme/theme_provider.dart';
+import '../services/api_service.dart';
+import '../models/models.dart';
+import '../utils/message_helper.dart';
 import './account_item/widgets/type_selector.dart';
 import './account_item/widgets/amount_input.dart';
 import './account_item/widgets/category_selector.dart';
@@ -10,9 +12,8 @@ import './account_item/widgets/description_input.dart';
 import './account_item/widgets/book_header.dart';
 import './account_item/providers/account_item_provider.dart';
 import 'package:intl/intl.dart';
-import '../utils/message_helper.dart';
-import './account_item/widgets/shop_selector.dart';
 import '../widgets/app_bar_factory.dart';
+import './account_item/widgets/shop_selector.dart';
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -47,16 +48,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
   @override
   void initState() {
     super.initState();
-    _provider = AccountItemProvider();
-
-    // 立即设置初始账本
-    _selectedBook = widget.initialBook;
+    _provider = AccountItemProvider(selectedBook: widget.initialBook);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
       // 设置provider中的账本并加载相关数据
-      await _provider.setSelectedBook(context, widget.initialBook);
+      await _provider.setSelectedBook(widget.initialBook);
       if (widget.initialBook != null) {
         await _loadCategories();
         await _loadFundList();
@@ -106,11 +104,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return ChangeNotifierProvider.value(
       value: _provider,
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
+      child: Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          final colorScheme = theme.colorScheme;
+
           return Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBarFactory.buildAppBar(
@@ -129,8 +129,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color:
-                              theme.colorScheme.outlineVariant.withOpacity(0.5),
+                          color: colorScheme.outlineVariant.withOpacity(0.5),
                         ),
                       ),
                     ),
@@ -225,11 +224,10 @@ class _AccountItemFormState extends State<AccountItemForm> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
+                      color: colorScheme.surface,
                       border: Border(
                         top: BorderSide(
-                          color:
-                              theme.colorScheme.outlineVariant.withOpacity(0.1),
+                          color: colorScheme.outlineVariant.withOpacity(0.1),
                         ),
                       ),
                     ),
@@ -279,13 +277,12 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   Future<void> _loadCategories() async {
     if (_selectedBook == null) return;
-    await _provider.loadCategories(context, _selectedBook!['id']);
+    await _provider.loadData();
   }
 
   Future<void> _loadFundList() async {
     if (_selectedBook == null) return;
-    final provider = Provider.of<AccountItemProvider>(context, listen: false);
-    await provider.loadFundList(_selectedBook!['id']);
+    await _provider.loadData();
   }
 
   String get _formattedDateTime {
@@ -295,7 +292,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
   }
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
-    print('Saving transaction with shop: $_selectedShop');
     if (!mounted) return;
     try {
       // 验证必填字段
@@ -319,58 +315,33 @@ class _AccountItemFormState extends State<AccountItemForm> {
       // 收起键盘
       FocusScope.of(context).unfocus();
 
-      // 修改保存数据的结构
-      final saveData = {
-        ...data,
-        'shop': _selectedShopName,
-      };
+      final accountItem = AccountItem(
+        id: data['id'] ?? '',
+        accountBookId: data['accountBookId'],
+        type: data['type'],
+        amount: data['amount'],
+        category: data['category'],
+        description: data['description'],
+        shop: data['shop'],
+        fundId: data['fundId'],
+        accountDate: DateTime.parse(data['accountDate']),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
 
-      await _provider.saveTransaction(context, saveData);
+      if (accountItem.id.isEmpty) {
+        await ApiService.createAccountItem(accountItem);
+      } else {
+        await ApiService.updateAccountItem(accountItem.id, accountItem);
+      }
+
       if (!mounted) return;
-
       Navigator.pop(context, true);
+      MessageHelper.showSuccess(context, message: '保存成功');
     } catch (e) {
       if (!mounted) return;
       MessageHelper.showError(context, message: e.toString());
     }
-  }
-
-  void _resetForm() {
-    setState(() {
-      _amountController.clear();
-      _descriptionController.clear();
-      _selectedCategory = null;
-      _selectedShop = null;
-      _selectedFund = null; // 也重置账户选择
-      _selectedDate = DateTime.now();
-      _selectedTime = TimeOfDay.now();
-    });
-  }
-
-  void _resetFormForContinue() {
-    setState(() {
-      _amountController.clear();
-      _descriptionController.clear();
-      _selectedCategory = null;
-      _selectedShop = null;
-      _selectedFund = null;
-      _selectedDate = DateTime.now();
-      _selectedTime = TimeOfDay.now();
-      // 不重置 _selectedBook 和 _transactionType
-    });
-
-    // 只在重置后立即聚焦一次，不保持焦点
-    Future.delayed(Duration(milliseconds: 100), () {
-      if (mounted) {
-        FocusScope.of(context).requestFocus(_amountFocusNode);
-        // 聚焦后立即释放焦点，这样点击其他地方时不会再次聚焦
-        Future.delayed(Duration(milliseconds: 100), () {
-          if (mounted) {
-            _amountFocusNode.unfocus();
-          }
-        });
-      }
-    });
   }
 
   final _amountFocusNode = FocusNode();

@@ -1,30 +1,27 @@
 import 'package:flutter/material.dart';
-import '../../user/user_info_page.dart';
+import '../../../services/user_service.dart';
 
 class UserCard extends StatefulWidget {
-  final Map<String, dynamic> userInfo;
-  final VoidCallback? onUserInfoUpdated;
-
-  const UserCard({
-    Key? key,
-    required this.userInfo,
-    this.onUserInfoUpdated,
-  }) : super(key: key);
+  const UserCard({Key? key}) : super(key: key);
 
   @override
   State<UserCard> createState() => _UserCardState();
 }
 
 class _UserCardState extends State<UserCard> {
-  Future<void> _navigateToUserInfo() async {
-    final needsRefresh = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(builder: (context) => UserInfoPage()),
-    );
+  late Map<String, dynamic> _userInfo;
 
-    if (needsRefresh == true && mounted && widget.onUserInfoUpdated != null) {
-      widget.onUserInfoUpdated!();
-    }
+  @override
+  void initState() {
+    super.initState();
+    _userInfo = UserService.getUserInfo() ?? {};
+  }
+
+  void _refreshUserInfo() {
+    if (!mounted) return;
+    setState(() {
+      _userInfo = UserService.getUserInfo() ?? _userInfo;
+    });
   }
 
   @override
@@ -33,61 +30,44 @@ class _UserCardState extends State<UserCard> {
     final colorScheme = theme.colorScheme;
 
     return Card(
-      margin: EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(horizontal: 16),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: colorScheme.outlineVariant),
       ),
-      child: InkWell(
-        onTap: _navigateToUserInfo,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: colorScheme.primaryContainer,
-                radius: 24,
-                child: Text(
-                  widget.userInfo['nickname']?[0] ??
-                      widget.userInfo['username'][0],
-                  style: TextStyle(
-                    color: colorScheme.onPrimaryContainer,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.userInfo['nickname'] ??
-                          widget.userInfo['username'],
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      widget.userInfo['username'],
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ],
+      child: ListTile(
+        contentPadding: EdgeInsets.all(16),
+        leading: CircleAvatar(
+          backgroundColor: colorScheme.primaryContainer,
+          child: Text(
+            _userInfo['nickname']?.substring(0, 1) ??
+                _userInfo['username']?.substring(0, 1) ??
+                'U',
+            style: TextStyle(color: colorScheme.onPrimaryContainer),
           ),
         ),
+        title: Text(
+          _userInfo['nickname'] ?? _userInfo['username'] ?? '未登录',
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
+        subtitle: Text(
+          _userInfo['email'] ?? '',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: colorScheme.onSurfaceVariant,
+        ),
+        onTap: () {
+          Navigator.pushNamed(context, '/user-info').then((_) {
+            _refreshUserInfo();
+          });
+        },
       ),
     );
   }

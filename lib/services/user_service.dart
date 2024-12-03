@@ -1,16 +1,21 @@
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:convert';
-import 'api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:universal_html/html.dart' as html;
+import '../data/data_source_factory.dart';
+import '../data/http/http_data_source.dart';
+import 'auth_service.dart';
 
 class UserService {
   static Database? _database;
   static Map<String, dynamic>? _cachedUserInfo;
   static const String _currentAccountBookKey = 'currentAccountBook';
   static const String _sessionKey = 'user_session';
+  static final HttpDataSource _httpDataSource =
+      DataSourceFactory.create(DataSourceType.http) as HttpDataSource;
+  static const String _tokenKey = 'auth_token';
 
   // Web 平台的存储实现
   static Future<void> _saveToWeb(Map<String, dynamic> data) async {
@@ -73,7 +78,7 @@ class UserService {
     final sessionData = await getUserSession();
     if (sessionData != null) {
       _cachedUserInfo = sessionData['userInfo'];
-      ApiService.setToken(sessionData['token']);
+      AuthService.setToken(sessionData['token']);
     }
   }
 
@@ -87,22 +92,31 @@ class UserService {
     String token,
     Map<String, dynamic> userInfo,
   ) async {
-    if (kIsWeb) {
-      await _saveToWeb({
-        'token': token,
-        'userInfo': userInfo,
-      });
-    } else {
-      final db = await database;
-      await db.delete('user_session');
-      await db.insert('user_session', {
-        'token': token,
-        'user_info': jsonEncode(userInfo),
-      });
-    }
+    try {
+      print('Saving session - token: $token'); // 添加调试日志
 
-    _cachedUserInfo = userInfo;
-    ApiService.setToken(token);
+      // 立即设置 token 到 HTTP 客户端
+      _httpDataSource.setToken(token);
+
+      if (kIsWeb) {
+        await _saveToWeb({
+          'token': token,
+          'userInfo': userInfo,
+        });
+      } else {
+        final db = await database;
+        await db.delete('user_session');
+        await db.insert('user_session', {
+          'token': token,
+          'user_info': jsonEncode(userInfo),
+        });
+      }
+
+      _cachedUserInfo = userInfo;
+    } catch (e) {
+      print('Error saving session: $e'); // 添加调试日志
+      rethrow;
+    }
   }
 
   // 获取用户会话信息
@@ -111,7 +125,7 @@ class UserService {
       if (kIsWeb) {
         final sessionData = await _loadFromWeb();
         if (sessionData != null) {
-          ApiService.setToken(sessionData['token']);
+          AuthService.setToken(sessionData['token']);
           _cachedUserInfo = sessionData['userInfo'];
           return sessionData;
         }
@@ -129,7 +143,7 @@ class UserService {
             'userInfo': jsonDecode(results.first['user_info']),
           };
 
-          ApiService.setToken(sessionData['token']);
+          AuthService.setToken(sessionData['token']);
           _cachedUserInfo = sessionData['userInfo'];
           return sessionData;
         }
@@ -165,7 +179,7 @@ class UserService {
         await db.delete('user_session');
       }
       _cachedUserInfo = null;
-      ApiService.clearToken();
+      AuthService.clearToken();
     } catch (e) {
       print('退出登录失败: $e');
     }
@@ -201,6 +215,24 @@ class UserService {
           whereArgs: [sessionData['token']],
         );
       }
+    }
+  }
+
+  static void setToken(String token) {
+    _httpDataSource.setToken(token);
+  }
+
+  static void clearToken() {
+    _httpDataSource.clearToken();
+  }
+
+  static String? getStoredToken() {
+    if (kIsWeb) {
+      return html.window.localStorage[_tokenKey];
+    } else {
+      // 从 SQLite 获取最新的 token
+      final sessionData = _cachedUserInfo;
+      return sessionData?['token'];
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../services/api_service.dart';
 import '../../../utils/message_helper.dart';
+import '../../../models/models.dart';
 
 class ShopSelector extends StatefulWidget {
   final String? selectedShop;
@@ -21,9 +22,8 @@ class ShopSelector extends StatefulWidget {
 }
 
 class _ShopSelectorState extends State<ShopSelector> {
-  List<Map<String, dynamic>> _shops = [];
-  bool _isLoading = false;
-  String? _selectedShopName;
+  List<Shop> _shops = [];
+  Shop? _selectedShop;
 
   @override
   void initState() {
@@ -40,16 +40,15 @@ class _ShopSelectorState extends State<ShopSelector> {
   }
 
   Future<void> _loadShops() async {
-    setState(() => _isLoading = true);
     try {
-      _shops = await ApiService.fetchShops(context, widget.accountBookId);
+      _shops = await ApiService.getShops(widget.accountBookId);
 
       if (widget.selectedShop != null) {
         final selectedShop = _shops.firstWhere(
-          (shop) => shop['shopCode'] == widget.selectedShop,
-          orElse: () => {'name': '', 'shopCode': widget.selectedShop},
+          (shop) => shop.id == widget.selectedShop,
+          orElse: () => throw '未找到商家',
         );
-        _selectedShopName = selectedShop['name'];
+        _selectedShop = selectedShop;
       }
 
       setState(() {});
@@ -57,17 +56,15 @@ class _ShopSelectorState extends State<ShopSelector> {
       if (mounted) {
         MessageHelper.showError(context, message: e.toString());
       }
-    } finally {
-      setState(() => _isLoading = false);
     }
   }
 
   Future<void> _showShopDialog() async {
-    final result = await showDialog<Map<String, dynamic>>(
+    final result = await showDialog<Shop>(
       context: context,
       builder: (context) => _ShopDialog(
         shops: _shops,
-        selectedShopCode: widget.selectedShop,
+        selectedShop: widget.selectedShop,
         accountBookId: widget.accountBookId,
         onShopsUpdated: (shops) {
           setState(() => _shops = shops);
@@ -76,9 +73,9 @@ class _ShopSelectorState extends State<ShopSelector> {
     );
 
     if (result != null) {
-      widget.onChanged(result['name']);
+      widget.onChanged(result.id);
       setState(() {
-        _selectedShopName = result['name'];
+        _selectedShop = result;
       });
     }
   }
@@ -115,9 +112,9 @@ class _ShopSelectorState extends State<ShopSelector> {
                 _showShopDialog();
               },
               child: Text(
-                _selectedShopName ?? '选择商家',
+                _selectedShop?.name ?? '选择商家',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: _selectedShopName != null
+                  color: _selectedShop != null
                       ? colorScheme.onSurface
                       : colorScheme.onSurfaceVariant,
                 ),
@@ -145,15 +142,15 @@ class _ShopSelectorState extends State<ShopSelector> {
 }
 
 class _ShopDialog extends StatefulWidget {
-  final List<Map<String, dynamic>> shops;
-  final String? selectedShopCode;
+  final List<Shop> shops;
+  final String? selectedShop;
   final String accountBookId;
-  final ValueChanged<List<Map<String, dynamic>>> onShopsUpdated;
+  final ValueChanged<List<Shop>> onShopsUpdated;
 
   const _ShopDialog({
     Key? key,
     required this.shops,
-    this.selectedShopCode,
+    this.selectedShop,
     required this.accountBookId,
     required this.onShopsUpdated,
   }) : super(key: key);
@@ -172,10 +169,10 @@ class _ShopDialogState extends State<_ShopDialog> {
     super.dispose();
   }
 
-  List<Map<String, dynamic>> get _filteredShops {
+  List<Shop> get _filteredShops {
     if (_searchText.isEmpty) return widget.shops;
     return widget.shops
-        .where((shop) => shop['name']
+        .where((shop) => shop.name
             .toString()
             .toLowerCase()
             .contains(_searchText.toLowerCase()))
@@ -240,55 +237,75 @@ class _ShopDialogState extends State<_ShopDialog> {
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(context).size.height * 0.4,
               ),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: _filteredShops.length,
-                itemBuilder: (context, index) {
-                  final shop = _filteredShops[index];
-                  final isSelected =
-                      shop['shopCode'] == widget.selectedShopCode;
-
-                  return ListTile(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                    title: Text(
-                      shop['name'] ?? '',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: isSelected
-                            ? colorScheme.primary
-                            : colorScheme.onSurface,
-                      ),
-                    ),
-                    leading: Icon(
-                      isSelected
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_unchecked,
-                      color: isSelected ? colorScheme.primary : null,
-                      size: 20,
-                    ),
-                    onTap: () => Navigator.pop(context, shop),
-                  );
-                },
-              ),
+              child: _buildShopList(),
             ),
-            if (_searchText.isNotEmpty &&
-                !_filteredShops.any((s) => s['name'] == _searchText))
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: ElevatedButton.icon(
-                  onPressed: () =>
-                      Navigator.pop(context, {'name': _searchText}),
-                  icon: Icon(Icons.add, size: 18),
-                  label: Text('添加"$_searchText"'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
+            _buildCreateButton(),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildShopList() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return ListView.builder(
+      itemCount: _filteredShops.length,
+      shrinkWrap: true,
+      itemBuilder: (context, index) {
+        final shop = _filteredShops[index];
+        final isSelected = shop.id == widget.selectedShop;
+
+        return ListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+          title: Text(
+            shop.name,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: isSelected ? colorScheme.primary : colorScheme.onSurface,
+            ),
+          ),
+          leading: Icon(
+            isSelected
+                ? Icons.radio_button_checked
+                : Icons.radio_button_unchecked,
+            color: isSelected ? colorScheme.primary : null,
+            size: 20,
+          ),
+          onTap: () => Navigator.pop(context, shop),
+        );
+      },
+    );
+  }
+
+  Widget _buildCreateButton() {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (_searchText.isNotEmpty &&
+        !_filteredShops.any((s) => s.name == _searchText)) {
+      return Padding(
+        padding: EdgeInsets.only(top: 16),
+        child: ElevatedButton.icon(
+          onPressed: () => Navigator.pop(
+            context,
+            Shop(
+              id: '',
+              name: _searchText,
+              accountBookId: widget.accountBookId,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          ),
+          icon: Icon(Icons.add, size: 18),
+          label: Text('添加"$_searchText"'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
+            padding: EdgeInsets.symmetric(vertical: 12),
+          ),
+        ),
+      );
+    }
+    return SizedBox.shrink();
   }
 }

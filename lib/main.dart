@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import "pages/login_page.dart";
 import 'pages/home_page.dart';
 import 'pages/register_page.dart';
+import 'pages/user/user_info_page.dart';
 import 'theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'services/user_service.dart';
@@ -65,12 +66,12 @@ void main() async {
               '/register': (context) => RegisterPage(),
               '/account-books': (context) => AccountBookList(),
               '/create-account-book': (context) => CreateAccountBookPage(),
+              '/user-info': (context) => UserInfoPage(),
             },
             onGenerateRoute: (settings) {
               if (settings.name == '/home') {
-                final userInfo = settings.arguments as Map<String, dynamic>;
                 return MaterialPageRoute(
-                  builder: (context) => HomePage(userInfo: userInfo),
+                  builder: (context) => HomePage(),
                 );
               }
               return null;
@@ -97,9 +98,7 @@ void main() async {
                     ),
                   );
                 }
-                return snapshot.data != null
-                    ? HomePage(userInfo: snapshot.data!)
-                    : LoginPage();
+                return snapshot.data != null ? HomePage() : LoginPage();
               },
             ),
           );

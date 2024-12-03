@@ -7,6 +7,7 @@ import './account_book/widgets/member_list.dart';
 import '../widgets/app_bar_factory.dart';
 import '../services/user_service.dart';
 import 'package:intl/intl.dart';
+import '../models/models.dart';
 
 class AccountBookInfo extends StatefulWidget {
   final Map<String, dynamic> accountBook;
@@ -24,31 +25,33 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   late String _currencySymbol;
-  late List<dynamic> _members;
+  late List<Member> _members;
   late IconData _selectedIcon;
   bool _isSaving = false;
   bool _canEdit = false;
   String? _currentUserId;
+  late AccountBook _accountBook;
 
   @override
   void initState() {
     super.initState();
     _currentUserId = UserService.getUserInfo()?['userId'];
     _canEdit = _checkEditPermission();
-    _nameController = TextEditingController(text: widget.accountBook['name']);
+    _accountBook = AccountBook.fromJson(widget.accountBook);
+    _nameController = TextEditingController(text: _accountBook.name);
     _descriptionController =
-        TextEditingController(text: widget.accountBook['description']);
-    _currencySymbol = widget.accountBook['currencySymbol'] ?? '¥';
-    _members = List<dynamic>.from(widget.accountBook['members'] ?? []);
-    _selectedIcon = _getBookIcon(widget.accountBook);
+        TextEditingController(text: _accountBook.description);
+    _currencySymbol = _accountBook.currencySymbol;
+    _members = _accountBook.members;
+    _selectedIcon = _getBookIcon(_accountBook);
   }
 
   bool _checkEditPermission() {
     if (_currentUserId == null) return false;
 
-    if (widget.accountBook['createdBy'] == _currentUserId) return true;
+    if (_accountBook.createdBy == _currentUserId) return true;
 
-    final member = (widget.accountBook['members'] as List?)?.firstWhere(
+    final member = (_accountBook.members as List?)?.firstWhere(
       (m) => m['userId'] == _currentUserId,
       orElse: () => null,
     );
@@ -56,8 +59,8 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
     return member?['canEditBook'] == true;
   }
 
-  IconData _getBookIcon(Map<String, dynamic> book) {
-    final String? iconString = book['icon']?.toString();
+  IconData _getBookIcon(AccountBook book) {
+    final String? iconString = book.icon?.toString();
     if (iconString == null || iconString.isEmpty) {
       return BookIcons.defaultIcon;
     }
@@ -89,52 +92,32 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
   }
 
   Future<void> _saveChanges() async {
-    if (_nameController.text.isEmpty) {
-      MessageHelper.showWarning(
-        context,
-        message: '账本名称不能为空',
-      );
-      return;
-    }
-
-    setState(() => _isSaving = true);
-
     try {
-      final response = await ApiService.updateAccountBook(
-        context,
-        widget.accountBook['id'],
-        {
-          'name': _nameController.text,
-          'description': _descriptionController.text,
-          'currencySymbol': _currencySymbol,
-          'members': _members,
-          'icon': _selectedIcon.codePoint.toString(),
-        },
+      final updatedBook = _accountBook.copyWith(
+        name: _nameController.text,
+        description: _descriptionController.text,
+        currencySymbol: _currencySymbol,
+        icon: _selectedIcon.codePoint.toString(),
+        members: _members,
+        updatedAt: DateTime.now(),
       );
 
-      if (response['code'] == 0) {
-        final updatedAccountBook = {
-          ...widget.accountBook,
-          'name': _nameController.text,
-          'description': _descriptionController.text,
-          'currencySymbol': _currencySymbol,
-          'members': _members,
-          'icon': _selectedIcon.codePoint.toString(),
-          'updatedAt': DateTime.now().toString(),
-        };
+      final response = await ApiService.updateAccountBook(
+        _accountBook.id,
+        updatedBook,
+      );
 
-        MessageHelper.showSuccess(
-          context,
-          message: '保存成功',
-        );
-
-        Navigator.pop(context, updatedAccountBook);
-      }
+      if (!mounted) return;
+      Navigator.pop(context, response.toJson());
+      MessageHelper.showSuccess(context, message: '保存成功');
     } catch (e) {
       if (!mounted) return;
-    } finally {
-      setState(() => _isSaving = false);
+      MessageHelper.showError(context, message: e.toString());
     }
+  }
+
+  void _handleMemberUpdate(List<Member> members) {
+    setState(() => _members = members);
   }
 
   @override
@@ -233,7 +216,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                         leading:
                             Icon(_selectedIcon, color: colorScheme.primary),
                         title: Text(
-                          widget.accountBook['name'] ?? '',
+                          _accountBook.name ?? '',
                           style: theme.textTheme.titleLarge?.copyWith(
                             color: colorScheme.onSurface,
                           ),
@@ -244,7 +227,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                       TextFormField(
                         controller: _descriptionController,
                         decoration: InputDecoration(
-                          labelText: '账本描述',
+                          labelText: '账本描',
                           labelStyle: TextStyle(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -280,7 +263,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            widget.accountBook['description'] ?? '',
+                            _accountBook.description ?? '',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: colorScheme.onSurface,
                             ),
@@ -293,14 +276,14 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                         _buildInfoItem(
                           context,
                           '创建者',
-                          widget.accountBook['fromName'] ?? '',
+                          _accountBook.fromName ?? '',
                         ),
                         SizedBox(width: 24),
                         _buildInfoItem(
                           context,
                           '创建时间',
-                          DateFormat('yyyy-MM-dd HH:mm').format(
-                              DateTime.parse(widget.accountBook['createdAt'])),
+                          DateFormat('yyyy-MM-dd HH:mm')
+                              .format(_accountBook.createdAt),
                         ),
                       ],
                     ),
@@ -311,10 +294,8 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
             if (_canEdit)
               MemberList(
                 members: _members,
-                createdBy: widget.accountBook['createdBy'],
-                onUpdate: (members) {
-                  setState(() => _members = members);
-                },
+                createdBy: _accountBook.createdBy,
+                onUpdate: _handleMemberUpdate,
                 currentUserId: _currentUserId,
               ),
           ],

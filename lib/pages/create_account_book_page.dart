@@ -4,6 +4,7 @@ import '../utils/message_helper.dart';
 import '../constants/currency_symbols.dart';
 import '../constants/book_icons.dart';
 import '../widgets/icon_picker_dialog.dart';
+import '../models/models.dart';
 
 class CreateAccountBookPage extends StatefulWidget {
   @override
@@ -173,12 +174,19 @@ class CreateAccountBookPageState extends State<CreateAccountBookPage> {
     setState(() => _isLoading = true);
 
     try {
-      await ApiService.createAccountBook(
+      final accountBook = AccountBook(
+        id: '', // 由后端生成
         name: _nameController.text,
         description: _descriptionController.text,
-        currencySymbol: _selectedCurrency,
+        currencySymbol: CurrencySymbols.currencies[_selectedCurrency]!,
         icon: _selectedIcon.codePoint.toString(),
+        createdBy: '', // 由后端填充
+        members: [], // 由后端填充
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
+
+      await ApiService.createAccountBook(accountBook);
 
       if (!mounted) return;
       MessageHelper.showSuccess(
