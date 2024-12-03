@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/api_service.dart';
 import '../utils/message_helper.dart';
 import '../constants/book_icons.dart';
 import 'account_book/widgets/book_info.dart';
+import '../services/user_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 class AccountBookList extends StatefulWidget {
   @override
@@ -84,16 +88,29 @@ class _AccountBookListState extends State<AccountBookList> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: Text('账本管理'),
+        title: Text(
+          '账本管理',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
         elevation: 0,
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        iconTheme: IconThemeData(
+          color: colorScheme.onSurface,
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
+            tooltip: '新建账本',
+            color: colorScheme.onSurface,
             onPressed: () {
               Navigator.pushNamed(context, '/create-account-book').then((_) {
                 _fetchAccountBooks();
@@ -101,17 +118,27 @@ class _AccountBookListState extends State<AccountBookList> {
             },
           ),
         ],
+        systemOverlayStyle: theme.brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
       ),
       body: RefreshIndicator(
         onRefresh: _fetchAccountBooks,
-        child: _buildContent(isDark, colorScheme),
+        child: _buildContent(),
       ),
     );
   }
 
-  Widget _buildContent(bool isDark, ColorScheme colorScheme) {
+  Widget _buildContent() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return Center(
+        child: CircularProgressIndicator(
+          color: colorScheme.primary,
+        ),
+      );
     }
 
     if (_error != null) {
@@ -121,12 +148,12 @@ class _AccountBookListState extends State<AccountBookList> {
           children: [
             Text(
               _error!,
-              style: TextStyle(
-                color: isDark ? Colors.white70 : Colors.grey[600],
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             SizedBox(height: 16),
-            TextButton(
+            FilledButton.tonal(
               onPressed: _fetchAccountBooks,
               child: Text('重试'),
             ),
@@ -143,7 +170,7 @@ class _AccountBookListState extends State<AccountBookList> {
             Text(
               '暂无账本',
               style: TextStyle(
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             SizedBox(height: 16),
@@ -161,46 +188,111 @@ class _AccountBookListState extends State<AccountBookList> {
     }
 
     return ListView.builder(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: _getHorizontalPadding(context),
+      ),
       itemCount: _accountBooks.length,
       itemBuilder: (context, index) {
         final book = _accountBooks[index];
-        return ListTile(
-          leading: CircleAvatar(
-            backgroundColor: colorScheme.primaryContainer,
-            child: Icon(
-              _getBookIcon(book),
-              color: colorScheme.onPrimaryContainer,
-              size: 20,
-            ),
-          ),
-          title: Text(
-            book['name'] ?? '未命名账本',
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: isDark ? Colors.white : Colors.grey[800],
-            ),
-          ),
-          subtitle:
-              book['description'] != null && book['description'].isNotEmpty
-                  ? Text(
-                      book['description'],
-                      style: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.grey[600],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  : null,
-          trailing: Icon(
-            Icons.chevron_right,
-            color: isDark ? Colors.white54 : Colors.grey[400],
-          ),
-          onTap: () {
-            _openAccountBookInfo(book);
-          },
-        );
+        return _buildAccountItem(book);
       },
+    );
+  }
+
+  double _getHorizontalPadding(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    if (width > 1200) return width * 0.2;
+    if (width > 600) return 32;
+    return 16;
+  }
+
+  Widget _buildAccountItem(Map<String, dynamic> book) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final currentUserId = UserService.getUserInfo()?['userId'];
+    final isShared = book['createdBy'] != currentUserId;
+
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.symmetric(vertical: 4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withOpacity(0.5),
+        ),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: colorScheme.primaryContainer,
+          child: Icon(
+            _getBookIcon(book),
+            color: colorScheme.onPrimaryContainer,
+            size: 20,
+          ),
+        ),
+        title: Row(
+          children: [
+            Text(
+              book['name'] ?? '未命名账本',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(width: 8),
+            if (isShared) ...[
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.people_outline,
+                      size: 14,
+                      color: colorScheme.primary,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      '共享自${book['fromName'] ?? '未知用户'}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            Spacer(),
+          ],
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (book['description'] != null && book['description'].isNotEmpty)
+              Text(
+                book['description'],
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
+        ),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: colorScheme.onSurfaceVariant,
+          size: 20,
+        ),
+        onTap: () {
+          _openAccountBookInfo(book);
+        },
+      ),
     );
   }
 }

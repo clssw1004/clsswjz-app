@@ -310,6 +310,7 @@ class ApiService {
           'name': data['name'],
           'description': data['description'],
           'currencySymbol': data['currencySymbol'],
+          'icon': data['icon'],
           'members': data['members']
               ?.map((member) => {
                     'userId': member['userId'],
