@@ -544,4 +544,31 @@ class ApiService {
       }
     });
   }
+
+  static Future<Map<String, dynamic>> updateShop(
+    BuildContext context,
+    String id,
+    String name,
+  ) async {
+    return ApiErrorHandler.wrapRequest(context, () async {
+      final uri = Uri.parse('$_baseUrl/api/account/shop/$id');
+      final response = await http.patch(
+        uri,
+        headers: _getHeaders(needsContentType: true),
+        body: json.encode({
+          'name': name,
+        }),
+      );
+
+      if (_isSuccessStatusCode(response.statusCode)) {
+        return Map<String, dynamic>.from(json.decode(response.body));
+      } else {
+        throw ApiException(
+          statusCode: response.statusCode,
+          body: '$uri: ${response.body}',
+          message: '更新商家失败',
+        );
+      }
+    });
+  }
 }

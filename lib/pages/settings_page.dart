@@ -8,6 +8,7 @@ import './settings/widgets/developer_mode_selector.dart';
 import '../services/user_service.dart';
 import './settings/category_management_page.dart';
 import '../widgets/app_bar_factory.dart';
+import './settings/shop_management_page.dart';
 
 class SettingsPage extends StatefulWidget {
   final Map<String, dynamic> userInfo;
@@ -76,6 +77,19 @@ class _SettingsPageState extends State<SettingsPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => CategoryManagementPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.store_outlined),
+                title: Text('商家管理'),
+                trailing: Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ShopManagementPage(),
                     ),
                   );
                 },

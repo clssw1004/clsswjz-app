@@ -5,6 +5,9 @@ import '../../services/user_service.dart';
 import '../../utils/message_helper.dart';
 import '../../widgets/app_bar_factory.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import '../../widgets/dialog_factory.dart';
+import '../../widgets/list_item_card.dart';
+import '../../widgets/avatar_factory.dart';
 
 class CategoryManagementPage extends StatefulWidget {
   @override
@@ -97,61 +100,32 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return showDialog<String>(
+    return DialogFactory.showFormDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+      title: initialName == null ? '新建分类' : '编辑分类',
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        decoration: DialogFactory.getInputDecoration(
+          context: context,
+          label: '分类名称',
         ),
-        title: Text(initialName == null ? '新建分类' : '编辑分类'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(
-            labelText: '分类名称',
-            filled: true,
-            fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: colorScheme.primary,
-                width: 2,
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            style: FilledButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(initialName == null ? '创建' : '保存'),
-          ),
-        ],
       ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          style: DialogFactory.getDialogButtonStyle(context: context),
+          child: Text('取消'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, controller.text.trim()),
+          style: DialogFactory.getDialogButtonStyle(
+            context: context,
+            isPrimary: true,
+          ),
+          child: Text(initialName == null ? '创建' : '保存'),
+        ),
+      ],
     );
   }
 
@@ -185,64 +159,25 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                   final category = _categories[index];
                   return Column(
                     children: [
-                      Slidable(
-                        endActionPane: ActionPane(
-                          motion: const ScrollMotion(),
-                          children: [
-                            SlidableAction(
-                              onPressed: (_) async {
-                                final newName = await _showNameDialog(
-                                  context,
-                                  category['name'],
-                                );
-                                if (newName != null && newName.isNotEmpty) {
-                                  await _updateCategory(
-                                      category['name'], newName);
-                                }
-                              },
-                              backgroundColor: colorScheme.primaryContainer,
-                              foregroundColor: colorScheme.onPrimaryContainer,
-                              icon: Icons.edit_outlined,
-                              label: '编辑',
-                            ),
-                          ],
+                      ListItemCard(
+                        title: category['name'],
+                        onTap: () async {
+                          final newName = await _showNameDialog(
+                            context,
+                            category['name'],
+                          );
+                          if (newName != null && newName.isNotEmpty) {
+                            await _updateCategory(category['name'], newName);
+                          }
+                        },
+                        leading: AvatarFactory.buildCircleAvatar(
+                          context: context,
+                          text: category['name'],
                         ),
-                        child: Card(
-                          elevation: 0,
-                          margin: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color:
-                                  colorScheme.outlineVariant.withOpacity(0.5),
-                            ),
-                          ),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
-                            ),
-                            title: Text(
-                              category['name'],
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            leading: CircleAvatar(
-                              backgroundColor: colorScheme.primaryContainer,
-                              child: Text(
-                                category['name'].substring(0, 1),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: colorScheme.onPrimaryContainer,
-                                ),
-                              ),
-                            ),
-                            trailing: Icon(
-                              Icons.chevron_right,
-                              color: colorScheme.onSurfaceVariant,
-                              size: 20,
-                            ),
-                          ),
+                        trailing: Icon(
+                          Icons.edit_outlined,
+                          color: colorScheme.onSurfaceVariant,
+                          size: 20,
                         ),
                       ),
                       if (!isLastItem) SizedBox(height: 8),
