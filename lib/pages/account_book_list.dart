@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../utils/message_helper.dart';
 import '../constants/book_icons.dart';
-import 'account_book/widgets/book_info.dart';
+import 'account_book_info.dart';
 import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
+import '../widgets/list_item_card.dart';
 
 class AccountBookList extends StatefulWidget {
   @override
@@ -55,7 +56,7 @@ class _AccountBookListState extends State<AccountBookList> {
     final updatedAccountBook = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
-        builder: (context) => BookInfo(accountBook: accountBook),
+        builder: (context) => AccountBookInfo(accountBook: accountBook),
       ),
     );
 
@@ -198,17 +199,13 @@ class _AccountBookListState extends State<AccountBookList> {
     final colorScheme = theme.colorScheme;
     final currentUserId = UserService.getUserInfo()?['userId'];
     final isShared = book['createdBy'] != currentUserId;
+    final canEdit = book['canEditBook'] == true;
 
-    return Card(
-      elevation: 0,
-      margin: EdgeInsets.symmetric(vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: colorScheme.outlineVariant.withOpacity(0.5),
-        ),
-      ),
-      child: ListTile(
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: ListItemCard(
+        title: book['name'] ?? '未命名账本',
+        onTap: () => _openAccountBookInfo(book),
         leading: CircleAvatar(
           backgroundColor: colorScheme.primaryContainer,
           child: Icon(
@@ -217,16 +214,39 @@ class _AccountBookListState extends State<AccountBookList> {
             size: 20,
           ),
         ),
-        title: Row(
+        trailing: Icon(
+          Icons.chevron_right,
+          color: colorScheme.onSurfaceVariant,
+          size: 20,
+        ),
+        subtitle: Row(
           children: [
-            Text(
-              book['name'] ?? '未命名账本',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w500,
+            if (canEdit)
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                margin: EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.edit_outlined,
+                      size: 14,
+                      color: colorScheme.primary,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      '可编辑',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(width: 8),
             if (isShared) ...[
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -256,28 +276,6 @@ class _AccountBookListState extends State<AccountBookList> {
             Spacer(),
           ],
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (book['description'] != null && book['description'].isNotEmpty)
-              Text(
-                book['description'],
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: colorScheme.onSurfaceVariant,
-          size: 20,
-        ),
-        onTap: () {
-          _openAccountBookInfo(book);
-        },
       ),
     );
   }

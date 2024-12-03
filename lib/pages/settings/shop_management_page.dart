@@ -110,7 +110,7 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
           decoration: InputDecoration(
             labelText: '商家名称',
             filled: true,
-            fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+            fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,

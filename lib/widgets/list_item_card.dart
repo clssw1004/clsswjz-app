@@ -6,6 +6,7 @@ class ListItemCard extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? contentPadding;
+  final Widget? subtitle;
 
   const ListItemCard({
     Key? key,
@@ -14,6 +15,7 @@ class ListItemCard extends StatelessWidget {
     this.trailing,
     this.onTap,
     this.contentPadding,
+    this.subtitle,
   }) : super(key: key);
 
   @override
@@ -43,8 +45,12 @@ class ListItemCard extends StatelessWidget {
             color: colorScheme.onSurface,
           ),
         ),
+        subtitle: subtitle,
         leading: leading,
-        trailing: trailing,
+        trailing: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 200),
+          child: trailing ?? SizedBox(),
+        ),
       ),
     );
   }

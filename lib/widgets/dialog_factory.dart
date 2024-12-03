@@ -40,7 +40,7 @@ class DialogFactory {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
