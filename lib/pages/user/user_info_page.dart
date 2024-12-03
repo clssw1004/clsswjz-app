@@ -7,10 +7,10 @@ import '../../widgets/app_bar_factory.dart';
 
 class UserInfoPage extends StatefulWidget {
   @override
-  _UserInfoPageState createState() => _UserInfoPageState();
+  State<UserInfoPage> createState() => UserInfoPageState();
 }
 
-class _UserInfoPageState extends State<UserInfoPage> {
+class UserInfoPageState extends State<UserInfoPage> {
   Map<String, dynamic>? _userInfo;
   bool _isLoading = true;
   final _nicknameController = TextEditingController();
@@ -498,7 +498,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
       await UserService.logout();
       if (!mounted) return;
 
-      // 清除导航栈并跳转到登录页
+      // 清除导航��并跳转到登录页
       Navigator.of(context).pushNamedAndRemoveUntil(
         '/login',
         (route) => false,

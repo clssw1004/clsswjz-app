@@ -7,10 +7,10 @@ import '../widgets/icon_picker_dialog.dart';
 
 class CreateAccountBookPage extends StatefulWidget {
   @override
-  _CreateAccountBookPageState createState() => _CreateAccountBookPageState();
+  State<CreateAccountBookPage> createState() => CreateAccountBookPageState();
 }
 
-class _CreateAccountBookPageState extends State<CreateAccountBookPage> {
+class CreateAccountBookPageState extends State<CreateAccountBookPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -174,9 +174,9 @@ class _CreateAccountBookPageState extends State<CreateAccountBookPage> {
 
     try {
       await ApiService.createAccountBook(
-        _nameController.text,
-        _descriptionController.text,
-        currencySymbol: CurrencySymbols.currencies[_selectedCurrency]!,
+        name: _nameController.text,
+        description: _descriptionController.text,
+        currencySymbol: _selectedCurrency,
         icon: _selectedIcon.codePoint.toString(),
       );
 
