@@ -164,7 +164,7 @@ class _ShopManagementPageState extends State<ShopManagementPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: '商家管理',
+        title: AppBarFactory.buildTitle(context, '商家管理'),
         actions: [
           IconButton(
             icon: Icon(Icons.add),

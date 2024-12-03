@@ -164,7 +164,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
       return Scaffold(
         appBar: AppBarFactory.buildAppBar(
           context: context,
-          title: '用户信息',
+          title: AppBarFactory.buildTitle(context, '用户信息'),
         ),
         body: Center(child: CircularProgressIndicator()),
       );
@@ -191,7 +191,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         backgroundColor: colorScheme.surface,
         appBar: AppBarFactory.buildAppBar(
           context: context,
-          title: '用户信息',
+          title: AppBarFactory.buildTitle(context, '用户信息'),
         ),
         body: Column(
           children: [

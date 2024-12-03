@@ -115,7 +115,10 @@ class _AccountItemFormState extends State<AccountItemForm> {
             resizeToAvoidBottomInset: false,
             appBar: AppBarFactory.buildAppBar(
               context: context,
-              title: _recordId == null ? '记一笔' : '编辑记录',
+              title: AppBarFactory.buildTitle(
+                context,
+                _recordId == null ? '记一笔' : '编辑记录',
+              ),
             ),
             body: SafeArea(
               child: Column(

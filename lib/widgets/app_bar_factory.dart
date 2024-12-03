@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppBarFactory {
+  static Widget buildTitle(BuildContext context, String text) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+    );
+  }
+
   static PreferredSizeWidget buildAppBar({
     required BuildContext context,
-    required String title,
+    required Widget title,
     List<Widget>? actions,
     Widget? leading,
     bool automaticallyImplyLeading = true,
@@ -29,12 +38,7 @@ class AppBarFactory {
     );
 
     return AppBar(
-      title: Text(
-        title,
-        style: theme.textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurface,
-        ),
-      ),
+      title: title,
       elevation: 0,
       scrolledUnderElevation: 0,
       backgroundColor: colorScheme.surface.withOpacity(0.95),

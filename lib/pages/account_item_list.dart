@@ -9,6 +9,7 @@ import 'account_item/widgets/book_selector_header.dart';
 import 'account_item/widgets/filter_section.dart';
 import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
+import '../widgets/global_book_selector.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
@@ -101,127 +102,118 @@ class AccountItemListState extends State<AccountItemList> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // 根据屏幕宽度调整布局
-        final isWideScreen = constraints.maxWidth > 600;
-
-        return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          appBar: AppBarFactory.buildAppBar(
-            context: context,
-            title: '账目列表',
-            actions: [
-              IconButton(
-                icon: Icon(Icons.add),
-                tooltip: '新增账目',
-                onPressed: _addNewItem,
-              ),
-            ],
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      extendBodyBehindAppBar: true,
+      appBar: AppBarFactory.buildAppBar(
+        context: context,
+        title: GlobalBookSelector(
+          selectedBook: _selectedBook,
+          books: _accountBooks,
+          onBookSelected: _onBookSelected,
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            tooltip: '新增账目',
+            onPressed: _addNewItem,
           ),
-          body: _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Column(
-                  children: [
-                    BookSelectorHeader(
-                      selectedBook: _selectedBook,
-                      books: _accountBooks,
-                      onBookSelected: _onBookSelected,
-                    ),
-                    FilterSection(
-                      isExpanded: _isFilterExpanded,
-                      selectedType: _selectedType,
-                      selectedCategories: _selectedCategories,
-                      minAmount: _minAmount,
-                      maxAmount: _maxAmount,
-                      startDate: _startDate,
-                      endDate: _endDate,
-                      categories: _categories,
-                      onTypeChanged: (type) {
-                        setState(() => _selectedType = type);
-                        _loadAccountItems();
-                      },
-                      onCategoriesChanged: (categories) {
-                        setState(() => _selectedCategories = categories);
-                        _loadAccountItems();
-                      },
-                      onMinAmountChanged: (amount) {
-                        setState(() => _minAmount = amount);
-                        _loadAccountItems();
-                      },
-                      onMaxAmountChanged: (amount) {
-                        setState(() => _maxAmount = amount);
-                        _loadAccountItems();
-                      },
-                      onStartDateChanged: (date) {
-                        setState(() => _startDate = date);
-                        _loadAccountItems();
-                      },
-                      onEndDateChanged: (date) {
-                        setState(() => _endDate = date);
-                        _loadAccountItems();
-                      },
-                      onClearFilter: () {
-                        setState(() {
-                          _selectedType = null;
-                          _selectedCategories = [];
-                          _minAmount = null;
-                          _maxAmount = null;
-                          _startDate = null;
-                          _endDate = null;
-                        });
-                        _loadAccountItems();
-                      },
-                    ),
-                    Expanded(
-                      child: _accountItems.isEmpty
-                          ? _buildEmptyView(Theme.of(context).colorScheme)
-                          : ListView.builder(
-                              physics: const AlwaysScrollableScrollPhysics(
-                                parent: BouncingScrollPhysics(),
-                              ),
-                              padding: EdgeInsets.only(
-                                bottom: 80,
-                                left: isWideScreen ? 32 : 16,
-                                right: isWideScreen ? 32 : 16,
-                              ),
-                              itemCount: _accountItems.length +
-                                  _getDateHeaders().length,
-                              itemBuilder: (context, index) {
-                                final dateHeaders = _getDateHeaders();
-                                final headerIndex =
-                                    _getHeaderIndexForPosition(index);
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            FilterSection(
+              isExpanded: _isFilterExpanded,
+              selectedType: _selectedType,
+              selectedCategories: _selectedCategories,
+              minAmount: _minAmount,
+              maxAmount: _maxAmount,
+              startDate: _startDate,
+              endDate: _endDate,
+              categories: _categories,
+              onTypeChanged: (type) {
+                setState(() => _selectedType = type);
+                _loadAccountItems();
+              },
+              onCategoriesChanged: (categories) {
+                setState(() => _selectedCategories = categories);
+                _loadAccountItems();
+              },
+              onMinAmountChanged: (amount) {
+                setState(() => _minAmount = amount);
+                _loadAccountItems();
+              },
+              onMaxAmountChanged: (amount) {
+                setState(() => _maxAmount = amount);
+                _loadAccountItems();
+              },
+              onStartDateChanged: (date) {
+                setState(() => _startDate = date);
+                _loadAccountItems();
+              },
+              onEndDateChanged: (date) {
+                setState(() => _endDate = date);
+                _loadAccountItems();
+              },
+              onClearFilter: () {
+                setState(() {
+                  _selectedType = null;
+                  _selectedCategories = [];
+                  _minAmount = null;
+                  _maxAmount = null;
+                  _startDate = null;
+                  _endDate = null;
+                });
+                _loadAccountItems();
+              },
+            ),
+            Expanded(
+              child: _accountItems.isEmpty
+                  ? _buildEmptyView(Theme.of(context).colorScheme)
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      padding: EdgeInsets.only(
+                        bottom: 80,
+                        left: 16,
+                        right: 16,
+                      ),
+                      itemCount:
+                          _accountItems.length + _getDateHeaders().length,
+                      itemBuilder: (context, index) {
+                        final dateHeaders = _getDateHeaders();
+                        final headerIndex = _getHeaderIndexForPosition(index);
 
-                                if (headerIndex != -1) {
-                                  // 渲染日期头部
-                                  return _buildDateHeader(
-                                      context, dateHeaders[headerIndex]);
-                                }
+                        if (headerIndex != -1) {
+                          // 渲染日期头部
+                          return _buildDateHeader(
+                              context, dateHeaders[headerIndex]);
+                        }
 
-                                // 渲染账目项
-                                final itemIndex =
-                                    _getItemIndexForPosition(index);
-                                return _buildAccountItem(
-                                  context,
-                                  _accountItems[itemIndex],
-                                );
-                              },
-                            ),
+                        // 渲染账目项
+                        final itemIndex = _getItemIndexForPosition(index);
+                        return _buildAccountItem(
+                          context,
+                          _accountItems[itemIndex],
+                        );
+                      },
                     ),
-                  ],
-                ),
-          floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
-              ? FloatingActionButton(
-                  onPressed: _addNewRecord,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  elevation: 2,
-                  tooltip: '新增记录',
-                  child: Icon(Icons.add),
-                )
-              : null,
-        );
-      },
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
+          ? FloatingActionButton(
+              onPressed: _addNewRecord,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              elevation: 2,
+              tooltip: '新增记录',
+              child: Icon(Icons.add),
+            )
+          : null,
     );
   }
 

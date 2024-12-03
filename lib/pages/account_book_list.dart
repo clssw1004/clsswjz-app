@@ -95,7 +95,7 @@ class _AccountBookListState extends State<AccountBookList> {
       extendBodyBehindAppBar: true,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: '账本管理',
+        title: AppBarFactory.buildTitle(context, '账本管理'),
         actions: [
           IconButton(
             icon: Icon(Icons.add),

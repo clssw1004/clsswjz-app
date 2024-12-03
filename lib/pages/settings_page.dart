@@ -45,7 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: '设置',
+        title: AppBarFactory.buildTitle(context, '设置'),
       ),
       body: ListView(
         children: [

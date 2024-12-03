@@ -137,7 +137,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: '分类管理',
+        title: AppBarFactory.buildTitle(context, '分类管理'),
         actions: [
           IconButton(
             icon: Icon(Icons.add, color: theme.primaryColor),

@@ -147,7 +147,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
       extendBodyBehindAppBar: true,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: '账本详情',
+        title: AppBarFactory.buildTitle(context, '账本详情'),
         actions: _canEdit
             ? [
                 if (_isSaving)
