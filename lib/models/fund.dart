@@ -4,9 +4,7 @@ class Fund {
   final String fundType;
   final String fundRemark;
   final double fundBalance;
-  final bool isDefault;
-  final bool fundIn;
-  final bool fundOut;
+  final List<FundBook> fundBooks;
   final String? createdBy;
   final String? updatedBy;
   final DateTime? createdAt;
@@ -18,9 +16,7 @@ class Fund {
     required this.fundType,
     required this.fundRemark,
     required this.fundBalance,
-    this.isDefault = false,
-    this.fundIn = true,
-    this.fundOut = true,
+    this.fundBooks = const [],
     this.createdBy,
     this.updatedBy,
     this.createdAt,
@@ -33,9 +29,7 @@ class Fund {
         'fundType': fundType,
         'fundRemark': fundRemark,
         'fundBalance': fundBalance,
-        'isDefault': isDefault ? 1 : 0,
-        'fundIn': fundIn,
-        'fundOut': fundOut,
+        'fundBooks': fundBooks.map((book) => book.toJson()).toList(),
       };
 
   factory Fund.fromJson(Map<String, dynamic> json) => Fund(
@@ -44,9 +38,10 @@ class Fund {
         fundType: json['fundType'],
         fundRemark: json['fundRemark'],
         fundBalance: (json['fundBalance'] as num).toDouble(),
-        isDefault: json['isDefault'] == 1,
-        fundIn: json['fundIn'] ?? true,
-        fundOut: json['fundOut'] ?? true,
+        fundBooks: (json['fundBooks'] as List?)
+                ?.map((book) => FundBook.fromJson(book))
+                .toList() ??
+            [],
         createdBy: json['createdBy'],
         updatedBy: json['updatedBy'],
         createdAt: json['createdAt'] != null
@@ -63,9 +58,7 @@ class Fund {
     String? fundType,
     String? fundRemark,
     double? fundBalance,
-    bool? isDefault,
-    bool? fundIn,
-    bool? fundOut,
+    List<FundBook>? fundBooks,
   }) =>
       Fund(
         id: id ?? this.id,
@@ -73,12 +66,42 @@ class Fund {
         fundType: fundType ?? this.fundType,
         fundRemark: fundRemark ?? this.fundRemark,
         fundBalance: fundBalance ?? this.fundBalance,
-        isDefault: isDefault ?? this.isDefault,
-        fundIn: fundIn ?? this.fundIn,
-        fundOut: fundOut ?? this.fundOut,
+        fundBooks: fundBooks ?? this.fundBooks,
         createdBy: createdBy,
         updatedBy: updatedBy,
         createdAt: createdAt,
         updatedAt: updatedAt,
+      );
+}
+
+class FundBook {
+  final String accountBookId;
+  final String bookName;
+  final bool fundIn;
+  final bool fundOut;
+  final bool isDefault;
+
+  FundBook({
+    required this.accountBookId,
+    required this.bookName,
+    this.fundIn = true,
+    this.fundOut = true,
+    this.isDefault = false,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'accountBookId': accountBookId,
+        'bookName': bookName,
+        'fundIn': fundIn,
+        'fundOut': fundOut,
+        'isDefault': isDefault,
+      };
+
+  factory FundBook.fromJson(Map<String, dynamic> json) => FundBook(
+        accountBookId: json['accountBookId'],
+        bookName: json['bookName'],
+        fundIn: json['fundIn'] ?? true,
+        fundOut: json['fundOut'] ?? true,
+        isDefault: json['isDefault'] ?? false,
       );
 }

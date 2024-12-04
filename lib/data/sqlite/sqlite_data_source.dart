@@ -299,7 +299,7 @@ class SqliteDataSource implements DataSource {
 
   // 资金账户相关方法
   @override
-  Future<List<Fund>> getFunds(String bookId) async {
+  Future<List<Fund>> getBookFunds(String bookId) async {
     final db = await _dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'funds',
@@ -314,9 +314,15 @@ class SqliteDataSource implements DataSource {
               'fundType': map['type'],
               'fundRemark': map['remark'] ?? '',
               'fundBalance': map['balance'],
-              'isDefault': map['is_default'],
-              'fundIn': map['fund_in'] == 1,
-              'fundOut': map['fund_out'] == 1,
+              'fundBooks': [
+                {
+                  'accountBookId': map['account_book_id'],
+                  'bookName': '', // 从账本表获取
+                  'fundIn': map['fund_in'] == 1,
+                  'fundOut': map['fund_out'] == 1,
+                  'isDefault': map['is_default'] == 1,
+                }
+              ],
               'createdBy': map['created_by'],
               'updatedBy': map['updated_by'],
               'createdAt': map['created_at'],
@@ -328,15 +334,17 @@ class SqliteDataSource implements DataSource {
   @override
   Future<Fund> createFund(Fund fund) async {
     final db = await _dbHelper.database;
+    final fundBook = fund.fundBooks.first; // 假设至少有一个账本关联
     await db.insert('funds', {
       'id': fund.id,
       'name': fund.name,
       'type': fund.fundType,
       'remark': fund.fundRemark,
       'balance': fund.fundBalance,
-      'is_default': fund.isDefault ? 1 : 0,
-      'fund_in': fund.fundIn ? 1 : 0,
-      'fund_out': fund.fundOut ? 1 : 0,
+      'account_book_id': fundBook.accountBookId,
+      'is_default': fundBook.isDefault ? 1 : 0,
+      'fund_in': fundBook.fundIn ? 1 : 0,
+      'fund_out': fundBook.fundOut ? 1 : 0,
       'created_by': fund.createdBy,
       'updated_by': fund.updatedBy,
       'created_at': fund.createdAt?.toIso8601String(),
@@ -348,6 +356,7 @@ class SqliteDataSource implements DataSource {
   @override
   Future<Fund> updateFund(String id, Fund fund) async {
     final db = await _dbHelper.database;
+    final fundBook = fund.fundBooks.first; // 假设至少有一个账本关联
     await db.update(
       'funds',
       {
@@ -355,9 +364,9 @@ class SqliteDataSource implements DataSource {
         'type': fund.fundType,
         'remark': fund.fundRemark,
         'balance': fund.fundBalance,
-        'is_default': fund.isDefault ? 1 : 0,
-        'fund_in': fund.fundIn ? 1 : 0,
-        'fund_out': fund.fundOut ? 1 : 0,
+        'is_default': fundBook.isDefault ? 1 : 0,
+        'fund_in': fundBook.fundIn ? 1 : 0,
+        'fund_out': fundBook.fundOut ? 1 : 0,
         'updated_by': fund.updatedBy,
         'updated_at': fund.updatedAt?.toIso8601String(),
       },
@@ -400,5 +409,40 @@ class SqliteDataSource implements DataSource {
   @override
   Future<String> resetInviteCode() async {
     throw UnimplementedError('SQLite does not support user operations');
+  }
+
+  @override
+  Future<List<Fund>> getUserFunds() async {
+    final db = await _dbHelper.database;
+
+    // 获取所有资金账户
+    final List<Map<String, dynamic>> fundMaps = await db.query('funds');
+
+    // 获取账本信息
+    final List<Map<String, dynamic>> bookMaps = await db.query('account_books');
+    final bookNameMap = {for (var book in bookMaps) book['id']: book['name']};
+
+    return fundMaps
+        .map((map) => Fund.fromJson({
+              'id': map['id'],
+              'name': map['name'],
+              'fundType': map['type'],
+              'fundRemark': map['remark'] ?? '',
+              'fundBalance': map['balance'],
+              'fundBooks': [
+                {
+                  'accountBookId': map['account_book_id'],
+                  'bookName': bookNameMap[map['account_book_id']] ?? '',
+                  'fundIn': map['fund_in'] == 1,
+                  'fundOut': map['fund_out'] == 1,
+                  'isDefault': map['is_default'] == 1,
+                }
+              ],
+              'createdBy': map['created_by'],
+              'updatedBy': map['updated_by'],
+              'createdAt': map['created_at'],
+              'updatedAt': map['updated_at'],
+            }))
+        .toList();
   }
 }

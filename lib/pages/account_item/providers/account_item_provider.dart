@@ -18,7 +18,8 @@ class AccountItemProvider extends ChangeNotifier {
             'fundType': f.fundType,
             'fundRemark': f.fundRemark,
             'fundBalance': f.fundBalance,
-            'isDefault': f.isDefault,
+            'isDefault': f.fundBooks.any((book) =>
+                book.accountBookId == selectedBook?['id'] && book.isDefault),
           })
       .toList();
   List<Map<String, dynamic>> get displayCategories =>
@@ -46,7 +47,7 @@ class AccountItemProvider extends ChangeNotifier {
       final bookId = selectedBook!['id'];
       final futures = await Future.wait([
         ApiService.getCategories(bookId),
-        ApiService.getFunds(bookId),
+        ApiService.getBookFunds(bookId),
         ApiService.getShops(bookId),
       ]);
 

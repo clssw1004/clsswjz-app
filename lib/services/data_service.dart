@@ -28,7 +28,7 @@ class DataService {
     );
   }
 
-  static Future<List<Fund>> getFunds(String bookId) {
-    return ApiService.getFunds(bookId);
+  static Future<List<Fund>> getBookFunds(String bookId) {
+    return ApiService.getBookFunds(bookId);
   }
 }

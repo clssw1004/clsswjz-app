@@ -253,12 +253,25 @@ class HttpDataSource implements DataSource {
     }
   }
 
-  // 资金账户相关方法
   @override
-  Future<List<Fund>> getFunds(String bookId) async {
+  Future<List<Fund>> getUserFunds() async {
     try {
       final response = await _httpClient.request<List<dynamic>>(
         path: '${ApiEndpoints.funds}/list',
+        method: HttpMethod.get,
+      );
+      return response.map((json) => Fund.fromJson(json)).toList();
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  // 资金账户相关方法
+  @override
+  Future<List<Fund>> getBookFunds(String bookId) async {
+    try {
+      final response = await _httpClient.request<List<dynamic>>(
+        path: '${ApiEndpoints.funds}/bookfunds',
         method: HttpMethod.post,
         data: {'accountBookId': bookId},
       );

@@ -110,13 +110,15 @@ class DatabaseHelper {
         type TEXT NOT NULL,
         remark TEXT,
         balance REAL NOT NULL DEFAULT 0,
+        account_book_id TEXT NOT NULL,
         is_default INTEGER NOT NULL DEFAULT 0,
         fund_in INTEGER NOT NULL DEFAULT 1,
         fund_out INTEGER NOT NULL DEFAULT 1,
         created_by TEXT NOT NULL,
         updated_by TEXT NOT NULL,
         created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (account_book_id) REFERENCES account_books (id) ON DELETE CASCADE
       )
     ''');
   }
