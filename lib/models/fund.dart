@@ -1,4 +1,4 @@
-class Fund {
+class UserFund {
   final String id;
   final String name;
   final String fundType;
@@ -10,7 +10,7 @@ class Fund {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  Fund({
+  UserFund({
     required this.id,
     required this.name,
     required this.fundType,
@@ -32,7 +32,15 @@ class Fund {
         'fundBooks': fundBooks.map((book) => book.toJson()).toList(),
       };
 
-  factory Fund.fromJson(Map<String, dynamic> json) => Fund(
+  Map<String, dynamic> toRequestJson() => {
+        'name': name,
+        'fundType': fundType,
+        'fundRemark': fundRemark,
+        'fundBalance': fundBalance,
+        'fundBooks': fundBooks.map((book) => book.toRequestJson()).toList(),
+      };
+
+  factory UserFund.fromJson(Map<String, dynamic> json) => UserFund(
         id: json['id'],
         name: json['name'],
         fundType: json['fundType'],
@@ -52,7 +60,7 @@ class Fund {
             : null,
       );
 
-  Fund copyWith({
+  UserFund copyWith({
     String? id,
     String? name,
     String? fundType,
@@ -60,7 +68,7 @@ class Fund {
     double? fundBalance,
     List<FundBook>? fundBooks,
   }) =>
-      Fund(
+      UserFund(
         id: id ?? this.id,
         name: name ?? this.name,
         fundType: fundType ?? this.fundType,
@@ -76,14 +84,14 @@ class Fund {
 
 class FundBook {
   final String accountBookId;
-  final String bookName;
+  final String accountBookName;
   final bool fundIn;
   final bool fundOut;
   final bool isDefault;
 
   FundBook({
     required this.accountBookId,
-    required this.bookName,
+    required this.accountBookName,
     this.fundIn = true,
     this.fundOut = true,
     this.isDefault = false,
@@ -91,7 +99,14 @@ class FundBook {
 
   Map<String, dynamic> toJson() => {
         'accountBookId': accountBookId,
-        'bookName': bookName,
+        'accountBookName': accountBookName,
+        'fundIn': fundIn,
+        'fundOut': fundOut,
+        'isDefault': isDefault,
+      };
+
+  Map<String, dynamic> toRequestJson() => {
+        'accountBookId': accountBookId,
         'fundIn': fundIn,
         'fundOut': fundOut,
         'isDefault': isDefault,
@@ -99,9 +114,121 @@ class FundBook {
 
   factory FundBook.fromJson(Map<String, dynamic> json) => FundBook(
         accountBookId: json['accountBookId'],
-        bookName: json['bookName'],
+        accountBookName: json['accountBookName'],
         fundIn: json['fundIn'] ?? true,
         fundOut: json['fundOut'] ?? true,
         isDefault: json['isDefault'] ?? false,
+      );
+
+  FundBook copyWith({
+    String? accountBookId,
+    String? accountBookName,
+    bool? fundIn,
+    bool? fundOut,
+    bool? isDefault,
+  }) {
+    return FundBook(
+      accountBookId: accountBookId ?? this.accountBookId,
+      accountBookName: accountBookName ?? this.accountBookName,
+      fundIn: fundIn ?? this.fundIn,
+      fundOut: fundOut ?? this.fundOut,
+      isDefault: isDefault ?? this.isDefault,
+    );
+  }
+}
+
+class AccountBookFund {
+  final String id;
+  final String name;
+  final String fundType;
+  final String fundRemark;
+  final double fundBalance;
+  final bool fundIn;
+  final bool fundOut;
+  final bool isDefault;
+  final String accountBookName;
+  final String? createdBy;
+  final String? updatedBy;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  AccountBookFund({
+    required this.id,
+    required this.name,
+    required this.fundType,
+    required this.fundRemark,
+    required this.fundBalance,
+    this.fundIn = true,
+    this.fundOut = true,
+    this.isDefault = false,
+    required this.accountBookName,
+    this.createdBy,
+    this.updatedBy,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'fundType': fundType,
+        'fundRemark': fundRemark,
+        'fundBalance': fundBalance,
+        'fundIn': fundIn,
+        'fundOut': fundOut,
+        'isDefault': isDefault,
+        'accountBookName': accountBookName,
+        'createdBy': createdBy,
+        'updatedBy': updatedBy,
+        'createdAt': createdAt?.toIso8601String(),
+        'updatedAt': updatedAt?.toIso8601String(),
+      };
+
+  factory AccountBookFund.fromJson(Map<String, dynamic> json) =>
+      AccountBookFund(
+        id: json['id'],
+        name: json['name'],
+        fundType: json['fundType'],
+        fundRemark: json['fundRemark'],
+        fundBalance: (json['fundBalance'] as num).toDouble(),
+        fundIn: json['fundIn'] ?? true,
+        fundOut: json['fundOut'] ?? true,
+        isDefault: json['isDefault'] ?? false,
+        accountBookName: json['accountBookName'],
+        createdBy: json['createdBy'],
+        updatedBy: json['updatedBy'],
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : null,
+      );
+
+  AccountBookFund copyWith({
+    String? id,
+    String? name,
+    String? fundType,
+    String? fundRemark,
+    double? fundBalance,
+    bool? fundIn,
+    bool? fundOut,
+    bool? isDefault,
+    String? accountBookName,
+  }) =>
+      AccountBookFund(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        fundType: fundType ?? this.fundType,
+        fundRemark: fundRemark ?? this.fundRemark,
+        fundBalance: fundBalance ?? this.fundBalance,
+        fundIn: fundIn ?? this.fundIn,
+        fundOut: fundOut ?? this.fundOut,
+        isDefault: isDefault ?? this.isDefault,
+        accountBookName: accountBookName ?? this.accountBookName,
+        createdBy: createdBy,
+        updatedBy: updatedBy,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
       );
 }

@@ -43,8 +43,8 @@ abstract class DataSource {
   Future<Shop> updateShop(String id, Shop shop);
 
   // 资金账户相关
-  Future<List<Fund>> getBookFunds(String bookId);
-  Future<List<Fund>> getUserFunds();
-  Future<Fund> createFund(Fund fund);
-  Future<Fund> updateFund(String id, Fund fund);
+  Future<List<AccountBookFund>> getBookFunds(String bookId);
+  Future<List<UserFund>> getUserFunds();
+  Future<UserFund> createFund(UserFund fund);
+  Future<UserFund> updateFund(String id, UserFund fund);
 }

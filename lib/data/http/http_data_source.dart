@@ -109,7 +109,7 @@ class HttpDataSource implements DataSource {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: ApiEndpoints.accountItems,
         method: HttpMethod.post,
-        data: item.toJson(),
+        data: item.toJsonCreate(),
       );
       return AccountItem.fromJson(response);
     } on DioException catch (e) {
@@ -254,13 +254,13 @@ class HttpDataSource implements DataSource {
   }
 
   @override
-  Future<List<Fund>> getUserFunds() async {
+  Future<List<UserFund>> getUserFunds() async {
     try {
       final response = await _httpClient.request<List<dynamic>>(
         path: '${ApiEndpoints.funds}/list',
         method: HttpMethod.get,
       );
-      return response.map((json) => Fund.fromJson(json)).toList();
+      return response.map((json) => UserFund.fromJson(json)).toList();
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -268,42 +268,42 @@ class HttpDataSource implements DataSource {
 
   // 资金账户相关方法
   @override
-  Future<List<Fund>> getBookFunds(String bookId) async {
+  Future<List<AccountBookFund>> getBookFunds(String bookId) async {
     try {
       final response = await _httpClient.request<List<dynamic>>(
         path: '${ApiEndpoints.funds}/bookfunds',
         method: HttpMethod.post,
         data: {'accountBookId': bookId},
       );
-      return response.map((json) => Fund.fromJson(json)).toList();
+      return response.map((json) => AccountBookFund.fromJson(json)).toList();
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
   @override
-  Future<Fund> createFund(Fund fund) async {
+  Future<UserFund> createFund(UserFund fund) async {
     try {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: ApiEndpoints.funds,
         method: HttpMethod.post,
         data: fund.toJson(),
       );
-      return Fund.fromJson(response);
+      return UserFund.fromJson(response);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
   @override
-  Future<Fund> updateFund(String id, Fund fund) async {
+  Future<UserFund> updateFund(String id, UserFund fund) async {
     try {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.funds}/$id',
         method: HttpMethod.patch,
-        data: fund.toJson(),
+        data: fund.toRequestJson(),
       );
-      return Fund.fromJson(response);
+      return UserFund.fromJson(response);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }

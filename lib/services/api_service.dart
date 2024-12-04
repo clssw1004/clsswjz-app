@@ -81,19 +81,19 @@ class ApiService {
   }
 
   // 资金账户相关
-  static Future<List<Fund>> getBookFunds(String bookId) {
+  static Future<List<AccountBookFund>> getBookFunds(String bookId) {
     return _dataSource.getBookFunds(bookId);
   }
 
-  static Future<Fund> createFund(Fund fund) {
+  static Future<UserFund> createFund(UserFund fund) {
     return _dataSource.createFund(fund);
   }
 
-  static Future<Fund> updateFund(String id, Fund fund) {
+  static Future<UserFund> updateFund(String id, UserFund fund) {
     return _dataSource.updateFund(id, fund);
   }
 
-  static Future<List<Fund>> getUserFunds() {
+  static Future<List<UserFund>> getUserFunds() {
     return _dataSource.getUserFunds();
   }
 

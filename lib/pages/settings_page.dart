@@ -7,6 +7,7 @@ import './settings/widgets/developer_mode_selector.dart';
 import './settings/category_management_page.dart';
 import '../widgets/app_bar_factory.dart';
 import './settings/shop_management_page.dart';
+import './settings/fund_management_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -58,6 +59,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ShopManagementPage(),
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.account_balance_wallet_outlined),
+                title: Text('账户管理'),
+                trailing: Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FundManagementPage(),
                   ),
                 ),
               ),

@@ -41,6 +41,17 @@ class AccountItem {
         'accountDate': accountDate.toIso8601String(),
       };
 
+  Map<String, dynamic> toJsonCreate() => {
+        'accountBookId': accountBookId,
+        'type': type,
+        'amount': amount,
+        'category': category,
+        'description': description,
+        'shop': shop,
+        'fundId': fundId,
+        'accountDate': accountDate.toIso8601String(),
+      };
+
   factory AccountItem.fromJson(Map<String, dynamic> json) => AccountItem(
         id: json['id'],
         accountBookId: json['accountBookId'],

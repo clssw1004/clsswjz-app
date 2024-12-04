@@ -299,40 +299,50 @@ class SqliteDataSource implements DataSource {
 
   // 资金账户相关方法
   @override
-  Future<List<Fund>> getBookFunds(String bookId) async {
+  Future<List<AccountBookFund>> getBookFunds(String bookId) async {
     final db = await _dbHelper.database;
+
+    // 获取账本信息
+    final bookMap = await db.query(
+      'account_books',
+      where: 'id = ?',
+      whereArgs: [bookId],
+      limit: 1,
+    );
+    final bookName = bookMap.isNotEmpty ? bookMap.first['name'] as String : '';
+
     final List<Map<String, dynamic>> maps = await db.query(
       'funds',
       where: 'account_book_id = ?',
       whereArgs: [bookId],
       orderBy: 'name ASC',
     );
+
     return maps
-        .map((map) => Fund.fromJson({
-              'id': map['id'],
-              'name': map['name'],
-              'fundType': map['type'],
-              'fundRemark': map['remark'] ?? '',
-              'fundBalance': map['balance'],
-              'fundBooks': [
-                {
-                  'accountBookId': map['account_book_id'],
-                  'bookName': '', // 从账本表获取
-                  'fundIn': map['fund_in'] == 1,
-                  'fundOut': map['fund_out'] == 1,
-                  'isDefault': map['is_default'] == 1,
-                }
-              ],
-              'createdBy': map['created_by'],
-              'updatedBy': map['updated_by'],
-              'createdAt': map['created_at'],
-              'updatedAt': map['updated_at'],
-            }))
+        .map((map) => AccountBookFund(
+              id: map['id'],
+              name: map['name'],
+              fundType: map['type'],
+              fundRemark: map['remark'] ?? '',
+              fundBalance: map['balance'],
+              fundIn: map['fund_in'] == 1,
+              fundOut: map['fund_out'] == 1,
+              isDefault: map['is_default'] == 1,
+              accountBookName: bookName,
+              createdBy: map['created_by'],
+              updatedBy: map['updated_by'],
+              createdAt: map['created_at'] != null
+                  ? DateTime.parse(map['created_at'])
+                  : null,
+              updatedAt: map['updated_at'] != null
+                  ? DateTime.parse(map['updated_at'])
+                  : null,
+            ))
         .toList();
   }
 
   @override
-  Future<Fund> createFund(Fund fund) async {
+  Future<UserFund> createFund(UserFund fund) async {
     final db = await _dbHelper.database;
     final fundBook = fund.fundBooks.first; // 假设至少有一个账本关联
     await db.insert('funds', {
@@ -354,7 +364,7 @@ class SqliteDataSource implements DataSource {
   }
 
   @override
-  Future<Fund> updateFund(String id, Fund fund) async {
+  Future<UserFund> updateFund(String id, UserFund fund) async {
     final db = await _dbHelper.database;
     final fundBook = fund.fundBooks.first; // 假设至少有一个账本关联
     await db.update(
@@ -412,7 +422,7 @@ class SqliteDataSource implements DataSource {
   }
 
   @override
-  Future<List<Fund>> getUserFunds() async {
+  Future<List<UserFund>> getUserFunds() async {
     final db = await _dbHelper.database;
 
     // 获取所有资金账户
@@ -423,7 +433,7 @@ class SqliteDataSource implements DataSource {
     final bookNameMap = {for (var book in bookMaps) book['id']: book['name']};
 
     return fundMaps
-        .map((map) => Fund.fromJson({
+        .map((map) => UserFund.fromJson({
               'id': map['id'],
               'name': map['name'],
               'fundType': map['type'],
@@ -432,7 +442,7 @@ class SqliteDataSource implements DataSource {
               'fundBooks': [
                 {
                   'accountBookId': map['account_book_id'],
-                  'bookName': bookNameMap[map['account_book_id']] ?? '',
+                  'accountBookName': bookNameMap[map['account_book_id']] ?? '',
                   'fundIn': map['fund_in'] == 1,
                   'fundOut': map['fund_out'] == 1,
                   'isDefault': map['is_default'] == 1,
