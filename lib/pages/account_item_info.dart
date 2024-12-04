@@ -49,6 +49,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
   void initState() {
     super.initState();
     _provider = AccountItemProvider(selectedBook: widget.initialBook);
+    _selectedBook = widget.initialBook;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
@@ -56,12 +57,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
       // 设置provider中的账本并加载相关数据
       await _provider.setSelectedBook(widget.initialBook);
       if (widget.initialBook != null) {
+        setState(() => _selectedBook = widget.initialBook);
         await _loadCategories();
         await _loadFundList();
       }
 
       // 设置初始数据
       if (widget.initialData != null) {
+        print('Initial data: ${widget.initialData}');
         setState(() {
           _recordId = widget.initialData!['id'];
           _transactionType =
@@ -69,8 +72,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
           _provider.setTransactionType(_transactionType);
           _amountController.text = widget.initialData!['amount'].toString();
           _selectedCategory = widget.initialData!['category'];
-          _selectedShop = widget.initialData!['shopCode'];
-          _selectedShopName = widget.initialData!['shop'];
+
+          // 修改商家信息的设置
+          if (widget.initialData!['shop'] != null) {
+            _selectedShop = widget.initialData!['shop']; // 使用 shop 而不是 shopCode
+            _selectedShopName = widget.initialData!['shop'];
+          }
+
           _descriptionController.text =
               widget.initialData!['description'] ?? '';
 
@@ -78,7 +86,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
           if (widget.initialData!['fundId'] != null) {
             _selectedFund = _provider.fundList.firstWhere(
               (fund) => fund['id'] == widget.initialData!['fundId'],
-              orElse: () => <String, dynamic>{},
+              orElse: () => Map<String, Object>.from({
+                'id': '',
+                'name': '',
+                'fundType': '',
+                'fundRemark': '',
+                'fundBalance': 0.0,
+                'isDefault': false,
+              }),
             );
           }
 
@@ -190,7 +205,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                       _amountFocusNode.unfocus();
                                     },
                                     onChanged: (shop) {
-                                      print('Selected shop changed: $shop');
                                       setState(() {
                                         _selectedShopName = shop;
                                       });

@@ -51,6 +51,15 @@ class Member {
         'canEditItem': canEditItem,
         'canDeleteItem': canDeleteItem,
       };
+  Map<String, dynamic> toJsonRequest() => {
+        'userId': userId,
+        'canViewBook': canViewBook,
+        'canEditBook': canEditBook,
+        'canDeleteBook': canDeleteBook,
+        'canViewItem': canViewItem,
+        'canEditItem': canEditItem,
+        'canDeleteItem': canDeleteItem,
+      };
 
   factory Member.fromJson(Map<String, dynamic> json) {
     return Member(

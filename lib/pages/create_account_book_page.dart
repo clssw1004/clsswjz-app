@@ -180,27 +180,16 @@ class CreateAccountBookPageState extends State<CreateAccountBookPage> {
         description: _descriptionController.text,
         currencySymbol: CurrencySymbols.currencies[_selectedCurrency]!,
         icon: _selectedIcon.codePoint.toString(),
-        createdBy: '', // 由后端填充
-        members: [], // 由后端填充
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
 
       await ApiService.createAccountBook(accountBook);
 
       if (!mounted) return;
-      MessageHelper.showSuccess(
-        context,
-        message: '创建成功',
-      );
-
+      MessageHelper.showSuccess(context, message: '创建成功');
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
-      MessageHelper.showError(
-        context,
-        message: '创建失败：$e',
-      );
+      MessageHelper.showError(context, message: '创建失败：$e');
     } finally {
       setState(() => _isLoading = false);
     }

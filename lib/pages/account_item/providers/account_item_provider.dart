@@ -11,10 +11,25 @@ class AccountItemProvider extends ChangeNotifier {
   bool isLoading = false;
 
   String get transactionType => _transactionType;
-  List<Map<String, dynamic>> get fundList =>
-      funds.map((f) => f.toJson()).toList();
+  List<Map<String, dynamic>> get fundList => funds
+      .map((f) => {
+            'id': f.id,
+            'name': f.name,
+            'fundType': f.fundType,
+            'fundRemark': f.fundRemark,
+            'fundBalance': f.fundBalance,
+            'isDefault': f.isDefault,
+          })
+      .toList();
   List<Map<String, dynamic>> get displayCategories =>
       categories.take(11).map((c) => {'name': c.name}).toList();
+  List<Map<String, dynamic>> get shopList => shops
+      .map((s) => {
+            'id': s.id,
+            'name': s.name,
+            'shopCode': s.shopCode,
+          })
+      .toList();
 
   AccountItemProvider({this.selectedBook}) {
     if (selectedBook != null) {
@@ -70,5 +85,10 @@ class AccountItemProvider extends ChangeNotifier {
       ];
       notifyListeners();
     }
+  }
+
+  void updateShops(List<Shop> newShops) {
+    shops = newShops;
+    notifyListeners();
   }
 }

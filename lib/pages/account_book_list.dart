@@ -5,7 +5,6 @@ import '../constants/book_icons.dart';
 import 'account_book_info.dart';
 import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
-import '../widgets/list_item_card.dart';
 
 class AccountBookList extends StatefulWidget {
   @override
@@ -198,85 +197,138 @@ class AccountBookListState extends State<AccountBookList> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final currentUserId = UserService.getUserInfo()?['userId'];
-    final isShared = book['createdBy'] != currentUserId;
-    final canEdit = book['canEditBook'] == true;
+    final isShared = book['fromId'] != currentUserId;
+    final permissions = book['permissions'] as Map<String, dynamic>;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
-      child: ListItemCard(
-        title: book['name'] ?? '未命名账本',
-        onTap: () => _openAccountBookInfo(book),
-        leading: CircleAvatar(
-          backgroundColor: colorScheme.primaryContainer,
-          child: Icon(
-            _getBookIcon(book),
-            color: colorScheme.onPrimaryContainer,
-            size: 20,
-          ),
-        ),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: colorScheme.onSurfaceVariant,
-          size: 20,
-        ),
-        subtitle: Row(
-          children: [
-            if (canEdit)
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                margin: EdgeInsets.only(right: 8),
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.edit_outlined,
-                      size: 14,
-                      color: colorScheme.primary,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      '可编辑',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (isShared) ...[
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.people_outline,
-                      size: 14,
-                      color: colorScheme.primary,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      '共享自${book['fromName'] ?? '未知用户'}',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            Spacer(),
-          ],
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 4),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: colorScheme.outlineVariant.withOpacity(0.5),
         ),
       ),
+      child: InkWell(
+        onTap: () => _openAccountBookInfo(book),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: colorScheme.primaryContainer,
+                    child: Icon(
+                      _getBookIcon(book),
+                      color: colorScheme.onPrimaryContainer,
+                      size: 20,
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          book['name'] ?? '未命名账本',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        if (book['description'] != null) ...[
+                          SizedBox(height: 4),
+                          Text(
+                            book['description'],
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (isShared) ...[
+                    SizedBox(width: 8),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.people_outline,
+                          size: 14,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          '共享自${book['fromName'] ?? '未知用户'}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+              SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 权限图标
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildPermissionIcon(
+                        icon: Icons.visibility,
+                        enabled: permissions['canViewBook'] == true,
+                        colorScheme: colorScheme,
+                      ),
+                      SizedBox(width: 8),
+                      _buildPermissionIcon(
+                        icon: Icons.edit_outlined,
+                        enabled: permissions['canEditBook'] == true,
+                        colorScheme: colorScheme,
+                      ),
+                      SizedBox(width: 8),
+                      _buildPermissionIcon(
+                        icon: Icons.delete_outline,
+                        enabled: permissions['canDeleteBook'] == true,
+                        colorScheme: colorScheme,
+                        useErrorColor: true,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPermissionIcon({
+    required IconData icon,
+    required bool enabled,
+    required ColorScheme colorScheme,
+    bool useErrorColor = false,
+  }) {
+    return Icon(
+      icon,
+      size: 16,
+      color: enabled
+          ? useErrorColor
+              ? colorScheme.error
+              : colorScheme.primary
+          : colorScheme.onSurfaceVariant.withOpacity(0.5),
     );
   }
 }

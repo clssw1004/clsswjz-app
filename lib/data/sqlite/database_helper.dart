@@ -94,10 +94,11 @@ class DatabaseHelper {
       CREATE TABLE shops (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
-        account_book_id TEXT NOT NULL,
+        shop_code TEXT NOT NULL,
+        created_by TEXT NOT NULL,
+        updated_by TEXT NOT NULL,
         created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (account_book_id) REFERENCES account_books (id) ON DELETE CASCADE
+        updated_at TEXT NOT NULL
       )
     ''');
 
@@ -106,13 +107,16 @@ class DatabaseHelper {
       CREATE TABLE funds (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
-        account_book_id TEXT NOT NULL,
         type TEXT NOT NULL,
+        remark TEXT,
         balance REAL NOT NULL DEFAULT 0,
         is_default INTEGER NOT NULL DEFAULT 0,
+        fund_in INTEGER NOT NULL DEFAULT 1,
+        fund_out INTEGER NOT NULL DEFAULT 1,
+        created_by TEXT NOT NULL,
+        updated_by TEXT NOT NULL,
         created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (account_book_id) REFERENCES account_books (id) ON DELETE CASCADE
+        updated_at TEXT NOT NULL
       )
     ''');
   }

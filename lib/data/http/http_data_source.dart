@@ -14,13 +14,11 @@ class HttpDataSource implements DataSource {
 
   void setToken(String token) {
     _token = token;
-    print('Setting token in HttpDataSource: $token');
     _httpClient.setToken(token);
   }
 
   void clearToken() {
     _token = null;
-    print('Clearing token in HttpDataSource');
     _httpClient.clearToken();
   }
 
@@ -58,7 +56,7 @@ class HttpDataSource implements DataSource {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.accountBooks}/$id',
         method: HttpMethod.patch,
-        data: book.toJson(),
+        data: book.toJsonRequest(),
       );
       return AccountBook.fromJson(response);
     } on DioException catch (e) {
@@ -89,9 +87,9 @@ class HttpDataSource implements DataSource {
   }) async {
     try {
       final response = await _httpClient.request<List<dynamic>>(
-        path: ApiEndpoints.accountItems,
-        method: HttpMethod.get,
-        queryParameters: {
+        path: '${ApiEndpoints.accountItems}/list',
+        method: HttpMethod.post,
+        data: {
           'accountBookId': bookId,
           if (categories != null) 'categories': categories,
           if (type != null) 'type': type,
@@ -260,9 +258,9 @@ class HttpDataSource implements DataSource {
   Future<List<Fund>> getFunds(String bookId) async {
     try {
       final response = await _httpClient.request<List<dynamic>>(
-        path: ApiEndpoints.funds,
-        method: HttpMethod.get,
-        queryParameters: {'accountBookId': bookId},
+        path: '${ApiEndpoints.funds}/list',
+        method: HttpMethod.post,
+        data: {'accountBookId': bookId},
       );
       return response.map((json) => Fund.fromJson(json)).toList();
     } on DioException catch (e) {
@@ -321,10 +319,8 @@ class HttpDataSource implements DataSource {
           'password': password,
         },
       );
-      print('Login response in HttpDataSource: $response');
       return response;
     } catch (e) {
-      print('Login error in HttpDataSource: $e');
       rethrow;
     }
   }
@@ -350,7 +346,7 @@ class HttpDataSource implements DataSource {
   @override
   Future<Map<String, dynamic>> getUserInfo() async {
     final response = await request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/me',
+      path: '${ApiEndpoints.users}/current',
       method: HttpMethod.get,
     );
     return response;
@@ -359,7 +355,7 @@ class HttpDataSource implements DataSource {
   @override
   Future<Map<String, dynamic>> updateUserInfo(Map<String, dynamic> data) async {
     final response = await request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/me',
+      path: '${ApiEndpoints.users}/current',
       method: HttpMethod.patch,
       data: data,
     );
@@ -391,12 +387,6 @@ class HttpDataSource implements DataSource {
     dynamic data,
   }) async {
     try {
-      if (_token != null) {
-        print('Using token in request: $_token');
-      } else {
-        print('No token available for request');
-      }
-
       return await _httpClient.request<T>(
         path: path,
         method: method,
@@ -404,7 +394,6 @@ class HttpDataSource implements DataSource {
         data: data,
       );
     } catch (e) {
-      print('Request error in HttpDataSource: $e');
       rethrow;
     }
   }

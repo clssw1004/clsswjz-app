@@ -1,64 +1,84 @@
 class Fund {
   final String id;
   final String name;
-  final String accountBookId;
-  final String type; // cash, bank, alipay, wechat, etc.
-  final double balance;
+  final String fundType;
+  final String fundRemark;
+  final double fundBalance;
   final bool isDefault;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final bool fundIn;
+  final bool fundOut;
+  final String? createdBy;
+  final String? updatedBy;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Fund({
     required this.id,
     required this.name,
-    required this.accountBookId,
-    required this.type,
-    required this.balance,
+    required this.fundType,
+    required this.fundRemark,
+    required this.fundBalance,
     this.isDefault = false,
-    required this.createdAt,
-    required this.updatedAt,
+    this.fundIn = true,
+    this.fundOut = true,
+    this.createdBy,
+    this.updatedBy,
+    this.createdAt,
+    this.updatedAt,
   });
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
-        'accountBookId': accountBookId,
-        'type': type,
-        'balance': balance,
-        'isDefault': isDefault,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
+        'fundType': fundType,
+        'fundRemark': fundRemark,
+        'fundBalance': fundBalance,
+        'isDefault': isDefault ? 1 : 0,
+        'fundIn': fundIn,
+        'fundOut': fundOut,
       };
 
   factory Fund.fromJson(Map<String, dynamic> json) => Fund(
         id: json['id'],
         name: json['name'],
-        accountBookId: json['accountBookId'],
-        type: json['type'],
-        balance: json['balance'].toDouble(),
-        isDefault: json['isDefault'] ?? false,
-        createdAt: DateTime.parse(json['createdAt']),
-        updatedAt: DateTime.parse(json['updatedAt']),
+        fundType: json['fundType'],
+        fundRemark: json['fundRemark'],
+        fundBalance: (json['fundBalance'] as num).toDouble(),
+        isDefault: json['isDefault'] == 1,
+        fundIn: json['fundIn'] ?? true,
+        fundOut: json['fundOut'] ?? true,
+        createdBy: json['createdBy'],
+        updatedBy: json['updatedBy'],
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : null,
       );
 
   Fund copyWith({
     String? id,
     String? name,
-    String? accountBookId,
-    String? type,
-    double? balance,
+    String? fundType,
+    String? fundRemark,
+    double? fundBalance,
     bool? isDefault,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    bool? fundIn,
+    bool? fundOut,
   }) =>
       Fund(
         id: id ?? this.id,
         name: name ?? this.name,
-        accountBookId: accountBookId ?? this.accountBookId,
-        type: type ?? this.type,
-        balance: balance ?? this.balance,
+        fundType: fundType ?? this.fundType,
+        fundRemark: fundRemark ?? this.fundRemark,
+        fundBalance: fundBalance ?? this.fundBalance,
         isDefault: isDefault ?? this.isDefault,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
+        fundIn: fundIn ?? this.fundIn,
+        fundOut: fundOut ?? this.fundOut,
+        createdBy: createdBy,
+        updatedBy: updatedBy,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
       );
 }

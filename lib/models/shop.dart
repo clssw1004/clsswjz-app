@@ -1,47 +1,61 @@
 class Shop {
   final String id;
   final String name;
+  final String? shopCode;
   final String accountBookId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? createdBy;
+  final String? updatedBy;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Shop({
     required this.id,
     required this.name,
+    this.shopCode,
     required this.accountBookId,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdBy,
+    this.updatedBy,
+    this.createdAt,
+    this.updatedAt,
   });
-
-  Shop copyWith({
-    String? id,
-    String? name,
-    String? accountBookId,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) {
-    return Shop(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      accountBookId: accountBookId ?? this.accountBookId,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
+        'shopCode': shopCode,
         'accountBookId': accountBookId,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
       };
 
   factory Shop.fromJson(Map<String, dynamic> json) => Shop(
         id: json['id'],
         name: json['name'],
+        shopCode: json['shopCode'],
         accountBookId: json['accountBookId'],
-        createdAt: DateTime.parse(json['createdAt']),
-        updatedAt: DateTime.parse(json['updatedAt']),
+        createdBy: json['createdBy'],
+        updatedBy: json['updatedBy'],
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : null,
       );
+
+  Shop copyWith({
+    String? id,
+    String? name,
+    String? shopCode,
+    String? accountBookId,
+  }) {
+    return Shop(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      shopCode: shopCode ?? this.shopCode,
+      accountBookId: accountBookId ?? this.accountBookId,
+      createdBy: createdBy,
+      updatedBy: updatedBy,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
 }

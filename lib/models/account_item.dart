@@ -8,8 +8,10 @@ class AccountItem {
   final String? shop;
   final String? fundId;
   final DateTime accountDate;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? createdBy;
+  final String? updatedBy;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   AccountItem({
     required this.id,
@@ -21,8 +23,10 @@ class AccountItem {
     this.shop,
     this.fundId,
     required this.accountDate,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdBy,
+    this.updatedBy,
+    this.createdAt,
+    this.updatedAt,
   });
 
   Map<String, dynamic> toJson() => {
@@ -35,8 +39,6 @@ class AccountItem {
         'shop': shop,
         'fundId': fundId,
         'accountDate': accountDate.toIso8601String(),
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
       };
 
   factory AccountItem.fromJson(Map<String, dynamic> json) => AccountItem(
@@ -49,8 +51,14 @@ class AccountItem {
         shop: json['shop'],
         fundId: json['fundId'],
         accountDate: DateTime.parse(json['accountDate']),
-        createdAt: DateTime.parse(json['createdAt']),
-        updatedAt: DateTime.parse(json['updatedAt']),
+        createdBy: json['createdBy'],
+        updatedBy: json['updatedBy'],
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : null,
       );
 
   AccountItem copyWith({
@@ -63,8 +71,6 @@ class AccountItem {
     String? shop,
     String? fundId,
     DateTime? accountDate,
-    DateTime? createdAt,
-    DateTime? updatedAt,
   }) =>
       AccountItem(
         id: id ?? this.id,
@@ -76,7 +82,9 @@ class AccountItem {
         shop: shop ?? this.shop,
         fundId: fundId ?? this.fundId,
         accountDate: accountDate ?? this.accountDate,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
+        createdBy: createdBy,
+        updatedBy: updatedBy,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
       );
 }

@@ -58,8 +58,6 @@ class CategoryManagementPageState extends State<CategoryManagementPage> {
         id: '', // 由后端生成
         name: name,
         accountBookId: _currentAccountBookId!,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
 
       await ApiService.createCategory(category);
@@ -76,7 +74,6 @@ class CategoryManagementPageState extends State<CategoryManagementPage> {
     try {
       final updatedCategory = category.copyWith(
         name: newName,
-        updatedAt: DateTime.now(),
       );
 
       await ApiService.updateCategory(category.id, updatedCategory);

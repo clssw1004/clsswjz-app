@@ -9,6 +9,7 @@ import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
 import '../widgets/global_book_selector.dart';
 import '../utils/message_helper.dart';
+import '../constants/app_colors.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
@@ -68,7 +69,7 @@ class AccountItemListState extends State<AccountItemList> {
         // 保存选中的账本ID
         await UserService.setCurrentAccountBookId(_selectedBook!['id']);
         await _loadCategories();
-        _loadAccountItems();
+        await _loadAccountItems();
       }
     } catch (e) {
       if (!mounted) return;
@@ -100,6 +101,10 @@ class AccountItemListState extends State<AccountItemList> {
 
   @override
   Widget build(BuildContext context) {
+    // 获取屏幕尺寸
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth > 600;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       extendBodyBehindAppBar: true,
@@ -112,94 +117,101 @@ class AccountItemListState extends State<AccountItemList> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
-            tooltip: '新增账目',
-            onPressed: _addNewItem,
+            icon: Icon(Icons.filter_list),
+            tooltip: '筛选',
+            onPressed: () {
+              setState(() {
+                _isFilterExpanded = !_isFilterExpanded;
+              });
+            },
           ),
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            FilterSection(
-              isExpanded: _isFilterExpanded,
-              selectedType: _selectedType,
-              selectedCategories: _selectedCategories,
-              minAmount: _minAmount,
-              maxAmount: _maxAmount,
-              startDate: _startDate,
-              endDate: _endDate,
-              categories: _categories,
-              onTypeChanged: (type) {
-                setState(() => _selectedType = type);
-                _loadAccountItems();
-              },
-              onCategoriesChanged: (categories) {
-                setState(() => _selectedCategories = categories);
-                _loadAccountItems();
-              },
-              onMinAmountChanged: (amount) {
-                setState(() => _minAmount = amount);
-                _loadAccountItems();
-              },
-              onMaxAmountChanged: (amount) {
-                setState(() => _maxAmount = amount);
-                _loadAccountItems();
-              },
-              onStartDateChanged: (date) {
-                setState(() => _startDate = date);
-                _loadAccountItems();
-              },
-              onEndDateChanged: (date) {
-                setState(() => _endDate = date);
-                _loadAccountItems();
-              },
-              onClearFilter: () {
-                setState(() {
-                  _selectedType = null;
-                  _selectedCategories = [];
-                  _minAmount = null;
-                  _maxAmount = null;
-                  _startDate = null;
-                  _endDate = null;
-                });
-                _loadAccountItems();
-              },
-            ),
-            Expanded(
-              child: _accountItems.isEmpty
-                  ? _buildEmptyView(Theme.of(context).colorScheme)
-                  : ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      padding: EdgeInsets.only(
-                        bottom: 80,
-                        left: 16,
-                        right: 16,
-                      ),
-                      itemCount:
-                          _accountItems.length + _getDateHeaders().length,
-                      itemBuilder: (context, index) {
-                        final dateHeaders = _getDateHeaders();
-                        final headerIndex = _getHeaderIndexForPosition(index);
+        child: RefreshIndicator(
+          onRefresh: _loadAccountItems,
+          child: Column(
+            children: [
+              FilterSection(
+                isExpanded: _isFilterExpanded,
+                selectedType: _selectedType,
+                selectedCategories: _selectedCategories,
+                minAmount: _minAmount,
+                maxAmount: _maxAmount,
+                startDate: _startDate,
+                endDate: _endDate,
+                categories: _categories,
+                onTypeChanged: (type) {
+                  setState(() => _selectedType = type);
+                  _loadAccountItems();
+                },
+                onCategoriesChanged: (categories) {
+                  setState(() => _selectedCategories = categories);
+                  _loadAccountItems();
+                },
+                onMinAmountChanged: (amount) {
+                  setState(() => _minAmount = amount);
+                  _loadAccountItems();
+                },
+                onMaxAmountChanged: (amount) {
+                  setState(() => _maxAmount = amount);
+                  _loadAccountItems();
+                },
+                onStartDateChanged: (date) {
+                  setState(() => _startDate = date);
+                  _loadAccountItems();
+                },
+                onEndDateChanged: (date) {
+                  setState(() => _endDate = date);
+                  _loadAccountItems();
+                },
+                onClearFilter: () {
+                  setState(() {
+                    _selectedType = null;
+                    _selectedCategories = [];
+                    _minAmount = null;
+                    _maxAmount = null;
+                    _startDate = null;
+                    _endDate = null;
+                  });
+                  _loadAccountItems();
+                },
+              ),
+              Expanded(
+                child: _accountItems.isEmpty
+                    ? _buildEmptyView(Theme.of(context).colorScheme)
+                    : ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        padding: EdgeInsets.only(
+                          bottom: 80,
+                          left: isLargeScreen ? 32 : 16,
+                          right: isLargeScreen ? 32 : 16,
+                        ),
+                        itemCount:
+                            _accountItems.length + _getDateHeaders().length,
+                        itemBuilder: (context, index) {
+                          final dateHeaders = _getDateHeaders();
+                          final headerIndex = _getHeaderIndexForPosition(index);
 
-                        if (headerIndex != -1) {
-                          // 渲染日期头部
-                          return _buildDateHeader(
-                              context, dateHeaders[headerIndex]);
-                        }
+                          if (headerIndex != -1) {
+                            // 渲染日期头部
+                            return _buildDateHeader(
+                                context, dateHeaders[headerIndex]);
+                          }
 
-                        // 渲染账目项
-                        final itemIndex = _getItemIndexForPosition(index);
-                        return _buildAccountItem(
-                          context,
-                          _accountItems[itemIndex],
-                        );
-                      },
-                    ),
-            ),
-          ],
+                          // 渲染账目项
+                          final itemIndex = _getItemIndexForPosition(index);
+                          return _buildAccountItem(
+                            context,
+                            _accountItems[itemIndex],
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
@@ -401,10 +413,8 @@ class AccountItemListState extends State<AccountItemList> {
     final isExpense = item['type'] == 'EXPENSE';
     final currencySymbol = item['currencySymbol'] ?? '¥';
 
-    // 定义收支颜色
-    final typeColor = isExpense
-        ? Color(0xFFE53935) // Material Red 600
-        : Color(0xFF43A047); // Material Green 600
+    // 使用常量定义的颜色
+    final typeColor = isExpense ? AppColors.expense : AppColors.income;
 
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),

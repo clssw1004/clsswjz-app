@@ -73,7 +73,6 @@ class ShopManagementPageState extends State<ShopManagementPage> {
     try {
       final updatedShop = shop.copyWith(
         name: newName,
-        updatedAt: DateTime.now(),
       );
 
       await ApiService.updateShop(shop.id, updatedShop);

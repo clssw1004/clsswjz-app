@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class BookHeader extends StatelessWidget {
   final Map<String, dynamic>? book;
 
-  const BookHeader({
-    Key? key,
-    required this.book,
-  }) : super(key: key);
+  const BookHeader({Key? key, this.book}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,24 +13,20 @@ class BookHeader extends StatelessWidget {
     return Row(
       children: [
         Icon(
-          Icons.account_balance_wallet,
-          size: 20,
-          color: colorScheme.primary,
+          Icons.book_outlined,
+          size: 18,
+          color: colorScheme.onSurfaceVariant,
         ),
         SizedBox(width: 8),
         Expanded(
           child: Text(
             book?['name'] ?? '选择账本',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontSize: 15,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: book != null
+                  ? colorScheme.onSurface
+                  : colorScheme.onSurfaceVariant,
             ),
           ),
-        ),
-        Icon(
-          Icons.chevron_right,
-          size: 20,
-          color: colorScheme.onSurfaceVariant,
         ),
       ],
     );

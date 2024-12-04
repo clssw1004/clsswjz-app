@@ -14,7 +14,43 @@ class HttpClient {
           headers: {
             'Content-Type': 'application/json',
           },
-        ));
+        )) {
+    _dio.interceptors.add(LogInterceptor(
+      request: true,
+      requestHeader: true,
+      requestBody: true,
+      responseHeader: true,
+      responseBody: true,
+      error: true,
+      logPrint: (object) {
+        print('HTTP Log: $object');
+      },
+    ));
+
+    _dio.interceptors.add(InterceptorsWrapper(
+      onError: (DioException e, handler) async {
+        if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          print('Request timeout, retrying...');
+          try {
+            final response = await _dio.request(
+              e.requestOptions.path,
+              data: e.requestOptions.data,
+              queryParameters: e.requestOptions.queryParameters,
+              options: Options(
+                method: e.requestOptions.method,
+                headers: e.requestOptions.headers,
+              ),
+            );
+            return handler.resolve(response);
+          } catch (e) {
+            return handler.next(e as DioException);
+          }
+        }
+        return handler.next(e);
+      },
+    ));
+  }
 
   void setToken(String token) {
     _token = token;
@@ -39,55 +75,50 @@ class HttpClient {
     dynamic data,
   }) async {
     try {
-      print('Current _token value: $_token');
-      final headers = {
-        'Content-Type': 'application/json',
-        if (_token != null) 'Authorization': 'Bearer $_token',
-      };
-      print('Request headers in HttpClient: $headers');
       print('Request path: $path');
       print('Request data: $data');
-
-      final response = await _dio.request<dynamic>(
+      final response = await _dio.request<Map<String, dynamic>>(
         path,
         queryParameters: queryParameters,
         data: data,
         options: Options(
           method: method.value,
-          headers: headers,
-          validateStatus: (status) => status != null && status < 500,
+          headers: {
+            'Content-Type': 'application/json',
+            if (_token != null) 'Authorization': 'Bearer $_token',
+          },
         ),
       );
 
-      print('Response data: ${response.data}');
-      print('Response type: ${response.data.runtimeType}');
+      // 处理统一响应格式
+      final apiResponse = response.data!;
+      final code = apiResponse['code'] as int;
+      final message = apiResponse['message'] as String;
 
-      if (response.statusCode != null && response.statusCode! >= 400) {
-        final responseData = response.data;
-        final message = responseData is Map
-            ? responseData['message']?.toString() ?? 'Request failed'
-            : 'Request failed';
-
+      // 处理错误状态码
+      if (code >= 400) {
         throw ApiException(
-          statusCode: response.statusCode,
+          statusCode: code,
           message: message,
-          body: responseData?.toString(),
         );
       }
 
-      final responseType = T.toString();
-      if (responseType.startsWith('List<') && response.data is! List) {
+      // 处理成功响应
+      final responseData = apiResponse['data'];
+
+      // 类型检查
+      if (T.toString().startsWith('List<') && responseData is! List) {
         throw ApiException(
-          message: 'Expected List but got ${response.data.runtimeType}',
+          message: 'Expected List but got ${responseData.runtimeType}',
         );
-      } else if (responseType == 'Map<String, dynamic>' &&
-          response.data is! Map) {
+      } else if (T.toString() == 'Map<String, dynamic>' &&
+          responseData is! Map) {
         throw ApiException(
-          message: 'Expected Map but got ${response.data.runtimeType}',
+          message: 'Expected Map but got ${responseData.runtimeType}',
         );
       }
 
-      return response.data as T;
+      return responseData as T;
     } on DioException catch (e) {
       print('DioException: $e');
       print('DioException response: ${e.response?.data}');
@@ -96,15 +127,16 @@ class HttpClient {
   }
 
   ApiException _handleDioError(DioException e) {
-    final responseData = e.response?.data;
-    final message = responseData is Map
-        ? responseData['message']?.toString() ?? e.message ?? 'Request failed'
-        : e.message ?? 'Request failed';
-
+    if (e.response?.data != null && e.response?.data is Map) {
+      final apiResponse = e.response!.data as Map<String, dynamic>;
+      return ApiException(
+        statusCode: apiResponse['code'] as int,
+        message: apiResponse['message'] as String,
+      );
+    }
     return ApiException(
       statusCode: e.response?.statusCode,
-      message: message,
-      body: responseData?.toString(),
+      message: e.message ?? 'Request failed',
     );
   }
 }

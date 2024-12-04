@@ -97,7 +97,7 @@ class _FundSelectorState extends State<FundSelector> {
                                   contentPadding:
                                       EdgeInsets.symmetric(horizontal: 8),
                                   title: Text(
-                                    fund['fundName'] ?? '',
+                                    fund['name'] ?? '',
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: fund['id'] ==
                                               widget.selectedFund?['id']
@@ -129,7 +129,7 @@ class _FundSelectorState extends State<FundSelector> {
                     }
                   },
                   child: Text(
-                    '${widget.selectedFund?['fundName'] ?? '选择账户'}',
+                    '${widget.selectedFund?['name'] ?? '选择账户'}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: widget.selectedFund != null
                           ? colorScheme.onSurface

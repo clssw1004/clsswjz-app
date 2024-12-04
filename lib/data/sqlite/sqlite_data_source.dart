@@ -45,85 +45,34 @@ class SqliteDataSource implements DataSource {
   @override
   Future<AccountBook> createAccountBook(AccountBook book) async {
     final db = await _dbHelper.database;
-    await db.transaction((txn) async {
-      // 插入账本
-      await txn.insert(
-        'account_books',
-        {
-          'id': book.id,
-          'name': book.name,
-          'description': book.description,
-          'currency_symbol': book.currencySymbol,
-          'icon': book.icon,
-          'created_by': book.createdBy,
-          'created_at': book.createdAt.toIso8601String(),
-          'updated_at': book.updatedAt.toIso8601String(),
-        },
-      );
-
-      // 插入成员
-      for (var member in book.members) {
-        await txn.insert(
-          'members',
-          {
-            'user_id': member.userId,
-            'account_book_id': book.id,
-            'nickname': member.nickname,
-            'can_view_book': member.canViewBook ? 1 : 0,
-            'can_edit_book': member.canEditBook ? 1 : 0,
-            'can_delete_book': member.canDeleteBook ? 1 : 0,
-            'can_view_item': member.canViewItem ? 1 : 0,
-            'can_edit_item': member.canEditItem ? 1 : 0,
-            'can_delete_item': member.canDeleteItem ? 1 : 0,
-          },
-        );
-      }
+    await db.insert('account_books', {
+      'id': book.id,
+      'name': book.name,
+      'description': book.description,
+      'currency_symbol': book.currencySymbol,
+      'icon': book.icon,
+      'created_by': book.createdBy,
+      'created_at': book.createdAt?.toIso8601String(),
+      'updated_at': book.updatedAt?.toIso8601String(),
     });
-
     return book;
   }
 
   @override
   Future<AccountBook> updateAccountBook(String id, AccountBook book) async {
     final db = await _dbHelper.database;
-    await db.transaction((txn) async {
-      // 更新账本
-      await txn.update(
-        'account_books',
-        {
-          'name': book.name,
-          'description': book.description,
-          'currency_symbol': book.currencySymbol,
-          'icon': book.icon,
-          'updated_at': book.updatedAt.toIso8601String(),
-        },
-        where: 'id = ?',
-        whereArgs: [id],
-      );
-
-      // 删除旧成员
-      await txn.delete(
-        'members',
-        where: 'account_book_id = ?',
-        whereArgs: [id],
-      );
-
-      // 插入新成员
-      for (var member in book.members) {
-        await txn.insert('members', {
-          'user_id': member.userId,
-          'account_book_id': id,
-          'nickname': member.nickname,
-          'can_view_book': member.canViewBook ? 1 : 0,
-          'can_edit_book': member.canEditBook ? 1 : 0,
-          'can_delete_book': member.canDeleteBook ? 1 : 0,
-          'can_view_item': member.canViewItem ? 1 : 0,
-          'can_edit_item': member.canEditItem ? 1 : 0,
-          'can_delete_item': member.canDeleteItem ? 1 : 0,
-        });
-      }
-    });
-
+    await db.update(
+      'account_books',
+      {
+        'name': book.name,
+        'description': book.description,
+        'currency_symbol': book.currencySymbol,
+        'icon': book.icon,
+        'updated_at': book.updatedAt?.toIso8601String(),
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
     return book;
   }
 
@@ -192,8 +141,8 @@ class SqliteDataSource implements DataSource {
       'shop': item.shop,
       'fund_id': item.fundId,
       'account_date': item.accountDate.toIso8601String(),
-      'created_at': item.createdAt.toIso8601String(),
-      'updated_at': item.updatedAt.toIso8601String(),
+      'created_at': item.createdAt?.toIso8601String(),
+      'updated_at': item.updatedAt?.toIso8601String(),
     });
     return item;
   }
@@ -212,7 +161,7 @@ class SqliteDataSource implements DataSource {
         'shop': item.shop,
         'fund_id': item.fundId,
         'account_date': item.accountDate.toIso8601String(),
-        'updated_at': item.updatedAt.toIso8601String(),
+        'updated_at': item.updatedAt?.toIso8601String(),
       },
       where: 'id = ?',
       whereArgs: [id],
@@ -258,8 +207,8 @@ class SqliteDataSource implements DataSource {
       'id': category.id,
       'name': category.name,
       'account_book_id': category.accountBookId,
-      'created_at': category.createdAt.toIso8601String(),
-      'updated_at': category.updatedAt.toIso8601String(),
+      'created_at': category.createdAt?.toIso8601String(),
+      'updated_at': category.updatedAt?.toIso8601String(),
     });
     return category;
   }
@@ -271,7 +220,7 @@ class SqliteDataSource implements DataSource {
       'categories',
       {
         'name': category.name,
-        'updated_at': category.updatedAt.toIso8601String(),
+        'updated_at': category.updatedAt?.toIso8601String(),
       },
       where: 'id = ?',
       whereArgs: [id],
@@ -317,8 +266,8 @@ class SqliteDataSource implements DataSource {
       'id': shop.id,
       'name': shop.name,
       'account_book_id': shop.accountBookId,
-      'created_at': shop.createdAt.toIso8601String(),
-      'updated_at': shop.updatedAt.toIso8601String(),
+      'created_at': shop.createdAt?.toIso8601String(),
+      'updated_at': shop.updatedAt?.toIso8601String(),
     });
     return shop;
   }
@@ -330,7 +279,7 @@ class SqliteDataSource implements DataSource {
       'shops',
       {
         'name': shop.name,
-        'updated_at': shop.updatedAt.toIso8601String(),
+        'updated_at': shop.updatedAt?.toIso8601String(),
       },
       where: 'id = ?',
       whereArgs: [id],
@@ -362,10 +311,14 @@ class SqliteDataSource implements DataSource {
         .map((map) => Fund.fromJson({
               'id': map['id'],
               'name': map['name'],
-              'accountBookId': map['account_book_id'],
-              'type': map['type'],
-              'balance': map['balance'],
-              'isDefault': map['is_default'] == 1,
+              'fundType': map['type'],
+              'fundRemark': map['remark'] ?? '',
+              'fundBalance': map['balance'],
+              'isDefault': map['is_default'],
+              'fundIn': map['fund_in'] == 1,
+              'fundOut': map['fund_out'] == 1,
+              'createdBy': map['created_by'],
+              'updatedBy': map['updated_by'],
               'createdAt': map['created_at'],
               'updatedAt': map['updated_at'],
             }))
@@ -378,12 +331,16 @@ class SqliteDataSource implements DataSource {
     await db.insert('funds', {
       'id': fund.id,
       'name': fund.name,
-      'account_book_id': fund.accountBookId,
-      'type': fund.type,
-      'balance': fund.balance,
+      'type': fund.fundType,
+      'remark': fund.fundRemark,
+      'balance': fund.fundBalance,
       'is_default': fund.isDefault ? 1 : 0,
-      'created_at': fund.createdAt.toIso8601String(),
-      'updated_at': fund.updatedAt.toIso8601String(),
+      'fund_in': fund.fundIn ? 1 : 0,
+      'fund_out': fund.fundOut ? 1 : 0,
+      'created_by': fund.createdBy,
+      'updated_by': fund.updatedBy,
+      'created_at': fund.createdAt?.toIso8601String(),
+      'updated_at': fund.updatedAt?.toIso8601String(),
     });
     return fund;
   }
@@ -395,10 +352,14 @@ class SqliteDataSource implements DataSource {
       'funds',
       {
         'name': fund.name,
-        'type': fund.type,
-        'balance': fund.balance,
+        'type': fund.fundType,
+        'remark': fund.fundRemark,
+        'balance': fund.fundBalance,
         'is_default': fund.isDefault ? 1 : 0,
-        'updated_at': fund.updatedAt.toIso8601String(),
+        'fund_in': fund.fundIn ? 1 : 0,
+        'fund_out': fund.fundOut ? 1 : 0,
+        'updated_by': fund.updatedBy,
+        'updated_at': fund.updatedAt?.toIso8601String(),
       },
       where: 'id = ?',
       whereArgs: [id],

@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import '../../../services/api_service.dart';
 import '../../../utils/message_helper.dart';
 import '../../../models/models.dart';
+import '../providers/account_item_provider.dart';
+import 'package:provider/provider.dart';
 
 class ShopSelector extends StatefulWidget {
   final String? selectedShop;
   final String accountBookId;
   final ValueChanged<String?> onChanged;
   final VoidCallback? onTap;
+  final String? selectedShopName;
 
   const ShopSelector({
     Key? key,
@@ -15,6 +18,7 @@ class ShopSelector extends StatefulWidget {
     required this.accountBookId,
     required this.onChanged,
     this.onTap,
+    this.selectedShopName,
   }) : super(key: key);
 
   @override
@@ -22,62 +26,58 @@ class ShopSelector extends StatefulWidget {
 }
 
 class _ShopSelectorState extends State<ShopSelector> {
-  List<Shop> _shops = [];
   Shop? _selectedShop;
 
   @override
   void initState() {
     super.initState();
-    _loadShops();
+    _initializeShop();
   }
 
   @override
   void didUpdateWidget(ShopSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedShop != widget.selectedShop) {
-      _loadShops();
+      _initializeShop();
     }
   }
 
-  Future<void> _loadShops() async {
-    try {
-      _shops = await ApiService.getShops(widget.accountBookId);
+  Future<void> _initializeShop() async {
+    if (!mounted) return;
+    final provider = Provider.of<AccountItemProvider>(context, listen: false);
 
-      if (widget.selectedShop != null) {
-        final selectedShop = _shops.firstWhere(
-          (shop) => shop.id == widget.selectedShop,
+    if (widget.selectedShop != null) {
+      try {
+        _selectedShop = provider.shops.firstWhere(
+          (shop) => shop.name == widget.selectedShop,
           orElse: () => throw '未找到商家',
         );
-        _selectedShop = selectedShop;
-      }
-
-      setState(() {});
-    } catch (e) {
-      if (mounted) {
-        MessageHelper.showError(context, message: e.toString());
+        print('Found shop: ${_selectedShop?.name}');
+        setState(() {});
+      } catch (e) {
+        print('Error finding shop: $e');
+        // 可以选择是否显示错误信息
+        // MessageHelper.showError(context, message: e.toString());
       }
     }
   }
 
-  Future<void> _showShopDialog() async {
-    final result = await showDialog<Shop>(
+  void _showShopDialog(BuildContext context) {
+    final provider = Provider.of<AccountItemProvider>(context, listen: false);
+    showDialog<Shop>(
       context: context,
       builder: (context) => _ShopDialog(
-        shops: _shops,
+        shops: provider.shops,
         selectedShop: widget.selectedShop,
         accountBookId: widget.accountBookId,
-        onShopsUpdated: (shops) {
-          setState(() => _shops = shops);
-        },
+        onShopsUpdated: provider.updateShops,
       ),
-    );
-
-    if (result != null) {
-      widget.onChanged(result.id);
-      setState(() {
-        _selectedShop = result;
-      });
-    }
+    ).then((shop) {
+      if (shop != null) {
+        widget.onChanged(shop.name);
+        setState(() => _selectedShop = shop);
+      }
+    });
   }
 
   @override
@@ -109,24 +109,22 @@ class _ShopSelectorState extends State<ShopSelector> {
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 widget.onTap?.call();
-                _showShopDialog();
+                _showShopDialog(context);
               },
               child: Text(
-                _selectedShop?.name ?? '选择商家',
+                _selectedShop?.name ?? widget.selectedShopName ?? '选择商家',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: _selectedShop != null
-                      ? colorScheme.onSurface
-                      : colorScheme.onSurfaceVariant,
+                  color:
+                      (_selectedShop != null || widget.selectedShopName != null)
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
           ),
           IconButton(
-            icon: Icon(
-              Icons.chevron_right,
-              size: 18,
-            ),
-            onPressed: _showShopDialog,
+            icon: Icon(Icons.chevron_right, size: 18),
+            onPressed: () => _showShopDialog(context),
             color: colorScheme.onSurfaceVariant,
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
@@ -255,7 +253,7 @@ class _ShopDialogState extends State<_ShopDialog> {
       shrinkWrap: true,
       itemBuilder: (context, index) {
         final shop = _filteredShops[index];
-        final isSelected = shop.id == widget.selectedShop;
+        final isSelected = shop.name == widget.selectedShop;
 
         return ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 8),

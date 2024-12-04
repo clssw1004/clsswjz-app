@@ -35,9 +35,14 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
   @override
   void initState() {
     super.initState();
+    _initializeData();
+  }
+
+  void _initializeData() {
     _currentUserId = UserService.getUserInfo()?['userId'];
-    _canEdit = _checkEditPermission();
     _accountBook = AccountBook.fromJson(widget.accountBook);
+    _canEdit = _checkEditPermission();
+
     _nameController = TextEditingController(text: _accountBook.name);
     _descriptionController =
         TextEditingController(text: _accountBook.description);
@@ -48,15 +53,8 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
 
   bool _checkEditPermission() {
     if (_currentUserId == null) return false;
-
     if (_accountBook.createdBy == _currentUserId) return true;
-
-    final member = (_accountBook.members as List?)?.firstWhere(
-      (m) => m['userId'] == _currentUserId,
-      orElse: () => null,
-    );
-
-    return member?['canEditBook'] == true;
+    return _accountBook.canEditBook;
   }
 
   IconData _getBookIcon(AccountBook book) {
@@ -99,7 +97,6 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
         currencySymbol: _currencySymbol,
         icon: _selectedIcon.codePoint.toString(),
         members: _members,
-        updatedAt: DateTime.now(),
       );
 
       final response = await ApiService.updateAccountBook(
@@ -276,14 +273,16 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                         _buildInfoItem(
                           context,
                           '创建者',
-                          _accountBook.fromName ?? '',
+                          _accountBook.fromName ?? '未知',
                         ),
                         SizedBox(width: 24),
                         _buildInfoItem(
                           context,
                           '创建时间',
-                          DateFormat('yyyy-MM-dd HH:mm')
-                              .format(_accountBook.createdAt),
+                          _accountBook.createdAt != null
+                              ? DateFormat('yyyy-MM-dd HH:mm')
+                                  .format(_accountBook.createdAt!)
+                              : '未知',
                         ),
                       ],
                     ),
@@ -294,7 +293,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
             if (_canEdit)
               MemberList(
                 members: _members,
-                createdBy: _accountBook.createdBy,
+                createdBy: _accountBook.createdBy ?? '',
                 onUpdate: _handleMemberUpdate,
                 currentUserId: _currentUserId,
               ),
