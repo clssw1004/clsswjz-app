@@ -79,28 +79,36 @@ class _FundEditPageState extends State<FundEditPage> {
       return;
     }
 
-    if (_selectedBooks.isEmpty) {
-      MessageHelper.showError(context, message: '请至少选择一个关联账本');
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     try {
-      final updatedFund = widget.fund.copyWith(
-        name: _nameController.text,
-        fundRemark: _remarkController.text,
-        fundType: _selectedType,
-        fundBalance: _fundBalance,
-        fundBooks: _selectedBooks,
-      );
+      if (widget.fund.id.isEmpty) {
+        // 新增账户
+        final newFund = UserFund(
+          id: '', // 空ID，由后端生成
+          name: _nameController.text,
+          fundType: _selectedType,
+          fundRemark: _remarkController.text,
+          fundBalance: _fundBalance,
+          fundBooks: [], // 空列表，由后端处理账本关联
+        );
+        final result = await ApiService.createFund(newFund);
+        if (!mounted) return;
+        Navigator.pop(context, result);
+      } else {
+        // 更新账户
+        final updatedFund = widget.fund.copyWith(
+          name: _nameController.text,
+          fundRemark: _remarkController.text,
+          fundType: _selectedType,
+          fundBalance: _fundBalance,
+          fundBooks: _selectedBooks,
+        );
+        final result = await ApiService.updateFund(widget.fund.id, updatedFund);
+        if (!mounted) return;
+        Navigator.pop(context, result);
+      }
 
-      final result = widget.fund.id.isEmpty
-          ? await ApiService.createFund(updatedFund)
-          : await ApiService.updateFund(widget.fund.id, updatedFund);
-
-      if (!mounted) return;
-      Navigator.pop(context, result);
       MessageHelper.showSuccess(context, message: '保存成功');
     } catch (e) {
       if (!mounted) return;
@@ -122,32 +130,6 @@ class _FundEditPageState extends State<FundEditPage> {
         final isWide = constraints.maxWidth > 600;
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
-
-        // 定义通用的输入框装饰
-        final inputDecoration = InputDecoration(
-          filled: true,
-          fillColor: AppColors.white,
-          border: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: colorScheme.outline.withOpacity(0.5),
-            ),
-          ),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: colorScheme.outline.withOpacity(0.5),
-            ),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: colorScheme.primary,
-            ),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 0,
-            vertical: AppDimens.paddingSmall,
-          ),
-          isDense: true,
-        );
 
         return Scaffold(
           backgroundColor: colorScheme.surface,
@@ -209,26 +191,26 @@ class _FundEditPageState extends State<FundEditPage> {
                         showBalance: widget.fund.id.isNotEmpty,
                       ),
                     ),
-                    SizedBox(height: AppDimens.padding),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: AppDimens.paddingSmall),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '关联账本',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: colorScheme.primary,
+                    if (widget.fund.id.isNotEmpty) ...[
+                      SizedBox(height: AppDimens.padding),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: AppDimens.paddingSmall),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '关联账本',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: colorScheme.primary,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: AppDimens.paddingSmall),
-                          _buildBookList(),
-                        ],
+                            SizedBox(height: AppDimens.paddingSmall),
+                            _buildBookList(),
+                          ],
+                        ),
                       ),
-                    ),
-
-                    // 更新时间信息
+                    ],
                     if (widget.fund.updatedAt != null) ...[
                       SizedBox(height: AppDimens.padding),
                       Padding(

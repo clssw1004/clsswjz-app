@@ -37,7 +37,6 @@ class FundSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final provider = Provider.of<AccountItemProvider>(context);
 
     return Container(
       height: 48,
@@ -146,7 +145,7 @@ class _FundDialog extends StatelessWidget {
     if (fundList.isEmpty) {
       return Center(
         child: Text(
-          '暂无资金账户',
+          '暂无可用账户',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -169,14 +168,39 @@ class _FundDialog extends StatelessWidget {
               color: isSelected ? colorScheme.primary : colorScheme.onSurface,
             ),
           ),
-          subtitle: fund['fundRemark'].isNotEmpty
-              ? Text(
-                  fund['fundRemark'],
-                  style: theme.textTheme.bodySmall?.copyWith(
+          subtitle: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  fund['fundType'],
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
-                )
-              : null,
+                ),
+              ),
+              if (fund['fundRemark']?.isNotEmpty == true) ...[
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    fund['fundRemark'],
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ],
+          ),
           leading: Icon(
             isSelected
                 ? Icons.radio_button_checked

@@ -78,7 +78,7 @@ class HttpDataSource implements DataSource {
 
   // 账目相关方法
   @override
-  Future<List<AccountItem>> getAccountItems(
+  Future<AccountItemResponse> getAccountItems(
     String bookId, {
     List<String>? categories,
     String? type,
@@ -86,7 +86,7 @@ class HttpDataSource implements DataSource {
     DateTime? endDate,
   }) async {
     try {
-      final response = await _httpClient.request<List<dynamic>>(
+      final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.accountItems}/list',
         method: HttpMethod.post,
         data: {
@@ -97,7 +97,7 @@ class HttpDataSource implements DataSource {
           if (endDate != null) 'endDate': endDate.toIso8601String(),
         },
       );
-      return response.map((json) => AccountItem.fromJson(json)).toList();
+      return AccountItemResponse.fromJson(response);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -123,7 +123,7 @@ class HttpDataSource implements DataSource {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.accountItems}/$id',
         method: HttpMethod.patch,
-        data: item.toJson(),
+        data: item.toJsonUpdate(),
       );
       return AccountItem.fromJson(response);
     } on DioException catch (e) {
@@ -219,7 +219,7 @@ class HttpDataSource implements DataSource {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: ApiEndpoints.shops,
         method: HttpMethod.post,
-        data: shop.toJson(),
+        data: shop.toJsonCreate(),
       );
       return Shop.fromJson(response);
     } on DioException catch (e) {
@@ -233,7 +233,7 @@ class HttpDataSource implements DataSource {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.shops}/$id',
         method: HttpMethod.patch,
-        data: shop.toJson(),
+        data: shop.toJsonUpdate(),
       );
       return Shop.fromJson(response);
     } on DioException catch (e) {
@@ -287,7 +287,7 @@ class HttpDataSource implements DataSource {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: ApiEndpoints.funds,
         method: HttpMethod.post,
-        data: fund.toJson(),
+        data: fund.toRequestCreateJson(),
       );
       return UserFund.fromJson(response);
     } on DioException catch (e) {
@@ -301,7 +301,7 @@ class HttpDataSource implements DataSource {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.funds}/$id',
         method: HttpMethod.patch,
-        data: fund.toRequestJson(),
+        data: fund.toRequestUpdateJson(),
       );
       return UserFund.fromJson(response);
     } on DioException catch (e) {

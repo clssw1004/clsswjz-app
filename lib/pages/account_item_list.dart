@@ -10,6 +10,8 @@ import '../widgets/app_bar_factory.dart';
 import '../widgets/global_book_selector.dart';
 import '../utils/message_helper.dart';
 import '../constants/app_colors.dart';
+import 'account_item/widgets/summary_card.dart';
+import '../models/account_item.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
@@ -17,7 +19,7 @@ class AccountItemList extends StatefulWidget {
 }
 
 class AccountItemListState extends State<AccountItemList> {
-  List<Map<String, dynamic>> _accountItems = [];
+  List<AccountItem> _accountItems = [];
   List<Map<String, dynamic>> _accountBooks = [];
   List<String> _categories = [];
   Map<String, dynamic>? _selectedBook;
@@ -29,10 +31,13 @@ class AccountItemListState extends State<AccountItemList> {
   List<String> _selectedCategories = [];
   double? _minAmount;
   double? _maxAmount;
+  AccountSummary? _summary;
+  late AccountItemProvider _provider;
 
   @override
   void initState() {
     super.initState();
+    _provider = AccountItemProvider();
     _initializeAccountBooks();
   }
 
@@ -177,6 +182,12 @@ class AccountItemListState extends State<AccountItemList> {
                   _loadAccountItems();
                 },
               ),
+              if (_summary != null)
+                SummaryCard(
+                  allIn: _summary!.allIn,
+                  allOut: _summary!.allOut,
+                  allBalance: _summary!.allBalance,
+                ),
               Expanded(
                 child: _accountItems.isEmpty
                     ? _buildEmptyView(Theme.of(context).colorScheme)
@@ -232,7 +243,8 @@ class AccountItemListState extends State<AccountItemList> {
     setState(() => _isLoading = true);
 
     try {
-      final items = await ApiService.getAccountItems(
+      // 加载账目数据
+      final response = await ApiService.getAccountItems(
         _selectedBook!['id'],
         categories: _selectedCategories,
         type: _selectedType,
@@ -240,9 +252,14 @@ class AccountItemListState extends State<AccountItemList> {
         endDate: _endDate,
       );
 
+      // 加载资金账户数据
+      await _provider.setSelectedBook(_selectedBook);
+      await _provider.loadData();
+
       if (!mounted) return;
       setState(() {
-        _accountItems = items.map((item) => item.toJson()).toList();
+        _accountItems = response.items;
+        _summary = response.summary;
         _isLoading = false;
       });
     } catch (e) {
@@ -324,21 +341,12 @@ class AccountItemListState extends State<AccountItemList> {
   }
 
   List<String> _getDateHeaders() {
-    final headers = <String>{};
+    final Set<String> dates = {};
     for (var item in _accountItems) {
-      try {
-        final dateStr = item['accountDate'];
-        if (dateStr != null) {
-          // 统一处理时区问题
-          final date = DateTime.parse(dateStr).toLocal();
-          headers.add(DateFormat('yyyy-MM-dd').format(date));
-        }
-      } catch (e) {
-        print('日期解析错误: ${item['accountDate']} - $e');
-        continue;
-      }
+      final dateStr = DateFormat('yyyy-MM-dd').format(item.accountDate);
+      dates.add(dateStr);
     }
-    return headers.toList()..sort((a, b) => b.compareTo(a));
+    return dates.toList()..sort((a, b) => b.compareTo(a));
   }
 
   int _getHeaderIndexForPosition(int position) {
@@ -369,10 +377,9 @@ class AccountItemListState extends State<AccountItemList> {
     return itemIndex;
   }
 
-  List<Map<String, dynamic>> _getItemsForDate(String date) {
+  List<AccountItem> _getItemsForDate(String date) {
     return _accountItems.where((item) {
-      final itemDate =
-          DateFormat('yyyy-MM-dd').format(DateTime.parse(item['accountDate']));
+      final itemDate = DateFormat('yyyy-MM-dd').format(item.accountDate);
       return itemDate == date;
     }).toList();
   }
@@ -407,147 +414,165 @@ class AccountItemListState extends State<AccountItemList> {
     return DateFormat('MM月dd日').format(DateTime.parse(date));
   }
 
-  Widget _buildAccountItem(BuildContext context, Map<String, dynamic> item) {
+  Widget _buildAccountItem(BuildContext context, AccountItem item) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isExpense = item['type'] == 'EXPENSE';
-    final currencySymbol = item['currencySymbol'] ?? '¥';
-
-    // 使用常量定义的颜色
-    final typeColor = isExpense ? AppColors.expense : AppColors.income;
 
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: colorScheme.outlineVariant.withOpacity(0.5),
-        ),
-      ),
-      child: InkWell(
-        onTap: () => _editRecord(item),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: typeColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '$currencySymbol${item['amount'].toString()}',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: typeColor,
-                              fontWeight: FontWeight.w600,
-                            ),
+      margin: EdgeInsets.symmetric(vertical: 4),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 分类名称
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          item.category,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: colorScheme.onSecondaryContainer,
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                      ),
+                      if (item.description?.isNotEmpty == true) ...[
+                        SizedBox(width: 8),
+                        Expanded(
                           child: Text(
-                            item['category'].toString(),
-                            style: theme.textTheme.labelSmall?.copyWith(
+                            item.description!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 4),
-                    Row(
-                      children: [
-                        if (item['fundName'] != null) ...[
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color:
-                                  colorScheme.primaryContainer.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              item['fundName'],
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                        ],
-                        if (item['shop'] != null) ...[
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.tertiaryContainer
-                                  .withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              item['shop'],
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onTertiaryContainer,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                        ],
-                        Expanded(
-                          child: Text(
-                            item['description']?.isNotEmpty == true
-                                ? item['description']
-                                : '无备注',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: item['description']?.isNotEmpty == true
-                                  ? colorScheme.onSurfaceVariant
-                                  : colorScheme.outline,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                      ],
+                    ],
+                  ),
+                ),
+                SizedBox(width: 16),
+                // 金额
+                Text(
+                  '${item.type == 'EXPENSE' ? '-' : '+'}¥${item.amount.toStringAsFixed(2)}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: item.type == 'EXPENSE'
+                        ? AppColors.expense
+                        : AppColors.income,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
+            // 底部信息行
+            Row(
+              children: [
+                // 账户标签
+                if (item.fundId != null) ...[
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.account_balance_wallet_outlined,
+                          size: 12,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                        SizedBox(width: 4),
                         Text(
-                          DateFormat('HH:mm')
-                              .format(DateTime.parse(item['accountDate'])),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                          item.fundName!,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onPrimaryContainer,
                           ),
                         ),
                       ],
                     ),
-                  ],
+                  ),
+                  SizedBox(width: 8),
+                ],
+                // 商家标签
+                if (item.shop != null) ...[
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.tertiaryContainer.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.store_outlined,
+                          size: 12,
+                          color: colorScheme.onTertiaryContainer,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          item.shop!,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onTertiaryContainer,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                Spacer(),
+                // 时间
+                Text(
+                  DateFormat('HH:mm').format(item.accountDate),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
+        ),
+        onTap: () => _editAccountItem(item),
+      ),
+    );
+  }
+
+  void _editAccountItem(AccountItem item) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AccountItemForm(
+          initialData: item.toJson(),
+          initialBook: _selectedBook,
         ),
       ),
     );
+
+    if (result == true) {
+      _loadAccountItems();
+    }
   }
 
   void _addNewItem() async {

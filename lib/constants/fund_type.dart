@@ -1,10 +1,14 @@
 enum FundType {
   CASH('现金'),
-  BANK('银行卡'),
+  DEBIT('储蓄卡'),
+  CREDIT('信用卡'),
+  PREPAID_CARD('充值卡'),
   ALIPAY('支付宝'),
   WECHAT('微信'),
-  CREDIT('信用卡'),
-  OTHER('其他');
+  DEBT('欠款'),
+  INVESTMENT('理财账户'),
+  E_WALLET('网络钱包'),
+  OTHER("其它");
 
   final String label;
   const FundType(this.label);

@@ -88,7 +88,7 @@ class SqliteDataSource implements DataSource {
 
   // 账目相关方法
   @override
-  Future<List<AccountItem>> getAccountItems(
+  Future<AccountItemResponse> getAccountItems(
     String bookId, {
     List<String>? categories,
     String? type,
@@ -125,7 +125,27 @@ class SqliteDataSource implements DataSource {
       orderBy: 'account_date DESC',
     );
 
-    return maps.map((map) => AccountItem.fromJson(map)).toList();
+    final items = maps.map((map) => AccountItem.fromJson(map)).toList();
+
+    // 计算汇总信息
+    double allIn = 0;
+    double allOut = 0;
+    for (var item in items) {
+      if (item.type == 'INCOME') {
+        allIn += item.amount;
+      } else {
+        allOut += item.amount;
+      }
+    }
+
+    return AccountItemResponse(
+      items: items,
+      summary: AccountSummary(
+        allIn: allIn,
+        allOut: allOut,
+        allBalance: allIn - allOut,
+      ),
+    );
   }
 
   @override

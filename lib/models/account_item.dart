@@ -1,3 +1,39 @@
+class AccountItemResponse {
+  final List<AccountItem> items;
+  final AccountSummary summary;
+
+  AccountItemResponse({
+    required this.items,
+    required this.summary,
+  });
+
+  factory AccountItemResponse.fromJson(Map<String, dynamic> json) =>
+      AccountItemResponse(
+        items: (json['items'] as List)
+            .map((item) => AccountItem.fromJson(item))
+            .toList(),
+        summary: AccountSummary.fromJson(json['summary']),
+      );
+}
+
+class AccountSummary {
+  final double allIn;
+  final double allOut;
+  final double allBalance;
+
+  AccountSummary({
+    required this.allIn,
+    required this.allOut,
+    required this.allBalance,
+  });
+
+  factory AccountSummary.fromJson(Map<String, dynamic> json) => AccountSummary(
+        allIn: (json['allIn'] as num).toDouble(),
+        allOut: (json['allOut'] as num).toDouble(),
+        allBalance: (json['allBalance'] as num).toDouble(),
+      );
+}
+
 class AccountItem {
   final String id;
   final String accountBookId;
@@ -7,6 +43,7 @@ class AccountItem {
   final String? description;
   final String? shop;
   final String? fundId;
+  final String? fundName;
   final DateTime accountDate;
   final String? createdBy;
   final String? updatedBy;
@@ -22,6 +59,7 @@ class AccountItem {
     this.description,
     this.shop,
     this.fundId,
+    this.fundName,
     required this.accountDate,
     this.createdBy,
     this.updatedBy,
@@ -30,6 +68,19 @@ class AccountItem {
   });
 
   Map<String, dynamic> toJson() => {
+        'id': id,
+        'accountBookId': accountBookId,
+        'type': type,
+        'amount': amount,
+        'category': category,
+        'description': description,
+        'shop': shop,
+        'fundId': fundId,
+        'fundName': fundName,
+        'accountDate': accountDate.toIso8601String(),
+      };
+
+  Map<String, dynamic> toJsonUpdate() => {
         'id': id,
         'accountBookId': accountBookId,
         'type': type,
@@ -61,6 +112,7 @@ class AccountItem {
         description: json['description'],
         shop: json['shop'],
         fundId: json['fundId'],
+        fundName: json['fundName'],
         accountDate: DateTime.parse(json['accountDate']),
         createdBy: json['createdBy'],
         updatedBy: json['updatedBy'],
@@ -81,6 +133,7 @@ class AccountItem {
     String? description,
     String? shop,
     String? fundId,
+    String? fundName,
     DateTime? accountDate,
   }) =>
       AccountItem(
@@ -92,6 +145,7 @@ class AccountItem {
         description: description ?? this.description,
         shop: shop ?? this.shop,
         fundId: fundId ?? this.fundId,
+        fundName: fundName ?? this.fundName,
         accountDate: accountDate ?? this.accountDate,
         createdBy: createdBy,
         updatedBy: updatedBy,

@@ -34,6 +34,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
+  List<Category> _categories = [];
 
   String _transactionType = '支出';
   String? _selectedCategory;
@@ -59,7 +60,37 @@ class _AccountItemFormState extends State<AccountItemForm> {
       if (widget.initialBook != null) {
         setState(() => _selectedBook = widget.initialBook);
         await _loadCategories();
-        await _loadFundList();
+        await _provider.loadData();
+
+        // 如果是编辑模式，设置选中的账户
+        if (widget.initialData != null &&
+            widget.initialData!['fundId'] != null) {
+          final fund = _provider.funds.firstWhere(
+            (f) => f.id == widget.initialData!['fundId'],
+            orElse: () => AccountBookFund(
+              id: '',
+              name: '未知账户',
+              fundType: 'OTHER',
+              fundRemark: '',
+              fundBalance: 0,
+              fundIn: true,
+              fundOut: true,
+              isDefault: false,
+              accountBookName: '',
+            ),
+          );
+
+          setState(() {
+            _selectedFund = {
+              'id': fund.id,
+              'name': fund.name,
+              'fundType': fund.fundType,
+              'fundRemark': fund.fundRemark,
+              'fundBalance': fund.fundBalance,
+              'isDefault': fund.isDefault,
+            };
+          });
+        }
       }
 
       // 设置初始数据
@@ -81,21 +112,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
           _descriptionController.text =
               widget.initialData!['description'] ?? '';
-
-          // 设置账户信息
-          if (widget.initialData!['fundId'] != null) {
-            _selectedFund = _provider.fundList.firstWhere(
-              (fund) => fund['id'] == widget.initialData!['fundId'],
-              orElse: () => Map<String, Object>.from({
-                'id': '',
-                'name': '',
-                'fundType': '',
-                'fundRemark': '',
-                'fundBalance': 0.0,
-                'isDefault': false,
-              }),
-            );
-          }
 
           // 设置日期时间
           if (widget.initialData!['accountDate'] != null) {
@@ -211,16 +227,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                     },
                                   ),
                                   SizedBox(height: 8),
-                                  FundSelector(
-                                    selectedFund: _selectedFund,
-                                    accountBookId: _selectedBook?['id'] ?? '',
-                                    onTap: () {
-                                      _amountFocusNode.unfocus();
-                                    },
-                                    onChanged: (fund) =>
-                                        setState(() => _selectedFund = fund),
-                                    isRequired: true,
-                                  ),
+                                  _buildFundSelector(),
                                   SizedBox(height: 8),
                                   DescriptionInput(
                                     controller: _descriptionController,
@@ -291,12 +298,15 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   Future<void> _loadCategories() async {
     if (_selectedBook == null) return;
-    await _provider.loadData();
-  }
-
-  Future<void> _loadFundList() async {
-    if (_selectedBook == null) return;
-    await _provider.loadData();
+    try {
+      final categories = await ApiService.getCategories(_selectedBook!['id']);
+      if (!mounted) return;
+      setState(() {
+        _categories = categories;
+      });
+    } catch (e) {
+      print('加载分类失败: $e');
+    }
   }
 
   String get _formattedDateTime {
@@ -337,7 +347,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
         category: data['category'],
         description: data['description'],
         shop: data['shop'],
-        fundId: data['fundId'],
+        fundId: _selectedFund?['id'],
+        fundName: _selectedFund?['name'],
         accountDate: DateTime.parse(data['accountDate']),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -359,4 +370,22 @@ class _AccountItemFormState extends State<AccountItemForm> {
   }
 
   final _amountFocusNode = FocusNode();
+
+  Widget _buildFundSelector() {
+    return Consumer<AccountItemProvider>(
+      builder: (context, provider, _) {
+        return FundSelector(
+          selectedFund: _selectedFund,
+          accountBookId: _selectedBook!['id'],
+          onChanged: (fund) {
+            setState(() => _selectedFund = fund);
+          },
+          onTap: () {
+            _amountFocusNode.unfocus();
+          },
+          isRequired: true,
+        );
+      },
+    );
+  }
 }

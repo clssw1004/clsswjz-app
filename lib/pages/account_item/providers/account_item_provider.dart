@@ -61,6 +61,16 @@ class AccountItemProvider extends ChangeNotifier {
       categories = futures[0] as List<Category>;
       funds = futures[1] as List<AccountBookFund>;
       shops = futures[2] as List<Shop>;
+
+      // 如果没有选择账户，设置默认账户
+      if (_selectedFund == null) {
+        final defaultFund = getDefaultFund();
+        if (defaultFund != null) {
+          _selectedFund = defaultFund;
+        }
+      }
+
+      notifyListeners();
     } catch (e) {
       print('加载数据失败: $e');
     } finally {
@@ -137,5 +147,17 @@ class AccountItemProvider extends ChangeNotifier {
     } catch (e) {
       print('加载资金账户失败: $e');
     }
+  }
+
+  // 添加账目数据相关字段和方法
+  List<AccountItem> _accountItems = [];
+  List<AccountItem> get accountItems => _accountItems;
+
+  // 添加选中账户相关字段和方法
+  Map<String, dynamic>? _selectedFund;
+  Map<String, dynamic>? get selectedFund => _selectedFund;
+  void setSelectedFund(Map<String, dynamic>? fund) {
+    _selectedFund = fund;
+    notifyListeners();
   }
 }

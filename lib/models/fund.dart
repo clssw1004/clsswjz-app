@@ -32,7 +32,14 @@ class UserFund {
         'fundBooks': fundBooks.map((book) => book.toJson()).toList(),
       };
 
-  Map<String, dynamic> toRequestJson() => {
+  Map<String, dynamic> toRequestCreateJson() => {
+        'name': name,
+        'fundType': fundType,
+        'fundRemark': fundRemark,
+        'fundBalance': fundBalance,
+      };
+
+  Map<String, dynamic> toRequestUpdateJson() => {
         'name': name,
         'fundType': fundType,
         'fundRemark': fundRemark,

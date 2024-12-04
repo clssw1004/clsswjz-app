@@ -26,6 +26,15 @@ class Shop {
         'accountBookId': accountBookId,
       };
 
+  Map<String, dynamic> toJsonCreate() => {
+        'name': name,
+        'accountBookId': accountBookId,
+      };
+
+  Map<String, dynamic> toJsonUpdate() => {
+        'name': name,
+      };
+
   factory Shop.fromJson(Map<String, dynamic> json) => Shop(
         id: json['id'],
         name: json['name'],

@@ -26,7 +26,7 @@ class ApiService {
   }
 
   // 账目相关
-  static Future<List<AccountItem>> getAccountItems(
+  static Future<AccountItemResponse> getAccountItems(
     String bookId, {
     List<String>? categories,
     String? type,

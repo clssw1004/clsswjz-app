@@ -12,7 +12,7 @@ class DataService {
     return ApiService.getCategories(bookId);
   }
 
-  static Future<List<AccountItem>> getAccountItems(
+  static Future<AccountItemResponse> getAccountItems(
     String bookId, {
     List<String>? categories,
     String? type,

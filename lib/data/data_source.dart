@@ -21,7 +21,7 @@ abstract class DataSource {
   Future<void> deleteAccountBook(String id);
 
   // 账目相关
-  Future<List<AccountItem>> getAccountItems(
+  Future<AccountItemResponse> getAccountItems(
     String bookId, {
     List<String>? categories,
     String? type,
