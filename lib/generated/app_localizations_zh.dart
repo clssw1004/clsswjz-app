@@ -408,7 +408,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fundExpense => '支出';
 
   @override
-  String get checkButton => '检查';
+  String get checkButton => '检��';
 
   @override
   String get saveButton => '保存';
@@ -518,7 +518,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get permDeleteItem => '删除账目';
 
   @override
-  String get shopManagementTitle => '商家管理';
+  String get shopManagementTitle => '商家��理';
 
   @override
   String get newShopButton => '新建商家';
@@ -673,7 +673,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchBook => '搜索账本';
 
   @override
-  String get selectBookHint => '��选择账本';
+  String get selectBookHint => '选择账本';
 
   @override
   String get sharedBook => '共享账本';
@@ -729,6 +729,39 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noTransactions => '暂无交易';
+
+  @override
+  String get statistics => '统计';
+
+  @override
+  String get statisticsTimeRange => '时间范围';
+
+  @override
+  String get statisticsWeek => '本周';
+
+  @override
+  String get statisticsMonth => '本月';
+
+  @override
+  String get statisticsYear => '本年';
+
+  @override
+  String get statisticsCustom => '自定义';
+
+  @override
+  String get statisticsOverview => '收支总览';
+
+  @override
+  String get statisticsTrend => '收支趋势';
+
+  @override
+  String get statisticsExpenseByCategory => '支出分类';
+
+  @override
+  String get statisticsIncomeByCategory => '收入分类';
+
+  @override
+  String get statisticsNoData => '暂无数据';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

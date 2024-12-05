@@ -1487,6 +1487,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No transactions'**
   String get noTransactions;
+
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
+  /// No description provided for @statisticsTimeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Range'**
+  String get statisticsTimeRange;
+
+  /// No description provided for @statisticsWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get statisticsWeek;
+
+  /// No description provided for @statisticsMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get statisticsMonth;
+
+  /// No description provided for @statisticsYear.
+  ///
+  /// In en, this message translates to:
+  /// **'This Year'**
+  String get statisticsYear;
+
+  /// No description provided for @statisticsCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get statisticsCustom;
+
+  /// No description provided for @statisticsOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get statisticsOverview;
+
+  /// No description provided for @statisticsTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Trend'**
+  String get statisticsTrend;
+
+  /// No description provided for @statisticsExpenseByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense by Category'**
+  String get statisticsExpenseByCategory;
+
+  /// No description provided for @statisticsIncomeByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Income by Category'**
+  String get statisticsIncomeByCategory;
+
+  /// No description provided for @statisticsNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No Data'**
+  String get statisticsNoData;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

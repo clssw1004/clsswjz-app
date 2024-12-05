@@ -6,6 +6,17 @@
 
   "zh_Hant": [
     "invalidEmailFormat",
-    "invalidPhoneFormat"
+    "invalidPhoneFormat",
+    "statistics",
+    "statisticsTimeRange",
+    "statisticsWeek",
+    "statisticsMonth",
+    "statisticsYear",
+    "statisticsCustom",
+    "statisticsOverview",
+    "statisticsTrend",
+    "statisticsExpenseByCategory",
+    "statisticsIncomeByCategory",
+    "statisticsNoData"
   ]
 }

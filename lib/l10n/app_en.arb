@@ -231,5 +231,16 @@
   "summaryExpense": "Expense",
   "summaryBalance": "Balance",
   "currencySymbol": "¥",
-  "noTransactions": "No transactions"
+  "noTransactions": "No transactions",
+  "statistics": "Statistics",
+  "statisticsTimeRange": "Time Range",
+  "statisticsWeek": "This Week",
+  "statisticsMonth": "This Month", 
+  "statisticsYear": "This Year",
+  "statisticsCustom": "Custom",
+  "statisticsOverview": "Overview",
+  "statisticsTrend": "Trend",
+  "statisticsExpenseByCategory": "Expense by Category",
+  "statisticsIncomeByCategory": "Income by Category",
+  "statisticsNoData": "No Data"
 }

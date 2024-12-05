@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/account_item_provider.dart';
 import './category_dialog.dart';
-import 'package:intl/intl.dart';
 import '../../../l10n/l10n.dart';
 
 class CategorySelector extends StatelessWidget {

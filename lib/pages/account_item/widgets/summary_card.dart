@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../constants/app_colors.dart';
 import '../../../l10n/l10n.dart';
 
 class SummaryCard extends StatelessWidget {

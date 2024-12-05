@@ -13,13 +13,21 @@ import '../constants/app_colors.dart';
 import 'account_item/widgets/summary_card.dart';
 import '../models/account_item.dart';
 import '../l10n/l10n.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountItemList extends StatefulWidget {
+  final void Function(Map<String, dynamic>)? onBookSelected;
+
+  const AccountItemList({
+    super.key,
+    this.onBookSelected,
+  });
+
   @override
-  State<AccountItemList> createState() => AccountItemListState();
+  State<AccountItemList> createState() => _AccountItemListState();
 }
 
-class AccountItemListState extends State<AccountItemList> {
+class _AccountItemListState extends State<AccountItemList> {
   List<AccountItem> _accountItems = [];
   List<Map<String, dynamic>> _accountBooks = [];
   List<String> _categories = [];
@@ -99,10 +107,19 @@ class AccountItemListState extends State<AccountItemList> {
   // 修改选择账本的回调方法
   void _onBookSelected(Map<String, dynamic> book) async {
     setState(() => _selectedBook = book);
-    // 保存选中的账本ID
+
+    // 保存选中的账本ID和名称
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('currentBookId', book['id']);
+    await prefs.setString('currentBookName', book['name']);
     await UserService.setCurrentAccountBookId(book['id']);
+
+    // 调用回调通知父组件
+    widget.onBookSelected?.call(book);
+
+    // 重新加载数据
     await _loadCategories();
-    _loadAccountItems();
+    await _loadAccountItems();
   }
 
   @override

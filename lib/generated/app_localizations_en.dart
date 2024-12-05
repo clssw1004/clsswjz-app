@@ -729,4 +729,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noTransactions => 'No transactions';
+
+  @override
+  String get statistics => 'Statistics';
+
+  @override
+  String get statisticsTimeRange => 'Time Range';
+
+  @override
+  String get statisticsWeek => 'This Week';
+
+  @override
+  String get statisticsMonth => 'This Month';
+
+  @override
+  String get statisticsYear => 'This Year';
+
+  @override
+  String get statisticsCustom => 'Custom';
+
+  @override
+  String get statisticsOverview => 'Overview';
+
+  @override
+  String get statisticsTrend => 'Trend';
+
+  @override
+  String get statisticsExpenseByCategory => 'Expense by Category';
+
+  @override
+  String get statisticsIncomeByCategory => 'Income by Category';
+
+  @override
+  String get statisticsNoData => 'No Data';
 }

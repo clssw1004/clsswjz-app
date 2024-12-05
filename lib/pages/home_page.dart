@@ -1,53 +1,88 @@
 import 'package:flutter/material.dart';
 import 'account_item_list.dart';
 import 'settings_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'statistics/statistics_page.dart';
+import '../l10n/l10n.dart';
 
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => HomePageState();
 }
 
-class HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
-
-  late final List<Widget> _pages;
+  String? _currentBookId;
+  String? _currentBookName;
 
   @override
   void initState() {
     super.initState();
-    _pages = [
-      AccountItemList(),
-      Center(child: Text('统计')), // 待实现
-      SettingsPage(),
-    ];
+    _loadCurrentBook();
+  }
+
+  Future<void> _loadCurrentBook() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentBookId = prefs.getString('currentBookId');
+      _currentBookName = prefs.getString('currentBookName');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
+
+    final pages = [
+      AccountItemList(
+        onBookSelected: (book) {
+          _selectBook(book);
+        },
+      ),
+      if (_currentBookId != null)
+        const StatisticsPage()
+      else
+        _buildNoBookSelected(),
+      SettingsPage(),
+    ];
 
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: pages[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) {
+          if (index == 1 && _currentBookId == null) {
+            // 如果点击统计但没有选择账本，显示提示
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.pleaseSelectBook),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+            return;
+          }
           setState(() {
             _currentIndex = index;
           });
         },
         destinations: [
           NavigationDestination(
-            icon: Icon(Icons.list),
-            label: '账目',
+            icon: const Icon(Icons.list_alt_outlined),
+            selectedIcon: const Icon(Icons.list_alt),
+            label: l10n.accountBookList,
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart),
-            label: '统计',
+            icon: const Icon(Icons.analytics_outlined),
+            selectedIcon: const Icon(Icons.analytics),
+            label: l10n.statistics,
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings),
-            label: '设置',
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings),
+            label: l10n.settings,
           ),
         ],
         backgroundColor: colorScheme.surface,
@@ -57,5 +92,37 @@ class HomePageState extends State<HomePage> {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       ),
     );
+  }
+
+  Widget _buildNoBookSelected() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 48,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            L10n.of(context).pleaseSelectBook,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _selectBook(Map<String, dynamic> book) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('currentBookId', book['id']);
+    await prefs.setString('currentBookName', book['name']);
+    setState(() {
+      _currentBookId = book['id'];
+      _currentBookName = book['name'];
+    });
   }
 }

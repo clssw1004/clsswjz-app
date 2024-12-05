@@ -14,6 +14,8 @@ import 'package:flutter/services.dart';
 import 'providers/locale_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/app_localizations.dart';
+import 'data/http/http_data_source.dart';
+import 'data/data_source.dart';
 
 Future<Map<String, dynamic>?> _initializeApp() async {
   try {
@@ -32,13 +34,13 @@ Future<Map<String, dynamic>?> _initializeApp() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 加载主题
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
 
-  // 加载语言设置
   final localeProvider = LocaleProvider();
   await localeProvider.loadSavedLocale();
+
+  final dataSource = HttpDataSource();
 
   if (!kIsWeb && Platform.isAndroid) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -50,7 +52,6 @@ void main() async {
       ),
     );
 
-    // 启用 Android 返回手势
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.edgeToEdge,
       overlays: [SystemUiOverlay.top],
@@ -58,72 +59,68 @@ void main() async {
   }
 
   runApp(
-    Builder(
-      builder: (context) {
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(value: themeProvider),
-            ChangeNotifierProvider.value(value: localeProvider),
-          ],
-          child: Consumer2<ThemeProvider, LocaleProvider>(
-            builder: (context, themeProvider, localeProvider, _) {
-              return MaterialApp(
-                theme: themeProvider.lightTheme,
-                darkTheme: themeProvider.darkTheme,
-                themeMode: themeProvider.themeMode,
-                title: '记账本',
-                routes: {
-                  '/login': (context) => LoginPage(),
-                  '/register': (context) => RegisterPage(),
-                  '/account-books': (context) => AccountBookList(),
-                  '/create-account-book': (context) => CreateAccountBookPage(),
-                  '/user-info': (context) => UserInfoPage(),
-                },
-                onGenerateRoute: (settings) {
-                  if (settings.name == '/home') {
-                    return MaterialPageRoute(
-                      builder: (context) => HomePage(),
-                    );
-                  }
-                  return null;
-                },
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('zh'),
-                  Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
-                  Locale('en'),
-                ],
-                locale: localeProvider.locale,
-                home: Builder(
-                  builder: (context) {
-                    return FutureBuilder<Map<String, dynamic>?>(
-                      future: _initializeApp(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Scaffold(
-                            body: Center(
-                              child: CircularProgressIndicator(
-                                color: themeProvider.themeColor,
-                              ),
-                            ),
-                          );
-                        }
-                        return snapshot.data != null ? HomePage() : LoginPage();
-                      },
-                    );
-                  },
-                ),
-              );
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: themeProvider),
+        ChangeNotifierProvider.value(value: localeProvider),
+        Provider<DataSource>.value(value: dataSource),
+      ],
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, themeProvider, localeProvider, _) {
+          return MaterialApp(
+            theme: themeProvider.lightTheme,
+            darkTheme: themeProvider.darkTheme,
+            themeMode: themeProvider.themeMode,
+            title: '记账本',
+            routes: {
+              '/login': (context) => LoginPage(),
+              '/register': (context) => RegisterPage(),
+              '/account-books': (context) => AccountBookList(),
+              '/create-account-book': (context) => CreateAccountBookPage(),
+              '/user-info': (context) => UserInfoPage(),
             },
-          ),
-        );
-      },
+            onGenerateRoute: (settings) {
+              if (settings.name == '/home') {
+                return MaterialPageRoute(
+                  builder: (context) => HomePage(),
+                );
+              }
+              return null;
+            },
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('zh'),
+              Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+              Locale('en'),
+            ],
+            locale: localeProvider.locale,
+            home: Builder(
+              builder: (context) {
+                return FutureBuilder<Map<String, dynamic>?>(
+                  future: _initializeApp(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Scaffold(
+                        body: Center(
+                          child: CircularProgressIndicator(
+                            color: themeProvider.themeColor,
+                          ),
+                        ),
+                      );
+                    }
+                    return snapshot.data != null ? HomePage() : LoginPage();
+                  },
+                );
+              },
+            ),
+          );
+        },
+      ),
     ),
   );
 }
