@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/l10n.dart';
 
 class TypeSelector extends StatelessWidget {
   final String value;
@@ -14,6 +15,7 @@ class TypeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Container(
       height: 40,
@@ -25,15 +27,15 @@ class TypeSelector extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _TypeButton(
-            label: '支出',
-            isSelected: value == '支出',
-            onPressed: () => onChanged('支出'),
+            label: l10n.expenseType,
+            isSelected: value == l10n.expenseType,
+            onPressed: () => onChanged(l10n.expenseType),
             color: Color(0xFFE53935), // Material Red 600
           ),
           _TypeButton(
-            label: '收入',
-            isSelected: value == '收入',
-            onPressed: () => onChanged('收入'),
+            label: l10n.incomeType,
+            isSelected: value == l10n.incomeType,
+            onPressed: () => onChanged(l10n.incomeType),
             color: Color(0xFF43A047), // Material Green 600
           ),
         ],
