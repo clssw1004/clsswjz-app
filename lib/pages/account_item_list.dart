@@ -12,6 +12,7 @@ import '../utils/message_helper.dart';
 import '../constants/app_colors.dart';
 import 'account_item/widgets/summary_card.dart';
 import '../models/account_item.dart';
+import '../l10n/l10n.dart';
 
 class AccountItemList extends StatefulWidget {
   @override
@@ -106,12 +107,14 @@ class AccountItemListState extends State<AccountItemList> {
 
   @override
   Widget build(BuildContext context) {
-    // 获取屏幕尺寸
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final isLargeScreen = screenWidth > 600;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: AppBarFactory.buildAppBar(
         context: context,
@@ -123,7 +126,7 @@ class AccountItemListState extends State<AccountItemList> {
         actions: [
           IconButton(
             icon: Icon(Icons.filter_list),
-            tooltip: '筛选',
+            tooltip: l10n.filter,
             onPressed: () {
               setState(() {
                 _isFilterExpanded = !_isFilterExpanded;
@@ -228,10 +231,10 @@ class AccountItemListState extends State<AccountItemList> {
       floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
           ? FloatingActionButton(
               onPressed: _addNewRecord,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
               elevation: 2,
-              tooltip: '新增记录',
+              tooltip: l10n.newRecord,
               child: Icon(Icons.add),
             )
           : null,
@@ -318,6 +321,7 @@ class AccountItemListState extends State<AccountItemList> {
   }
 
   Widget _buildEmptyView(ColorScheme colorScheme) {
+    final l10n = L10n.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -329,7 +333,7 @@ class AccountItemListState extends State<AccountItemList> {
           ),
           SizedBox(height: 16),
           Text(
-            '暂无账目记录',
+            l10n.noAccountItems,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 16,
@@ -401,17 +405,23 @@ class AccountItemListState extends State<AccountItemList> {
   }
 
   String _formatDateHeader(String date) {
+    final l10n = L10n.of(context);
     final now = DateTime.now();
     final today = DateFormat('yyyy-MM-dd').format(now);
     final yesterday =
         DateFormat('yyyy-MM-dd').format(now.subtract(Duration(days: 1)));
 
     if (date == today) {
-      return '今天';
+      return l10n.today;
     } else if (date == yesterday) {
-      return '昨天';
+      return l10n.yesterday;
     }
-    return DateFormat('MM月dd日').format(DateTime.parse(date));
+
+    final dateTime = DateTime.parse(date);
+    return l10n.monthDayFormat(
+      dateTime.month.toString(),
+      dateTime.day.toString(),
+    );
   }
 
   Widget _buildAccountItem(BuildContext context, AccountItem item) {

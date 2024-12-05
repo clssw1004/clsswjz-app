@@ -85,7 +85,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateSuccess => '更新成功';
 
   @override
-  String registerTime(String time) {
+  String registerTime(Object time) {
     return '注册时间：$time';
   }
 
@@ -124,27 +124,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get merchantManagement => '商家管理';
-
-  @override
-  String get serverUrlRequired => 'Server URL is required';
-
-  @override
-  String get serverStatusNormal => 'Server status: Normal';
-
-  @override
-  String get serverStatusError => 'Server status: Error';
-
-  @override
-  String get databaseStatus => 'Database status';
-
-  @override
-  String get memoryUsage => 'Memory usage';
-
-  @override
-  String get saveSuccessRestartRequired => 'Save successful, please restart the app';
-
-  @override
-  String get saveFailed => 'Save failed';
 
   @override
   String get themeColorTitle => '主题颜色';
@@ -201,7 +180,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get createSuccess => '创建成功';
 
   @override
-  String createFailed(String error) {
+  String createFailed(Object error) {
     return '创建失败：$error';
   }
 
@@ -284,30 +263,88 @@ class AppLocalizationsZh extends AppLocalizations {
   String get other => '其他';
 
   @override
-  String get accountBookList => 'Account Books';
+  String get filter => '筛选';
 
   @override
-  String get newAccountBook => 'New Account Book';
+  String get noAccountItems => '暂无账目记录';
 
   @override
-  String get retryLoading => 'Retry';
+  String get newRecord => '新增记录';
 
   @override
-  String get loadAccountBooksFailed => 'Failed to load account books';
+  String get today => '今天';
 
   @override
-  String get noAccountBooks => 'No account books';
+  String get yesterday => '昨天';
 
   @override
-  String get unnamedBook => 'Unnamed Book';
-
-  @override
-  String sharedFrom(String name) {
-    return 'Shared from $name';
+  String monthDayFormat(Object day, Object month) {
+    return '$month月$day日';
   }
 
   @override
-  String get unknownUser => 'Unknown User';
+  String get filterConditions => '筛选条件';
+
+  @override
+  String get clearFilter => '清空筛选';
+
+  @override
+  String get type => '类型';
+
+  @override
+  String get expense => '支出';
+
+  @override
+  String get income => '收入';
+
+  @override
+  String get category => '分类';
+
+  @override
+  String selectedCount(Object count) {
+    return '已选$count项';
+  }
+
+  @override
+  String get amount => '金额';
+
+  @override
+  String get date => '日期';
+
+  @override
+  String get filtered => '已筛选';
+
+  @override
+  String get totalIncome => '收入';
+
+  @override
+  String get totalExpense => '支出';
+
+  @override
+  String get balance => '结余';
+
+  @override
+  String get accountBookList => '账本列表';
+
+  @override
+  String get newAccountBook => '新建账本';
+
+  @override
+  String get retryLoading => '重试';
+
+  @override
+  String get noAccountBooks => '暂无账本';
+
+  @override
+  String get unnamedBook => '未命名账本';
+
+  @override
+  String sharedFrom(String name) {
+    return '共享自$name';
+  }
+
+  @override
+  String get unknownUser => '未知用户';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -393,7 +430,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get updateSuccess => '更新成功';
 
   @override
-  String registerTime(String time) {
+  String registerTime(Object time) {
     return '註冊時間：$time';
   }
 
@@ -488,7 +525,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get createSuccess => '創建成功';
 
   @override
-  String createFailed(String error) {
+  String createFailed(Object error) {
     return '創建失敗：$error';
   }
 
@@ -505,7 +542,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get noDefaultBook => '未選擇默認賬本';
 
   @override
-  String get updateShopSuccess => '更新成功';
+  String get updateShopSuccess => '更新成';
 
   @override
   String get createShopSuccess => '創建成功';
@@ -569,4 +606,88 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get other => '其他';
+
+  @override
+  String get filter => '篩選';
+
+  @override
+  String get noAccountItems => '暫無賬目記錄';
+
+  @override
+  String get newRecord => '新增記錄';
+
+  @override
+  String get today => '今天';
+
+  @override
+  String get yesterday => '昨天';
+
+  @override
+  String monthDayFormat(Object day, Object month) {
+    return '$month月$day日';
+  }
+
+  @override
+  String get filterConditions => '篩選條件';
+
+  @override
+  String get clearFilter => '清空篩選';
+
+  @override
+  String get type => '類型';
+
+  @override
+  String get expense => '支出';
+
+  @override
+  String get income => '收入';
+
+  @override
+  String get category => '分類';
+
+  @override
+  String selectedCount(Object count) {
+    return '已選$count項';
+  }
+
+  @override
+  String get amount => '金額';
+
+  @override
+  String get date => '日期';
+
+  @override
+  String get filtered => '已篩選';
+
+  @override
+  String get totalIncome => '收入';
+
+  @override
+  String get totalExpense => '支出';
+
+  @override
+  String get balance => '結餘';
+
+  @override
+  String get accountBookList => '賬本列表';
+
+  @override
+  String get newAccountBook => '新建賬本';
+
+  @override
+  String get retryLoading => '重試';
+
+  @override
+  String get noAccountBooks => '暫無賬本';
+
+  @override
+  String get unnamedBook => '未命名賬本';
+
+  @override
+  String sharedFrom(String name) {
+    return '共享自$name';
+  }
+
+  @override
+  String get unknownUser => '未知用戶';
 }

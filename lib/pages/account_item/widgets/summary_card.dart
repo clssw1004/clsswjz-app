@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../constants/theme_constants.dart';
+import '../../../constants/app_colors.dart';
+import '../../../l10n/l10n.dart';
 
 class SummaryCard extends StatelessWidget {
   final double allIn;
@@ -22,7 +23,7 @@ class SummaryCard extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimens.radius),
+        borderRadius: BorderRadius.circular(12),
         side: BorderSide(
           color: colorScheme.outlineVariant.withOpacity(0.5),
         ),
@@ -36,7 +37,7 @@ class SummaryCard extends StatelessWidget {
                 context,
                 label: '收入',
                 amount: allIn,
-                color: Colors.green,
+                color: AppColors.income,
               ),
             ),
             Container(
@@ -49,7 +50,7 @@ class SummaryCard extends StatelessWidget {
                 context,
                 label: '支出',
                 amount: allOut,
-                color: Colors.red,
+                color: AppColors.expense,
               ),
             ),
             Container(
@@ -79,11 +80,16 @@ class SummaryCard extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Column(
       children: [
         Text(
-          label,
+          label == '收入'
+              ? l10n.totalIncome
+              : label == '支出'
+                  ? l10n.totalExpense
+                  : l10n.balance,
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/language.dart';
+import '../l10n/l10n.dart';
 
 class LocaleProvider extends ChangeNotifier {
   static const String _localeKey = 'app_locale';
@@ -13,11 +14,18 @@ class LocaleProvider extends ChangeNotifier {
   }
 
   Future<void> _loadSavedLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedLocale = prefs.getString(_localeKey);
-    if (savedLocale != null) {
-      final language = Language.fromCode(savedLocale);
-      _setLocale(language);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedLocale = prefs.getString(_localeKey);
+      if (savedLocale != null) {
+        final language = Language.fromCode(savedLocale);
+        _setLocale(language);
+      } else {
+        _setLocale(Language.ZH_CN);
+      }
+    } catch (e) {
+      print('加载语言设置失败: $e');
+      _setLocale(Language.ZH_CN);
     }
   }
 

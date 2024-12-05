@@ -96,551 +96,623 @@ abstract class AppLocalizations {
     Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')
   ];
 
-  /// The application name
+  /// No description provided for @appName.
   ///
   /// In en, this message translates to:
   /// **'Account Book'**
   String get appName;
 
-  /// Settings page title
+  /// No description provided for @settings.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
   String get settings;
 
-  /// Account management section title
+  /// No description provided for @accountManagement.
   ///
   /// In en, this message translates to:
   /// **'Account Management'**
   String get accountManagement;
 
-  /// Theme settings section title
+  /// No description provided for @themeSettings.
   ///
   /// In en, this message translates to:
   /// **'Theme Settings'**
   String get themeSettings;
 
-  /// System settings section title
+  /// No description provided for @systemSettings.
   ///
   /// In en, this message translates to:
   /// **'System Settings'**
   String get systemSettings;
 
-  /// Category management menu item
+  /// No description provided for @categoryManagement.
   ///
   /// In en, this message translates to:
   /// **'Category Management'**
   String get categoryManagement;
 
-  /// Shop management menu item
+  /// No description provided for @shopManagement.
   ///
   /// In en, this message translates to:
   /// **'Shop Management'**
   String get shopManagement;
 
-  /// Fund management menu item
+  /// No description provided for @fundManagement.
   ///
   /// In en, this message translates to:
   /// **'Fund Management'**
   String get fundManagement;
 
-  /// Create account book menu item
+  /// No description provided for @createAccountBook.
   ///
   /// In en, this message translates to:
   /// **'Create Account Book'**
   String get createAccountBook;
 
-  /// Server settings menu item
+  /// No description provided for @serverSettings.
   ///
   /// In en, this message translates to:
   /// **'Server Settings'**
   String get serverSettings;
 
-  /// Logout button text
+  /// No description provided for @logout.
   ///
   /// In en, this message translates to:
   /// **'Logout'**
   String get logout;
 
-  /// Logout confirmation dialog title
+  /// No description provided for @confirmLogout.
   ///
   /// In en, this message translates to:
   /// **'Confirm Logout'**
   String get confirmLogout;
 
-  /// Logout confirmation dialog message
+  /// No description provided for @confirmLogoutMessage.
   ///
   /// In en, this message translates to:
   /// **'Are you sure you want to logout?'**
   String get confirmLogoutMessage;
 
-  /// Cancel button text
+  /// No description provided for @cancel.
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
 
-  /// Confirm button text
+  /// No description provided for @confirm.
   ///
   /// In en, this message translates to:
   /// **'Confirm'**
   String get confirm;
 
-  /// User info page title
+  /// No description provided for @userInfo.
   ///
   /// In en, this message translates to:
   /// **'User Info'**
   String get userInfo;
 
-  /// Nickname field label
+  /// No description provided for @nickname.
   ///
   /// In en, this message translates to:
   /// **'Nickname'**
   String get nickname;
 
-  /// Email field label
+  /// No description provided for @email.
   ///
   /// In en, this message translates to:
   /// **'Email'**
   String get email;
 
-  /// Phone field label
+  /// No description provided for @phone.
   ///
   /// In en, this message translates to:
   /// **'Phone'**
   String get phone;
 
-  /// Language settings field label
+  /// No description provided for @languageSettings.
   ///
   /// In en, this message translates to:
   /// **'Language Settings'**
   String get languageSettings;
 
-  /// Timezone settings field label
+  /// No description provided for @timezoneSettings.
   ///
   /// In en, this message translates to:
   /// **'Timezone Settings'**
   String get timezoneSettings;
 
-  /// Invite code field label
+  /// No description provided for @inviteCode.
   ///
   /// In en, this message translates to:
   /// **'Invite Code'**
   String get inviteCode;
 
-  /// Reset button text
+  /// No description provided for @reset.
   ///
   /// In en, this message translates to:
   /// **'Reset'**
   String get reset;
 
-  /// Reset success message
+  /// No description provided for @resetSuccess.
   ///
   /// In en, this message translates to:
   /// **'Reset successful'**
   String get resetSuccess;
 
-  /// Copied to clipboard message
+  /// No description provided for @copied.
   ///
   /// In en, this message translates to:
   /// **'Copied to clipboard'**
   String get copied;
 
-  /// Update success message
+  /// No description provided for @updateSuccess.
   ///
   /// In en, this message translates to:
   /// **'Update successful'**
   String get updateSuccess;
 
-  /// Register time text
+  /// No description provided for @registerTime.
   ///
   /// In en, this message translates to:
   /// **'Register time: {time}'**
-  String registerTime(String time);
+  String registerTime(Object time);
 
-  /// Developer mode menu item
+  /// No description provided for @developerMode.
   ///
   /// In en, this message translates to:
   /// **'Developer Mode'**
   String get developerMode;
 
-  /// Theme mode menu item
+  /// No description provided for @themeMode.
   ///
   /// In en, this message translates to:
   /// **'Theme Mode'**
   String get themeMode;
 
-  /// Theme color menu item
+  /// No description provided for @themeColor.
   ///
   /// In en, this message translates to:
   /// **'Theme Color'**
   String get themeColor;
 
-  /// Light theme mode
+  /// No description provided for @light.
   ///
   /// In en, this message translates to:
   /// **'Light'**
   String get light;
 
-  /// Dark theme mode
+  /// No description provided for @dark.
   ///
   /// In en, this message translates to:
   /// **'Dark'**
   String get dark;
 
-  /// System theme mode
+  /// No description provided for @system.
   ///
   /// In en, this message translates to:
   /// **'System'**
   String get system;
 
-  /// Server URL dialog title
+  /// No description provided for @serverUrl.
   ///
   /// In en, this message translates to:
   /// **'Server URL'**
   String get serverUrl;
 
-  /// Save button text
+  /// No description provided for @save.
   ///
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
 
-  /// Nickname required error message
+  /// No description provided for @nicknameRequired.
   ///
   /// In en, this message translates to:
   /// **'Nickname is required'**
   String get nicknameRequired;
 
-  /// Invalid email error message
+  /// No description provided for @invalidEmail.
   ///
   /// In en, this message translates to:
   /// **'Invalid email format'**
   String get invalidEmail;
 
-  /// Invalid phone error message
+  /// No description provided for @invalidPhone.
   ///
   /// In en, this message translates to:
   /// **'Invalid phone number format'**
   String get invalidPhone;
 
-  /// Merchant management menu item
+  /// No description provided for @merchantManagement.
   ///
   /// In en, this message translates to:
   /// **'Merchant Management'**
   String get merchantManagement;
 
-  /// No description provided for @serverUrlRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Server URL is required'**
-  String get serverUrlRequired;
-
-  /// No description provided for @serverStatusNormal.
-  ///
-  /// In en, this message translates to:
-  /// **'Server status: Normal'**
-  String get serverStatusNormal;
-
-  /// No description provided for @serverStatusError.
-  ///
-  /// In en, this message translates to:
-  /// **'Server status: Error'**
-  String get serverStatusError;
-
-  /// No description provided for @databaseStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'Database status'**
-  String get databaseStatus;
-
-  /// No description provided for @memoryUsage.
-  ///
-  /// In en, this message translates to:
-  /// **'Memory usage'**
-  String get memoryUsage;
-
-  /// No description provided for @saveSuccessRestartRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Save successful, please restart the app'**
-  String get saveSuccessRestartRequired;
-
-  /// No description provided for @saveFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Save failed'**
-  String get saveFailed;
-
-  /// Theme color dialog title
+  /// No description provided for @themeColorTitle.
   ///
   /// In en, this message translates to:
   /// **'Theme Color'**
   String get themeColorTitle;
 
-  /// Theme color dialog subtitle
+  /// No description provided for @themeColorSubtitle.
   ///
   /// In en, this message translates to:
   /// **'Choose your favorite theme color'**
   String get themeColorSubtitle;
 
-  /// Failed to load server URL message
+  /// No description provided for @loadServerUrlFailed.
   ///
   /// In en, this message translates to:
   /// **'Failed to load server URL'**
   String get loadServerUrlFailed;
 
-  /// Server URL input hint
+  /// No description provided for @serverUrlHint.
   ///
   /// In en, this message translates to:
   /// **'http://example.com:3000'**
   String get serverUrlHint;
 
-  /// Login page title and button text
+  /// No description provided for @login.
   ///
   /// In en, this message translates to:
   /// **'Login'**
   String get login;
 
-  /// Username field label
+  /// No description provided for @username.
   ///
   /// In en, this message translates to:
   /// **'Username'**
   String get username;
 
-  /// Password field label
+  /// No description provided for @password.
   ///
   /// In en, this message translates to:
   /// **'Password'**
   String get password;
 
-  /// Username required error message
+  /// No description provided for @usernameRequired.
   ///
   /// In en, this message translates to:
   /// **'Username is required'**
   String get usernameRequired;
 
-  /// Password required error message
+  /// No description provided for @passwordRequired.
   ///
   /// In en, this message translates to:
   /// **'Password is required'**
   String get passwordRequired;
 
-  /// Register link text
+  /// No description provided for @noAccount.
   ///
   /// In en, this message translates to:
   /// **'No account? Register now'**
   String get noAccount;
 
-  /// Book name field label
+  /// No description provided for @bookName.
   ///
   /// In en, this message translates to:
   /// **'Book Name'**
   String get bookName;
 
-  /// Book name field hint
+  /// No description provided for @bookNameHint.
   ///
   /// In en, this message translates to:
   /// **'Please enter book name'**
   String get bookNameHint;
 
-  /// Book name required error message
+  /// No description provided for @bookNameRequired.
   ///
   /// In en, this message translates to:
   /// **'Book name is required'**
   String get bookNameRequired;
 
-  /// Book description field label
+  /// No description provided for @bookDescription.
   ///
   /// In en, this message translates to:
   /// **'Description'**
   String get bookDescription;
 
-  /// Book description field hint
+  /// No description provided for @bookDescriptionHint.
   ///
   /// In en, this message translates to:
   /// **'Please enter description (optional)'**
   String get bookDescriptionHint;
 
-  /// Currency field label
+  /// No description provided for @currency.
   ///
   /// In en, this message translates to:
   /// **'Currency'**
   String get currency;
 
-  /// Create book button text
+  /// No description provided for @createBook.
   ///
   /// In en, this message translates to:
   /// **'Create Book'**
   String get createBook;
 
-  /// Create success message
+  /// No description provided for @createSuccess.
   ///
   /// In en, this message translates to:
   /// **'Created successfully'**
   String get createSuccess;
 
-  /// Create failed message
+  /// No description provided for @createFailed.
   ///
   /// In en, this message translates to:
   /// **'Create failed: {error}'**
-  String createFailed(String error);
+  String createFailed(Object error);
 
-  /// New shop button tooltip
+  /// No description provided for @newShop.
   ///
   /// In en, this message translates to:
   /// **'New Shop'**
   String get newShop;
 
-  /// Edit shop dialog title
+  /// No description provided for @editShop.
   ///
   /// In en, this message translates to:
   /// **'Edit Shop'**
   String get editShop;
 
-  /// Shop name field label
+  /// No description provided for @shopName.
   ///
   /// In en, this message translates to:
   /// **'Shop Name'**
   String get shopName;
 
-  /// Error message when no default book is selected
+  /// No description provided for @noDefaultBook.
   ///
   /// In en, this message translates to:
   /// **'No default account book selected'**
   String get noDefaultBook;
 
-  /// Shop update success message
+  /// No description provided for @updateShopSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Shop updated successfully'**
+  /// **'Update successful'**
   String get updateShopSuccess;
 
-  /// Shop create success message
+  /// No description provided for @createShopSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Shop created successfully'**
+  /// **'Create successful'**
   String get createShopSuccess;
 
-  /// Shop name required error message
+  /// No description provided for @shopNameRequired.
   ///
   /// In en, this message translates to:
   /// **'Shop name is required'**
   String get shopNameRequired;
 
-  /// New category button tooltip
+  /// No description provided for @newCategory.
   ///
   /// In en, this message translates to:
   /// **'New Category'**
   String get newCategory;
 
-  /// Edit category dialog title
+  /// No description provided for @editCategory.
   ///
   /// In en, this message translates to:
   /// **'Edit Category'**
   String get editCategory;
 
-  /// Category name field label
+  /// No description provided for @categoryName.
   ///
   /// In en, this message translates to:
   /// **'Category Name'**
   String get categoryName;
 
-  /// Category name required error message
+  /// No description provided for @categoryNameRequired.
   ///
   /// In en, this message translates to:
   /// **'Category name is required'**
   String get categoryNameRequired;
 
-  /// Category update success message
+  /// No description provided for @updateCategorySuccess.
   ///
   /// In en, this message translates to:
-  /// **'Category updated successfully'**
+  /// **'Update successful'**
   String get updateCategorySuccess;
 
-  /// Category create success message
+  /// No description provided for @createCategorySuccess.
   ///
   /// In en, this message translates to:
-  /// **'Category created successfully'**
+  /// **'Create successful'**
   String get createCategorySuccess;
 
-  /// New fund account button tooltip
+  /// No description provided for @newFund.
   ///
   /// In en, this message translates to:
   /// **'New Account'**
   String get newFund;
 
-  /// Edit fund account dialog title
+  /// No description provided for @editFund.
   ///
   /// In en, this message translates to:
   /// **'Edit Account'**
   String get editFund;
 
-  /// Fund account name field label
+  /// No description provided for @fundName.
   ///
   /// In en, this message translates to:
   /// **'Account Name'**
   String get fundName;
 
-  /// Fund account name required error message
+  /// No description provided for @fundNameRequired.
   ///
   /// In en, this message translates to:
   /// **'Account name is required'**
   String get fundNameRequired;
 
-  /// Fund account type field label
+  /// No description provided for @fundType.
   ///
   /// In en, this message translates to:
   /// **'Account Type'**
   String get fundType;
 
-  /// Fund account update success message
+  /// No description provided for @updateFundSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Account updated successfully'**
+  /// **'Update successful'**
   String get updateFundSuccess;
 
-  /// Fund account create success message
+  /// No description provided for @createFundSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Account created successfully'**
+  /// **'Create successful'**
   String get createFundSuccess;
 
-  /// Cash account type
+  /// No description provided for @cash.
   ///
   /// In en, this message translates to:
   /// **'Cash'**
   String get cash;
 
-  /// Bank card account type
+  /// No description provided for @bankCard.
   ///
   /// In en, this message translates to:
   /// **'Bank Card'**
   String get bankCard;
 
-  /// Credit card account type
+  /// No description provided for @creditCard.
   ///
   /// In en, this message translates to:
   /// **'Credit Card'**
   String get creditCard;
 
-  /// Alipay account type
+  /// No description provided for @alipay.
   ///
   /// In en, this message translates to:
   /// **'Alipay'**
   String get alipay;
 
-  /// WeChat Pay account type
+  /// No description provided for @wechat.
   ///
   /// In en, this message translates to:
   /// **'WeChat Pay'**
   String get wechat;
 
-  /// Other account type
+  /// No description provided for @other.
   ///
   /// In en, this message translates to:
   /// **'Other'**
   String get other;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @noAccountItems.
+  ///
+  /// In en, this message translates to:
+  /// **'No account records'**
+  String get noAccountItems;
+
+  /// No description provided for @newRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'New Record'**
+  String get newRecord;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @monthDayFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}/{day}'**
+  String monthDayFormat(Object day, Object month);
+
+  /// No description provided for @filterConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Conditions'**
+  String get filterConditions;
+
+  /// No description provided for @clearFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Filter'**
+  String get clearFilter;
+
+  /// No description provided for @type.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get type;
+
+  /// No description provided for @expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get expense;
+
+  /// No description provided for @income.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get income;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @selectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Selected'**
+  String selectedCount(Object count);
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @filtered.
+  ///
+  /// In en, this message translates to:
+  /// **'Filtered'**
+  String get filtered;
+
+  /// No description provided for @totalIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get totalIncome;
+
+  /// No description provided for @totalExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get totalExpense;
+
+  /// No description provided for @balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get balance;
 
   /// Account book list page title
   ///
@@ -659,12 +731,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get retryLoading;
-
-  /// Error message when loading account books fails
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load account books'**
-  String get loadAccountBooksFailed;
 
   /// Message when no account books exist
   ///

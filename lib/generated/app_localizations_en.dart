@@ -85,7 +85,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateSuccess => 'Update successful';
 
   @override
-  String registerTime(String time) {
+  String registerTime(Object time) {
     return 'Register time: $time';
   }
 
@@ -124,27 +124,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get merchantManagement => 'Merchant Management';
-
-  @override
-  String get serverUrlRequired => 'Server URL is required';
-
-  @override
-  String get serverStatusNormal => 'Server status: Normal';
-
-  @override
-  String get serverStatusError => 'Server status: Error';
-
-  @override
-  String get databaseStatus => 'Database status';
-
-  @override
-  String get memoryUsage => 'Memory usage';
-
-  @override
-  String get saveSuccessRestartRequired => 'Save successful, please restart the app';
-
-  @override
-  String get saveFailed => 'Save failed';
 
   @override
   String get themeColorTitle => 'Theme Color';
@@ -201,7 +180,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createSuccess => 'Created successfully';
 
   @override
-  String createFailed(String error) {
+  String createFailed(Object error) {
     return 'Create failed: $error';
   }
 
@@ -218,10 +197,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noDefaultBook => 'No default account book selected';
 
   @override
-  String get updateShopSuccess => 'Shop updated successfully';
+  String get updateShopSuccess => 'Update successful';
 
   @override
-  String get createShopSuccess => 'Shop created successfully';
+  String get createShopSuccess => 'Create successful';
 
   @override
   String get shopNameRequired => 'Shop name is required';
@@ -239,10 +218,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryNameRequired => 'Category name is required';
 
   @override
-  String get updateCategorySuccess => 'Category updated successfully';
+  String get updateCategorySuccess => 'Update successful';
 
   @override
-  String get createCategorySuccess => 'Category created successfully';
+  String get createCategorySuccess => 'Create successful';
 
   @override
   String get newFund => 'New Account';
@@ -260,10 +239,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fundType => 'Account Type';
 
   @override
-  String get updateFundSuccess => 'Account updated successfully';
+  String get updateFundSuccess => 'Update successful';
 
   @override
-  String get createFundSuccess => 'Account created successfully';
+  String get createFundSuccess => 'Create successful';
 
   @override
   String get cash => 'Cash';
@@ -284,6 +263,67 @@ class AppLocalizationsEn extends AppLocalizations {
   String get other => 'Other';
 
   @override
+  String get filter => 'Filter';
+
+  @override
+  String get noAccountItems => 'No account records';
+
+  @override
+  String get newRecord => 'New Record';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String monthDayFormat(Object day, Object month) {
+    return '$month/$day';
+  }
+
+  @override
+  String get filterConditions => 'Filter Conditions';
+
+  @override
+  String get clearFilter => 'Clear Filter';
+
+  @override
+  String get type => 'Type';
+
+  @override
+  String get expense => 'Expense';
+
+  @override
+  String get income => 'Income';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String selectedCount(Object count) {
+    return '$count Selected';
+  }
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get filtered => 'Filtered';
+
+  @override
+  String get totalIncome => 'Income';
+
+  @override
+  String get totalExpense => 'Expense';
+
+  @override
+  String get balance => 'Balance';
+
+  @override
   String get accountBookList => 'Account Books';
 
   @override
@@ -291,9 +331,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retryLoading => 'Retry';
-
-  @override
-  String get loadAccountBooksFailed => 'Failed to load account books';
 
   @override
   String get noAccountBooks => 'No account books';

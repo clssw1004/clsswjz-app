@@ -3,6 +3,7 @@ import 'dialogs/type_selector_dialog.dart';
 import 'dialogs/category_selector_dialog.dart';
 import 'dialogs/amount_range_dialog.dart';
 import 'dialogs/date_range_dialog.dart';
+import '../../../l10n/l10n.dart';
 
 class FilterSection extends StatelessWidget {
   final bool isExpanded;
@@ -56,12 +57,12 @@ class FilterSection extends StatelessWidget {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       height: isExpanded ? 220 : 0,
-      child: Card(
+      child: Container(
         margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        elevation: 0,
-        shape: RoundedRectangleBorder(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: colorScheme.outlineVariant),
+          border: Border.all(color: colorScheme.outlineVariant),
         ),
         child: SingleChildScrollView(
           child: Padding(
@@ -83,12 +84,13 @@ class FilterSection extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          '筛选条件',
+          l10n.filterConditions,
           style: theme.textTheme.titleSmall?.copyWith(
             color: colorScheme.onSurface,
             fontWeight: FontWeight.w500,
@@ -102,7 +104,7 @@ class FilterSection extends StatelessWidget {
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           child: Text(
-            '清空筛选',
+            l10n.clearFilter,
             style: theme.textTheme.labelSmall?.copyWith(
               color: _hasAnyFilter ? colorScheme.primary : colorScheme.outline,
             ),
@@ -127,39 +129,44 @@ class FilterSection extends StatelessWidget {
   }
 
   Widget _buildTypeButton(BuildContext context) {
+    final l10n = L10n.of(context);
     return _FilterButton(
       label: selectedType == null
-          ? '类型'
+          ? l10n.type
           : selectedType == 'EXPENSE'
-              ? '支出'
-              : '收入',
+              ? l10n.expense
+              : l10n.income,
       isSelected: selectedType != null,
       onPressed: () => _showTypeSelector(context),
     );
   }
 
   Widget _buildCategoryButton(BuildContext context) {
+    final l10n = L10n.of(context);
     return _FilterButton(
-      label:
-          selectedCategories.isEmpty ? '分类' : '已选${selectedCategories.length}',
+      label: selectedCategories.isEmpty
+          ? l10n.category
+          : l10n.selectedCount(selectedCategories.length),
       isSelected: selectedCategories.isNotEmpty,
       onPressed: () => _showCategorySelector(context),
     );
   }
 
   Widget _buildAmountButton(BuildContext context) {
+    final l10n = L10n.of(context);
     final hasAmountFilter = minAmount != null || maxAmount != null;
     return _FilterButton(
-      label: hasAmountFilter ? '已筛选' : '金额',
+      label: hasAmountFilter ? l10n.filtered : l10n.amount,
       isSelected: hasAmountFilter,
       onPressed: () => _showAmountRangeDialog(context),
     );
   }
 
   Widget _buildDateButton(BuildContext context) {
+    final l10n = L10n.of(context);
     final hasDateFilter = startDate != null || endDate != null;
     return _FilterButton(
-      label: hasDateFilter ? '已筛选' : '日期',
+      label: hasDateFilter ? l10n.filtered : l10n.date,
       isSelected: hasDateFilter,
       onPressed: () => _showDateRangeDialog(context),
     );

@@ -88,6 +88,14 @@ void main() async {
             localizationsDelegates: L10n.localizationsDelegates,
             supportedLocales: L10n.supportedLocales,
             locale: localeProvider.locale,
+            localeResolutionCallback: (locale, supportedLocales) {
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale?.languageCode) {
+                  return supportedLocale;
+                }
+              }
+              return const Locale('zh', 'CN');
+            },
             home: FutureBuilder<Map<String, dynamic>?>(
               future: _initializeApp(),
               builder: (context, snapshot) {
