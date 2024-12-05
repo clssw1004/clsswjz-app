@@ -58,7 +58,7 @@ class AmountInput extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: l10n.amountLabel,
                   hintText: l10n.amountHint,
-                  hintStyle: theme.textTheme.headlineMedium?.copyWith(
+                  hintStyle: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
                   isDense: true,

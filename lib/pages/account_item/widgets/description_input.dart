@@ -26,48 +26,37 @@ class DescriptionInput extends StatelessWidget {
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: EdgeInsets.only(top: 4),
-            child: Icon(
-              Icons.description_outlined,
-              size: 18,
-              color: colorScheme.onSurfaceVariant,
-            ),
+          Icon(
+            Icons.description_outlined,
+            size: 18,
+            color: colorScheme.onSurfaceVariant,
           ),
           SizedBox(width: 12),
           Expanded(
-            child: Theme(
-              data: theme.copyWith(
-                inputDecorationTheme: InputDecorationTheme(
-                  filled: false,
-                  fillColor: Colors.transparent,
-                ),
+            child: TextField(
+              controller: controller,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
               ),
-              child: TextField(
-                controller: controller,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
+              decoration: InputDecoration(
+                labelText: l10n.descriptionLabel,
+                hintText: l10n.descriptionHint,
+                hintStyle: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
-                decoration: InputDecoration(
-                  labelText: l10n.descriptionLabel,
-                  hintText: l10n.descriptionHint,
-                  hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  filled: false,
-                  fillColor: Colors.transparent,
-                ),
-                textInputAction: TextInputAction.newline,
-                maxLines: 2,
-                minLines: 1,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
+                fillColor: Colors.transparent,
               ),
+              textInputAction: TextInputAction.newline,
+              maxLines: 2,
+              minLines: 1,
             ),
           ),
         ],
