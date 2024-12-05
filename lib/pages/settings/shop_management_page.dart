@@ -4,6 +4,7 @@ import '../../services/user_service.dart';
 import '../../utils/message_helper.dart';
 import '../../widgets/app_bar_factory.dart';
 import '../../models/models.dart';
+import '../../l10n/l10n.dart';
 
 class ShopManagementPage extends StatefulWidget {
   @override
@@ -47,6 +48,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
   }
 
   Future<void> _createShop() async {
+    final l10n = L10n.of(context);
     final name = await _showNameDialog(context);
     if (name == null || name.isEmpty || !mounted) return;
 
@@ -62,7 +64,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
       await ApiService.createShop(shop);
       await _loadData();
       if (!mounted) return;
-      MessageHelper.showSuccess(context, message: '创建成功');
+      MessageHelper.showSuccess(context, message: l10n.createShopSuccess);
     } catch (e) {
       if (!mounted) return;
       MessageHelper.showError(context, message: e.toString());
@@ -70,6 +72,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
   }
 
   Future<void> _updateShop(Shop shop, String newName) async {
+    final l10n = L10n.of(context);
     try {
       final updatedShop = shop.copyWith(
         name: newName,
@@ -78,7 +81,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
       await ApiService.updateShop(shop.id, updatedShop);
       await _loadData();
       if (!mounted) return;
-      MessageHelper.showSuccess(context, message: '更新成功');
+      MessageHelper.showSuccess(context, message: l10n.updateShopSuccess);
     } catch (e) {
       if (!mounted) return;
       MessageHelper.showError(context, message: e.toString());
@@ -89,6 +92,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
     final controller = TextEditingController(text: initialName);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return showDialog<String>(
       context: context,
@@ -97,12 +101,13 @@ class ShopManagementPageState extends State<ShopManagementPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
         ),
-        title: Text(initialName == null ? '新建商家' : '编辑商家'),
+        title:
+            Text(initialName == null ? l10n.newShopTitle : l10n.editShopTitle),
         content: TextField(
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            labelText: '商家名称',
+            labelText: l10n.shopNameLabel,
             filled: true,
             fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
             border: OutlineInputBorder(
@@ -131,7 +136,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text('取消'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
@@ -141,7 +146,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text(initialName == null ? '创建' : '保存'),
+            child: Text(initialName == null ? l10n.create : l10n.save),
           ),
         ],
       ),
@@ -152,17 +157,18 @@ class ShopManagementPageState extends State<ShopManagementPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: AppBarFactory.buildTitle(context, '商家管理'),
+        title: AppBarFactory.buildTitle(context, l10n.shopManagementTitle),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            tooltip: '新建商家',
+            tooltip: l10n.newShopButton,
             onPressed: _createShop,
           ),
         ],

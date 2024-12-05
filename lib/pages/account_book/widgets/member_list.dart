@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../services/api_service.dart';
 import '../../../models/models.dart';
+import '../../../l10n/l10n.dart';
 
 class MemberList extends StatefulWidget {
   final List<Member> members;
@@ -44,21 +45,22 @@ class _MemberListState extends State<MemberList> {
 
   Future<void> _removeMember(int index) async {
     if (!isEditable) return;
+    final l10n = L10n.of(context);
 
     final shouldRemove = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('确认删除'),
-        content: Text('确定要移除该成员吗？'),
+        title: Text(l10n.confirmRemoveMember),
+        content: Text(l10n.confirmRemoveMemberMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('取消'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              '删除',
+              l10n.delete,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
@@ -77,6 +79,7 @@ class _MemberListState extends State<MemberList> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +87,7 @@ class _MemberListState extends State<MemberList> {
         Padding(
           padding: EdgeInsets.fromLTRB(24, 16, 24, 8),
           child: Text(
-            '成员管理',
+            l10n.memberManagement,
             style: theme.textTheme.titleMedium?.copyWith(
               color: colorScheme.primary,
             ),
@@ -96,7 +99,7 @@ class _MemberListState extends State<MemberList> {
             child: FilledButton.icon(
               onPressed: () => _showAddMemberDialog(context),
               icon: Icon(Icons.person_add_outlined, size: 18),
-              label: Text('添加成员'),
+              label: Text(l10n.addMember),
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.primaryContainer,
                 foregroundColor: colorScheme.onPrimaryContainer,
@@ -133,6 +136,7 @@ class _MemberListState extends State<MemberList> {
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -152,7 +156,7 @@ class _MemberListState extends State<MemberList> {
             title: Row(
               children: [
                 Text(
-                  member.nickname ?? '未知用户',
+                  member.nickname ?? l10n.unknownMember,
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.w500,
@@ -160,7 +164,20 @@ class _MemberListState extends State<MemberList> {
                 ),
                 if (isCreator) ...[
                   SizedBox(width: 8),
-                  _buildCreatorBadge(context),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      l10n.creator,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ),
                 ],
               ],
             ),
@@ -181,61 +198,45 @@ class _MemberListState extends State<MemberList> {
     );
   }
 
-  Widget _buildCreatorBadge(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: colorScheme.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        '创建者',
-        style: TextStyle(
-          fontSize: 12,
-          color: colorScheme.primary,
-        ),
-      ),
-    );
-  }
-
   Widget _buildPermissionToggles(Member member, int index) {
+    final l10n = L10n.of(context);
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
         _buildPermissionToggle(
-          '查看账本',
+          l10n.permViewBook,
           'canViewBook',
           member.canViewBook,
           index,
         ),
         _buildPermissionToggle(
-          '编辑账本',
+          l10n.permEditBook,
           'canEditBook',
           member.canEditBook,
           index,
         ),
         _buildPermissionToggle(
-          '删除账本',
+          l10n.permDeleteBook,
           'canDeleteBook',
           member.canDeleteBook,
           index,
         ),
         _buildPermissionToggle(
-          '查看账目',
+          l10n.permViewItem,
           'canViewItem',
           member.canViewItem,
           index,
         ),
         _buildPermissionToggle(
-          '编辑账',
+          l10n.permEditItem,
           'canEditItem',
           member.canEditItem,
           index,
         ),
         _buildPermissionToggle(
-          '删除账目',
+          l10n.permDeleteItem,
           'canDeleteItem',
           member.canDeleteItem,
           index,
@@ -292,29 +293,30 @@ class _MemberListState extends State<MemberList> {
 
   Future<void> _showAddMemberDialog(BuildContext dialogContext) async {
     if (!mounted) return;
+    final l10n = L10n.of(dialogContext);
 
     // 添加邀请码输入对话框
     final controller = TextEditingController();
     final inviteCode = await showDialog<String>(
       context: dialogContext,
       builder: (context) => AlertDialog(
-        title: Text('添加成员'),
+        title: Text(l10n.addMemberTitle),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            labelText: '邀请码',
-            hintText: '请输入邀请码',
+            labelText: l10n.inviteCodeLabel,
+            hintText: l10n.inviteCodeHint,
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('取消'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: Text('添加'),
+            child: Text(l10n.add),
           ),
         ],
       ),
@@ -333,7 +335,7 @@ class _MemberListState extends State<MemberList> {
       if (isAlreadyMember) {
         if (!mounted) return;
         ScaffoldMessenger.of(dialogContext).showSnackBar(
-          SnackBar(content: Text('该用户已经是成员')),
+          SnackBar(content: Text(l10n.memberAlreadyExists)),
         );
         return;
       }
@@ -356,12 +358,12 @@ class _MemberListState extends State<MemberList> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(dialogContext).showSnackBar(
-        SnackBar(content: Text('成员添加成功')),
+        SnackBar(content: Text(l10n.addMemberSuccess)),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(dialogContext).showSnackBar(
-        SnackBar(content: Text('添加成员失败：$e')),
+        SnackBar(content: Text(l10n.addMemberFailed(e.toString()))),
       );
     }
   }

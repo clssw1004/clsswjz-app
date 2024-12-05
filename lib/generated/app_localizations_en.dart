@@ -194,13 +194,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopName => 'Shop Name';
 
   @override
-  String get noDefaultBook => 'No default account book selected';
+  String get noDefaultBook => 'No default book selected';
 
   @override
-  String get updateShopSuccess => 'Update successful';
+  String get updateShopSuccess => 'Shop updated successfully';
 
   @override
-  String get createShopSuccess => 'Create successful';
+  String get createShopSuccess => 'Shop created successfully';
 
   @override
   String get shopNameRequired => 'Shop name is required';
@@ -218,10 +218,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryNameRequired => 'Category name is required';
 
   @override
-  String get updateCategorySuccess => 'Update successful';
+  String get updateCategorySuccess => 'Category updated successfully';
 
   @override
-  String get createCategorySuccess => 'Create successful';
+  String get createCategorySuccess => 'Category created successfully';
 
   @override
   String get newFund => 'New Account';
@@ -344,7 +344,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get unknownUser => 'Unknown User';
+  String get unknownUser => 'Unknown';
 
   @override
   String get serverAddress => 'Server Address';
@@ -418,4 +418,150 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fundExpense => 'Expense';
+
+  @override
+  String get checkButton => 'Check';
+
+  @override
+  String get saveButton => 'Save';
+
+  @override
+  String get serverUrlLabel => 'Server URL';
+
+  @override
+  String get normalStatus => 'Normal';
+
+  @override
+  String get categoryTitle => 'Category Management';
+
+  @override
+  String get addCategory => 'Add Category';
+
+  @override
+  String get noCategories => 'No categories yet';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get bookDetails => 'Book Details';
+
+  @override
+  String get bookNameLabel => 'Book Name';
+
+  @override
+  String get bookDescriptionLabel => 'Book Description';
+
+  @override
+  String get creatorLabel => 'Creator';
+
+  @override
+  String get createTimeLabel => 'Create Time';
+
+  @override
+  String get unknownTime => 'Unknown';
+
+  @override
+  String get memberManagement => 'Member Management';
+
+  @override
+  String get addMember => 'Add Member';
+
+  @override
+  String get unknownMember => 'Unknown User';
+
+  @override
+  String get creator => 'Creator';
+
+  @override
+  String get confirmRemoveMember => 'Confirm Remove';
+
+  @override
+  String get confirmRemoveMemberMessage => 'Are you sure to remove this member?';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get addMemberTitle => 'Add Member';
+
+  @override
+  String get inviteCodeLabel => 'Invite Code';
+
+  @override
+  String get inviteCodeHint => 'Please enter invite code';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get memberAlreadyExists => 'Member already exists';
+
+  @override
+  String get addMemberSuccess => 'Member added successfully';
+
+  @override
+  String addMemberFailed(String error) {
+    return 'Failed to add member: $error';
+  }
+
+  @override
+  String get permViewBook => 'View Book';
+
+  @override
+  String get permEditBook => 'Edit Book';
+
+  @override
+  String get permDeleteBook => 'Delete Book';
+
+  @override
+  String get permViewItem => 'View Records';
+
+  @override
+  String get permEditItem => 'Edit Records';
+
+  @override
+  String get permDeleteItem => 'Delete Records';
+
+  @override
+  String get shopManagementTitle => 'Shop Management';
+
+  @override
+  String get newShopButton => 'New Shop';
+
+  @override
+  String get newShopTitle => 'New Shop';
+
+  @override
+  String get editShopTitle => 'Edit Shop';
+
+  @override
+  String get shopNameLabel => 'Shop Name';
+
+  @override
+  String get userInfoTitle => 'User Info';
+
+  @override
+  String get editUserInfo => 'Edit User Info';
+
+  @override
+  String get nicknameLabel => 'Nickname';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get phoneLabel => 'Phone';
+
+  @override
+  String get resetInviteCode => 'Reset Invite Code';
+
+  @override
+  String get resetInviteCodeSuccess => 'Reset successful';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
+  String get updateUserInfoSuccess => 'Update successful';
 }

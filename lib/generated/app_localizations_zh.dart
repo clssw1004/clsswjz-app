@@ -344,7 +344,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get unknownUser => '未知用户';
+  String get unknownUser => '未知';
 
   @override
   String get serverAddress => '服务地址';
@@ -418,6 +418,152 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get fundExpense => '支出';
+
+  @override
+  String get checkButton => '检查';
+
+  @override
+  String get saveButton => '保存';
+
+  @override
+  String get serverUrlLabel => '服务器地址';
+
+  @override
+  String get normalStatus => '正常';
+
+  @override
+  String get categoryTitle => '分类管理';
+
+  @override
+  String get addCategory => '添加分类';
+
+  @override
+  String get noCategories => '暂无分类';
+
+  @override
+  String get create => '创建';
+
+  @override
+  String get bookDetails => '账本详情';
+
+  @override
+  String get bookNameLabel => '账本名称';
+
+  @override
+  String get bookDescriptionLabel => '账本描述';
+
+  @override
+  String get creatorLabel => '创建者';
+
+  @override
+  String get createTimeLabel => '创建时间';
+
+  @override
+  String get unknownTime => '未知';
+
+  @override
+  String get memberManagement => '成员管理';
+
+  @override
+  String get addMember => '添加成员';
+
+  @override
+  String get unknownMember => '未知用户';
+
+  @override
+  String get creator => '创建者';
+
+  @override
+  String get confirmRemoveMember => '确认删除';
+
+  @override
+  String get confirmRemoveMemberMessage => '确定要移除该成员吗？';
+
+  @override
+  String get delete => '删除';
+
+  @override
+  String get addMemberTitle => '添加成员';
+
+  @override
+  String get inviteCodeLabel => '邀请码';
+
+  @override
+  String get inviteCodeHint => '请输入邀请码';
+
+  @override
+  String get add => '添加';
+
+  @override
+  String get memberAlreadyExists => '该用户已经是成员';
+
+  @override
+  String get addMemberSuccess => '成员添加成功';
+
+  @override
+  String addMemberFailed(String error) {
+    return '添加成员失败：$error';
+  }
+
+  @override
+  String get permViewBook => '查看账本';
+
+  @override
+  String get permEditBook => '编辑账本';
+
+  @override
+  String get permDeleteBook => '删除账本';
+
+  @override
+  String get permViewItem => '查看账目';
+
+  @override
+  String get permEditItem => '编辑账目';
+
+  @override
+  String get permDeleteItem => '删除账目';
+
+  @override
+  String get shopManagementTitle => '商家管理';
+
+  @override
+  String get newShopButton => '新建商家';
+
+  @override
+  String get newShopTitle => '新建商家';
+
+  @override
+  String get editShopTitle => '编辑商家';
+
+  @override
+  String get shopNameLabel => '商家名称';
+
+  @override
+  String get userInfoTitle => '用户信息';
+
+  @override
+  String get editUserInfo => '编辑用户信息';
+
+  @override
+  String get nicknameLabel => '昵称';
+
+  @override
+  String get emailLabel => '邮箱';
+
+  @override
+  String get phoneLabel => '手机号';
+
+  @override
+  String get resetInviteCode => '重置邀请码';
+
+  @override
+  String get resetInviteCodeSuccess => '重置成功';
+
+  @override
+  String get copiedToClipboard => '已复制到剪贴板';
+
+  @override
+  String get updateUserInfoSuccess => '更新成功';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -615,7 +761,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get noDefaultBook => '未選擇默認賬本';
 
   @override
-  String get updateShopSuccess => '更新成';
+  String get updateShopSuccess => '更新成功';
 
   @override
   String get createShopSuccess => '創建成功';
@@ -762,7 +908,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get unknownUser => '未知用戶';
+  String get unknownUser => '未知';
 
   @override
   String get serverAddress => '服務地址';
@@ -836,4 +982,150 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get fundExpense => '支出';
+
+  @override
+  String get checkButton => '檢查';
+
+  @override
+  String get saveButton => '保存';
+
+  @override
+  String get serverUrlLabel => '伺服器地址';
+
+  @override
+  String get normalStatus => '正常';
+
+  @override
+  String get categoryTitle => '分類管理';
+
+  @override
+  String get addCategory => '添加分類';
+
+  @override
+  String get noCategories => '暫無分類';
+
+  @override
+  String get create => '創建';
+
+  @override
+  String get bookDetails => '賬本詳情';
+
+  @override
+  String get bookNameLabel => '賬本名稱';
+
+  @override
+  String get bookDescriptionLabel => '賬本描述';
+
+  @override
+  String get creatorLabel => '創建者';
+
+  @override
+  String get createTimeLabel => '創建時間';
+
+  @override
+  String get unknownTime => '未知';
+
+  @override
+  String get memberManagement => '成員管理';
+
+  @override
+  String get addMember => '添加成員';
+
+  @override
+  String get unknownMember => '未知用戶';
+
+  @override
+  String get creator => '創建者';
+
+  @override
+  String get confirmRemoveMember => '確認刪除';
+
+  @override
+  String get confirmRemoveMemberMessage => '確定要移除該成員嗎？';
+
+  @override
+  String get delete => '刪除';
+
+  @override
+  String get addMemberTitle => '添加成員';
+
+  @override
+  String get inviteCodeLabel => '邀請碼';
+
+  @override
+  String get inviteCodeHint => '請輸入邀請碼';
+
+  @override
+  String get add => '添加';
+
+  @override
+  String get memberAlreadyExists => '該用戶已經是成員';
+
+  @override
+  String get addMemberSuccess => '成員添加成功';
+
+  @override
+  String addMemberFailed(String error) {
+    return '添加成員失敗：$error';
+  }
+
+  @override
+  String get permViewBook => '查看賬本';
+
+  @override
+  String get permEditBook => '編輯賬本';
+
+  @override
+  String get permDeleteBook => '刪除賬本';
+
+  @override
+  String get permViewItem => '查看賬目';
+
+  @override
+  String get permEditItem => '編輯賬目';
+
+  @override
+  String get permDeleteItem => '刪除賬目';
+
+  @override
+  String get shopManagementTitle => '商家管理';
+
+  @override
+  String get newShopButton => '新建商家';
+
+  @override
+  String get newShopTitle => '新建商家';
+
+  @override
+  String get editShopTitle => '編輯商家';
+
+  @override
+  String get shopNameLabel => '商家名稱';
+
+  @override
+  String get userInfoTitle => '用戶信息';
+
+  @override
+  String get editUserInfo => '編輯用戶信息';
+
+  @override
+  String get nicknameLabel => '暱稱';
+
+  @override
+  String get emailLabel => '郵箱';
+
+  @override
+  String get phoneLabel => '手機號';
+
+  @override
+  String get resetInviteCode => '重置邀請碼';
+
+  @override
+  String get resetInviteCodeSuccess => '重置成功';
+
+  @override
+  String get copiedToClipboard => '已複製到剪貼板';
+
+  @override
+  String get updateUserInfoSuccess => '更新成功';
 }

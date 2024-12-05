@@ -8,6 +8,7 @@ import '../../services/api_service.dart';
 import '../../utils/message_helper.dart';
 import '../../constants/language.dart';
 import '../../constants/timezone.dart';
+import '../../l10n/l10n.dart';
 
 class UserInfoPage extends StatefulWidget {
   @override
@@ -158,26 +159,88 @@ class UserInfoPageState extends State<UserInfoPage> {
   }
 
   Future<void> _resetInviteCode() async {
+    final l10n = L10n.of(context);
     try {
-      final newInviteCode = await ApiService.resetInviteCode();
-
-      // 更新本地用户信息
-      final updatedInfo = {
-        ...?_userInfo,
-        'inviteCode': newInviteCode,
-      };
-      await UserService.updateUserInfo(updatedInfo);
-
-      setState(() {
-        _userInfo = updatedInfo;
-        _inviteCode = newInviteCode;
-      });
-
+      final newCode = await ApiService.resetInviteCode();
+      setState(() => _inviteCode = newCode);
       if (!mounted) return;
-      MessageHelper.showSuccess(context, message: '重置成功');
+      MessageHelper.showSuccess(context, message: l10n.resetInviteCodeSuccess);
     } catch (e) {
       if (!mounted) return;
       MessageHelper.showError(context, message: e.toString());
+    }
+  }
+
+  Future<void> _copyInviteCode() async {
+    final l10n = L10n.of(context);
+    if (_inviteCode == null) return;
+
+    await Clipboard.setData(ClipboardData(text: _inviteCode!));
+    if (!mounted) return;
+    MessageHelper.showSuccess(context, message: l10n.copiedToClipboard);
+  }
+
+  Future<void> _showEditDialog() async {
+    final l10n = L10n.of(context);
+    final result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.editUserInfo),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nicknameController,
+              decoration: InputDecoration(
+                labelText: l10n.nicknameLabel,
+                // ... 其他装饰保持不变 ...
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: l10n.emailLabel,
+                // ... 其他装饰保持不变 ...
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _phoneController,
+              decoration: InputDecoration(
+                labelText: l10n.phoneLabel,
+                // ... 其他装饰保持不变 ...
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, {
+              'nickname': _nicknameController.text,
+              'email': _emailController.text,
+              'phone': _phoneController.text,
+            }),
+            child: Text(l10n.save),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      try {
+        await ApiService.updateUserInfo(result);
+        await _loadUserInfo();
+        if (!mounted) return;
+        MessageHelper.showSuccess(context, message: l10n.updateUserInfoSuccess);
+      } catch (e) {
+        if (!mounted) return;
+        MessageHelper.showError(context, message: e.toString());
+      }
     }
   }
 
@@ -185,12 +248,13 @@ class UserInfoPageState extends State<UserInfoPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     if (_isLoading) {
       return Scaffold(
         appBar: AppBarFactory.buildAppBar(
           context: context,
-          title: AppBarFactory.buildTitle(context, '用户信息'),
+          title: AppBarFactory.buildTitle(context, l10n.userInfoTitle),
         ),
         body: Center(child: CircularProgressIndicator()),
       );
@@ -217,7 +281,7 @@ class UserInfoPageState extends State<UserInfoPage> {
         backgroundColor: colorScheme.surface,
         appBar: AppBarFactory.buildAppBar(
           context: context,
-          title: AppBarFactory.buildTitle(context, '用户信息'),
+          title: AppBarFactory.buildTitle(context, l10n.userInfoTitle),
         ),
         body: Column(
           children: [
@@ -272,7 +336,7 @@ class UserInfoPageState extends State<UserInfoPage> {
                       delegate: SliverChildListDelegate([
                         _buildTextField(
                           controller: _nicknameController,
-                          label: '昵称',
+                          label: l10n.nicknameLabel,
                           focusNode: _nicknameFocus,
                           validator: (value) {
                             if (value?.isEmpty ?? true) return '昵称不能为空';
@@ -282,7 +346,7 @@ class UserInfoPageState extends State<UserInfoPage> {
                         SizedBox(height: 24),
                         _buildTextField(
                           controller: _emailController,
-                          label: '邮箱',
+                          label: l10n.emailLabel,
                           keyboardType: TextInputType.emailAddress,
                           focusNode: _emailFocus,
                           validator: (value) {
@@ -295,7 +359,7 @@ class UserInfoPageState extends State<UserInfoPage> {
                         SizedBox(height: 24),
                         _buildTextField(
                           controller: _phoneController,
-                          label: '手机号',
+                          label: l10n.phoneLabel,
                           keyboardType: TextInputType.phone,
                           focusNode: _phoneFocus,
                           validator: (value) {
@@ -305,10 +369,6 @@ class UserInfoPageState extends State<UserInfoPage> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 24),
-                        _buildLanguageField(),
-                        SizedBox(height: 24),
-                        _buildTimeZoneField(),
                         SizedBox(height: 24),
                         _buildInviteCodeField(
                           value: _userInfo?['inviteCode'] ?? '',
@@ -434,71 +494,46 @@ class UserInfoPageState extends State<UserInfoPage> {
   }
 
   Widget _buildInviteCodeField({
-    required String value,
+    required String? value,
     required VoidCallback onReset,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: TextFormField(
-            controller: TextEditingController(text: value),
-            readOnly: true,
-            decoration: InputDecoration(
-              labelText: '邀请码',
-              labelStyle: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              border: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.outline.withOpacity(0.5),
-                ),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.outline.withOpacity(0.5),
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.primary,
-                ),
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.copy, size: 18),
-                onPressed: () async {
-                  await Clipboard.setData(ClipboardData(text: value));
-                  if (!mounted) return;
-                  MessageHelper.showSuccess(context, message: '已复制到剪贴板');
-                },
-                tooltip: '复制邀请码',
-              ),
-            ),
+        Text(
+          l10n.inviteCodeLabel,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
-        SizedBox(width: 16),
-        TextButton(
-          onPressed: onReset,
-          style: TextButton.styleFrom(
-            foregroundColor: colorScheme.primary,
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            minimumSize: Size(0, 32),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+        SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                value ?? '',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
             ),
-          ),
-          child: Text(
-            '重置',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: colorScheme.primary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+            if (value?.isNotEmpty == true) ...[
+              IconButton(
+                icon: Icon(Icons.copy),
+                onPressed: _copyInviteCode,
+                tooltip: l10n.copiedToClipboard,
+              ),
+              IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: onReset,
+                tooltip: l10n.resetInviteCode,
+              ),
+            ],
+          ],
         ),
       ],
     );

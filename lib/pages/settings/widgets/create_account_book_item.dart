@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../services/api_service.dart';
+import '../../../l10n/l10n.dart';
 
 class CreateAccountBookItem extends StatelessWidget {
   const CreateAccountBookItem({Key? key}) : super(key: key);
@@ -8,6 +9,7 @@ class CreateAccountBookItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return ListTile(
       leading: Icon(
@@ -15,7 +17,7 @@ class CreateAccountBookItem extends StatelessWidget {
         color: colorScheme.primary,
       ),
       title: Text(
-        '账本管理',
+        l10n.accountManagement,
         style: theme.textTheme.bodyLarge?.copyWith(
           color: colorScheme.onSurface,
         ),

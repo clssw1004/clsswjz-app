@@ -185,7 +185,7 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
                 Container(
                   padding: EdgeInsets.all(AppDimens.spacing12),
                   decoration: BoxDecoration(
-                    color: _checkResult!.contains('正常')
+                    color: _checkResult!.contains(l10n.normalStatus)
                         ? colorScheme.primaryContainer
                         : colorScheme.errorContainer,
                     borderRadius: BorderRadius.circular(AppDimens.cardRadius),
@@ -193,7 +193,7 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
                   child: Text(
                     _checkResult!,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: _checkResult!.contains('正常')
+                      color: _checkResult!.contains(l10n.normalStatus)
                           ? colorScheme.onPrimaryContainer
                           : colorScheme.onErrorContainer,
                     ),

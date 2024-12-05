@@ -300,7 +300,7 @@ abstract class AppLocalizations {
   /// **'Server URL'**
   String get serverUrl;
 
-  /// No description provided for @save.
+  /// Save button text
   ///
   /// In en, this message translates to:
   /// **'Save'**
@@ -348,7 +348,7 @@ abstract class AppLocalizations {
   /// **'Failed to load server URL'**
   String get loadServerUrlFailed;
 
-  /// No description provided for @serverUrlHint.
+  /// Server URL input hint
   ///
   /// In en, this message translates to:
   /// **'http://example.com:3000'**
@@ -462,22 +462,22 @@ abstract class AppLocalizations {
   /// **'Shop Name'**
   String get shopName;
 
-  /// No description provided for @noDefaultBook.
+  /// Error message when no default book is selected
   ///
   /// In en, this message translates to:
-  /// **'No default account book selected'**
+  /// **'No default book selected'**
   String get noDefaultBook;
 
-  /// No description provided for @updateShopSuccess.
+  /// Update shop success message
   ///
   /// In en, this message translates to:
-  /// **'Update successful'**
+  /// **'Shop updated successfully'**
   String get updateShopSuccess;
 
-  /// No description provided for @createShopSuccess.
+  /// Create shop success message
   ///
   /// In en, this message translates to:
-  /// **'Create successful'**
+  /// **'Shop created successfully'**
   String get createShopSuccess;
 
   /// No description provided for @shopNameRequired.
@@ -492,7 +492,7 @@ abstract class AppLocalizations {
   /// **'New Category'**
   String get newCategory;
 
-  /// No description provided for @editCategory.
+  /// Edit category button text
   ///
   /// In en, this message translates to:
   /// **'Edit Category'**
@@ -510,16 +510,16 @@ abstract class AppLocalizations {
   /// **'Category name is required'**
   String get categoryNameRequired;
 
-  /// No description provided for @updateCategorySuccess.
+  /// Success message after updating category
   ///
   /// In en, this message translates to:
-  /// **'Update successful'**
+  /// **'Category updated successfully'**
   String get updateCategorySuccess;
 
-  /// No description provided for @createCategorySuccess.
+  /// Success message after creating category
   ///
   /// In en, this message translates to:
-  /// **'Create successful'**
+  /// **'Category created successfully'**
   String get createCategorySuccess;
 
   /// No description provided for @newFund.
@@ -750,10 +750,10 @@ abstract class AppLocalizations {
   /// **'Shared from {name}'**
   String sharedFrom(String name);
 
-  /// Default name for unknown user
+  /// Unknown user text
   ///
   /// In en, this message translates to:
-  /// **'Unknown User'**
+  /// **'Unknown'**
   String get unknownUser;
 
   /// Server address input label
@@ -881,6 +881,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expense'**
   String get fundExpense;
+
+  /// Check button text
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get checkButton;
+
+  /// Save button text
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButton;
+
+  /// Server URL input label
+  ///
+  /// In en, this message translates to:
+  /// **'Server URL'**
+  String get serverUrlLabel;
+
+  /// Normal status text
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get normalStatus;
+
+  /// Category management page title
+  ///
+  /// In en, this message translates to:
+  /// **'Category Management'**
+  String get categoryTitle;
+
+  /// Add category button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add Category'**
+  String get addCategory;
+
+  /// Empty category list message
+  ///
+  /// In en, this message translates to:
+  /// **'No categories yet'**
+  String get noCategories;
+
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// Account book details page title
+  ///
+  /// In en, this message translates to:
+  /// **'Book Details'**
+  String get bookDetails;
+
+  /// Book name input label
+  ///
+  /// In en, this message translates to:
+  /// **'Book Name'**
+  String get bookNameLabel;
+
+  /// Book description input label
+  ///
+  /// In en, this message translates to:
+  /// **'Book Description'**
+  String get bookDescriptionLabel;
+
+  /// Creator label text
+  ///
+  /// In en, this message translates to:
+  /// **'Creator'**
+  String get creatorLabel;
+
+  /// Create time label text
+  ///
+  /// In en, this message translates to:
+  /// **'Create Time'**
+  String get createTimeLabel;
+
+  /// Unknown time text
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknownTime;
+
+  /// Member management section title
+  ///
+  /// In en, this message translates to:
+  /// **'Member Management'**
+  String get memberManagement;
+
+  /// Add member button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add Member'**
+  String get addMember;
+
+  /// Unknown member name
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown User'**
+  String get unknownMember;
+
+  /// Creator badge text
+  ///
+  /// In en, this message translates to:
+  /// **'Creator'**
+  String get creator;
+
+  /// Remove member confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Remove'**
+  String get confirmRemoveMember;
+
+  /// Remove member confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure to remove this member?'**
+  String get confirmRemoveMemberMessage;
+
+  /// Delete button text
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// Add member dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Add Member'**
+  String get addMemberTitle;
+
+  /// Invite code label
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Code'**
+  String get inviteCodeLabel;
+
+  /// Invite code input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter invite code'**
+  String get inviteCodeHint;
+
+  /// Add button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// Member already exists error message
+  ///
+  /// In en, this message translates to:
+  /// **'Member already exists'**
+  String get memberAlreadyExists;
+
+  /// Add member success message
+  ///
+  /// In en, this message translates to:
+  /// **'Member added successfully'**
+  String get addMemberSuccess;
+
+  /// Add member failed message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add member: {error}'**
+  String addMemberFailed(String error);
+
+  /// View book permission label
+  ///
+  /// In en, this message translates to:
+  /// **'View Book'**
+  String get permViewBook;
+
+  /// Edit book permission label
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Book'**
+  String get permEditBook;
+
+  /// Delete book permission label
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Book'**
+  String get permDeleteBook;
+
+  /// View records permission label
+  ///
+  /// In en, this message translates to:
+  /// **'View Records'**
+  String get permViewItem;
+
+  /// Edit records permission label
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Records'**
+  String get permEditItem;
+
+  /// Delete records permission label
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Records'**
+  String get permDeleteItem;
+
+  /// Shop management page title
+  ///
+  /// In en, this message translates to:
+  /// **'Shop Management'**
+  String get shopManagementTitle;
+
+  /// New shop button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'New Shop'**
+  String get newShopButton;
+
+  /// New shop dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'New Shop'**
+  String get newShopTitle;
+
+  /// Edit shop dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Shop'**
+  String get editShopTitle;
+
+  /// Shop name input label
+  ///
+  /// In en, this message translates to:
+  /// **'Shop Name'**
+  String get shopNameLabel;
+
+  /// User info page title
+  ///
+  /// In en, this message translates to:
+  /// **'User Info'**
+  String get userInfoTitle;
+
+  /// Edit user info dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit User Info'**
+  String get editUserInfo;
+
+  /// Nickname input label
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get nicknameLabel;
+
+  /// Email input label
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// Phone input label
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phoneLabel;
+
+  /// Reset invite code button text
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Invite Code'**
+  String get resetInviteCode;
+
+  /// Reset invite code success message
+  ///
+  /// In en, this message translates to:
+  /// **'Reset successful'**
+  String get resetInviteCodeSuccess;
+
+  /// Copied to clipboard message
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
+
+  /// Update user info success message
+  ///
+  /// In en, this message translates to:
+  /// **'Update successful'**
+  String get updateUserInfoSuccess;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

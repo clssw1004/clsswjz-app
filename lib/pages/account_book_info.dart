@@ -8,6 +8,7 @@ import '../widgets/app_bar_factory.dart';
 import '../services/user_service.dart';
 import 'package:intl/intl.dart';
 import '../models/models.dart';
+import '../l10n/l10n.dart';
 
 class AccountBookInfo extends StatefulWidget {
   final Map<String, dynamic> accountBook;
@@ -90,6 +91,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
   }
 
   Future<void> _saveChanges() async {
+    final l10n = L10n.of(context);
     try {
       final updatedBook = _accountBook.copyWith(
         name: _nameController.text,
@@ -106,7 +108,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
 
       if (!mounted) return;
       Navigator.pop(context, response.toJson());
-      MessageHelper.showSuccess(context, message: '保存成功');
+      MessageHelper.showSuccess(context, message: l10n.saveSuccess);
     } catch (e) {
       if (!mounted) return;
       MessageHelper.showError(context, message: e.toString());
@@ -121,13 +123,14 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: AppBarFactory.buildTitle(context, '账本详情'),
+        title: AppBarFactory.buildTitle(context, l10n.bookDetails),
         actions: _canEdit
             ? [
                 if (_isSaving)
@@ -148,7 +151,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                 else
                   IconButton(
                     icon: Icon(Icons.check),
-                    tooltip: '保存',
+                    tooltip: l10n.save,
                     onPressed: _saveChanges,
                   ),
               ]
@@ -174,7 +177,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                       TextFormField(
                         controller: _nameController,
                         decoration: InputDecoration(
-                          labelText: '账本名称',
+                          labelText: l10n.bookNameLabel,
                           labelStyle: TextStyle(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -224,7 +227,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                       TextFormField(
                         controller: _descriptionController,
                         decoration: InputDecoration(
-                          labelText: '账本描',
+                          labelText: l10n.bookDescriptionLabel,
                           labelStyle: TextStyle(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -253,7 +256,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '账本描述',
+                            l10n.bookDescriptionLabel,
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: colorScheme.primary,
                             ),
@@ -272,17 +275,17 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
                       children: [
                         _buildInfoItem(
                           context,
-                          '创建者',
-                          _accountBook.fromName ?? '未知',
+                          l10n.creatorLabel,
+                          _accountBook.fromName ?? l10n.unknownUser,
                         ),
                         SizedBox(width: 24),
                         _buildInfoItem(
                           context,
-                          '创建时间',
+                          l10n.createTimeLabel,
                           _accountBook.createdAt != null
                               ? DateFormat('yyyy-MM-dd HH:mm')
                                   .format(_accountBook.createdAt!)
-                              : '未知',
+                              : l10n.unknownTime,
                         ),
                       ],
                     ),

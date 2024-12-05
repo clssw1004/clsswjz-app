@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../services/user_service.dart';
+import '../../../l10n/l10n.dart';
 
 class LogoutButton extends StatelessWidget {
   const LogoutButton({Key? key}) : super(key: key);
@@ -8,6 +9,7 @@ class LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -21,7 +23,7 @@ class LogoutButton extends StatelessWidget {
           ),
         ),
         child: Text(
-          '退出登录',
+          l10n.logout,
           style: theme.textTheme.labelLarge?.copyWith(
             color: colorScheme.error,
           ),
@@ -33,16 +35,17 @@ class LogoutButton extends StatelessWidget {
   void _showLogoutConfirmation(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          '确认退出',
+          l10n.confirmLogout,
           style: theme.textTheme.titleLarge,
         ),
         content: Text(
-          '确定要退出登录吗？',
+          l10n.confirmLogoutMessage,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -51,7 +54,7 @@ class LogoutButton extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              '取消',
+              l10n.cancel,
               style: theme.textTheme.labelLarge?.copyWith(
                 color: colorScheme.primary,
               ),
@@ -67,7 +70,7 @@ class LogoutButton extends StatelessWidget {
               );
             },
             child: Text(
-              '确定',
+              l10n.confirm,
               style: theme.textTheme.labelLarge?.copyWith(
                 color: colorScheme.error,
               ),
@@ -77,4 +80,4 @@ class LogoutButton extends StatelessWidget {
       ),
     );
   }
-} 
+}
