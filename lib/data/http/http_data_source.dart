@@ -426,7 +426,7 @@ class HttpDataSource implements DataSource {
   Future<ServerStatus> serverStatus() async {
     try {
       final response = await _httpClient.request<Map<String, dynamic>>(
-        path: '${ApiEndpoints.health}',
+        path: ApiEndpoints.health,
         method: HttpMethod.get,
       );
       return ServerStatus.fromJson(response);

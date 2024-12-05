@@ -6,6 +6,8 @@ import '../../services/user_service.dart';
 import '../../widgets/app_bar_factory.dart';
 import '../../services/api_service.dart';
 import '../../utils/message_helper.dart';
+import '../../constants/language.dart';
+import '../../constants/timezone.dart';
 
 class UserInfoPage extends StatefulWidget {
   @override
@@ -19,6 +21,8 @@ class UserInfoPageState extends State<UserInfoPage> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   String? _inviteCode;
+  Language _selectedLanguage = Language.ZH_CN;
+  String _selectedTimeZone = TimeZone.getDefaultTimeZone();
 
   // 添加焦点节点
   final _nicknameFocus = FocusNode();
@@ -93,6 +97,9 @@ class UserInfoPageState extends State<UserInfoPage> {
         _emailController.text = userInfo['email'] ?? '';
         _phoneController.text = userInfo['phone'] ?? '';
         _inviteCode = userInfo['inviteCode'] ?? '';
+        _selectedLanguage = Language.fromCode(userInfo['language'] ?? 'zh-CN');
+        _selectedTimeZone =
+            userInfo['timezone'] ?? TimeZone.getDefaultTimeZone();
         _isLoading = false;
       });
     } catch (e) {
@@ -100,19 +107,36 @@ class UserInfoPageState extends State<UserInfoPage> {
     }
   }
 
-  Future<void> _updateUserInfo() async {
+  Future<void> _updateUserInfo(Map<String, dynamic> data) async {
     try {
       final updatedInfo = await ApiErrorHandler.wrapRequest(
         context,
         () => ApiService.updateUserInfo({
-          'nickname': _nicknameController.text,
-          'email': _emailController.text,
-          'phone': _phoneController.text,
+          ...data,
+          if (!data.containsKey('nickname'))
+            'nickname': _nicknameController.text,
+          if (!data.containsKey('email')) 'email': _emailController.text,
+          if (!data.containsKey('phone')) 'phone': _phoneController.text,
+          if (!data.containsKey('language')) 'language': _selectedLanguage.code,
+          if (!data.containsKey('timezone')) 'timezone': _selectedTimeZone,
         }),
       );
 
-      setState(() => _userInfo = updatedInfo);
+      setState(() {
+        _userInfo = updatedInfo;
+        if (data.containsKey('language')) {
+          _selectedLanguage =
+              Language.fromCode(updatedInfo['language'] ?? 'zh-CN');
+        }
+        if (data.containsKey('timezone')) {
+          _selectedTimeZone =
+              updatedInfo['timezone'] ?? TimeZone.getDefaultTimeZone();
+        }
+      });
       await UserService.updateUserInfo(updatedInfo);
+
+      if (!mounted) return;
+      MessageHelper.showSuccess(context, message: '更新成功');
     } catch (e) {
       // 错误已由 ApiErrorHandler 处理
     }
@@ -120,17 +144,17 @@ class UserInfoPageState extends State<UserInfoPage> {
 
   void _handleNicknameSubmitted(String value) {
     if (value.isEmpty || value == _userInfo?['nickname']) return;
-    _updateUserInfo();
+    _updateUserInfo({'nickname': value});
   }
 
   void _handleEmailSubmitted(String value) {
     if (value == _userInfo?['email']) return;
-    _updateUserInfo();
+    _updateUserInfo({'email': value});
   }
 
   void _handlePhoneSubmitted(String value) {
     if (value == _userInfo?['phone']) return;
-    _updateUserInfo();
+    _updateUserInfo({'phone': value});
   }
 
   Future<void> _resetInviteCode() async {
@@ -282,18 +306,15 @@ class UserInfoPageState extends State<UserInfoPage> {
                           },
                         ),
                         SizedBox(height: 24),
+                        _buildLanguageField(),
+                        SizedBox(height: 24),
+                        _buildTimeZoneField(),
+                        SizedBox(height: 24),
                         _buildInviteCodeField(
                           value: _userInfo?['inviteCode'] ?? '',
                           onReset: _resetInviteCode,
                         ),
-                        SizedBox(height: 24),
-                        _buildReadOnlyField(
-                          label: '注册时间',
-                          value: _userInfo?['createdAt'] != null
-                              ? DateFormat('yyyy-MM-dd HH:mm:ss').format(
-                                  DateTime.parse(_userInfo!['createdAt']))
-                              : '',
-                        ),
+                        _buildCreatedAtText(),
                       ]),
                     ),
                   ),
@@ -566,5 +587,132 @@ class UserInfoPageState extends State<UserInfoPage> {
         (route) => false,
       );
     }
+  }
+
+  Widget _buildLanguageField() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return DropdownButtonFormField<Language>(
+      value: _selectedLanguage,
+      decoration: InputDecoration(
+        labelText: '语言设置',
+        labelStyle: theme.textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+        floatingLabelStyle: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w500,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.outline.withOpacity(0.5),
+          ),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.outline.withOpacity(0.5),
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.primary,
+            width: 1.5,
+          ),
+        ),
+        contentPadding: EdgeInsets.only(bottom: 4),
+      ),
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: colorScheme.onSurface,
+      ),
+      items: Language.supportedLanguages.map((lang) {
+        return DropdownMenuItem(
+          value: lang,
+          child: Text(lang.label),
+        );
+      }).toList(),
+      onChanged: (Language? value) {
+        if (value != null) {
+          _updateUserInfo({'language': value.code});
+        }
+      },
+    );
+  }
+
+  Widget _buildTimeZoneField() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return DropdownButtonFormField<String>(
+      value: _selectedTimeZone,
+      decoration: InputDecoration(
+        labelText: '时区设置',
+        labelStyle: theme.textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+        floatingLabelStyle: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.primary,
+          fontWeight: FontWeight.w500,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.outline.withOpacity(0.5),
+          ),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.outline.withOpacity(0.5),
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.primary,
+            width: 1.5,
+          ),
+        ),
+        contentPadding: EdgeInsets.only(bottom: 4),
+      ),
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: colorScheme.onSurface,
+      ),
+      items: TimeZone.supportedTimeZones.map((tz) {
+        return DropdownMenuItem(
+          value: tz['code']!,
+          child: Text(
+            tz['label']!,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      }).toList(),
+      onChanged: (String? value) {
+        if (value != null && TimeZone.isValidTimeZone(value)) {
+          _updateUserInfo({'timezone': value});
+        }
+      },
+    );
+  }
+
+  Widget _buildCreatedAtText() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    if (_userInfo?['createdAt'] == null) return SizedBox.shrink();
+
+    final createdAt = DateTime.parse(_userInfo!['createdAt']);
+    final formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(createdAt);
+
+    return Padding(
+      padding: EdgeInsets.only(top: 32),
+      child: Text(
+        '注册时间：$formattedDate',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
   }
 }

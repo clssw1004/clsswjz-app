@@ -8,8 +8,6 @@ import './settings/category_management_page.dart';
 import '../widgets/app_bar_factory.dart';
 import './settings/shop_management_page.dart';
 import './settings/fund_management_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../utils/message_helper.dart';
 import './settings/widgets/server_url_dialog.dart';
 
 class SettingsPage extends StatefulWidget {

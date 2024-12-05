@@ -4,6 +4,7 @@ import '../data/http/http_method.dart';
 import '../models/models.dart';
 import '../data/data_source_factory.dart';
 import '../data/data_source.dart';
+import '../models/register_request.dart';
 
 class ApiService {
   static final DataSource _dataSource =
@@ -108,21 +109,11 @@ class ApiService {
     return response;
   }
 
-  static Future<void> register({
-    required String username,
-    required String password,
-    required String email,
-    String? nickname,
-  }) async {
-    await _dataSource.request<void>(
-      path: '${ApiEndpoints.auth}/register',
+  static Future<Map<String, dynamic>> register(RegisterRequest request) async {
+    return _dataSource.request<Map<String, dynamic>>(
+      path: '${ApiEndpoints.users}/register',
       method: HttpMethod.post,
-      data: {
-        'username': username,
-        'password': password,
-        'email': email,
-        if (nickname != null) 'nickname': nickname,
-      },
+      data: request.toJson(),
     );
   }
 
