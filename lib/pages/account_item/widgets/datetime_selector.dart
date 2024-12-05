@@ -19,6 +19,16 @@ class DateTimeSelector extends StatelessWidget {
     required this.onTimeChanged,
   }) : super(key: key);
 
+  DateTime _combineDateAndTime(DateTime date, TimeOfDay time) {
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -28,21 +38,71 @@ class DateTimeSelector extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: TextFormField(
-            // ... 其他属性保持不变 ...
-            decoration: InputDecoration(
-              labelText: l10n.dateLabel,
-              // ... 其他装饰保持不变 ...
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: colorScheme.outlineVariant.withOpacity(0.5),
+                ),
+              ),
+            ),
+            child: TextFormField(
+              readOnly: true,
+              onTap: () => _selectDate(context),
+              controller: TextEditingController(
+                text: DateFormat('yyyy-MM-dd').format(selectedDate),
+              ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+              ),
+              decoration: InputDecoration(
+                labelText: l10n.dateLabel,
+                suffixIcon: Icon(
+                  Icons.calendar_today_outlined,
+                  size: 18,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
+                contentPadding: EdgeInsets.symmetric(vertical: 12),
+              ),
             ),
           ),
         ),
         SizedBox(width: 16),
         Expanded(
-          child: TextFormField(
-            // ... 其他属性保持不变 ...
-            decoration: InputDecoration(
-              labelText: l10n.timeLabel,
-              // ... 其他装饰保持不变 ...
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: colorScheme.outlineVariant.withOpacity(0.5),
+                ),
+              ),
+            ),
+            child: TextFormField(
+              readOnly: true,
+              onTap: () => _selectTime(context),
+              controller: TextEditingController(
+                text: selectedTime.format(context),
+              ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+              ),
+              decoration: InputDecoration(
+                labelText: l10n.timeLabel,
+                suffixIcon: Icon(
+                  Icons.access_time_outlined,
+                  size: 18,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
+                contentPadding: EdgeInsets.symmetric(vertical: 12),
+              ),
             ),
           ),
         ),
@@ -68,7 +128,10 @@ class DateTimeSelector extends StatelessWidget {
             child: CupertinoDatePicker(
               mode: CupertinoDatePickerMode.date,
               initialDateTime: selectedDate,
-              onDateTimeChanged: onDateChanged,
+              onDateTimeChanged: (date) {
+                final newDateTime = _combineDateAndTime(date, selectedTime);
+                onDateChanged(newDateTime);
+              },
               minimumDate: DateTime(2000),
               maximumDate: DateTime(2100),
             ),
@@ -97,7 +160,10 @@ class DateTimeSelector extends StatelessWidget {
           );
         },
       );
-      if (picked != null) onDateChanged(picked);
+      if (picked != null) {
+        final newDateTime = _combineDateAndTime(picked, selectedTime);
+        onDateChanged(newDateTime);
+      }
     }
   }
 
@@ -118,18 +184,15 @@ class DateTimeSelector extends StatelessWidget {
             top: false,
             child: CupertinoDatePicker(
               mode: CupertinoDatePickerMode.time,
-              initialDateTime: DateTime(
-                selectedDate.year,
-                selectedDate.month,
-                selectedDate.day,
-                selectedTime.hour,
-                selectedTime.minute,
-              ),
+              initialDateTime: _combineDateAndTime(selectedDate, selectedTime),
               onDateTimeChanged: (dateTime) {
-                onTimeChanged(TimeOfDay(
+                final newTime = TimeOfDay(
                   hour: dateTime.hour,
                   minute: dateTime.minute,
-                ));
+                );
+                final newDateTime = _combineDateAndTime(selectedDate, newTime);
+                onTimeChanged(newTime);
+                onDateChanged(newDateTime);
               },
             ),
           ),
@@ -162,91 +225,11 @@ class DateTimeSelector extends StatelessWidget {
           );
         },
       );
-      if (picked != null) onTimeChanged(picked);
+      if (picked != null) {
+        final newDateTime = _combineDateAndTime(selectedDate, picked);
+        onTimeChanged(picked);
+        onDateChanged(newDateTime);
+      }
     }
-  }
-}
-
-class _DateButton extends StatelessWidget {
-  final DateTime date;
-  final VoidCallback onPressed;
-
-  const _DateButton({
-    Key? key,
-    required this.date,
-    required this.onPressed,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: colorScheme.primary,
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        side: BorderSide(color: colorScheme.outlineVariant),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.calendar_today, size: 18),
-          SizedBox(width: 8),
-          Text(
-            DateFormat('yyyy-MM-dd').format(date),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TimeButton extends StatelessWidget {
-  final TimeOfDay time;
-  final VoidCallback onPressed;
-
-  const _TimeButton({
-    Key? key,
-    required this.time,
-    required this.onPressed,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: colorScheme.primary,
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        side: BorderSide(color: colorScheme.outlineVariant),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.access_time, size: 18),
-          SizedBox(width: 8),
-          Text(
-            '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurface,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
