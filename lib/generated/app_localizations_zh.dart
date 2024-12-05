@@ -345,6 +345,79 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unknownUser => '未知用户';
+
+  @override
+  String get serverAddress => '服务地址';
+
+  @override
+  String serverStatusNormal(String dbStatus, String memUsed, String memTotal) {
+    return '服务正常\n数据库状态: $dbStatus\n内存使用: $memUsed/$memTotal';
+  }
+
+  @override
+  String serverStatusError(String error) {
+    return '服务异常: $error';
+  }
+
+  @override
+  String get pleaseInputServerUrl => '请输入服务地址';
+
+  @override
+  String get saveSuccess => '保存成功';
+
+  @override
+  String saveFailed(String error) {
+    return '保存失败: $error';
+  }
+
+  @override
+  String get restartAppAfterChange => '修改后需要重启应用才能生效';
+
+  @override
+  String get checkServer => '检测服务';
+
+  @override
+  String linkedBooksCount(int count) {
+    return '$count个关联账本';
+  }
+
+  @override
+  String get editFundTitle => '编辑账户';
+
+  @override
+  String get newFundTitle => '新建账户';
+
+  @override
+  String get linkedBooks => '关联账本';
+
+  @override
+  String lastUpdated(String time) {
+    return '最近更新：$time';
+  }
+
+  @override
+  String get unknown => '未知';
+
+  @override
+  String get basicInfo => '基本信息';
+
+  @override
+  String get accountName => '账户名称';
+
+  @override
+  String get accountRemark => '账户备注';
+
+  @override
+  String get currentBalance => '当前余额';
+
+  @override
+  String get pleaseInputAccountName => '请输入账户名称';
+
+  @override
+  String get fundIncome => '收入';
+
+  @override
+  String get fundExpense => '支出';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -690,4 +763,77 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get unknownUser => '未知用戶';
+
+  @override
+  String get serverAddress => '服務地址';
+
+  @override
+  String serverStatusNormal(String dbStatus, String memUsed, String memTotal) {
+    return '服務正常\n數據庫狀態: $dbStatus\n內存使用: $memUsed/$memTotal';
+  }
+
+  @override
+  String serverStatusError(String error) {
+    return '服務異常: $error';
+  }
+
+  @override
+  String get pleaseInputServerUrl => '請輸入服務地址';
+
+  @override
+  String get saveSuccess => '保存成功';
+
+  @override
+  String saveFailed(String error) {
+    return '保存失敗: $error';
+  }
+
+  @override
+  String get restartAppAfterChange => '修改後需要重啟應用才能生效';
+
+  @override
+  String get checkServer => '檢測服務';
+
+  @override
+  String linkedBooksCount(int count) {
+    return '$count個關聯賬本';
+  }
+
+  @override
+  String get editFundTitle => '編輯賬戶';
+
+  @override
+  String get newFundTitle => '新建賬戶';
+
+  @override
+  String get linkedBooks => '關聯賬本';
+
+  @override
+  String lastUpdated(String time) {
+    return '最近更新：$time';
+  }
+
+  @override
+  String get unknown => '未知';
+
+  @override
+  String get basicInfo => '基本信息';
+
+  @override
+  String get accountName => '賬戶名稱';
+
+  @override
+  String get accountRemark => '賬戶備註';
+
+  @override
+  String get currentBalance => '當前餘額';
+
+  @override
+  String get pleaseInputAccountName => '請輸入賬戶名稱';
+
+  @override
+  String get fundIncome => '收入';
+
+  @override
+  String get fundExpense => '支出';
 }

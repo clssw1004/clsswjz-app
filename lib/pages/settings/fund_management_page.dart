@@ -4,6 +4,7 @@ import '../../services/api_service.dart';
 import '../../utils/message_helper.dart';
 import '../../widgets/app_bar_factory.dart';
 import '../../constants/fund_type.dart';
+import '../../l10n/l10n.dart';
 import 'fund_edit_page.dart';
 
 class FundManagementPage extends StatefulWidget {
@@ -51,15 +52,17 @@ class _FundManagementPageState extends State<FundManagementPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: AppBarFactory.buildTitle(context, '账户管理'),
+        title: AppBarFactory.buildTitle(context, l10n.fundManagement),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
+            tooltip: l10n.newFund,
             onPressed: () => _editFund(UserFund(
               id: '',
               name: '',
@@ -138,7 +141,7 @@ class _FundManagementPageState extends State<FundManagementPage> {
                             ),
                             SizedBox(width: 8),
                             Text(
-                              '${fund.fundBooks.length}个关联账本',
+                              l10n.linkedBooksCount(fund.fundBooks.length),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),

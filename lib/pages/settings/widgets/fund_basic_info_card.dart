@@ -3,6 +3,7 @@ import '../../../constants/theme_constants.dart';
 import './fund_text_field.dart';
 import './fund_type_selector.dart';
 import './fund_balance_input.dart';
+import '../../../l10n/l10n.dart';
 
 class FundBasicInfoCard extends StatelessWidget {
   final TextEditingController nameController;
@@ -28,6 +29,7 @@ class FundBasicInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -51,7 +53,7 @@ class FundBasicInfoCard extends StatelessWidget {
               ),
             ),
             child: Text(
-              '基本信息',
+              l10n.basicInfo,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.primary,
               ),
@@ -64,13 +66,13 @@ class FundBasicInfoCard extends StatelessWidget {
               children: [
                 FundTextField(
                   controller: nameController,
-                  label: '账户名称',
+                  label: l10n.accountName,
                   style: theme.textTheme.titleMedium,
                 ),
                 SizedBox(height: AppDimens.padding),
                 FundTextField(
                   controller: remarkController,
-                  label: '账户备注',
+                  label: l10n.accountRemark,
                 ),
                 SizedBox(height: AppDimens.padding),
                 FundTypeSelector(

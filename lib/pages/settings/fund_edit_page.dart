@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../constants/theme_constants.dart';
 import '../../pages/settings/widgets/fund_book_list.dart';
 import '../../pages/settings/widgets/fund_basic_info_card.dart';
+import '../../l10n/l10n.dart';
 
 class FundEditPage extends StatefulWidget {
   final UserFund fund;
@@ -74,8 +75,9 @@ class _FundEditPageState extends State<FundEditPage> {
   }
 
   Future<void> _save() async {
+    final l10n = L10n.of(context);
     if (_nameController.text.isEmpty) {
-      MessageHelper.showError(context, message: '请输入账户名称');
+      MessageHelper.showError(context, message: l10n.pleaseInputAccountName);
       return;
     }
 
@@ -109,7 +111,7 @@ class _FundEditPageState extends State<FundEditPage> {
         Navigator.pop(context, result);
       }
 
-      MessageHelper.showSuccess(context, message: '保存成功');
+      MessageHelper.showSuccess(context, message: l10n.saveSuccess);
     } catch (e) {
       if (!mounted) return;
       MessageHelper.showError(context, message: e.toString());
@@ -119,7 +121,8 @@ class _FundEditPageState extends State<FundEditPage> {
   }
 
   String _formatDate(DateTime? date) {
-    if (date == null) return '未知';
+    final l10n = L10n.of(context);
+    if (date == null) return l10n.unknown;
     return DateFormat('yyyy-MM-dd HH:mm').format(date);
   }
 
@@ -130,6 +133,7 @@ class _FundEditPageState extends State<FundEditPage> {
         final isWide = constraints.maxWidth > 600;
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
+        final l10n = L10n.of(context);
 
         return Scaffold(
           backgroundColor: colorScheme.surface,
@@ -137,7 +141,7 @@ class _FundEditPageState extends State<FundEditPage> {
             context: context,
             title: AppBarFactory.buildTitle(
               context,
-              widget.fund.id.isEmpty ? '新建账户' : '编辑账户',
+              widget.fund.id.isEmpty ? l10n.newFundTitle : l10n.editFundTitle,
             ),
             actions: [
               if (_isLoading)
@@ -200,7 +204,7 @@ class _FundEditPageState extends State<FundEditPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '关联账本',
+                              l10n.linkedBooks,
                               style: theme.textTheme.titleSmall?.copyWith(
                                 color: colorScheme.primary,
                               ),
@@ -217,7 +221,7 @@ class _FundEditPageState extends State<FundEditPage> {
                         padding: EdgeInsets.symmetric(
                             horizontal: AppDimens.paddingSmall),
                         child: Text(
-                          '最近更新：${_formatDate(widget.fund.updatedAt)}',
+                          l10n.lastUpdated(_formatDate(widget.fund.updatedAt)),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

@@ -136,5 +136,125 @@
   "unknownUser": "Unknown User",
   "@unknownUser": {
     "description": "Default name for unknown user"
+  },
+  "serverAddress": "Server Address",
+  "@serverAddress": {
+    "description": "Server address input label"
+  },
+  "serverStatusNormal": "Server Status: Normal\nDatabase Status: {dbStatus}\nMemory Usage: {memUsed}/{memTotal}",
+  "@serverStatusNormal": {
+    "description": "Server status check result when normal",
+    "placeholders": {
+      "dbStatus": {
+        "type": "String",
+        "example": "Connected"
+      },
+      "memUsed": {
+        "type": "String",
+        "example": "100MB"
+      },
+      "memTotal": {
+        "type": "String",
+        "example": "1GB"
+      }
+    }
+  },
+  "serverStatusError": "Server Error: {error}",
+  "@serverStatusError": {
+    "description": "Server status check result when error",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Connection failed"
+      }
+    }
+  },
+  "pleaseInputServerUrl": "Please input server address",
+  "@pleaseInputServerUrl": {
+    "description": "Server address input hint"
+  },
+  "saveSuccess": "Save successful, please restart app",
+  "@saveSuccess": {
+    "description": "Save server url success message"
+  },
+  "saveFailed": "Save failed: {error}",
+  "@saveFailed": {
+    "description": "Save server url failed message",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Invalid URL"
+      }
+    }
+  },
+  "restartAppAfterChange": "Modified, please restart the app to take effect",
+  "checkServer": "Check Server",
+  "linkedBooksCount": "{count} linked books",
+  "@linkedBooksCount": {
+    "description": "Number of linked account books",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "editFundTitle": "Edit Account",
+  "@editFundTitle": {
+    "description": "Title for edit fund page"
+  },
+  "newFundTitle": "New Account",
+  "@newFundTitle": {
+    "description": "Title for new fund page"
+  },
+  "linkedBooks": "Linked Books",
+  "@linkedBooks": {
+    "description": "Title for linked books section"
+  },
+  "lastUpdated": "Last Updated: {time}",
+  "@lastUpdated": {
+    "description": "Last updated time",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "2024-01-01 12:00"
+      }
+    }
+  },
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Text for unknown value"
+  },
+  "basicInfo": "Basic Info",
+  "@basicInfo": {
+    "description": "Basic information section title"
+  },
+  "accountName": "Account Name",
+  "@accountName": {
+    "description": "Account name field label"
+  },
+  "accountRemark": "Account Remark",
+  "@accountRemark": {
+    "description": "Account remark field label"
+  },
+  "currentBalance": "Current Balance",
+  "@currentBalance": {
+    "description": "Current balance field label"
+  },
+  "pleaseInputAccountName": "Please input account name",
+  "@pleaseInputAccountName": {
+    "description": "Account name required error message"
+  },
+  "fundIncome": "Income",
+  "@fundIncome": {
+    "description": "Fund income filter chip label"
+  },
+  "fundExpense": "Expense",
+  "@fundExpense": {
+    "description": "Fund expense filter chip label"
+  },
+  "saveSuccess": "Save successful",
+  "@saveSuccess": {
+    "description": "Save success message"
   }
-} 
+}

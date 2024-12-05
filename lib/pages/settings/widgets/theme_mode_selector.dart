@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../theme/theme_provider.dart';
+import '../../../l10n/l10n.dart';
 
 class ThemeModeSelector extends StatelessWidget {
   const ThemeModeSelector({Key? key}) : super(key: key);
@@ -9,6 +10,7 @@ class ThemeModeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
@@ -18,7 +20,7 @@ class ThemeModeSelector extends StatelessWidget {
             color: colorScheme.primary,
           ),
           title: Text(
-            '深色模式',
+            l10n.themeMode,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurface,
             ),
@@ -31,7 +33,7 @@ class ThemeModeSelector extends StatelessWidget {
               DropdownMenuItem(
                 value: ThemeMode.system,
                 child: Text(
-                  '跟随系统',
+                  l10n.system,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface,
                   ),
@@ -40,7 +42,7 @@ class ThemeModeSelector extends StatelessWidget {
               DropdownMenuItem(
                 value: ThemeMode.light,
                 child: Text(
-                  '浅色',
+                  l10n.light,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface,
                   ),
@@ -49,7 +51,7 @@ class ThemeModeSelector extends StatelessWidget {
               DropdownMenuItem(
                 value: ThemeMode.dark,
                 child: Text(
-                  '深色',
+                  l10n.dark,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface,
                   ),
@@ -66,4 +68,4 @@ class ThemeModeSelector extends StatelessWidget {
       },
     );
   }
-} 
+}

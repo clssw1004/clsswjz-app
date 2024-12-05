@@ -345,4 +345,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownUser => 'Unknown User';
+
+  @override
+  String get serverAddress => 'Server Address';
+
+  @override
+  String serverStatusNormal(String dbStatus, String memUsed, String memTotal) {
+    return 'Server Status: Normal\nDatabase Status: $dbStatus\nMemory Usage: $memUsed/$memTotal';
+  }
+
+  @override
+  String serverStatusError(String error) {
+    return 'Server Error: $error';
+  }
+
+  @override
+  String get pleaseInputServerUrl => 'Please input server address';
+
+  @override
+  String get saveSuccess => 'Save successful';
+
+  @override
+  String saveFailed(String error) {
+    return 'Save failed: $error';
+  }
+
+  @override
+  String get restartAppAfterChange => 'Modified, please restart the app to take effect';
+
+  @override
+  String get checkServer => 'Check Server';
+
+  @override
+  String linkedBooksCount(int count) {
+    return '$count linked books';
+  }
+
+  @override
+  String get editFundTitle => 'Edit Account';
+
+  @override
+  String get newFundTitle => 'New Account';
+
+  @override
+  String get linkedBooks => 'Linked Books';
+
+  @override
+  String lastUpdated(String time) {
+    return 'Last Updated: $time';
+  }
+
+  @override
+  String get unknown => 'Unknown';
+
+  @override
+  String get basicInfo => 'Basic Info';
+
+  @override
+  String get accountName => 'Account Name';
+
+  @override
+  String get accountRemark => 'Account Remark';
+
+  @override
+  String get currentBalance => 'Current Balance';
+
+  @override
+  String get pleaseInputAccountName => 'Please input account name';
+
+  @override
+  String get fundIncome => 'Income';
+
+  @override
+  String get fundExpense => 'Expense';
 }

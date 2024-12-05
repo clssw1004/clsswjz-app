@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../constants/theme_constants.dart';
+import '../../../l10n/l10n.dart';
 
 class FundBalanceInput extends StatelessWidget {
   final TextEditingController controller;
@@ -15,11 +16,12 @@ class FundBalanceInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Row(
       children: [
         Text(
-          '当前余额',
+          l10n.currentBalance,
           style: theme.textTheme.titleSmall?.copyWith(
             color: colorScheme.primary,
           ),

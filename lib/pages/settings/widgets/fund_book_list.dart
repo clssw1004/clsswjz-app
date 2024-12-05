@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../models/models.dart';
 import '../../../constants/theme_constants.dart';
 import './fund_filter_chip.dart';
+import '../../../l10n/l10n.dart';
 
 class FundBookList extends StatelessWidget {
   final List<AccountBook> books;
@@ -19,6 +20,7 @@ class FundBookList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -64,14 +66,14 @@ class FundBookList extends StatelessWidget {
               spacing: AppDimens.paddingTiny,
               children: [
                 FundFilterChip(
-                  label: '收入',
+                  label: l10n.fundIncome,
                   selected: fundBook.fundIn,
                   onSelected: (value) => onBookSettingsChanged(
                     fundBook.copyWith(fundIn: value),
                   ),
                 ),
                 FundFilterChip(
-                  label: '支出',
+                  label: l10n.fundExpense,
                   selected: fundBook.fundOut,
                   onSelected: (value) => onBookSettingsChanged(
                     fundBook.copyWith(fundOut: value),

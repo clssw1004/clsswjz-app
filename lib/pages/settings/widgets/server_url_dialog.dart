@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../services/api_service.dart';
 import '../../../utils/message_helper.dart';
 import '../../../constants/theme_constants.dart';
+import '../../../l10n/l10n.dart';
 
 class ServerUrlDialog extends StatefulWidget {
   @override
@@ -36,8 +37,9 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
   }
 
   Future<void> _checkServer(String url) async {
+    final l10n = L10n.of(context);
     if (url.isEmpty) {
-      setState(() => _checkResult = '请输入服务地址');
+      setState(() => _checkResult = l10n.pleaseInputServerUrl);
       return;
     }
 
@@ -51,28 +53,29 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
       if (!mounted) return;
 
       setState(() {
-        _checkResult = '服务正常\n'
-            '数据库状态: ${status.database.status}\n'
-            '内存使用: ${status.memory.heapUsed}/${status.memory.heapTotal}';
+        _checkResult = l10n.serverStatusNormal(
+          status.database.status,
+          status.memory.heapUsed,
+          status.memory.heapTotal,
+        );
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _checkResult = '服务异常: ${e.toString()}');
+      setState(() => _checkResult = l10n.serverStatusError(e.toString()));
     } finally {
       setState(() => _isChecking = false);
     }
   }
 
   Future<void> _saveServerUrl(String url) async {
+    final l10n = L10n.of(context);
     if (url.isEmpty) {
-      MessageHelper.showError(context, message: '请输入服务地址');
+      MessageHelper.showError(context, message: l10n.pleaseInputServerUrl);
       return;
     }
 
     try {
-      // 先检查服务是否可用
       await ApiService.checkServerStatus(url);
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('apiGateway', url);
 
@@ -80,12 +83,12 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
       Navigator.pop(context);
       MessageHelper.showSuccess(
         context,
-        message: '保存成功，请重启应用',
+        message: l10n.saveSuccess,
         showInRelease: true,
       );
     } catch (e) {
       if (!mounted) return;
-      MessageHelper.showError(context, message: '保存失败: $e');
+      MessageHelper.showError(context, message: l10n.saveFailed(e.toString()));
     }
   }
 
@@ -95,6 +98,7 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
     final colorScheme = theme.colorScheme;
     final mediaQuery = MediaQuery.of(context);
     final isSmallScreen = mediaQuery.size.width < AppDimens.breakpointMobile;
+    final l10n = L10n.of(context);
 
     return Dialog(
       surfaceTintColor: colorScheme.surface,
@@ -114,7 +118,7 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
             children: [
               // 标题
               Text(
-                '后台服务设置',
+                l10n.serverSettings,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: colorScheme.onSurface,
                 ),
@@ -125,8 +129,8 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
               TextField(
                 controller: _controller,
                 decoration: InputDecoration(
-                  labelText: '服务地址',
-                  hintText: 'http://example.com:3000',
+                  labelText: l10n.serverAddress,
+                  hintText: l10n.serverUrlHint,
                   prefixIcon: Icon(Icons.dns_outlined),
                   filled: true,
                   fillColor: colorScheme.surfaceContainerLowest,
@@ -172,7 +176,7 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
                           ),
                         ),
                       )
-                    : Text('检测服务'),
+                    : Text(l10n.checkServer),
               ),
 
               // 检测结果
@@ -200,7 +204,7 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
               // 提示信息
               SizedBox(height: AppDimens.spacing12),
               Text(
-                '修改后需要重启应用才能生效',
+                l10n.restartAppAfterChange,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.error,
                 ),
@@ -213,14 +217,14 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text('取消'),
+                    child: Text(l10n.cancel),
                   ),
                   SizedBox(width: AppDimens.spacing8),
                   FilledButton(
                     onPressed: () async {
                       await _saveServerUrl(_controller.text.trim());
                     },
-                    child: Text('保存'),
+                    child: Text(l10n.save),
                   ),
                 ],
               ),

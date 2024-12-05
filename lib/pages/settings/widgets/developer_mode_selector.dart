@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../utils/run_mode_util.dart';
+import '../../../l10n/l10n.dart';
 
 class DeveloperModeSelector extends StatefulWidget {
   const DeveloperModeSelector({Key? key}) : super(key: key);
@@ -37,6 +38,7 @@ class _DeveloperModeSelectorState extends State<DeveloperModeSelector> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return ListTile(
       leading: Icon(
@@ -44,7 +46,7 @@ class _DeveloperModeSelectorState extends State<DeveloperModeSelector> {
         color: colorScheme.primary,
       ),
       title: Text(
-        '开发者模式',
+        l10n.developerMode,
         style: theme.textTheme.bodyLarge?.copyWith(
           color: colorScheme.onSurface,
         ),

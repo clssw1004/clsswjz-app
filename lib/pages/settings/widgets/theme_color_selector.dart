@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../theme/theme_provider.dart';
 import '../../../theme/theme_manager.dart';
+import '../../../l10n/l10n.dart';
 
 class ThemeColorSelector extends StatelessWidget {
   const ThemeColorSelector({Key? key}) : super(key: key);
@@ -10,25 +11,45 @@ class ThemeColorSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
-    return ListTile(
-      leading: Icon(
-        Icons.palette,
-        color: colorScheme.primary,
-      ),
-      title: Text(
-        '主题颜色',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onSurface,
-        ),
-      ),
-      onTap: () => _showThemeColorPicker(context),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        return ListTile(
+          leading: Icon(
+            Icons.palette_outlined,
+            color: colorScheme.primary,
+          ),
+          title: Text(
+            l10n.themeColor,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+          ),
+          trailing: _buildColorPicker(context, themeProvider),
+        );
+      },
     );
   }
 
-  void _showThemeColorPicker(BuildContext context) {
+  Widget _buildColorPicker(BuildContext context, ThemeProvider themeProvider) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    return IconButton(
+      onPressed: () => _showThemeColorPicker(context, themeProvider),
+      icon: Icon(
+        Icons.palette,
+        color: colorScheme.primary,
+      ),
+    );
+  }
+
+  void _showThemeColorPicker(
+      BuildContext context, ThemeProvider themeProvider) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     showDialog(
       context: context,
@@ -38,12 +59,12 @@ class ThemeColorSelector extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '主题颜色',
+                l10n.themeColorTitle,
                 style: theme.textTheme.titleLarge,
               ),
               SizedBox(height: 8),
               Text(
-                '选择您喜欢的主题色',
+                l10n.themeColorSubtitle,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

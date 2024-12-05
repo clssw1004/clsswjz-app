@@ -755,6 +755,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown User'**
   String get unknownUser;
+
+  /// Server address input label
+  ///
+  /// In en, this message translates to:
+  /// **'Server Address'**
+  String get serverAddress;
+
+  /// Server status check result when normal
+  ///
+  /// In en, this message translates to:
+  /// **'Server Status: Normal\nDatabase Status: {dbStatus}\nMemory Usage: {memUsed}/{memTotal}'**
+  String serverStatusNormal(String dbStatus, String memUsed, String memTotal);
+
+  /// Server status check result when error
+  ///
+  /// In en, this message translates to:
+  /// **'Server Error: {error}'**
+  String serverStatusError(String error);
+
+  /// Server address input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please input server address'**
+  String get pleaseInputServerUrl;
+
+  /// Save success message
+  ///
+  /// In en, this message translates to:
+  /// **'Save successful'**
+  String get saveSuccess;
+
+  /// Save server url failed message
+  ///
+  /// In en, this message translates to:
+  /// **'Save failed: {error}'**
+  String saveFailed(String error);
+
+  /// No description provided for @restartAppAfterChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Modified, please restart the app to take effect'**
+  String get restartAppAfterChange;
+
+  /// No description provided for @checkServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Server'**
+  String get checkServer;
+
+  /// Number of linked account books
+  ///
+  /// In en, this message translates to:
+  /// **'{count} linked books'**
+  String linkedBooksCount(int count);
+
+  /// Title for edit fund page
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Account'**
+  String get editFundTitle;
+
+  /// Title for new fund page
+  ///
+  /// In en, this message translates to:
+  /// **'New Account'**
+  String get newFundTitle;
+
+  /// Title for linked books section
+  ///
+  /// In en, this message translates to:
+  /// **'Linked Books'**
+  String get linkedBooks;
+
+  /// Last updated time
+  ///
+  /// In en, this message translates to:
+  /// **'Last Updated: {time}'**
+  String lastUpdated(String time);
+
+  /// Text for unknown value
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
+
+  /// Basic information section title
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Info'**
+  String get basicInfo;
+
+  /// Account name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Account Name'**
+  String get accountName;
+
+  /// Account remark field label
+  ///
+  /// In en, this message translates to:
+  /// **'Account Remark'**
+  String get accountRemark;
+
+  /// Current balance field label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Balance'**
+  String get currentBalance;
+
+  /// Account name required error message
+  ///
+  /// In en, this message translates to:
+  /// **'Please input account name'**
+  String get pleaseInputAccountName;
+
+  /// Fund income filter chip label
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get fundIncome;
+
+  /// Fund expense filter chip label
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get fundExpense;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
