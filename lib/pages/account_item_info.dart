@@ -311,8 +311,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   String get _formattedDateTime {
     final date = DateFormat('yyyy-MM-dd').format(_selectedDate);
-    final time = _selectedTime.format(context).padLeft(5, '0');
-    return '$date $time:00';
+    final time =
+        '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}:00';
+    return '$date $time';
   }
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {

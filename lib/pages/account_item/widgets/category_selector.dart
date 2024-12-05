@@ -46,7 +46,7 @@ class CategorySelector extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: () => _showCategoryDialog(context, provider),
                   child: Text(
-                    selectedCategory ?? '选择分类${isRequired ? ' *' : ''}',
+                    selectedCategory ?? '选择分类',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: selectedCategory != null
                           ? colorScheme.onSurface

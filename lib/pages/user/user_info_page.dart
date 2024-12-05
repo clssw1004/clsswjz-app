@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../utils/api_error_handler.dart';
 import '../../services/user_service.dart';
 import '../../widgets/app_bar_factory.dart';
 import '../../services/api_service.dart';
+import '../../utils/message_helper.dart';
 
 class UserInfoPage extends StatefulWidget {
   @override
@@ -133,14 +135,25 @@ class UserInfoPageState extends State<UserInfoPage> {
 
   Future<void> _resetInviteCode() async {
     try {
-      final newInviteCode = await ApiErrorHandler.wrapRequest(
-        context,
-        () => ApiService.resetInviteCode(),
-      );
+      final newInviteCode = await ApiService.resetInviteCode();
 
-      setState(() => _inviteCode = newInviteCode);
+      // 更新本地用户信息
+      final updatedInfo = {
+        ...?_userInfo,
+        'inviteCode': newInviteCode,
+      };
+      await UserService.updateUserInfo(updatedInfo);
+
+      setState(() {
+        _userInfo = updatedInfo;
+        _inviteCode = newInviteCode;
+      });
+
+      if (!mounted) return;
+      MessageHelper.showSuccess(context, message: '重置成功');
     } catch (e) {
-      // 错误已由 ApiErrorHandler 处理
+      if (!mounted) return;
+      MessageHelper.showError(context, message: e.toString());
     }
   }
 
@@ -399,17 +412,6 @@ class UserInfoPageState extends State<UserInfoPage> {
     );
   }
 
-  Widget _buildReadOnlyField({
-    required String label,
-    required String value,
-  }) {
-    return _buildTextField(
-      controller: TextEditingController(text: value),
-      label: label,
-      readOnly: true,
-    );
-  }
-
   Widget _buildInviteCodeField({
     required String value,
     required VoidCallback onReset,
@@ -421,9 +423,41 @@ class UserInfoPageState extends State<UserInfoPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: _buildReadOnlyField(
-            label: '邀请码',
-            value: value,
+          child: TextFormField(
+            controller: TextEditingController(text: value),
+            readOnly: true,
+            decoration: InputDecoration(
+              labelText: '邀请码',
+              labelStyle: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              border: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  color: colorScheme.outline.withOpacity(0.5),
+                ),
+              ),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  color: colorScheme.outline.withOpacity(0.5),
+                ),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  color: colorScheme.primary,
+                ),
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(Icons.copy, size: 18),
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: value));
+                  if (!mounted) return;
+                  MessageHelper.showSuccess(context, message: '已复制到剪贴板');
+                },
+                tooltip: '复制邀请码',
+              ),
+            ),
           ),
         ),
         SizedBox(width: 16),
@@ -446,6 +480,45 @@ class UserInfoPageState extends State<UserInfoPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildReadOnlyField({
+    required String label,
+    required String value,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return TextFormField(
+      controller: TextEditingController(text: value),
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.outline.withOpacity(0.5),
+          ),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.outline.withOpacity(0.5),
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: colorScheme.primary,
+          ),
+        ),
+      ),
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: colorScheme.onSurfaceVariant,
+      ),
     );
   }
 

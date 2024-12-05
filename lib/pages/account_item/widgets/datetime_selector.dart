@@ -200,7 +200,7 @@ class _DateButton extends StatelessWidget {
           Icon(Icons.calendar_today, size: 18),
           SizedBox(width: 8),
           Text(
-            DateFormat('yyyy年MM月dd日').format(date),
+            DateFormat('yyyy-MM-dd').format(date),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurface,
             ),

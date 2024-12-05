@@ -101,7 +101,7 @@ class ApiService {
   static Future<Map<String, dynamic>> getUserByInviteCode(
       String inviteCode) async {
     final response = await _dataSource.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/invite-code/$inviteCode',
+      path: '${ApiEndpoints.users}/invite/$inviteCode',
       method: HttpMethod.get,
     );
     return response;

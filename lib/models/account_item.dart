@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class AccountItemResponse {
   final List<AccountItem> items;
   final AccountSummary summary;
@@ -89,7 +91,7 @@ class AccountItem {
         'description': description,
         'shop': shop,
         'fundId': fundId,
-        'accountDate': accountDate.toIso8601String(),
+        'accountDate': DateFormat('yyyy-MM-dd HH:mm:ss').format(accountDate),
       };
 
   Map<String, dynamic> toJsonCreate() => {
@@ -100,7 +102,7 @@ class AccountItem {
         'description': description,
         'shop': shop,
         'fundId': fundId,
-        'accountDate': accountDate.toIso8601String(),
+        'accountDate': DateFormat('yyyy-MM-dd HH:mm:ss').format(accountDate),
       };
 
   factory AccountItem.fromJson(Map<String, dynamic> json) => AccountItem(

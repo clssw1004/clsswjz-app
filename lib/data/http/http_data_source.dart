@@ -378,8 +378,8 @@ class HttpDataSource implements DataSource {
   @override
   Future<String> resetInviteCode() async {
     final response = await request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/invite-code',
-      method: HttpMethod.post,
+      path: '${ApiEndpoints.users}/invite/reset',
+      method: HttpMethod.put,
     );
     return response['inviteCode'];
   }
