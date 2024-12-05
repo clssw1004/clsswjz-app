@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../models/models.dart';
 import '../providers/account_item_provider.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/l10n.dart';
 
 class ShopSelector extends StatefulWidget {
   final String? selectedShop;
@@ -82,6 +83,7 @@ class _ShopSelectorState extends State<ShopSelector> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Container(
       height: 48,
@@ -110,7 +112,7 @@ class _ShopSelectorState extends State<ShopSelector> {
                 _showShopDialog(context);
               },
               child: Text(
-                _selectedShop?.name ?? widget.selectedShopName ?? '选择商家',
+                _selectedShop?.name ?? widget.selectedShopName ?? l10n.shopHint,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color:
                       (_selectedShop != null || widget.selectedShopName != null)
@@ -179,6 +181,7 @@ class _ShopDialogState extends State<_ShopDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -192,7 +195,7 @@ class _ShopDialogState extends State<_ShopDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '选择商家',
+              l10n.selectShopTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 color: colorScheme.onSurface,
               ),
@@ -202,7 +205,7 @@ class _ShopDialogState extends State<_ShopDialog> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: '搜索或输入新商家',
+                hintText: l10n.searchShopHint,
                 prefixIcon: Icon(
                   Icons.search,
                   color: colorScheme.onSurfaceVariant,
@@ -245,6 +248,18 @@ class _ShopDialogState extends State<_ShopDialog> {
   Widget _buildShopList() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
+
+    if (_filteredShops.isEmpty) {
+      return Center(
+        child: Text(
+          l10n.noAvailableShops,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      );
+    }
 
     return ListView.builder(
       itemCount: _filteredShops.length,
@@ -275,7 +290,9 @@ class _ShopDialogState extends State<_ShopDialog> {
   }
 
   Widget _buildCreateButton() {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     if (_searchText.isNotEmpty &&
         !_filteredShops.any((s) => s.name == _searchText)) {
@@ -293,7 +310,7 @@ class _ShopDialogState extends State<_ShopDialog> {
             ),
           ),
           icon: Icon(Icons.add, size: 18),
-          label: Text('添加"$_searchText"'),
+          label: Text(l10n.addShopButton(_searchText)),
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primary,
             foregroundColor: colorScheme.onPrimary,

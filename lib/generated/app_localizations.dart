@@ -168,7 +168,7 @@ abstract class AppLocalizations {
   /// **'Confirm Logout'**
   String get confirmLogout;
 
-  /// No description provided for @confirmLogoutMessage.
+  /// Confirm logout dialog message
   ///
   /// In en, this message translates to:
   /// **'Are you sure you want to logout?'**
@@ -306,7 +306,7 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get save;
 
-  /// No description provided for @nicknameRequired.
+  /// Nickname required error message
   ///
   /// In en, this message translates to:
   /// **'Nickname is required'**
@@ -1169,6 +1169,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update successful'**
   String get updateUserInfoSuccess;
+
+  /// Register time label with time placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Register time: {time}'**
+  String registerTimeLabel(String time);
+
+  /// Invalid email format error message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email format'**
+  String get invalidEmailFormat;
+
+  /// Invalid phone number format error message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid phone number format'**
+  String get invalidPhoneFormat;
+
+  /// Confirm logout dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Logout'**
+  String get confirmLogoutTitle;
+
+  /// New record page title
+  ///
+  /// In en, this message translates to:
+  /// **'New Record'**
+  String get newRecordTitle;
+
+  /// Edit record page title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Record'**
+  String get editRecordTitle;
+
+  /// Expense transaction type
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get expenseType;
+
+  /// Income transaction type
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get incomeType;
+
+  /// Amount required error message
+  ///
+  /// In en, this message translates to:
+  /// **'Please input amount'**
+  String get pleaseInputAmount;
+
+  /// Category required error message
+  ///
+  /// In en, this message translates to:
+  /// **'Please select category'**
+  String get pleaseSelectCategory;
+
+  /// Account required error message
+  ///
+  /// In en, this message translates to:
+  /// **'Please select account'**
+  String get pleaseSelectAccount;
+
+  /// Book required error message
+  ///
+  /// In en, this message translates to:
+  /// **'Please select book'**
+  String get pleaseSelectBook;
+
+  /// Save record button text
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveRecord;
+
+  /// Save record success message
+  ///
+  /// In en, this message translates to:
+  /// **'Save successful'**
+  String get saveRecordSuccess;
+
+  /// Amount input label
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amountLabel;
+
+  /// Amount input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please input amount'**
+  String get amountHint;
+
+  /// Category selector label
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get categoryLabel;
+
+  /// Category selector hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select category'**
+  String get categoryHint;
+
+  /// Date selector label
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dateLabel;
+
+  /// Time selector label
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get timeLabel;
+
+  /// Account selector label
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountLabel;
+
+  /// Account selector hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select account'**
+  String get accountHint;
+
+  /// Description input label
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get descriptionLabel;
+
+  /// Description input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please input description (optional)'**
+  String get descriptionHint;
+
+  /// Shop selector label
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get shopLabel;
+
+  /// Shop selector hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select shop'**
+  String get shopHint;
+
+  /// Select fund dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Account'**
+  String get selectFund;
+
+  /// Message when no funds are available
+  ///
+  /// In en, this message translates to:
+  /// **'No available accounts'**
+  String get noAvailableFunds;
+
+  /// Default fund indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Default Account'**
+  String get defaultFund;
+
+  /// Search fund input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Search accounts'**
+  String get searchFund;
+
+  /// Select fund hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Please select account'**
+  String get selectFundHint;
+
+  /// Select book dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Book'**
+  String get selectBookTitle;
+
+  /// Message when no books are available
+  ///
+  /// In en, this message translates to:
+  /// **'No available books'**
+  String get noAvailableBooks;
+
+  /// Default book indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Default Book'**
+  String get defaultBook;
+
+  /// Search book input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Search books'**
+  String get searchBook;
+
+  /// Select book hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Please select book'**
+  String get selectBookHint;
+
+  /// Shared book indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Shared Book'**
+  String get sharedBook;
+
+  /// Select book header title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Book'**
+  String get selectBookHeader;
+
+  /// Shared book label
+  ///
+  /// In en, this message translates to:
+  /// **'Shared'**
+  String get sharedBookLabel;
+
+  /// Cancel button text
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButton;
+
+  /// Select category dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Category'**
+  String get selectCategoryTitle;
+
+  /// Message when no categories are available
+  ///
+  /// In en, this message translates to:
+  /// **'No available categories'**
+  String get noAvailableCategories;
+
+  /// Search category input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Search or input new category'**
+  String get searchCategoryHint;
+
+  /// Add new category button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add \"{name}\"'**
+  String addCategoryButton(String name);
+
+  /// Select shop dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Shop'**
+  String get selectShopTitle;
+
+  /// Message when no shops are available
+  ///
+  /// In en, this message translates to:
+  /// **'No available shops'**
+  String get noAvailableShops;
+
+  /// Search shop input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Search or input new shop'**
+  String get searchShopHint;
+
+  /// Add new shop button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add \"{name}\"'**
+  String addShopButton(String name);
+
+  /// Income label in summary card
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get summaryIncome;
+
+  /// Expense label in summary card
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get summaryExpense;
+
+  /// Balance label in summary card
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get summaryBalance;
+
+  /// Currency symbol
+  ///
+  /// In en, this message translates to:
+  /// **'¥'**
+  String get currencySymbol;
+
+  /// Message when no transactions exist
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions'**
+  String get noTransactions;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

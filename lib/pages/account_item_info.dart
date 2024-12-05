@@ -14,6 +14,7 @@ import './account_item/providers/account_item_provider.dart';
 import 'package:intl/intl.dart';
 import '../widgets/app_bar_factory.dart';
 import './account_item/widgets/shop_selector.dart';
+import '../l10n/l10n.dart';
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -54,6 +55,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
+      final l10n = L10n.of(context);
 
       // 设置provider中的账本并加载相关数据
       await _provider.setSelectedBook(widget.initialBook);
@@ -98,8 +100,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
         print('Initial data: ${widget.initialData}');
         setState(() {
           _recordId = widget.initialData!['id'];
-          _transactionType =
-              widget.initialData!['type'] == 'EXPENSE' ? '支出' : '收入';
+          _transactionType = widget.initialData!['type'] == 'EXPENSE'
+              ? l10n.expenseType
+              : l10n.incomeType;
           _provider.setTransactionType(_transactionType);
           _amountController.text = widget.initialData!['amount'].toString();
           _selectedCategory = widget.initialData!['category'];
@@ -135,20 +138,21 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
+
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Builder(
         builder: (context) {
-          final theme = Theme.of(context);
-          final colorScheme = theme.colorScheme;
-
           return Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBarFactory.buildAppBar(
               context: context,
               title: AppBarFactory.buildTitle(
                 context,
-                _recordId == null ? '记一笔' : '编辑记录',
+                _recordId == null ? l10n.newRecordTitle : l10n.editRecordTitle,
               ),
             ),
             body: SafeArea(
@@ -282,7 +286,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                         children: [
                           Icon(Icons.save_outlined, size: 18),
                           SizedBox(width: 8),
-                          Text('保存'),
+                          Text(l10n.saveRecord),
                         ],
                       ),
                     ),
@@ -317,23 +321,24 @@ class _AccountItemFormState extends State<AccountItemForm> {
   }
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
+    final l10n = L10n.of(context);
     if (!mounted) return;
     try {
       // 验证必填字段
       if (data['amount'] == 0.0) {
-        MessageHelper.showError(context, message: '请输入金额');
+        MessageHelper.showError(context, message: l10n.pleaseInputAmount);
         return;
       }
       if (data['category'] == null) {
-        MessageHelper.showError(context, message: '请选择分类');
+        MessageHelper.showError(context, message: l10n.pleaseSelectCategory);
         return;
       }
       if (data['fundId'] == null) {
-        MessageHelper.showError(context, message: '请选择账户');
+        MessageHelper.showError(context, message: l10n.pleaseSelectAccount);
         return;
       }
       if (data['accountBookId'] == null) {
-        MessageHelper.showError(context, message: '请选择账本');
+        MessageHelper.showError(context, message: l10n.pleaseSelectBook);
         return;
       }
 
@@ -365,8 +370,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
       Navigator.pop(context, true);
       MessageHelper.showSuccess(
         context,
-        message: '保存成功',
-        showInRelease: true, // 在发布模式也显示保存成功提示
+        message: l10n.saveRecordSuccess,
+        showInRelease: true,
       );
     } catch (e) {
       if (!mounted) return;

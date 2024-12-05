@@ -564,4 +564,169 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateUserInfoSuccess => 'Update successful';
+
+  @override
+  String registerTimeLabel(String time) {
+    return 'Register time: $time';
+  }
+
+  @override
+  String get invalidEmailFormat => 'Invalid email format';
+
+  @override
+  String get invalidPhoneFormat => 'Invalid phone number format';
+
+  @override
+  String get confirmLogoutTitle => 'Confirm Logout';
+
+  @override
+  String get newRecordTitle => 'New Record';
+
+  @override
+  String get editRecordTitle => 'Edit Record';
+
+  @override
+  String get expenseType => 'Expense';
+
+  @override
+  String get incomeType => 'Income';
+
+  @override
+  String get pleaseInputAmount => 'Please input amount';
+
+  @override
+  String get pleaseSelectCategory => 'Please select category';
+
+  @override
+  String get pleaseSelectAccount => 'Please select account';
+
+  @override
+  String get pleaseSelectBook => 'Please select book';
+
+  @override
+  String get saveRecord => 'Save';
+
+  @override
+  String get saveRecordSuccess => 'Save successful';
+
+  @override
+  String get amountLabel => 'Amount';
+
+  @override
+  String get amountHint => 'Please input amount';
+
+  @override
+  String get categoryLabel => 'Category';
+
+  @override
+  String get categoryHint => 'Please select category';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get timeLabel => 'Time';
+
+  @override
+  String get accountLabel => 'Account';
+
+  @override
+  String get accountHint => 'Please select account';
+
+  @override
+  String get descriptionLabel => 'Description';
+
+  @override
+  String get descriptionHint => 'Please input description (optional)';
+
+  @override
+  String get shopLabel => 'Shop';
+
+  @override
+  String get shopHint => 'Please select shop';
+
+  @override
+  String get selectFund => 'Select Account';
+
+  @override
+  String get noAvailableFunds => 'No available accounts';
+
+  @override
+  String get defaultFund => 'Default Account';
+
+  @override
+  String get searchFund => 'Search accounts';
+
+  @override
+  String get selectFundHint => 'Please select account';
+
+  @override
+  String get selectBookTitle => 'Select Book';
+
+  @override
+  String get noAvailableBooks => 'No available books';
+
+  @override
+  String get defaultBook => 'Default Book';
+
+  @override
+  String get searchBook => 'Search books';
+
+  @override
+  String get selectBookHint => 'Please select book';
+
+  @override
+  String get sharedBook => 'Shared Book';
+
+  @override
+  String get selectBookHeader => 'Select Book';
+
+  @override
+  String get sharedBookLabel => 'Shared';
+
+  @override
+  String get cancelButton => 'Cancel';
+
+  @override
+  String get selectCategoryTitle => 'Select Category';
+
+  @override
+  String get noAvailableCategories => 'No available categories';
+
+  @override
+  String get searchCategoryHint => 'Search or input new category';
+
+  @override
+  String addCategoryButton(String name) {
+    return 'Add \"$name\"';
+  }
+
+  @override
+  String get selectShopTitle => 'Select Shop';
+
+  @override
+  String get noAvailableShops => 'No available shops';
+
+  @override
+  String get searchShopHint => 'Search or input new shop';
+
+  @override
+  String addShopButton(String name) {
+    return 'Add \"$name\"';
+  }
+
+  @override
+  String get summaryIncome => 'Income';
+
+  @override
+  String get summaryExpense => 'Expense';
+
+  @override
+  String get summaryBalance => 'Balance';
+
+  @override
+  String get currencySymbol => '¥';
+
+  @override
+  String get noTransactions => 'No transactions';
 }

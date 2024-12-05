@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
+import '../../../l10n/l10n.dart';
 import 'dart:io' show Platform;
 
 class DateTimeSelector extends StatelessWidget {
@@ -22,33 +23,30 @@ class DateTimeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.5),
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            // ... 其他属性保持不变 ...
+            decoration: InputDecoration(
+              labelText: l10n.dateLabel,
+              // ... 其他装饰保持不变 ...
+            ),
           ),
         ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _DateButton(
-              date: selectedDate,
-              onPressed: () => _selectDate(context),
+        SizedBox(width: 16),
+        Expanded(
+          child: TextFormField(
+            // ... 其他属性保持不变 ...
+            decoration: InputDecoration(
+              labelText: l10n.timeLabel,
+              // ... 其他装饰保持不变 ...
             ),
           ),
-          SizedBox(width: 8),
-          Expanded(
-            child: _TimeButton(
-              time: selectedTime,
-              onPressed: () => _selectTime(context),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

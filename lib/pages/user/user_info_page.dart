@@ -349,12 +349,6 @@ class UserInfoPageState extends State<UserInfoPage> {
                           label: l10n.emailLabel,
                           keyboardType: TextInputType.emailAddress,
                           focusNode: _emailFocus,
-                          validator: (value) {
-                            if (value?.isNotEmpty ?? false) {
-                              if (!_isValidEmail(value)) return '邮箱格式不正确';
-                            }
-                            return null;
-                          },
                         ),
                         SizedBox(height: 24),
                         _buildTextField(
@@ -362,12 +356,6 @@ class UserInfoPageState extends State<UserInfoPage> {
                           label: l10n.phoneLabel,
                           keyboardType: TextInputType.phone,
                           focusNode: _phoneFocus,
-                          validator: (value) {
-                            if (value?.isNotEmpty ?? false) {
-                              if (!_isValidPhone(value)) return '手机号格式不正确';
-                            }
-                            return null;
-                          },
                         ),
                         SizedBox(height: 24),
                         _buildInviteCodeField(
@@ -432,6 +420,7 @@ class UserInfoPageState extends State<UserInfoPage> {
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return TextFormField(
       controller: controller,
@@ -488,7 +477,22 @@ class UserInfoPageState extends State<UserInfoPage> {
       ),
       keyboardType: keyboardType,
       readOnly: readOnly,
-      validator: validator,
+      validator: (value) {
+        if (validator != null) {
+          if (label == l10n.nicknameLabel) {
+            if (value?.isEmpty ?? true) return l10n.nicknameRequired;
+          } else if (label == l10n.emailLabel) {
+            if (value?.isNotEmpty ?? false) {
+              if (!_isValidEmail(value)) return l10n.invalidEmailFormat;
+            }
+          } else if (label == l10n.phoneLabel) {
+            if (value?.isNotEmpty ?? false) {
+              if (!_isValidPhone(value)) return l10n.invalidPhoneFormat;
+            }
+          }
+        }
+        return null;
+      },
       autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
@@ -590,23 +594,20 @@ class UserInfoPageState extends State<UserInfoPage> {
   }
 
   Future<void> _handleLogout() async {
+    final l10n = L10n.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('确认退出'),
-        content: Text('确定要退出登录吗？'),
+        title: Text(l10n.confirmLogoutTitle),
+        content: Text(l10n.confirmLogoutMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('取消'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-              foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
-            ),
-            child: Text('退出'),
+            child: Text(l10n.confirm),
           ),
         ],
       ),
@@ -734,16 +735,17 @@ class UserInfoPageState extends State<UserInfoPage> {
   Widget _buildCreatedAtText() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     if (_userInfo?['createdAt'] == null) return SizedBox.shrink();
 
     final createdAt = DateTime.parse(_userInfo!['createdAt']);
-    final formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(createdAt);
+    final formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(createdAt);
 
     return Padding(
-      padding: EdgeInsets.only(top: 32),
+      padding: EdgeInsets.only(top: 24),
       child: Text(
-        '注册时间：$formattedDate',
+        l10n.registerTimeLabel(formattedDate),
         style: theme.textTheme.bodySmall?.copyWith(
           color: colorScheme.onSurfaceVariant,
         ),

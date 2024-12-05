@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../services/user_service.dart';
 import '../../../constants/book_icons.dart';
+import '../../../l10n/l10n.dart';
 
 class BookSelectorHeader extends StatelessWidget {
   final Map<String, dynamic>? selectedBook;
@@ -36,6 +37,7 @@ class BookSelectorHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Card(
       margin: EdgeInsets.all(16),
@@ -72,7 +74,7 @@ class BookSelectorHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      selectedBook?['name'] ?? '选择账本',
+                      selectedBook?['name'] ?? l10n.selectBookHeader,
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
@@ -106,11 +108,12 @@ class BookSelectorHeader extends StatelessWidget {
   Future<void> _showBookSelector(BuildContext context) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
     final currentUserId = UserService.getUserInfo()?['userId'];
 
     if (books.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('暂无可用账本')),
+        SnackBar(content: Text(l10n.noAvailableBooks)),
       );
       return;
     }
@@ -119,7 +122,7 @@ class BookSelectorHeader extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          '选择账本',
+          l10n.selectBookHeader,
           style: theme.textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurface,
           ),
@@ -152,7 +155,7 @@ class BookSelectorHeader extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        book['name'] ?? '未命名账本',
+                        book['name'] ?? l10n.unnamedBook,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: isSelected
                               ? colorScheme.primary
@@ -170,7 +173,7 @@ class BookSelectorHeader extends StatelessWidget {
                       ),
                       SizedBox(width: 4),
                       Text(
-                        '共享',
+                        l10n.sharedBookLabel,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: isSelected
                               ? colorScheme.primary
@@ -199,7 +202,7 @@ class BookSelectorHeader extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('取消'),
+            child: Text(l10n.cancelButton),
           ),
         ],
       ),

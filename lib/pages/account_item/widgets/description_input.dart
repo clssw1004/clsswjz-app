@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/l10n.dart';
 
 class DescriptionInput extends StatelessWidget {
   final TextEditingController controller;
@@ -12,6 +13,7 @@ class DescriptionInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Container(
       height: 64,
@@ -49,7 +51,8 @@ class DescriptionInput extends StatelessWidget {
                   color: colorScheme.onSurface,
                 ),
                 decoration: InputDecoration(
-                  hintText: '添加备注',
+                  labelText: l10n.descriptionLabel,
+                  hintText: l10n.descriptionHint,
                   hintStyle: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

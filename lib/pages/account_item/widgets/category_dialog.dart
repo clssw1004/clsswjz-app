@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/l10n.dart';
 
 class CategoryDialog extends StatelessWidget {
   final List<String> categories;
@@ -16,6 +17,7 @@ class CategoryDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -29,7 +31,7 @@ class CategoryDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '选择分类',
+              l10n.selectCategoryTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 color: colorScheme.onSurface,
               ),

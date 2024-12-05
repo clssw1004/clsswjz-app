@@ -564,6 +564,171 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get updateUserInfoSuccess => '更新成功';
+
+  @override
+  String registerTimeLabel(String time) {
+    return '注册时间：$time';
+  }
+
+  @override
+  String get invalidEmailFormat => '邮箱格式不正确';
+
+  @override
+  String get invalidPhoneFormat => '手机号格式不正确';
+
+  @override
+  String get confirmLogoutTitle => '确认退出';
+
+  @override
+  String get newRecordTitle => '记一笔';
+
+  @override
+  String get editRecordTitle => '编辑记录';
+
+  @override
+  String get expenseType => '支出';
+
+  @override
+  String get incomeType => '收入';
+
+  @override
+  String get pleaseInputAmount => '请输入金额';
+
+  @override
+  String get pleaseSelectCategory => '请选择分类';
+
+  @override
+  String get pleaseSelectAccount => '请选择账户';
+
+  @override
+  String get pleaseSelectBook => '请选择账本';
+
+  @override
+  String get saveRecord => '保存';
+
+  @override
+  String get saveRecordSuccess => '保存成功';
+
+  @override
+  String get amountLabel => '金额';
+
+  @override
+  String get amountHint => '请输入金额';
+
+  @override
+  String get categoryLabel => '分类';
+
+  @override
+  String get categoryHint => '请选择分类';
+
+  @override
+  String get dateLabel => '日期';
+
+  @override
+  String get timeLabel => '时间';
+
+  @override
+  String get accountLabel => '账户';
+
+  @override
+  String get accountHint => '请选择账户';
+
+  @override
+  String get descriptionLabel => '备注';
+
+  @override
+  String get descriptionHint => '请输入备注（选填）';
+
+  @override
+  String get shopLabel => '商家';
+
+  @override
+  String get shopHint => '请选择商家';
+
+  @override
+  String get selectFund => '选择账户';
+
+  @override
+  String get noAvailableFunds => '暂无可用账户';
+
+  @override
+  String get defaultFund => '默认账户';
+
+  @override
+  String get searchFund => '搜索账户';
+
+  @override
+  String get selectFundHint => '请选择账户';
+
+  @override
+  String get selectBookTitle => '选择账本';
+
+  @override
+  String get noAvailableBooks => '暂无可用账本';
+
+  @override
+  String get defaultBook => '默认账本';
+
+  @override
+  String get searchBook => '搜索账本';
+
+  @override
+  String get selectBookHint => '请选择账本';
+
+  @override
+  String get sharedBook => '共享账本';
+
+  @override
+  String get selectBookHeader => '选择账本';
+
+  @override
+  String get sharedBookLabel => '共享';
+
+  @override
+  String get cancelButton => '取消';
+
+  @override
+  String get selectCategoryTitle => '��择分类';
+
+  @override
+  String get noAvailableCategories => '暂无可用分类';
+
+  @override
+  String get searchCategoryHint => '搜索或输入新分类';
+
+  @override
+  String addCategoryButton(String name) {
+    return '添加\"$name\"';
+  }
+
+  @override
+  String get selectShopTitle => '选择商家';
+
+  @override
+  String get noAvailableShops => '暂无可用商家';
+
+  @override
+  String get searchShopHint => '搜索或输入新商家';
+
+  @override
+  String addShopButton(String name) {
+    return '添加\"$name\"';
+  }
+
+  @override
+  String get summaryIncome => '收入';
+
+  @override
+  String get summaryExpense => '支出';
+
+  @override
+  String get summaryBalance => '结余';
+
+  @override
+  String get currencySymbol => '¥';
+
+  @override
+  String get noTransactions => '暂无交易';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1128,4 +1293,169 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get updateUserInfoSuccess => '更新成功';
+
+  @override
+  String registerTimeLabel(String time) {
+    return '註冊時間：$time';
+  }
+
+  @override
+  String get invalidEmailFormat => '郵箱格式不正確';
+
+  @override
+  String get invalidPhoneFormat => '手機號格式不正確';
+
+  @override
+  String get confirmLogoutTitle => '確認退出';
+
+  @override
+  String get newRecordTitle => '記一筆';
+
+  @override
+  String get editRecordTitle => '編輯記錄';
+
+  @override
+  String get expenseType => '支出';
+
+  @override
+  String get incomeType => '收入';
+
+  @override
+  String get pleaseInputAmount => '請輸入金額';
+
+  @override
+  String get pleaseSelectCategory => '請選擇分類';
+
+  @override
+  String get pleaseSelectAccount => '請選擇賬戶';
+
+  @override
+  String get pleaseSelectBook => '請選擇賬本';
+
+  @override
+  String get saveRecord => '保存';
+
+  @override
+  String get saveRecordSuccess => '保存成功';
+
+  @override
+  String get amountLabel => '金額';
+
+  @override
+  String get amountHint => '請輸入金額';
+
+  @override
+  String get categoryLabel => '分類';
+
+  @override
+  String get categoryHint => '請選擇分類';
+
+  @override
+  String get dateLabel => '日期';
+
+  @override
+  String get timeLabel => '時間';
+
+  @override
+  String get accountLabel => '賬戶';
+
+  @override
+  String get accountHint => '請選擇賬戶';
+
+  @override
+  String get descriptionLabel => '備註';
+
+  @override
+  String get descriptionHint => '請輸入備註（選填）';
+
+  @override
+  String get shopLabel => '商家';
+
+  @override
+  String get shopHint => '請選擇商家';
+
+  @override
+  String get selectFund => '選擇賬戶';
+
+  @override
+  String get noAvailableFunds => '暫無可用賬戶';
+
+  @override
+  String get defaultFund => '默認賬戶';
+
+  @override
+  String get searchFund => '搜索賬戶';
+
+  @override
+  String get selectFundHint => '請選擇賬戶';
+
+  @override
+  String get selectBookTitle => '選擇賬本';
+
+  @override
+  String get noAvailableBooks => '暫無可用賬本';
+
+  @override
+  String get defaultBook => '默認賬本';
+
+  @override
+  String get searchBook => '搜索賬本';
+
+  @override
+  String get selectBookHint => '請選擇賬本';
+
+  @override
+  String get sharedBook => '共享賬本';
+
+  @override
+  String get selectBookHeader => '選擇賬本';
+
+  @override
+  String get sharedBookLabel => '共享';
+
+  @override
+  String get cancelButton => '取消';
+
+  @override
+  String get selectCategoryTitle => '選擇分類';
+
+  @override
+  String get noAvailableCategories => '暫無可用分類';
+
+  @override
+  String get searchCategoryHint => '搜索或輸入新分類';
+
+  @override
+  String addCategoryButton(String name) {
+    return '添加\"$name\"';
+  }
+
+  @override
+  String get selectShopTitle => '選擇商家';
+
+  @override
+  String get noAvailableShops => '暫無可用商家';
+
+  @override
+  String get searchShopHint => '搜索或輸入新商家';
+
+  @override
+  String addShopButton(String name) {
+    return '添加\"$name\"';
+  }
+
+  @override
+  String get summaryIncome => '收入';
+
+  @override
+  String get summaryExpense => '支出';
+
+  @override
+  String get summaryBalance => '結餘';
+
+  @override
+  String get currencySymbol => '¥';
+
+  @override
+  String get noTransactions => '暫無交易';
 }

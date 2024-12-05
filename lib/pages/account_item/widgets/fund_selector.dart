@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/account_item_provider.dart';
+import '../../../l10n/l10n.dart';
 
 class FundSelector extends StatelessWidget {
   final Map<String, dynamic>? selectedFund;
@@ -37,6 +38,7 @@ class FundSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Container(
       height: 48,
@@ -65,7 +67,7 @@ class FundSelector extends StatelessWidget {
                 _showFundDialog(context);
               },
               child: Text(
-                selectedFund?['name'] ?? '选择账户',
+                selectedFund?['name'] ?? l10n.selectFundHint,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: selectedFund != null
                       ? colorScheme.onSurface
@@ -105,6 +107,7 @@ class _FundDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -118,7 +121,7 @@ class _FundDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '选择账户',
+              l10n.selectFund,
               style: theme.textTheme.titleLarge?.copyWith(
                 color: colorScheme.onSurface,
               ),
@@ -140,12 +143,13 @@ class _FundDialog extends StatelessWidget {
   Widget _buildFundList(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
     final fundList = provider.fundList;
 
     if (fundList.isEmpty) {
       return Center(
         child: Text(
-          '暂无可用账户',
+          l10n.noAvailableFunds,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -213,6 +217,7 @@ class _FundDialog extends StatelessWidget {
                   Icons.star,
                   size: 16,
                   color: colorScheme.primary,
+                  semanticLabel: l10n.defaultFund,
                 )
               : null,
           onTap: () => Navigator.pop(context, fund),

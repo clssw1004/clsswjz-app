@@ -18,6 +18,7 @@ class SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -28,46 +29,58 @@ class SummaryCard extends StatelessWidget {
           color: colorScheme.outlineVariant.withOpacity(0.5),
         ),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child: _buildSummaryItem(
-                context,
-                label: '收入',
-                amount: allIn,
-                color: AppColors.income,
+      child: Column(
+        children: [
+          if (allIn == 0 && allOut == 0)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Text(
+                  l10n.noTransactions,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            )
+          else
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildSummaryItem(
+                    context,
+                    label: l10n.summaryIncome,
+                    amount: allIn,
+                    color: Color(0xFF43A047), // Material Green 600
+                  ),
+                  Container(
+                    height: 32,
+                    width: 1,
+                    color: colorScheme.outlineVariant,
+                  ),
+                  _buildSummaryItem(
+                    context,
+                    label: l10n.summaryExpense,
+                    amount: allOut,
+                    color: Color(0xFFE53935), // Material Red 600
+                  ),
+                  Container(
+                    height: 32,
+                    width: 1,
+                    color: colorScheme.outlineVariant,
+                  ),
+                  _buildSummaryItem(
+                    context,
+                    label: l10n.summaryBalance,
+                    amount: allBalance,
+                    color: colorScheme.primary,
+                  ),
+                ],
               ),
             ),
-            Container(
-              width: 1,
-              height: 24,
-              color: colorScheme.outlineVariant.withOpacity(0.5),
-            ),
-            Expanded(
-              child: _buildSummaryItem(
-                context,
-                label: '支出',
-                amount: allOut,
-                color: AppColors.expense,
-              ),
-            ),
-            Container(
-              width: 1,
-              height: 24,
-              color: colorScheme.outlineVariant.withOpacity(0.5),
-            ),
-            Expanded(
-              child: _buildSummaryItem(
-                context,
-                label: '结余',
-                amount: allBalance,
-                color: colorScheme.primary,
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -79,28 +92,39 @@ class SummaryCard extends StatelessWidget {
     required Color color,
   }) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          label == '收入'
-              ? l10n.totalIncome
-              : label == '支出'
-                  ? l10n.totalExpense
-                  : l10n.balance,
+          label,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         SizedBox(height: 4),
-        Text(
-          '¥${amount.toStringAsFixed(2)}',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: color,
-            fontWeight: FontWeight.w500,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              l10n.currencySymbol,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(width: 2),
+            Text(
+              amount.toStringAsFixed(2),
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ],
     );
