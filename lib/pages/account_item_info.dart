@@ -363,7 +363,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
       if (!mounted) return;
       Navigator.pop(context, true);
-      MessageHelper.showSuccess(context, message: '保存成功');
+      MessageHelper.showSuccess(
+        context,
+        message: '保存成功',
+        showInRelease: true, // 在发布模式也显示保存成功提示
+      );
     } catch (e) {
       if (!mounted) return;
       MessageHelper.showError(context, message: e.toString());

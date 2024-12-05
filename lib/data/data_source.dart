@@ -1,6 +1,58 @@
 import '../models/models.dart';
 import 'http/http_method.dart';
 
+class ServerStatus {
+  final String status;
+  final String timestamp;
+  final int uptime;
+  final ServerMemory memory;
+  final DatabaseStatus database;
+
+  ServerStatus({
+    required this.status,
+    required this.timestamp,
+    required this.uptime,
+    required this.memory,
+    required this.database,
+  });
+
+  factory ServerStatus.fromJson(Map<String, dynamic> json) => ServerStatus(
+        status: json['status'],
+        timestamp: json['timestamp'],
+        uptime: json['uptime'],
+        memory: ServerMemory.fromJson(json['memory']),
+        database: DatabaseStatus.fromJson(json['database']),
+      );
+}
+
+class ServerMemory {
+  final String heapUsed;
+  final String heapTotal;
+  final String rss;
+
+  ServerMemory({
+    required this.heapUsed,
+    required this.heapTotal,
+    required this.rss,
+  });
+
+  factory ServerMemory.fromJson(Map<String, dynamic> json) => ServerMemory(
+        heapUsed: json['heapUsed'],
+        heapTotal: json['heapTotal'],
+        rss: json['rss'],
+      );
+}
+
+class DatabaseStatus {
+  final String status;
+
+  DatabaseStatus({required this.status});
+
+  factory DatabaseStatus.fromJson(Map<String, dynamic> json) => DatabaseStatus(
+        status: json['status'],
+      );
+}
+
 abstract class DataSource {
   Future<T> request<T>({
     required String path,
@@ -47,4 +99,6 @@ abstract class DataSource {
   Future<List<UserFund>> getUserFunds();
   Future<UserFund> createFund(UserFund fund);
   Future<UserFund> updateFund(String id, UserFund fund);
+
+  Future<ServerStatus> serverStatus();
 }

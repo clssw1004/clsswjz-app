@@ -475,4 +475,9 @@ class SqliteDataSource implements DataSource {
             }))
         .toList();
   }
+
+  @override
+  Future<ServerStatus> serverStatus() {
+    throw UnimplementedError('SQLite does not support server status check');
+  }
 }

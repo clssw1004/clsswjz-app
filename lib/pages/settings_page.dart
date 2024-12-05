@@ -8,6 +8,9 @@ import './settings/category_management_page.dart';
 import '../widgets/app_bar_factory.dart';
 import './settings/shop_management_page.dart';
 import './settings/fund_management_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/message_helper.dart';
+import './settings/widgets/server_url_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -39,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
             context,
             title: '账本管理',
             children: [
-              CreateAccountBookItem(), // 移除 dataService 参数
+              CreateAccountBookItem(),
               ListTile(
                 leading: Icon(Icons.category_outlined),
                 title: Text('分类管理'),
@@ -86,12 +89,21 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
 
-          // 开发者选项
+          // 系统设置（原开发者选项）
           _buildSection(
             context,
-            title: '开发者选项',
+            title: '系统设置',
             children: [
               DeveloperModeSelector(),
+              ListTile(
+                leading: Icon(Icons.dns_outlined),
+                title: Text('后台服务设置'),
+                trailing: Icon(Icons.chevron_right),
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => ServerUrlDialog(),
+                ),
+              ),
             ],
           ),
         ],

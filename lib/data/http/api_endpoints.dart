@@ -6,4 +6,5 @@ class ApiEndpoints {
   static const String categories = '/api/account/category';
   static const String funds = '/api/account/fund';
   static const String shops = '/api/account/shop';
+  static const String health = '/api/health';
 }

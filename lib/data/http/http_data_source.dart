@@ -4,13 +4,24 @@ import '../data_source.dart';
 import '../../models/models.dart';
 import 'api_endpoints.dart';
 import 'http_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpDataSource implements DataSource {
   final HttpClient _httpClient;
   String? _token;
 
-  HttpDataSource({String baseUrl = 'http://192.168.2.147:3000'})
-      : _httpClient = HttpClient(baseUrl: baseUrl);
+  HttpDataSource._internal({String? baseUrl})
+      : _httpClient = HttpClient(
+          baseUrl: baseUrl ?? 'http://192.168.2.147:3000',
+        );
+
+  factory HttpDataSource({String? baseUrl}) {
+    return HttpDataSource._internal(baseUrl: baseUrl);
+  }
+
+  Future<void> initializeBaseUrl(String url) async {
+    _httpClient.setBaseUrl(url);
+  }
 
   void setToken(String token) {
     _token = token;
@@ -410,5 +421,19 @@ class HttpDataSource implements DataSource {
       rethrow;
     }
   }
+
+  @override
+  Future<ServerStatus> serverStatus() async {
+    try {
+      final response = await _httpClient.request<Map<String, dynamic>>(
+        path: '${ApiEndpoints.health}',
+        method: HttpMethod.get,
+      );
+      return ServerStatus.fromJson(response);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
   // 继续实现其他方法...
 }

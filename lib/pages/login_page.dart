@@ -3,6 +3,8 @@ import '../services/auth_service.dart';
 import '../pages/register_page.dart';
 import '../services/user_service.dart';
 import '../utils/message_helper.dart';
+import '../constants/theme_constants.dart';
+import '../pages/settings/widgets/server_url_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -48,108 +50,147 @@ class LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: '用户名',
-                    prefixIcon: Icon(
-                      Icons.person,
-                      color: colorScheme.primary,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: colorScheme.outline),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: colorScheme.outline),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: colorScheme.primary),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '请输入用户名';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: '密码',
-                    prefixIcon: Icon(
-                      Icons.lock,
-                      color: colorScheme.primary,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: colorScheme.outline),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: colorScheme.outline),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: colorScheme.primary),
-                    ),
-                  ),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '请输入密码';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 24),
-                _isLoading
-                    ? CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(colorScheme.primary),
-                      )
-                    : FilledButton(
-                        onPressed: _handleLogin,
-                        style: FilledButton.styleFrom(
-                          minimumSize: Size(double.infinity, 48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          '登录',
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: AppDimens.dialogMaxWidth,
+          ),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDimens.padding,
+              vertical: AppDimens.spacing24,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: '用户名',
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: colorScheme.primary,
                       ),
-                SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RegisterPage()),
-                    );
-                  },
-                  child: Text(
-                    '还没有账号？立即注册',
-                    style: theme.textTheme.bodyMedium?.copyWith(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.outline),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.outline),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.primary),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '请输入用户名';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      labelText: '密码',
+                      prefixIcon: Icon(
+                        Icons.lock,
+                        color: colorScheme.primary,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.outline),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.outline),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: colorScheme.primary),
+                      ),
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '请输入密码';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 24),
+                  TextButton.icon(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) => ServerUrlDialog(),
+                    ),
+                    icon: Icon(
+                      Icons.dns_outlined,
+                      size: 18,
                       color: colorScheme.primary,
                     ),
+                    label: Text(
+                      '后台服务设置',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimens.spacing16,
+                        vertical: AppDimens.spacing8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppDimens.buttonRadius),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(height: 24),
+                  _isLoading
+                      ? CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              colorScheme.primary),
+                        )
+                      : FilledButton(
+                          onPressed: _handleLogin,
+                          style: FilledButton.styleFrom(
+                            minimumSize:
+                                Size(double.infinity, AppDimens.buttonHeight),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppDimens.buttonRadius),
+                            ),
+                          ),
+                          child: Text(
+                            '登录',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: colorScheme.onPrimary,
+                            ),
+                          ),
+                        ),
+                  SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterPage()),
+                      );
+                    },
+                    child: Text(
+                      '还没有账号？立即注册',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

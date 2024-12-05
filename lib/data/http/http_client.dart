@@ -139,4 +139,8 @@ class HttpClient {
       message: e.message ?? 'Request failed',
     );
   }
+
+  void setBaseUrl(String baseUrl) {
+    _dio.options.baseUrl = baseUrl;
+  }
 }

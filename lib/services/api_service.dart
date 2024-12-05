@@ -1,4 +1,5 @@
 import '../data/http/api_endpoints.dart';
+import '../data/http/http_data_source.dart';
 import '../data/http/http_method.dart';
 import '../models/models.dart';
 import '../data/data_source_factory.dart';
@@ -136,5 +137,24 @@ class ApiService {
 
   static Future<String> resetInviteCode() {
     return _dataSource.resetInviteCode();
+  }
+
+  static Future<ServerStatus> checkServerStatus([String? customUrl]) async {
+    if (customUrl != null) {
+      // 创建一个新的 HttpDataSource 实例用于检查
+      final dataSource = HttpDataSource(baseUrl: customUrl);
+      try {
+        return await dataSource.serverStatus();
+      } catch (e) {
+        throw Exception('无法连接到服务器: $e');
+      }
+    }
+
+    // 使用当前的数据源检查状态
+    try {
+      return await _dataSource.serverStatus();
+    } catch (e) {
+      throw Exception('无法连接到服务器: $e');
+    }
   }
 }
