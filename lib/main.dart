@@ -8,10 +8,12 @@ import 'pages/user/user_info_page.dart';
 import 'theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'services/user_service.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'pages/account_book_list.dart';
 import 'pages/create_account_book_page.dart';
 import 'package:flutter/services.dart';
+import 'providers/locale_provider.dart';
+import 'l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<Map<String, dynamic>?> _initializeApp() async {
   try {
@@ -29,8 +31,14 @@ Future<Map<String, dynamic>?> _initializeApp() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 加载主题
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
+
+  // 加载语言设置
+  final localeProvider = LocaleProvider();
+  await localeProvider.loadSavedLocale();
 
   if (!kIsWeb && Platform.isAndroid) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -52,10 +60,11 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => themeProvider),
+        ChangeNotifierProvider(create: (_) => localeProvider),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, themeProvider, localeProvider, _) {
           return MaterialApp(
             theme: themeProvider.lightTheme,
             darkTheme: themeProvider.darkTheme,
@@ -76,16 +85,9 @@ void main() async {
               }
               return null;
             },
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('zh', 'CN'),
-              Locale('en', 'US'),
-            ],
-            locale: const Locale('zh', 'CN'),
+            localizationsDelegates: L10n.localizationsDelegates,
+            supportedLocales: L10n.supportedLocales,
+            locale: localeProvider.locale,
             home: FutureBuilder<Map<String, dynamic>?>(
               future: _initializeApp(),
               builder: (context, snapshot) {

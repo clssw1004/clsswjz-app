@@ -1,0 +1,396 @@
+{
+  "@@locale": "en",
+  "appName": "Account Book",
+  "@appName": {
+    "description": "The application name"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings page title"
+  },
+  "accountManagement": "Account Management",
+  "@accountManagement": {
+    "description": "Account management section title"
+  },
+  "themeSettings": "Theme Settings",
+  "@themeSettings": {
+    "description": "Theme settings section title"
+  },
+  "systemSettings": "System Settings",
+  "@systemSettings": {
+    "description": "System settings section title"
+  },
+  "categoryManagement": "Category Management",
+  "@categoryManagement": {
+    "description": "Category management menu item"
+  },
+  "shopManagement": "Shop Management",
+  "@shopManagement": {
+    "description": "Shop management menu item"
+  },
+  "fundManagement": "Fund Management",
+  "@fundManagement": {
+    "description": "Fund management menu item"
+  },
+  "createAccountBook": "Create Account Book",
+  "@createAccountBook": {
+    "description": "Create account book menu item"
+  },
+  "serverSettings": "Server Settings",
+  "@serverSettings": {
+    "description": "Server settings menu item"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "confirmLogout": "Confirm Logout",
+  "@confirmLogout": {
+    "description": "Logout confirmation dialog title"
+  },
+  "confirmLogoutMessage": "Are you sure you want to logout?",
+  "@confirmLogoutMessage": {
+    "description": "Logout confirmation dialog message"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  "userInfo": "User Info",
+  "@userInfo": {
+    "description": "User info page title"
+  },
+  "nickname": "Nickname",
+  "@nickname": {
+    "description": "Nickname field label"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  "phone": "Phone",
+  "@phone": {
+    "description": "Phone field label"
+  },
+  "languageSettings": "Language Settings",
+  "@languageSettings": {
+    "description": "Language settings field label"
+  },
+  "timezoneSettings": "Timezone Settings",
+  "@timezoneSettings": {
+    "description": "Timezone settings field label"
+  },
+  "inviteCode": "Invite Code",
+  "@inviteCode": {
+    "description": "Invite code field label"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "Reset button text"
+  },
+  "resetSuccess": "Reset successful",
+  "@resetSuccess": {
+    "description": "Reset success message"
+  },
+  "copied": "Copied to clipboard",
+  "@copied": {
+    "description": "Copied to clipboard message"
+  },
+  "updateSuccess": "Update successful",
+  "@updateSuccess": {
+    "description": "Update success message"
+  },
+  "registerTime": "Register time: {time}",
+  "@registerTime": {
+    "description": "Register time text",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "2024-01-01 12:00:00"
+      }
+    }
+  },
+  "developerMode": "Developer Mode",
+  "@developerMode": {
+    "description": "Developer mode menu item"
+  },
+  "themeMode": "Theme Mode",
+  "@themeMode": {
+    "description": "Theme mode menu item"
+  },
+  "themeColor": "Theme Color",
+  "@themeColor": {
+    "description": "Theme color menu item"
+  },
+  "light": "Light",
+  "@light": {
+    "description": "Light theme mode"
+  },
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark theme mode"
+  },
+  "system": "System",
+  "@system": {
+    "description": "System theme mode"
+  },
+  "serverUrl": "Server URL",
+  "@serverUrl": {
+    "description": "Server URL dialog title"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+  "nicknameRequired": "Nickname is required",
+  "@nicknameRequired": {
+    "description": "Nickname required error message"
+  },
+  "invalidEmail": "Invalid email format",
+  "@invalidEmail": {
+    "description": "Invalid email error message"
+  },
+  "invalidPhone": "Invalid phone number format",
+  "@invalidPhone": {
+    "description": "Invalid phone error message"
+  },
+  "merchantManagement": "Merchant Management",
+  "@merchantManagement": {
+    "description": "Merchant management menu item"
+  },
+  "serverUrlRequired": "Server URL is required",
+  "serverStatusNormal": "Server status: Normal",
+  "serverStatusError": "Server status: Error",
+  "databaseStatus": "Database status",
+  "memoryUsage": "Memory usage",
+  "saveSuccessRestartRequired": "Save successful, please restart the app",
+  "saveFailed": "Save failed",
+  "themeColorTitle": "Theme Color",
+  "@themeColorTitle": {
+    "description": "Theme color dialog title"
+  },
+  "themeColorSubtitle": "Choose your favorite theme color",
+  "@themeColorSubtitle": {
+    "description": "Theme color dialog subtitle"
+  },
+  "loadServerUrlFailed": "Failed to load server URL",
+  "@loadServerUrlFailed": {
+    "description": "Failed to load server URL message"
+  },
+  "serverUrlHint": "http://example.com:3000",
+  "@serverUrlHint": {
+    "description": "Server URL input hint"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login page title and button text"
+  },
+  "username": "Username",
+  "@username": {
+    "description": "Username field label"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  "usernameRequired": "Username is required",
+  "@usernameRequired": {
+    "description": "Username required error message"
+  },
+  "passwordRequired": "Password is required",
+  "@passwordRequired": {
+    "description": "Password required error message"
+  },
+  "noAccount": "No account? Register now",
+  "@noAccount": {
+    "description": "Register link text"
+  },
+  "bookName": "Book Name",
+  "@bookName": {
+    "description": "Book name field label"
+  },
+  "bookNameHint": "Please enter book name",
+  "@bookNameHint": {
+    "description": "Book name field hint"
+  },
+  "bookNameRequired": "Book name is required",
+  "@bookNameRequired": {
+    "description": "Book name required error message"
+  },
+  "bookDescription": "Description",
+  "@bookDescription": {
+    "description": "Book description field label"
+  },
+  "bookDescriptionHint": "Please enter description (optional)",
+  "@bookDescriptionHint": {
+    "description": "Book description field hint"
+  },
+  "currency": "Currency",
+  "@currency": {
+    "description": "Currency field label"
+  },
+  "createBook": "Create Book",
+  "@createBook": {
+    "description": "Create book button text"
+  },
+  "createSuccess": "Created successfully",
+  "@createSuccess": {
+    "description": "Create success message"
+  },
+  "createFailed": "Create failed: {error}",
+  "@createFailed": {
+    "description": "Create failed message",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "newShop": "New Shop",
+  "@newShop": {
+    "description": "New shop button tooltip"
+  },
+  "editShop": "Edit Shop",
+  "@editShop": {
+    "description": "Edit shop dialog title"
+  },
+  "shopName": "Shop Name",
+  "@shopName": {
+    "description": "Shop name field label"
+  },
+  "noDefaultBook": "No default account book selected",
+  "@noDefaultBook": {
+    "description": "Error message when no default book is selected"
+  },
+  "updateShopSuccess": "Shop updated successfully",
+  "@updateShopSuccess": {
+    "description": "Shop update success message"
+  },
+  "createShopSuccess": "Shop created successfully",
+  "@createShopSuccess": {
+    "description": "Shop create success message"
+  },
+  "shopNameRequired": "Shop name is required",
+  "@shopNameRequired": {
+    "description": "Shop name required error message"
+  },
+  "newCategory": "New Category",
+  "@newCategory": {
+    "description": "New category button tooltip"
+  },
+  "editCategory": "Edit Category",
+  "@editCategory": {
+    "description": "Edit category dialog title"
+  },
+  "categoryName": "Category Name",
+  "@categoryName": {
+    "description": "Category name field label"
+  },
+  "categoryNameRequired": "Category name is required",
+  "@categoryNameRequired": {
+    "description": "Category name required error message"
+  },
+  "updateCategorySuccess": "Category updated successfully",
+  "@updateCategorySuccess": {
+    "description": "Category update success message"
+  },
+  "createCategorySuccess": "Category created successfully",
+  "@createCategorySuccess": {
+    "description": "Category create success message"
+  },
+  "newFund": "New Account",
+  "@newFund": {
+    "description": "New fund account button tooltip"
+  },
+  "editFund": "Edit Account",
+  "@editFund": {
+    "description": "Edit fund account dialog title"
+  },
+  "fundName": "Account Name",
+  "@fundName": {
+    "description": "Fund account name field label"
+  },
+  "fundNameRequired": "Account name is required",
+  "@fundNameRequired": {
+    "description": "Fund account name required error message"
+  },
+  "fundType": "Account Type",
+  "@fundType": {
+    "description": "Fund account type field label"
+  },
+  "updateFundSuccess": "Account updated successfully",
+  "@updateFundSuccess": {
+    "description": "Fund account update success message"
+  },
+  "createFundSuccess": "Account created successfully",
+  "@createFundSuccess": {
+    "description": "Fund account create success message"
+  },
+  "cash": "Cash",
+  "@cash": {
+    "description": "Cash account type"
+  },
+  "bankCard": "Bank Card",
+  "@bankCard": {
+    "description": "Bank card account type"
+  },
+  "creditCard": "Credit Card",
+  "@creditCard": {
+    "description": "Credit card account type"
+  },
+  "alipay": "Alipay",
+  "@alipay": {
+    "description": "Alipay account type"
+  },
+  "wechat": "WeChat Pay",
+  "@wechat": {
+    "description": "WeChat Pay account type"
+  },
+  "other": "Other",
+  "@other": {
+    "description": "Other account type"
+  },
+  "accountBookList": "Account Books",
+  "@accountBookList": {
+    "description": "Account book list page title"
+  },
+  "newAccountBook": "New Account Book",
+  "@newAccountBook": {
+    "description": "New account book button tooltip"
+  },
+  "retryLoading": "Retry",
+  "@retryLoading": {
+    "description": "Retry button text"
+  },
+  "loadAccountBooksFailed": "Failed to load account books",
+  "@loadAccountBooksFailed": {
+    "description": "Error message when loading account books fails"
+  },
+  "noAccountBooks": "No account books",
+  "@noAccountBooks": {
+    "description": "Message when no account books exist"
+  },
+  "unnamedBook": "Unnamed Book",
+  "@unnamedBook": {
+    "description": "Default name for unnamed book"
+  },
+  "sharedFrom": "Shared from {name}",
+  "@sharedFrom": {
+    "description": "Shared book indicator",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "John"
+      }
+    }
+  },
+  "unknownUser": "Unknown User",
+  "@unknownUser": {
+    "description": "Default name for unknown user"
+  }
+} 

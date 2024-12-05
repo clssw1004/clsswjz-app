@@ -5,6 +5,7 @@ import '../constants/book_icons.dart';
 import 'account_book_info.dart';
 import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
+import '../l10n/l10n.dart';
 
 class AccountBookList extends StatefulWidget {
   @override
@@ -88,17 +89,18 @@ class AccountBookListState extends State<AccountBookList> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       extendBodyBehindAppBar: true,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: AppBarFactory.buildTitle(context, '账本管理'),
+        title: AppBarFactory.buildTitle(context, l10n.accountBookList),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            tooltip: '新建账本',
+            tooltip: l10n.newAccountBook,
             onPressed: () {
               Navigator.pushNamed(context, '/create-account-book')
                   .then((_) => _fetchAccountBooks());
@@ -118,6 +120,7 @@ class AccountBookListState extends State<AccountBookList> {
   Widget _buildContent() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     if (_isLoading) {
       return Center(
@@ -141,7 +144,7 @@ class AccountBookListState extends State<AccountBookList> {
             SizedBox(height: 16),
             FilledButton.tonal(
               onPressed: _fetchAccountBooks,
-              child: Text('重试'),
+              child: Text(l10n.retryLoading),
             ),
           ],
         ),
@@ -154,7 +157,7 @@ class AccountBookListState extends State<AccountBookList> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '暂无账本',
+              l10n.noAccountBooks,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -166,7 +169,7 @@ class AccountBookListState extends State<AccountBookList> {
                   _fetchAccountBooks();
                 });
               },
-              child: Text('新建账本'),
+              child: Text(l10n.newAccountBook),
             ),
           ],
         ),
@@ -196,6 +199,7 @@ class AccountBookListState extends State<AccountBookList> {
   Widget _buildAccountItem(Map<String, dynamic> book) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
     final currentUserId = UserService.getUserInfo()?['userId'];
     final isShared = book['fromId'] != currentUserId;
     final permissions = book['permissions'] as Map<String, dynamic>;
@@ -235,7 +239,7 @@ class AccountBookListState extends State<AccountBookList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          book['name'] ?? '未命名账本',
+                          book['name'] ?? l10n.unnamedBook,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: colorScheme.onSurface,
                             fontWeight: FontWeight.w500,
@@ -267,7 +271,7 @@ class AccountBookListState extends State<AccountBookList> {
                         ),
                         SizedBox(width: 4),
                         Text(
-                          '共享自${book['fromName'] ?? '未知用户'}',
+                          l10n.sharedFrom(book['fromName'] ?? l10n.unknownUser),
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
