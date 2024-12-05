@@ -12,8 +12,8 @@ import 'pages/account_book_list.dart';
 import 'pages/create_account_book_page.dart';
 import 'package:flutter/services.dart';
 import 'providers/locale_provider.dart';
-import 'l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'generated/app_localizations.dart';
 
 Future<Map<String, dynamic>?> _initializeApp() async {
   try {
@@ -58,62 +58,72 @@ void main() async {
   }
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => themeProvider),
-        ChangeNotifierProvider(create: (_) => localeProvider),
-      ],
-      child: Consumer2<ThemeProvider, LocaleProvider>(
-        builder: (context, themeProvider, localeProvider, _) {
-          return MaterialApp(
-            theme: themeProvider.lightTheme,
-            darkTheme: themeProvider.darkTheme,
-            themeMode: themeProvider.themeMode,
-            title: '记账本',
-            routes: {
-              '/login': (context) => LoginPage(),
-              '/register': (context) => RegisterPage(),
-              '/account-books': (context) => AccountBookList(),
-              '/create-account-book': (context) => CreateAccountBookPage(),
-              '/user-info': (context) => UserInfoPage(),
+    Builder(
+      builder: (context) {
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: themeProvider),
+            ChangeNotifierProvider.value(value: localeProvider),
+          ],
+          child: Consumer2<ThemeProvider, LocaleProvider>(
+            builder: (context, themeProvider, localeProvider, _) {
+              return MaterialApp(
+                theme: themeProvider.lightTheme,
+                darkTheme: themeProvider.darkTheme,
+                themeMode: themeProvider.themeMode,
+                title: '记账本',
+                routes: {
+                  '/login': (context) => LoginPage(),
+                  '/register': (context) => RegisterPage(),
+                  '/account-books': (context) => AccountBookList(),
+                  '/create-account-book': (context) => CreateAccountBookPage(),
+                  '/user-info': (context) => UserInfoPage(),
+                },
+                onGenerateRoute: (settings) {
+                  if (settings.name == '/home') {
+                    return MaterialPageRoute(
+                      builder: (context) => HomePage(),
+                    );
+                  }
+                  return null;
+                },
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [
+                  Locale('zh'),
+                  Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+                  Locale('en'),
+                ],
+                locale: localeProvider.locale,
+                home: Builder(
+                  builder: (context) {
+                    return FutureBuilder<Map<String, dynamic>?>(
+                      future: _initializeApp(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Scaffold(
+                            body: Center(
+                              child: CircularProgressIndicator(
+                                color: themeProvider.themeColor,
+                              ),
+                            ),
+                          );
+                        }
+                        return snapshot.data != null ? HomePage() : LoginPage();
+                      },
+                    );
+                  },
+                ),
+              );
             },
-            onGenerateRoute: (settings) {
-              if (settings.name == '/home') {
-                return MaterialPageRoute(
-                  builder: (context) => HomePage(),
-                );
-              }
-              return null;
-            },
-            localizationsDelegates: L10n.localizationsDelegates,
-            supportedLocales: L10n.supportedLocales,
-            locale: localeProvider.locale,
-            localeResolutionCallback: (locale, supportedLocales) {
-              for (var supportedLocale in supportedLocales) {
-                if (supportedLocale.languageCode == locale?.languageCode) {
-                  return supportedLocale;
-                }
-              }
-              return const Locale('zh', 'CN');
-            },
-            home: FutureBuilder<Map<String, dynamic>?>(
-              future: _initializeApp(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Scaffold(
-                    body: Center(
-                      child: CircularProgressIndicator(
-                        color: themeProvider.themeColor,
-                      ),
-                    ),
-                  );
-                }
-                return snapshot.data != null ? HomePage() : LoginPage();
-              },
-            ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     ),
   );
 }

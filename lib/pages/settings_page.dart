@@ -9,6 +9,8 @@ import '../widgets/app_bar_factory.dart';
 import './settings/shop_management_page.dart';
 import './settings/fund_management_page.dart';
 import './settings/widgets/server_url_dialog.dart';
+import './settings/widgets/language_selector.dart';
+import '../l10n/l10n.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -22,12 +24,13 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: AppBarFactory.buildTitle(context, '设置'),
+        title: AppBarFactory.buildTitle(context, l10n.settings),
       ),
       body: ListView(
         children: [
@@ -38,12 +41,12 @@ class _SettingsPageState extends State<SettingsPage> {
           // 账本管理
           _buildSection(
             context,
-            title: '账本管理',
+            title: l10n.accountManagement,
             children: [
               CreateAccountBookItem(),
               ListTile(
                 leading: Icon(Icons.category_outlined),
-                title: Text('分类管理'),
+                title: Text(l10n.categoryManagement),
                 trailing: Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,
@@ -54,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               ListTile(
                 leading: Icon(Icons.store_outlined),
-                title: Text('商家管理'),
+                title: Text(l10n.shopManagement),
                 trailing: Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,
@@ -65,7 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               ListTile(
                 leading: Icon(Icons.account_balance_wallet_outlined),
-                title: Text('账户管理'),
+                title: Text(l10n.fundManagement),
                 trailing: Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,
@@ -80,22 +83,23 @@ class _SettingsPageState extends State<SettingsPage> {
           // 主题设置
           _buildSection(
             context,
-            title: '主题设置',
+            title: l10n.themeSettings,
             children: [
               ThemeModeSelector(),
               ThemeColorSelector(),
             ],
           ),
 
-          // 系统设置（原开发者选项）
+          // 系统设置
           _buildSection(
             context,
-            title: '系统设置',
+            title: l10n.systemSettings,
             children: [
               DeveloperModeSelector(),
+              LanguageSelector(),
               ListTile(
                 leading: Icon(Icons.dns_outlined),
-                title: Text('后台服务设置'),
+                title: Text(l10n.serverSettings),
                 trailing: Icon(Icons.chevron_right),
                 onTap: () => showDialog(
                   context: context,

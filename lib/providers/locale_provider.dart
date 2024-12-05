@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/language.dart';
-import '../l10n/l10n.dart';
 
 class LocaleProvider extends ChangeNotifier {
   static const String _localeKey = 'app_locale';
-  Locale _locale = const Locale('zh', 'CN');
+  Locale _locale = const Locale('zh');
 
   Locale get locale => _locale;
 
@@ -20,12 +19,9 @@ class LocaleProvider extends ChangeNotifier {
       if (savedLocale != null) {
         final language = Language.fromCode(savedLocale);
         _setLocale(language);
-      } else {
-        _setLocale(Language.ZH_CN);
       }
     } catch (e) {
       print('加载语言设置失败: $e');
-      _setLocale(Language.ZH_CN);
     }
   }
 
@@ -34,23 +30,17 @@ class LocaleProvider extends ChangeNotifier {
   }
 
   Future<void> setLocale(Language language) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_localeKey, language.code);
-    _setLocale(language);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_localeKey, language.code);
+      _setLocale(language);
+    } catch (e) {
+      print('保存语言设置失败: $e');
+    }
   }
 
   void _setLocale(Language language) {
-    switch (language) {
-      case Language.ZH_CN:
-        _locale = const Locale('zh', 'CN');
-        break;
-      case Language.ZH_TW:
-        _locale = const Locale('zh', 'Hant');
-        break;
-      case Language.EN:
-        _locale = const Locale('en');
-        break;
-    }
+    _locale = language.toLocale();
     notifyListeners();
   }
 }
