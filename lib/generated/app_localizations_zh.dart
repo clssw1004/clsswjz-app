@@ -43,9 +43,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmLogout => '确认退出';
 
   @override
-  String get confirmLogoutMessage => '确定要退出登录吗？';
-
-  @override
   String get cancel => '取消';
 
   @override
@@ -111,12 +108,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverUrl => '服务器地址';
 
   @override
-  String get save => '保存';
-
-  @override
-  String get nicknameRequired => '昵称不能为空';
-
-  @override
   String get invalidEmail => '邮箱格式不正确';
 
   @override
@@ -133,9 +124,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get loadServerUrlFailed => '加载服务地址失败';
-
-  @override
-  String get serverUrlHint => 'http://example.com:3000';
 
   @override
   String get login => '登录';
@@ -339,23 +327,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unnamedBook => '未命名账本';
 
   @override
-  String sharedFrom(String name) {
+  String sharedFrom(Object name) {
     return '共享自$name';
   }
 
   @override
-  String get unknownUser => '未知';
+  String get unknownUser => '未知用户';
 
   @override
   String get serverAddress => '服务地址';
 
   @override
-  String serverStatusNormal(String dbStatus, String memUsed, String memTotal) {
+  String serverStatusNormal(Object dbStatus, Object memTotal, Object memUsed) {
     return '服务正常\n数据库状态: $dbStatus\n内存使用: $memUsed/$memTotal';
   }
 
   @override
-  String serverStatusError(String error) {
+  String serverStatusError(Object error) {
     return '服务异常: $error';
   }
 
@@ -363,10 +351,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseInputServerUrl => '请输入服务地址';
 
   @override
-  String get saveSuccess => '保存成功';
+  String get saveSuccess => '保存成功，请重启应用';
 
   @override
-  String saveFailed(String error) {
+  String saveFailed(Object error) {
     return '保存失败: $error';
   }
 
@@ -377,7 +365,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get checkServer => '检测服务';
 
   @override
-  String linkedBooksCount(int count) {
+  String linkedBooksCount(Object count) {
     return '$count个关联账本';
   }
 
@@ -391,7 +379,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get linkedBooks => '关联账本';
 
   @override
-  String lastUpdated(String time) {
+  String lastUpdated(Object time) {
     return '最近更新：$time';
   }
 
@@ -429,6 +417,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverUrlLabel => '服务器地址';
 
   @override
+  String get serverUrlHint => 'http://example.com:3000';
+
+  @override
   String get normalStatus => '正常';
 
   @override
@@ -445,6 +436,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bookDetails => '账本详情';
+
+  @override
+  String get save => '保存';
 
   @override
   String get bookNameLabel => '账本名称';
@@ -501,7 +495,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addMemberSuccess => '成员添加成功';
 
   @override
-  String addMemberFailed(String error) {
+  String addMemberFailed(Object error) {
     return '添加成员失败：$error';
   }
 
@@ -566,18 +560,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateUserInfoSuccess => '更新成功';
 
   @override
-  String registerTimeLabel(String time) {
+  String registerTimeLabel(Object time) {
     return '注册时间：$time';
   }
 
   @override
-  String get invalidEmailFormat => '邮箱格式不正确';
+  String get nicknameRequired => '昵称不能为空';
 
   @override
-  String get invalidPhoneFormat => '手机号格式不正确';
+  String get invalidEmailFormat => 'Invalid email format';
+
+  @override
+  String get invalidPhoneFormat => 'Invalid phone number format';
 
   @override
   String get confirmLogoutTitle => '确认退出';
+
+  @override
+  String get confirmLogoutMessage => '确定要退出登录吗？';
 
   @override
   String get newRecordTitle => '记一笔';
@@ -673,7 +673,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchBook => '搜索账本';
 
   @override
-  String get selectBookHint => '请选择账本';
+  String get selectBookHint => '��选择账本';
 
   @override
   String get sharedBook => '共享账本';
@@ -688,7 +688,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cancelButton => '取消';
 
   @override
-  String get selectCategoryTitle => '��择分类';
+  String get selectCategoryTitle => '选择分类';
 
   @override
   String get noAvailableCategories => '暂无可用分类';
@@ -697,7 +697,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchCategoryHint => '搜索或输入新分类';
 
   @override
-  String addCategoryButton(String name) {
+  String addCategoryButton(Object name) {
     return '添加\"$name\"';
   }
 
@@ -711,7 +711,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchShopHint => '搜索或输入新商家';
 
   @override
-  String addShopButton(String name) {
+  String addShopButton(Object name) {
     return '添加\"$name\"';
   }
 
@@ -770,9 +770,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get confirmLogout => '確認退出';
-
-  @override
-  String get confirmLogoutMessage => '確定要退出登錄嗎？';
 
   @override
   String get cancel => '取消';
@@ -840,12 +837,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get serverUrl => '伺服器地址';
 
   @override
-  String get save => '保存';
-
-  @override
-  String get nicknameRequired => '暱稱不能為空';
-
-  @override
   String get invalidEmail => '郵箱格式不正確';
 
   @override
@@ -862,9 +853,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get loadServerUrlFailed => '加載服務地址失敗';
-
-  @override
-  String get serverUrlHint => 'http://example.com:3000';
 
   @override
   String get login => '登錄';
@@ -1068,23 +1056,23 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get unnamedBook => '未命名賬本';
 
   @override
-  String sharedFrom(String name) {
+  String sharedFrom(Object name) {
     return '共享自$name';
   }
 
   @override
-  String get unknownUser => '未知';
+  String get unknownUser => '未知用戶';
 
   @override
   String get serverAddress => '服務地址';
 
   @override
-  String serverStatusNormal(String dbStatus, String memUsed, String memTotal) {
+  String serverStatusNormal(Object dbStatus, Object memTotal, Object memUsed) {
     return '服務正常\n數據庫狀態: $dbStatus\n內存使用: $memUsed/$memTotal';
   }
 
   @override
-  String serverStatusError(String error) {
+  String serverStatusError(Object error) {
     return '服務異常: $error';
   }
 
@@ -1092,10 +1080,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get pleaseInputServerUrl => '請輸入服務地址';
 
   @override
-  String get saveSuccess => '保存成功';
+  String get saveSuccess => '保存成功，請重啟應用';
 
   @override
-  String saveFailed(String error) {
+  String saveFailed(Object error) {
     return '保存失敗: $error';
   }
 
@@ -1106,7 +1094,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get checkServer => '檢測服務';
 
   @override
-  String linkedBooksCount(int count) {
+  String linkedBooksCount(Object count) {
     return '$count個關聯賬本';
   }
 
@@ -1120,7 +1108,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get linkedBooks => '關聯賬本';
 
   @override
-  String lastUpdated(String time) {
+  String lastUpdated(Object time) {
     return '最近更新：$time';
   }
 
@@ -1158,6 +1146,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get serverUrlLabel => '伺服器地址';
 
   @override
+  String get serverUrlHint => 'http://example.com:3000';
+
+  @override
   String get normalStatus => '正常';
 
   @override
@@ -1174,6 +1165,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get bookDetails => '賬本詳情';
+
+  @override
+  String get save => '保存';
 
   @override
   String get bookNameLabel => '賬本名稱';
@@ -1230,7 +1224,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get addMemberSuccess => '成員添加成功';
 
   @override
-  String addMemberFailed(String error) {
+  String addMemberFailed(Object error) {
     return '添加成員失敗：$error';
   }
 
@@ -1295,18 +1289,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get updateUserInfoSuccess => '更新成功';
 
   @override
-  String registerTimeLabel(String time) {
+  String registerTimeLabel(Object time) {
     return '註冊時間：$time';
   }
 
   @override
-  String get invalidEmailFormat => '郵箱格式不正確';
-
-  @override
-  String get invalidPhoneFormat => '手機號格式不正確';
+  String get nicknameRequired => '暱稱不能為空';
 
   @override
   String get confirmLogoutTitle => '確認退出';
+
+  @override
+  String get confirmLogoutMessage => '確定要退出登錄嗎？';
 
   @override
   String get newRecordTitle => '記一筆';
@@ -1426,7 +1420,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get searchCategoryHint => '搜索或輸入新分類';
 
   @override
-  String addCategoryButton(String name) {
+  String addCategoryButton(Object name) {
     return '添加\"$name\"';
   }
 
@@ -1440,7 +1434,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get searchShopHint => '搜索或輸入新商家';
 
   @override
-  String addShopButton(String name) {
+  String addShopButton(Object name) {
     return '添加\"$name\"';
   }
 

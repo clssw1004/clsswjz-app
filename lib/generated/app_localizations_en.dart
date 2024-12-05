@@ -43,9 +43,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmLogout => 'Confirm Logout';
 
   @override
-  String get confirmLogoutMessage => 'Are you sure you want to logout?';
-
-  @override
   String get cancel => 'Cancel';
 
   @override
@@ -111,12 +108,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverUrl => 'Server URL';
 
   @override
-  String get save => 'Save';
-
-  @override
-  String get nicknameRequired => 'Nickname is required';
-
-  @override
   String get invalidEmail => 'Invalid email format';
 
   @override
@@ -133,9 +124,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loadServerUrlFailed => 'Failed to load server URL';
-
-  @override
-  String get serverUrlHint => 'http://example.com:3000';
 
   @override
   String get login => 'Login';
@@ -197,10 +185,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noDefaultBook => 'No default book selected';
 
   @override
-  String get updateShopSuccess => 'Shop updated successfully';
+  String get updateShopSuccess => 'Update successful';
 
   @override
-  String get createShopSuccess => 'Shop created successfully';
+  String get createShopSuccess => 'Create successful';
 
   @override
   String get shopNameRequired => 'Shop name is required';
@@ -339,23 +327,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unnamedBook => 'Unnamed Book';
 
   @override
-  String sharedFrom(String name) {
+  String sharedFrom(Object name) {
     return 'Shared from $name';
   }
 
   @override
-  String get unknownUser => 'Unknown';
+  String get unknownUser => 'Unknown User';
 
   @override
   String get serverAddress => 'Server Address';
 
   @override
-  String serverStatusNormal(String dbStatus, String memUsed, String memTotal) {
+  String serverStatusNormal(Object dbStatus, Object memTotal, Object memUsed) {
     return 'Server Status: Normal\nDatabase Status: $dbStatus\nMemory Usage: $memUsed/$memTotal';
   }
 
   @override
-  String serverStatusError(String error) {
+  String serverStatusError(Object error) {
     return 'Server Error: $error';
   }
 
@@ -363,10 +351,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseInputServerUrl => 'Please input server address';
 
   @override
-  String get saveSuccess => 'Save successful';
+  String get saveSuccess => 'Save successful, please restart app';
 
   @override
-  String saveFailed(String error) {
+  String saveFailed(Object error) {
     return 'Save failed: $error';
   }
 
@@ -377,7 +365,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkServer => 'Check Server';
 
   @override
-  String linkedBooksCount(int count) {
+  String linkedBooksCount(Object count) {
     return '$count linked books';
   }
 
@@ -391,7 +379,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get linkedBooks => 'Linked Books';
 
   @override
-  String lastUpdated(String time) {
+  String lastUpdated(Object time) {
     return 'Last Updated: $time';
   }
 
@@ -429,6 +417,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverUrlLabel => 'Server URL';
 
   @override
+  String get serverUrlHint => 'http://example.com:3000';
+
+  @override
   String get normalStatus => 'Normal';
 
   @override
@@ -445,6 +436,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookDetails => 'Book Details';
+
+  @override
+  String get save => 'Save';
 
   @override
   String get bookNameLabel => 'Book Name';
@@ -501,7 +495,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addMemberSuccess => 'Member added successfully';
 
   @override
-  String addMemberFailed(String error) {
+  String addMemberFailed(Object error) {
     return 'Failed to add member: $error';
   }
 
@@ -566,9 +560,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateUserInfoSuccess => 'Update successful';
 
   @override
-  String registerTimeLabel(String time) {
+  String registerTimeLabel(Object time) {
     return 'Register time: $time';
   }
+
+  @override
+  String get nicknameRequired => 'Nickname is required';
 
   @override
   String get invalidEmailFormat => 'Invalid email format';
@@ -578,6 +575,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmLogoutTitle => 'Confirm Logout';
+
+  @override
+  String get confirmLogoutMessage => 'Are you sure you want to logout?';
 
   @override
   String get newRecordTitle => 'New Record';
@@ -697,7 +697,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchCategoryHint => 'Search or input new category';
 
   @override
-  String addCategoryButton(String name) {
+  String addCategoryButton(Object name) {
     return 'Add \"$name\"';
   }
 
@@ -711,7 +711,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchShopHint => 'Search or input new shop';
 
   @override
-  String addShopButton(String name) {
+  String addShopButton(Object name) {
     return 'Add \"$name\"';
   }
 

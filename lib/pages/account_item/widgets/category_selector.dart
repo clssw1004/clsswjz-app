@@ -24,6 +24,13 @@ class CategorySelector extends StatelessWidget {
     final l10n = L10n.of(context);
 
     return FormField<String>(
+      initialValue: selectedCategory,
+      validator: (value) {
+        if (isRequired && (value == null || value.isEmpty)) {
+          return l10n.pleaseSelectCategory;
+        }
+        return null;
+      },
       builder: (FormFieldState<String> field) {
         return Container(
           height: 48,
@@ -79,12 +86,6 @@ class CategorySelector extends StatelessWidget {
             ],
           ),
         );
-      },
-      validator: (value) {
-        if (isRequired && (value == null || value.isEmpty)) {
-          return l10n.categoryHint;
-        }
-        return null;
       },
     );
   }

@@ -168,12 +168,6 @@ abstract class AppLocalizations {
   /// **'Confirm Logout'**
   String get confirmLogout;
 
-  /// Confirm logout dialog message
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to logout?'**
-  String get confirmLogoutMessage;
-
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:
@@ -300,18 +294,6 @@ abstract class AppLocalizations {
   /// **'Server URL'**
   String get serverUrl;
 
-  /// Save button text
-  ///
-  /// In en, this message translates to:
-  /// **'Save'**
-  String get save;
-
-  /// Nickname required error message
-  ///
-  /// In en, this message translates to:
-  /// **'Nickname is required'**
-  String get nicknameRequired;
-
   /// No description provided for @invalidEmail.
   ///
   /// In en, this message translates to:
@@ -347,12 +329,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load server URL'**
   String get loadServerUrlFailed;
-
-  /// Server URL input hint
-  ///
-  /// In en, this message translates to:
-  /// **'http://example.com:3000'**
-  String get serverUrlHint;
 
   /// No description provided for @login.
   ///
@@ -462,22 +438,22 @@ abstract class AppLocalizations {
   /// **'Shop Name'**
   String get shopName;
 
-  /// Error message when no default book is selected
+  /// No description provided for @noDefaultBook.
   ///
   /// In en, this message translates to:
   /// **'No default book selected'**
   String get noDefaultBook;
 
-  /// Update shop success message
+  /// No description provided for @updateShopSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Shop updated successfully'**
+  /// **'Update successful'**
   String get updateShopSuccess;
 
-  /// Create shop success message
+  /// No description provided for @createShopSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Shop created successfully'**
+  /// **'Create successful'**
   String get createShopSuccess;
 
   /// No description provided for @shopNameRequired.
@@ -492,7 +468,7 @@ abstract class AppLocalizations {
   /// **'New Category'**
   String get newCategory;
 
-  /// Edit category button text
+  /// No description provided for @editCategory.
   ///
   /// In en, this message translates to:
   /// **'Edit Category'**
@@ -510,13 +486,13 @@ abstract class AppLocalizations {
   /// **'Category name is required'**
   String get categoryNameRequired;
 
-  /// Success message after updating category
+  /// No description provided for @updateCategorySuccess.
   ///
   /// In en, this message translates to:
   /// **'Category updated successfully'**
   String get updateCategorySuccess;
 
-  /// Success message after creating category
+  /// No description provided for @createCategorySuccess.
   ///
   /// In en, this message translates to:
   /// **'Category created successfully'**
@@ -714,83 +690,83 @@ abstract class AppLocalizations {
   /// **'Balance'**
   String get balance;
 
-  /// Account book list page title
+  /// No description provided for @accountBookList.
   ///
   /// In en, this message translates to:
   /// **'Account Books'**
   String get accountBookList;
 
-  /// New account book button tooltip
+  /// No description provided for @newAccountBook.
   ///
   /// In en, this message translates to:
   /// **'New Account Book'**
   String get newAccountBook;
 
-  /// Retry button text
+  /// No description provided for @retryLoading.
   ///
   /// In en, this message translates to:
   /// **'Retry'**
   String get retryLoading;
 
-  /// Message when no account books exist
+  /// No description provided for @noAccountBooks.
   ///
   /// In en, this message translates to:
   /// **'No account books'**
   String get noAccountBooks;
 
-  /// Default name for unnamed book
+  /// No description provided for @unnamedBook.
   ///
   /// In en, this message translates to:
   /// **'Unnamed Book'**
   String get unnamedBook;
 
-  /// Shared book indicator
+  /// No description provided for @sharedFrom.
   ///
   /// In en, this message translates to:
   /// **'Shared from {name}'**
-  String sharedFrom(String name);
+  String sharedFrom(Object name);
 
-  /// Unknown user text
+  /// No description provided for @unknownUser.
   ///
   /// In en, this message translates to:
-  /// **'Unknown'**
+  /// **'Unknown User'**
   String get unknownUser;
 
-  /// Server address input label
+  /// No description provided for @serverAddress.
   ///
   /// In en, this message translates to:
   /// **'Server Address'**
   String get serverAddress;
 
-  /// Server status check result when normal
+  /// No description provided for @serverStatusNormal.
   ///
   /// In en, this message translates to:
   /// **'Server Status: Normal\nDatabase Status: {dbStatus}\nMemory Usage: {memUsed}/{memTotal}'**
-  String serverStatusNormal(String dbStatus, String memUsed, String memTotal);
+  String serverStatusNormal(Object dbStatus, Object memTotal, Object memUsed);
 
-  /// Server status check result when error
+  /// No description provided for @serverStatusError.
   ///
   /// In en, this message translates to:
   /// **'Server Error: {error}'**
-  String serverStatusError(String error);
+  String serverStatusError(Object error);
 
-  /// Server address input hint
+  /// No description provided for @pleaseInputServerUrl.
   ///
   /// In en, this message translates to:
   /// **'Please input server address'**
   String get pleaseInputServerUrl;
 
-  /// Save success message
+  /// No description provided for @saveSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Save successful'**
+  /// **'Save successful, please restart app'**
   String get saveSuccess;
 
-  /// Save server url failed message
+  /// No description provided for @saveFailed.
   ///
   /// In en, this message translates to:
   /// **'Save failed: {error}'**
-  String saveFailed(String error);
+  String saveFailed(Object error);
 
   /// No description provided for @restartAppAfterChange.
   ///
@@ -804,121 +780,127 @@ abstract class AppLocalizations {
   /// **'Check Server'**
   String get checkServer;
 
-  /// Number of linked account books
+  /// No description provided for @linkedBooksCount.
   ///
   /// In en, this message translates to:
   /// **'{count} linked books'**
-  String linkedBooksCount(int count);
+  String linkedBooksCount(Object count);
 
-  /// Title for edit fund page
+  /// No description provided for @editFundTitle.
   ///
   /// In en, this message translates to:
   /// **'Edit Account'**
   String get editFundTitle;
 
-  /// Title for new fund page
+  /// No description provided for @newFundTitle.
   ///
   /// In en, this message translates to:
   /// **'New Account'**
   String get newFundTitle;
 
-  /// Title for linked books section
+  /// No description provided for @linkedBooks.
   ///
   /// In en, this message translates to:
   /// **'Linked Books'**
   String get linkedBooks;
 
-  /// Last updated time
+  /// No description provided for @lastUpdated.
   ///
   /// In en, this message translates to:
   /// **'Last Updated: {time}'**
-  String lastUpdated(String time);
+  String lastUpdated(Object time);
 
-  /// Text for unknown value
+  /// No description provided for @unknown.
   ///
   /// In en, this message translates to:
   /// **'Unknown'**
   String get unknown;
 
-  /// Basic information section title
+  /// No description provided for @basicInfo.
   ///
   /// In en, this message translates to:
   /// **'Basic Info'**
   String get basicInfo;
 
-  /// Account name field label
+  /// No description provided for @accountName.
   ///
   /// In en, this message translates to:
   /// **'Account Name'**
   String get accountName;
 
-  /// Account remark field label
+  /// No description provided for @accountRemark.
   ///
   /// In en, this message translates to:
   /// **'Account Remark'**
   String get accountRemark;
 
-  /// Current balance field label
+  /// No description provided for @currentBalance.
   ///
   /// In en, this message translates to:
   /// **'Current Balance'**
   String get currentBalance;
 
-  /// Account name required error message
+  /// No description provided for @pleaseInputAccountName.
   ///
   /// In en, this message translates to:
   /// **'Please input account name'**
   String get pleaseInputAccountName;
 
-  /// Fund income filter chip label
+  /// No description provided for @fundIncome.
   ///
   /// In en, this message translates to:
   /// **'Income'**
   String get fundIncome;
 
-  /// Fund expense filter chip label
+  /// No description provided for @fundExpense.
   ///
   /// In en, this message translates to:
   /// **'Expense'**
   String get fundExpense;
 
-  /// Check button text
+  /// No description provided for @checkButton.
   ///
   /// In en, this message translates to:
   /// **'Check'**
   String get checkButton;
 
-  /// Save button text
+  /// No description provided for @saveButton.
   ///
   /// In en, this message translates to:
   /// **'Save'**
   String get saveButton;
 
-  /// Server URL input label
+  /// No description provided for @serverUrlLabel.
   ///
   /// In en, this message translates to:
   /// **'Server URL'**
   String get serverUrlLabel;
 
-  /// Normal status text
+  /// No description provided for @serverUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'http://example.com:3000'**
+  String get serverUrlHint;
+
+  /// No description provided for @normalStatus.
   ///
   /// In en, this message translates to:
   /// **'Normal'**
   String get normalStatus;
 
-  /// Category management page title
+  /// No description provided for @categoryTitle.
   ///
   /// In en, this message translates to:
   /// **'Category Management'**
   String get categoryTitle;
 
-  /// Add category button text
+  /// No description provided for @addCategory.
   ///
   /// In en, this message translates to:
   /// **'Add Category'**
   String get addCategory;
 
-  /// Empty category list message
+  /// No description provided for @noCategories.
   ///
   /// In en, this message translates to:
   /// **'No categories yet'**
@@ -930,559 +912,577 @@ abstract class AppLocalizations {
   /// **'Create'**
   String get create;
 
-  /// Account book details page title
+  /// No description provided for @bookDetails.
   ///
   /// In en, this message translates to:
   /// **'Book Details'**
   String get bookDetails;
 
-  /// Book name input label
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @bookNameLabel.
   ///
   /// In en, this message translates to:
   /// **'Book Name'**
   String get bookNameLabel;
 
-  /// Book description input label
+  /// No description provided for @bookDescriptionLabel.
   ///
   /// In en, this message translates to:
   /// **'Book Description'**
   String get bookDescriptionLabel;
 
-  /// Creator label text
+  /// No description provided for @creatorLabel.
   ///
   /// In en, this message translates to:
   /// **'Creator'**
   String get creatorLabel;
 
-  /// Create time label text
+  /// No description provided for @createTimeLabel.
   ///
   /// In en, this message translates to:
   /// **'Create Time'**
   String get createTimeLabel;
 
-  /// Unknown time text
+  /// No description provided for @unknownTime.
   ///
   /// In en, this message translates to:
   /// **'Unknown'**
   String get unknownTime;
 
-  /// Member management section title
+  /// No description provided for @memberManagement.
   ///
   /// In en, this message translates to:
   /// **'Member Management'**
   String get memberManagement;
 
-  /// Add member button text
+  /// No description provided for @addMember.
   ///
   /// In en, this message translates to:
   /// **'Add Member'**
   String get addMember;
 
-  /// Unknown member name
+  /// No description provided for @unknownMember.
   ///
   /// In en, this message translates to:
   /// **'Unknown User'**
   String get unknownMember;
 
-  /// Creator badge text
+  /// No description provided for @creator.
   ///
   /// In en, this message translates to:
   /// **'Creator'**
   String get creator;
 
-  /// Remove member confirmation dialog title
+  /// No description provided for @confirmRemoveMember.
   ///
   /// In en, this message translates to:
   /// **'Confirm Remove'**
   String get confirmRemoveMember;
 
-  /// Remove member confirmation message
+  /// No description provided for @confirmRemoveMemberMessage.
   ///
   /// In en, this message translates to:
   /// **'Are you sure to remove this member?'**
   String get confirmRemoveMemberMessage;
 
-  /// Delete button text
+  /// No description provided for @delete.
   ///
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
 
-  /// Add member dialog title
+  /// No description provided for @addMemberTitle.
   ///
   /// In en, this message translates to:
   /// **'Add Member'**
   String get addMemberTitle;
 
-  /// Invite code label
+  /// No description provided for @inviteCodeLabel.
   ///
   /// In en, this message translates to:
   /// **'Invite Code'**
   String get inviteCodeLabel;
 
-  /// Invite code input hint
+  /// No description provided for @inviteCodeHint.
   ///
   /// In en, this message translates to:
   /// **'Please enter invite code'**
   String get inviteCodeHint;
 
-  /// Add button text
+  /// No description provided for @add.
   ///
   /// In en, this message translates to:
   /// **'Add'**
   String get add;
 
-  /// Member already exists error message
+  /// No description provided for @memberAlreadyExists.
   ///
   /// In en, this message translates to:
   /// **'Member already exists'**
   String get memberAlreadyExists;
 
-  /// Add member success message
+  /// No description provided for @addMemberSuccess.
   ///
   /// In en, this message translates to:
   /// **'Member added successfully'**
   String get addMemberSuccess;
 
-  /// Add member failed message
+  /// No description provided for @addMemberFailed.
   ///
   /// In en, this message translates to:
   /// **'Failed to add member: {error}'**
-  String addMemberFailed(String error);
+  String addMemberFailed(Object error);
 
-  /// View book permission label
+  /// No description provided for @permViewBook.
   ///
   /// In en, this message translates to:
   /// **'View Book'**
   String get permViewBook;
 
-  /// Edit book permission label
+  /// No description provided for @permEditBook.
   ///
   /// In en, this message translates to:
   /// **'Edit Book'**
   String get permEditBook;
 
-  /// Delete book permission label
+  /// No description provided for @permDeleteBook.
   ///
   /// In en, this message translates to:
   /// **'Delete Book'**
   String get permDeleteBook;
 
-  /// View records permission label
+  /// No description provided for @permViewItem.
   ///
   /// In en, this message translates to:
   /// **'View Records'**
   String get permViewItem;
 
-  /// Edit records permission label
+  /// No description provided for @permEditItem.
   ///
   /// In en, this message translates to:
   /// **'Edit Records'**
   String get permEditItem;
 
-  /// Delete records permission label
+  /// No description provided for @permDeleteItem.
   ///
   /// In en, this message translates to:
   /// **'Delete Records'**
   String get permDeleteItem;
 
-  /// Shop management page title
+  /// No description provided for @shopManagementTitle.
   ///
   /// In en, this message translates to:
   /// **'Shop Management'**
   String get shopManagementTitle;
 
-  /// New shop button tooltip
+  /// No description provided for @newShopButton.
   ///
   /// In en, this message translates to:
   /// **'New Shop'**
   String get newShopButton;
 
-  /// New shop dialog title
+  /// No description provided for @newShopTitle.
   ///
   /// In en, this message translates to:
   /// **'New Shop'**
   String get newShopTitle;
 
-  /// Edit shop dialog title
+  /// No description provided for @editShopTitle.
   ///
   /// In en, this message translates to:
   /// **'Edit Shop'**
   String get editShopTitle;
 
-  /// Shop name input label
+  /// No description provided for @shopNameLabel.
   ///
   /// In en, this message translates to:
   /// **'Shop Name'**
   String get shopNameLabel;
 
-  /// User info page title
+  /// No description provided for @userInfoTitle.
   ///
   /// In en, this message translates to:
   /// **'User Info'**
   String get userInfoTitle;
 
-  /// Edit user info dialog title
+  /// No description provided for @editUserInfo.
   ///
   /// In en, this message translates to:
   /// **'Edit User Info'**
   String get editUserInfo;
 
-  /// Nickname input label
+  /// No description provided for @nicknameLabel.
   ///
   /// In en, this message translates to:
   /// **'Nickname'**
   String get nicknameLabel;
 
-  /// Email input label
+  /// No description provided for @emailLabel.
   ///
   /// In en, this message translates to:
   /// **'Email'**
   String get emailLabel;
 
-  /// Phone input label
+  /// No description provided for @phoneLabel.
   ///
   /// In en, this message translates to:
   /// **'Phone'**
   String get phoneLabel;
 
-  /// Reset invite code button text
+  /// No description provided for @resetInviteCode.
   ///
   /// In en, this message translates to:
   /// **'Reset Invite Code'**
   String get resetInviteCode;
 
-  /// Reset invite code success message
+  /// No description provided for @resetInviteCodeSuccess.
   ///
   /// In en, this message translates to:
   /// **'Reset successful'**
   String get resetInviteCodeSuccess;
 
-  /// Copied to clipboard message
+  /// No description provided for @copiedToClipboard.
   ///
   /// In en, this message translates to:
   /// **'Copied to clipboard'**
   String get copiedToClipboard;
 
-  /// Update user info success message
+  /// No description provided for @updateUserInfoSuccess.
   ///
   /// In en, this message translates to:
   /// **'Update successful'**
   String get updateUserInfoSuccess;
 
-  /// Register time label with time placeholder
+  /// No description provided for @registerTimeLabel.
   ///
   /// In en, this message translates to:
   /// **'Register time: {time}'**
-  String registerTimeLabel(String time);
+  String registerTimeLabel(Object time);
 
-  /// Invalid email format error message
+  /// No description provided for @nicknameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname is required'**
+  String get nicknameRequired;
+
+  /// No description provided for @invalidEmailFormat.
   ///
   /// In en, this message translates to:
   /// **'Invalid email format'**
   String get invalidEmailFormat;
 
-  /// Invalid phone number format error message
+  /// No description provided for @invalidPhoneFormat.
   ///
   /// In en, this message translates to:
   /// **'Invalid phone number format'**
   String get invalidPhoneFormat;
 
-  /// Confirm logout dialog title
+  /// No description provided for @confirmLogoutTitle.
   ///
   /// In en, this message translates to:
   /// **'Confirm Logout'**
   String get confirmLogoutTitle;
 
-  /// New record page title
+  /// No description provided for @confirmLogoutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get confirmLogoutMessage;
+
+  /// No description provided for @newRecordTitle.
   ///
   /// In en, this message translates to:
   /// **'New Record'**
   String get newRecordTitle;
 
-  /// Edit record page title
+  /// No description provided for @editRecordTitle.
   ///
   /// In en, this message translates to:
   /// **'Edit Record'**
   String get editRecordTitle;
 
-  /// Expense transaction type
+  /// No description provided for @expenseType.
   ///
   /// In en, this message translates to:
   /// **'Expense'**
   String get expenseType;
 
-  /// Income transaction type
+  /// No description provided for @incomeType.
   ///
   /// In en, this message translates to:
   /// **'Income'**
   String get incomeType;
 
-  /// Amount required error message
+  /// No description provided for @pleaseInputAmount.
   ///
   /// In en, this message translates to:
   /// **'Please input amount'**
   String get pleaseInputAmount;
 
-  /// Category required error message
+  /// No description provided for @pleaseSelectCategory.
   ///
   /// In en, this message translates to:
   /// **'Please select category'**
   String get pleaseSelectCategory;
 
-  /// Account required error message
+  /// No description provided for @pleaseSelectAccount.
   ///
   /// In en, this message translates to:
   /// **'Please select account'**
   String get pleaseSelectAccount;
 
-  /// Book required error message
+  /// No description provided for @pleaseSelectBook.
   ///
   /// In en, this message translates to:
   /// **'Please select book'**
   String get pleaseSelectBook;
 
-  /// Save record button text
+  /// No description provided for @saveRecord.
   ///
   /// In en, this message translates to:
   /// **'Save'**
   String get saveRecord;
 
-  /// Save record success message
+  /// No description provided for @saveRecordSuccess.
   ///
   /// In en, this message translates to:
   /// **'Save successful'**
   String get saveRecordSuccess;
 
-  /// Amount input label
+  /// No description provided for @amountLabel.
   ///
   /// In en, this message translates to:
   /// **'Amount'**
   String get amountLabel;
 
-  /// Amount input hint
+  /// No description provided for @amountHint.
   ///
   /// In en, this message translates to:
   /// **'Please input amount'**
   String get amountHint;
 
-  /// Category selector label
+  /// No description provided for @categoryLabel.
   ///
   /// In en, this message translates to:
   /// **'Category'**
   String get categoryLabel;
 
-  /// Category selector hint
+  /// No description provided for @categoryHint.
   ///
   /// In en, this message translates to:
   /// **'Please select category'**
   String get categoryHint;
 
-  /// Date selector label
+  /// No description provided for @dateLabel.
   ///
   /// In en, this message translates to:
   /// **'Date'**
   String get dateLabel;
 
-  /// Time selector label
+  /// No description provided for @timeLabel.
   ///
   /// In en, this message translates to:
   /// **'Time'**
   String get timeLabel;
 
-  /// Account selector label
+  /// No description provided for @accountLabel.
   ///
   /// In en, this message translates to:
   /// **'Account'**
   String get accountLabel;
 
-  /// Account selector hint
+  /// No description provided for @accountHint.
   ///
   /// In en, this message translates to:
   /// **'Please select account'**
   String get accountHint;
 
-  /// Description input label
+  /// No description provided for @descriptionLabel.
   ///
   /// In en, this message translates to:
   /// **'Description'**
   String get descriptionLabel;
 
-  /// Description input hint
+  /// No description provided for @descriptionHint.
   ///
   /// In en, this message translates to:
   /// **'Please input description (optional)'**
   String get descriptionHint;
 
-  /// Shop selector label
+  /// No description provided for @shopLabel.
   ///
   /// In en, this message translates to:
   /// **'Shop'**
   String get shopLabel;
 
-  /// Shop selector hint
+  /// No description provided for @shopHint.
   ///
   /// In en, this message translates to:
   /// **'Please select shop'**
   String get shopHint;
 
-  /// Select fund dialog title
+  /// No description provided for @selectFund.
   ///
   /// In en, this message translates to:
   /// **'Select Account'**
   String get selectFund;
 
-  /// Message when no funds are available
+  /// No description provided for @noAvailableFunds.
   ///
   /// In en, this message translates to:
   /// **'No available accounts'**
   String get noAvailableFunds;
 
-  /// Default fund indicator
+  /// No description provided for @defaultFund.
   ///
   /// In en, this message translates to:
   /// **'Default Account'**
   String get defaultFund;
 
-  /// Search fund input hint
+  /// No description provided for @searchFund.
   ///
   /// In en, this message translates to:
   /// **'Search accounts'**
   String get searchFund;
 
-  /// Select fund hint text
+  /// No description provided for @selectFundHint.
   ///
   /// In en, this message translates to:
   /// **'Please select account'**
   String get selectFundHint;
 
-  /// Select book dialog title
+  /// No description provided for @selectBookTitle.
   ///
   /// In en, this message translates to:
   /// **'Select Book'**
   String get selectBookTitle;
 
-  /// Message when no books are available
+  /// No description provided for @noAvailableBooks.
   ///
   /// In en, this message translates to:
   /// **'No available books'**
   String get noAvailableBooks;
 
-  /// Default book indicator
+  /// No description provided for @defaultBook.
   ///
   /// In en, this message translates to:
   /// **'Default Book'**
   String get defaultBook;
 
-  /// Search book input hint
+  /// No description provided for @searchBook.
   ///
   /// In en, this message translates to:
   /// **'Search books'**
   String get searchBook;
 
-  /// Select book hint text
+  /// No description provided for @selectBookHint.
   ///
   /// In en, this message translates to:
   /// **'Please select book'**
   String get selectBookHint;
 
-  /// Shared book indicator
+  /// No description provided for @sharedBook.
   ///
   /// In en, this message translates to:
   /// **'Shared Book'**
   String get sharedBook;
 
-  /// Select book header title
+  /// No description provided for @selectBookHeader.
   ///
   /// In en, this message translates to:
   /// **'Select Book'**
   String get selectBookHeader;
 
-  /// Shared book label
+  /// No description provided for @sharedBookLabel.
   ///
   /// In en, this message translates to:
   /// **'Shared'**
   String get sharedBookLabel;
 
-  /// Cancel button text
+  /// No description provided for @cancelButton.
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancelButton;
 
-  /// Select category dialog title
+  /// No description provided for @selectCategoryTitle.
   ///
   /// In en, this message translates to:
   /// **'Select Category'**
   String get selectCategoryTitle;
 
-  /// Message when no categories are available
+  /// No description provided for @noAvailableCategories.
   ///
   /// In en, this message translates to:
   /// **'No available categories'**
   String get noAvailableCategories;
 
-  /// Search category input hint
+  /// No description provided for @searchCategoryHint.
   ///
   /// In en, this message translates to:
   /// **'Search or input new category'**
   String get searchCategoryHint;
 
-  /// Add new category button text
+  /// No description provided for @addCategoryButton.
   ///
   /// In en, this message translates to:
   /// **'Add \"{name}\"'**
-  String addCategoryButton(String name);
+  String addCategoryButton(Object name);
 
-  /// Select shop dialog title
+  /// No description provided for @selectShopTitle.
   ///
   /// In en, this message translates to:
   /// **'Select Shop'**
   String get selectShopTitle;
 
-  /// Message when no shops are available
+  /// No description provided for @noAvailableShops.
   ///
   /// In en, this message translates to:
   /// **'No available shops'**
   String get noAvailableShops;
 
-  /// Search shop input hint
+  /// No description provided for @searchShopHint.
   ///
   /// In en, this message translates to:
   /// **'Search or input new shop'**
   String get searchShopHint;
 
-  /// Add new shop button text
+  /// No description provided for @addShopButton.
   ///
   /// In en, this message translates to:
   /// **'Add \"{name}\"'**
-  String addShopButton(String name);
+  String addShopButton(Object name);
 
-  /// Income label in summary card
+  /// No description provided for @summaryIncome.
   ///
   /// In en, this message translates to:
   /// **'Income'**
   String get summaryIncome;
 
-  /// Expense label in summary card
+  /// No description provided for @summaryExpense.
   ///
   /// In en, this message translates to:
   /// **'Expense'**
   String get summaryExpense;
 
-  /// Balance label in summary card
+  /// No description provided for @summaryBalance.
   ///
   /// In en, this message translates to:
   /// **'Balance'**
   String get summaryBalance;
 
-  /// Currency symbol
+  /// No description provided for @currencySymbol.
   ///
   /// In en, this message translates to:
   /// **'¥'**
   String get currencySymbol;
 
-  /// Message when no transactions exist
+  /// No description provided for @noTransactions.
   ///
   /// In en, this message translates to:
   /// **'No transactions'**

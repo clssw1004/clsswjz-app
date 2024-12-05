@@ -12,7 +12,6 @@
   "serverSettings": "Server Settings",
   "logout": "Logout",
   "confirmLogout": "Confirm Logout",
-  "confirmLogoutMessage": "Are you sure you want to logout?",
   "cancel": "Cancel",
   "confirm": "Confirm",
   "userInfo": "User Info",
@@ -34,15 +33,12 @@
   "dark": "Dark",
   "system": "System",
   "serverUrl": "Server URL",
-  "save": "Save",
-  "nicknameRequired": "Nickname is required",
   "invalidEmail": "Invalid email format",
   "invalidPhone": "Invalid phone number format",
   "merchantManagement": "Merchant Management",
   "themeColorTitle": "Theme Color",
   "themeColorSubtitle": "Choose your favorite theme color",
   "loadServerUrlFailed": "Failed to load server URL",
-  "serverUrlHint": "http://example.com:3000",
   "login": "Login",
   "username": "Username",
   "password": "Password",
@@ -62,9 +58,6 @@
   "editShop": "Edit Shop",
   "shopName": "Shop Name",
   "noDefaultBook": "No default book selected",
-  "@noDefaultBook": {
-    "description": "Error message when no default book is selected"
-  },
   "updateShopSuccess": "Update successful",
   "createShopSuccess": "Create successful",
   "shopNameRequired": "Shop name is required",
@@ -73,13 +66,7 @@
   "categoryName": "Category Name",
   "categoryNameRequired": "Category name is required",
   "updateCategorySuccess": "Category updated successfully",
-  "@updateCategorySuccess": {
-    "description": "Success message after updating category"
-  },
   "createCategorySuccess": "Category created successfully",
-  "@createCategorySuccess": {
-    "description": "Success message after creating category"
-  },
   "newFund": "New Account",
   "editFund": "Edit Account",
   "fundName": "Account Name",
@@ -113,630 +100,136 @@
   "totalExpense": "Expense",
   "balance": "Balance",
   "accountBookList": "Account Books",
-  "@accountBookList": {
-    "description": "Account book list page title"
-  },
   "newAccountBook": "New Account Book",
-  "@newAccountBook": {
-    "description": "New account book button tooltip"
-  },
   "retryLoading": "Retry",
-  "@retryLoading": {
-    "description": "Retry button text"
-  },
   "noAccountBooks": "No account books",
-  "@noAccountBooks": {
-    "description": "Message when no account books exist"
-  },
   "unnamedBook": "Unnamed Book",
-  "@unnamedBook": {
-    "description": "Default name for unnamed book"
-  },
   "sharedFrom": "Shared from {name}",
-  "@sharedFrom": {
-    "description": "Shared book indicator",
-    "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "John"
-      }
-    }
-  },
   "unknownUser": "Unknown User",
-  "@unknownUser": {
-    "description": "Default name for unknown user"
-  },
   "serverAddress": "Server Address",
-  "@serverAddress": {
-    "description": "Server address input label"
-  },
   "serverStatusNormal": "Server Status: Normal\nDatabase Status: {dbStatus}\nMemory Usage: {memUsed}/{memTotal}",
-  "@serverStatusNormal": {
-    "description": "Server status check result when normal",
-    "placeholders": {
-      "dbStatus": {
-        "type": "String",
-        "example": "Connected"
-      },
-      "memUsed": {
-        "type": "String",
-        "example": "100MB"
-      },
-      "memTotal": {
-        "type": "String",
-        "example": "1GB"
-      }
-    }
-  },
   "serverStatusError": "Server Error: {error}",
-  "@serverStatusError": {
-    "description": "Server status check result when error",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Connection failed"
-      }
-    }
-  },
   "pleaseInputServerUrl": "Please input server address",
-  "@pleaseInputServerUrl": {
-    "description": "Server address input hint"
-  },
   "saveSuccess": "Save successful, please restart app",
-  "@saveSuccess": {
-    "description": "Save server url success message"
-  },
   "saveFailed": "Save failed: {error}",
-  "@saveFailed": {
-    "description": "Save server url failed message",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Invalid URL"
-      }
-    }
-  },
   "restartAppAfterChange": "Modified, please restart the app to take effect",
   "checkServer": "Check Server",
   "linkedBooksCount": "{count} linked books",
-  "@linkedBooksCount": {
-    "description": "Number of linked account books",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "3"
-      }
-    }
-  },
   "editFundTitle": "Edit Account",
-  "@editFundTitle": {
-    "description": "Title for edit fund page"
-  },
   "newFundTitle": "New Account",
-  "@newFundTitle": {
-    "description": "Title for new fund page"
-  },
   "linkedBooks": "Linked Books",
-  "@linkedBooks": {
-    "description": "Title for linked books section"
-  },
   "lastUpdated": "Last Updated: {time}",
-  "@lastUpdated": {
-    "description": "Last updated time",
-    "placeholders": {
-      "time": {
-        "type": "String",
-        "example": "2024-01-01 12:00"
-      }
-    }
-  },
   "unknown": "Unknown",
-  "@unknown": {
-    "description": "Text for unknown value"
-  },
   "basicInfo": "Basic Info",
-  "@basicInfo": {
-    "description": "Basic information section title"
-  },
   "accountName": "Account Name",
-  "@accountName": {
-    "description": "Account name field label"
-  },
   "accountRemark": "Account Remark",
-  "@accountRemark": {
-    "description": "Account remark field label"
-  },
   "currentBalance": "Current Balance",
-  "@currentBalance": {
-    "description": "Current balance field label"
-  },
   "pleaseInputAccountName": "Please input account name",
-  "@pleaseInputAccountName": {
-    "description": "Account name required error message"
-  },
   "fundIncome": "Income",
-  "@fundIncome": {
-    "description": "Fund income filter chip label"
-  },
   "fundExpense": "Expense",
-  "@fundExpense": {
-    "description": "Fund expense filter chip label"
-  },
-  "saveSuccess": "Save successful",
-  "@saveSuccess": {
-    "description": "Save success message"
-  },
   "checkButton": "Check",
-  "@checkButton": {
-    "description": "Check button text"
-  },
   "saveButton": "Save",
-  "@saveButton": {
-    "description": "Save button text"
-  },
   "serverUrlLabel": "Server URL",
-  "@serverUrlLabel": {
-    "description": "Server URL input label"
-  },
   "serverUrlHint": "http://example.com:3000",
-  "@serverUrlHint": {
-    "description": "Server URL input hint"
-  },
   "normalStatus": "Normal",
-  "@normalStatus": {
-    "description": "Normal status text"
-  },
   "categoryTitle": "Category Management",
-  "@categoryTitle": {
-    "description": "Category management page title"
-  },
   "addCategory": "Add Category",
-  "@addCategory": {
-    "description": "Add category button text"
-  },
-  "editCategory": "Edit Category",
-  "@editCategory": {
-    "description": "Edit category button text"
-  },
   "noCategories": "No categories yet",
-  "@noCategories": {
-    "description": "Empty category list message"
-  },
   "create": "Create",
   "bookDetails": "Book Details",
-  "@bookDetails": {
-    "description": "Account book details page title"
-  },
   "save": "Save",
-  "@save": {
-    "description": "Save button text"
-  },
   "bookNameLabel": "Book Name",
-  "@bookNameLabel": {
-    "description": "Book name input label"
-  },
   "bookDescriptionLabel": "Book Description",
-  "@bookDescriptionLabel": {
-    "description": "Book description input label"
-  },
   "creatorLabel": "Creator",
-  "@creatorLabel": {
-    "description": "Creator label text"
-  },
   "createTimeLabel": "Create Time",
-  "@createTimeLabel": {
-    "description": "Create time label text"
-  },
-  "unknownUser": "Unknown",
-  "@unknownUser": {
-    "description": "Unknown user text"
-  },
   "unknownTime": "Unknown",
-  "@unknownTime": {
-    "description": "Unknown time text"
-  },
-  "saveSuccess": "Save successful",
-  "@saveSuccess": {
-    "description": "Save success message"
-  },
   "memberManagement": "Member Management",
-  "@memberManagement": {
-    "description": "Member management section title"
-  },
   "addMember": "Add Member",
-  "@addMember": {
-    "description": "Add member button text"
-  },
   "unknownMember": "Unknown User",
-  "@unknownMember": {
-    "description": "Unknown member name"
-  },
   "creator": "Creator",
-  "@creator": {
-    "description": "Creator badge text"
-  },
   "confirmRemoveMember": "Confirm Remove",
-  "@confirmRemoveMember": {
-    "description": "Remove member confirmation dialog title"
-  },
   "confirmRemoveMemberMessage": "Are you sure to remove this member?",
-  "@confirmRemoveMemberMessage": {
-    "description": "Remove member confirmation message"
-  },
   "delete": "Delete",
-  "@delete": {
-    "description": "Delete button text"
-  },
   "addMemberTitle": "Add Member",
-  "@addMemberTitle": {
-    "description": "Add member dialog title"
-  },
   "inviteCodeLabel": "Invite Code",
-  "@inviteCodeLabel": {
-    "description": "Invite code input label"
-  },
   "inviteCodeHint": "Please enter invite code",
-  "@inviteCodeHint": {
-    "description": "Invite code input hint"
-  },
   "add": "Add",
-  "@add": {
-    "description": "Add button text"
-  },
   "memberAlreadyExists": "Member already exists",
-  "@memberAlreadyExists": {
-    "description": "Member already exists error message"
-  },
   "addMemberSuccess": "Member added successfully",
-  "@addMemberSuccess": {
-    "description": "Add member success message"
-  },
   "addMemberFailed": "Failed to add member: {error}",
-  "@addMemberFailed": {
-    "description": "Add member failed message",
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Invalid invite code"
-      }
-    }
-  },
   "permViewBook": "View Book",
-  "@permViewBook": {
-    "description": "View book permission label"
-  },
   "permEditBook": "Edit Book",
-  "@permEditBook": {
-    "description": "Edit book permission label"
-  },
   "permDeleteBook": "Delete Book",
-  "@permDeleteBook": {
-    "description": "Delete book permission label"
-  },
   "permViewItem": "View Records",
-  "@permViewItem": {
-    "description": "View records permission label"
-  },
   "permEditItem": "Edit Records",
-  "@permEditItem": {
-    "description": "Edit records permission label"
-  },
   "permDeleteItem": "Delete Records",
-  "@permDeleteItem": {
-    "description": "Delete records permission label"
-  },
   "shopManagementTitle": "Shop Management",
-  "@shopManagementTitle": {
-    "description": "Shop management page title"
-  },
   "newShopButton": "New Shop",
-  "@newShopButton": {
-    "description": "New shop button tooltip"
-  },
   "newShopTitle": "New Shop",
-  "@newShopTitle": {
-    "description": "New shop dialog title"
-  },
   "editShopTitle": "Edit Shop",
-  "@editShopTitle": {
-    "description": "Edit shop dialog title"
-  },
   "shopNameLabel": "Shop Name",
-  "@shopNameLabel": {
-    "description": "Shop name input label"
-  },
-  "createShopSuccess": "Shop created successfully",
-  "@createShopSuccess": {
-    "description": "Create shop success message"
-  },
-  "updateShopSuccess": "Shop updated successfully",
-  "@updateShopSuccess": {
-    "description": "Update shop success message"
-  },
   "userInfoTitle": "User Info",
-  "@userInfoTitle": {
-    "description": "User info page title"
-  },
   "editUserInfo": "Edit User Info",
-  "@editUserInfo": {
-    "description": "Edit user info dialog title"
-  },
   "nicknameLabel": "Nickname",
-  "@nicknameLabel": {
-    "description": "Nickname input label"
-  },
   "emailLabel": "Email",
-  "@emailLabel": {
-    "description": "Email input label"
-  },
   "phoneLabel": "Phone",
-  "@phoneLabel": {
-    "description": "Phone input label"
-  },
-  "inviteCodeLabel": "Invite Code",
-  "@inviteCodeLabel": {
-    "description": "Invite code label"
-  },
   "resetInviteCode": "Reset Invite Code",
-  "@resetInviteCode": {
-    "description": "Reset invite code button text"
-  },
   "resetInviteCodeSuccess": "Reset successful",
-  "@resetInviteCodeSuccess": {
-    "description": "Reset invite code success message"
-  },
   "copiedToClipboard": "Copied to clipboard",
-  "@copiedToClipboard": {
-    "description": "Copied to clipboard message"
-  },
   "updateUserInfoSuccess": "Update successful",
-  "@updateUserInfoSuccess": {
-    "description": "Update user info success message"
-  },
   "registerTimeLabel": "Register time: {time}",
-  "@registerTimeLabel": {
-    "description": "Register time label with time placeholder",
-    "placeholders": {
-      "time": {
-        "type": "String",
-        "example": "2024-01-01 12:00"
-      }
-    }
-  },
   "nicknameRequired": "Nickname is required",
-  "@nicknameRequired": {
-    "description": "Nickname required error message"
-  },
   "invalidEmailFormat": "Invalid email format",
-  "@invalidEmailFormat": {
-    "description": "Invalid email format error message"
-  },
   "invalidPhoneFormat": "Invalid phone number format",
-  "@invalidPhoneFormat": {
-    "description": "Invalid phone number format error message"
-  },
   "confirmLogoutTitle": "Confirm Logout",
-  "@confirmLogoutTitle": {
-    "description": "Confirm logout dialog title"
-  },
   "confirmLogoutMessage": "Are you sure you want to logout?",
-  "@confirmLogoutMessage": {
-    "description": "Confirm logout dialog message"
-  },
   "newRecordTitle": "New Record",
-  "@newRecordTitle": {
-    "description": "New record page title"
-  },
   "editRecordTitle": "Edit Record",
-  "@editRecordTitle": {
-    "description": "Edit record page title"
-  },
   "expenseType": "Expense",
-  "@expenseType": {
-    "description": "Expense transaction type"
-  },
   "incomeType": "Income",
-  "@incomeType": {
-    "description": "Income transaction type"
-  },
   "pleaseInputAmount": "Please input amount",
-  "@pleaseInputAmount": {
-    "description": "Amount required error message"
-  },
   "pleaseSelectCategory": "Please select category",
-  "@pleaseSelectCategory": {
-    "description": "Category required error message"
-  },
   "pleaseSelectAccount": "Please select account",
-  "@pleaseSelectAccount": {
-    "description": "Account required error message"
-  },
   "pleaseSelectBook": "Please select book",
-  "@pleaseSelectBook": {
-    "description": "Book required error message"
-  },
   "saveRecord": "Save",
-  "@saveRecord": {
-    "description": "Save record button text"
-  },
   "saveRecordSuccess": "Save successful",
-  "@saveRecordSuccess": {
-    "description": "Save record success message"
-  },
   "amountLabel": "Amount",
-  "@amountLabel": {
-    "description": "Amount input label"
-  },
   "amountHint": "Please input amount",
-  "@amountHint": {
-    "description": "Amount input hint"
-  },
   "categoryLabel": "Category",
-  "@categoryLabel": {
-    "description": "Category selector label"
-  },
   "categoryHint": "Please select category",
-  "@categoryHint": {
-    "description": "Category selector hint"
-  },
   "dateLabel": "Date",
-  "@dateLabel": {
-    "description": "Date selector label"
-  },
   "timeLabel": "Time",
-  "@timeLabel": {
-    "description": "Time selector label"
-  },
   "accountLabel": "Account",
-  "@accountLabel": {
-    "description": "Account selector label"
-  },
   "accountHint": "Please select account",
-  "@accountHint": {
-    "description": "Account selector hint"
-  },
   "descriptionLabel": "Description",
-  "@descriptionLabel": {
-    "description": "Description input label"
-  },
   "descriptionHint": "Please input description (optional)",
-  "@descriptionHint": {
-    "description": "Description input hint"
-  },
   "shopLabel": "Shop",
-  "@shopLabel": {
-    "description": "Shop selector label"
-  },
   "shopHint": "Please select shop",
-  "@shopHint": {
-    "description": "Shop selector hint"
-  },
   "selectFund": "Select Account",
-  "@selectFund": {
-    "description": "Select fund dialog title"
-  },
   "noAvailableFunds": "No available accounts",
-  "@noAvailableFunds": {
-    "description": "Message when no funds are available"
-  },
   "defaultFund": "Default Account",
-  "@defaultFund": {
-    "description": "Default fund indicator"
-  },
   "searchFund": "Search accounts",
-  "@searchFund": {
-    "description": "Search fund input hint"
-  },
   "selectFundHint": "Please select account",
-  "@selectFundHint": {
-    "description": "Select fund hint text"
-  },
   "selectBookTitle": "Select Book",
-  "@selectBookTitle": {
-    "description": "Select book dialog title"
-  },
   "noAvailableBooks": "No available books",
-  "@noAvailableBooks": {
-    "description": "Message when no books are available"
-  },
   "defaultBook": "Default Book",
-  "@defaultBook": {
-    "description": "Default book indicator"
-  },
   "searchBook": "Search books",
-  "@searchBook": {
-    "description": "Search book input hint"
-  },
   "selectBookHint": "Please select book",
-  "@selectBookHint": {
-    "description": "Select book hint text"
-  },
   "sharedBook": "Shared Book",
-  "@sharedBook": {
-    "description": "Shared book indicator"
-  },
   "selectBookHeader": "Select Book",
-  "@selectBookHeader": {
-    "description": "Select book header title"
-  },
-  "noAvailableBooks": "No available books",
-  "@noAvailableBooks": {
-    "description": "Message when no books are available"
-  },
-  "unnamedBook": "Unnamed Book",
-  "@unnamedBook": {
-    "description": "Default name for unnamed book"
-  },
   "sharedBookLabel": "Shared",
-  "@sharedBookLabel": {
-    "description": "Shared book label"
-  },
   "cancelButton": "Cancel",
-  "@cancelButton": {
-    "description": "Cancel button text"
-  },
   "selectCategoryTitle": "Select Category",
-  "@selectCategoryTitle": {
-    "description": "Select category dialog title"
-  },
   "noAvailableCategories": "No available categories",
-  "@noAvailableCategories": {
-    "description": "Message when no categories are available"
-  },
   "searchCategoryHint": "Search or input new category",
-  "@searchCategoryHint": {
-    "description": "Search category input hint"
-  },
   "addCategoryButton": "Add \"{name}\"",
-  "@addCategoryButton": {
-    "description": "Add new category button text",
-    "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Food"
-      }
-    }
-  },
   "selectShopTitle": "Select Shop",
-  "@selectShopTitle": {
-    "description": "Select shop dialog title"
-  },
   "noAvailableShops": "No available shops",
-  "@noAvailableShops": {
-    "description": "Message when no shops are available"
-  },
   "searchShopHint": "Search or input new shop",
-  "@searchShopHint": {
-    "description": "Search shop input hint"
-  },
   "addShopButton": "Add \"{name}\"",
-  "@addShopButton": {
-    "description": "Add new shop button text",
-    "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Shop name"
-      }
-    }
-  },
   "summaryIncome": "Income",
-  "@summaryIncome": {
-    "description": "Income label in summary card"
-  },
   "summaryExpense": "Expense",
-  "@summaryExpense": {
-    "description": "Expense label in summary card"
-  },
   "summaryBalance": "Balance",
-  "@summaryBalance": {
-    "description": "Balance label in summary card"
-  },
   "currencySymbol": "¥",
-  "@currencySymbol": {
-    "description": "Currency symbol"
-  },
-  "noTransactions": "No transactions",
-  "@noTransactions": {
-    "description": "Message when no transactions exist"
-  }
+  "noTransactions": "No transactions"
 }

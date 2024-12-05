@@ -1,1 +1,11 @@
-{}
+{
+  "zh": [
+    "invalidEmailFormat",
+    "invalidPhoneFormat"
+  ],
+
+  "zh_Hant": [
+    "invalidEmailFormat",
+    "invalidPhoneFormat"
+  ]
+}

@@ -73,15 +73,11 @@ class AmountInput extends StatelessWidget {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '请输入金额';
+                    return l10n.pleaseInputAmount;
                   }
-                  try {
-                    final amount = double.parse(value);
-                    if (amount <= 0) {
-                      return '金额必须大于0';
-                    }
-                  } catch (e) {
-                    return '请输入有效金额';
+                  final amount = double.tryParse(value);
+                  if (amount == null || amount <= 0) {
+                    return l10n.pleaseInputAmount;
                   }
                   return null;
                 },

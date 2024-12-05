@@ -4,7 +4,6 @@ import '../data_source.dart';
 import '../../models/models.dart';
 import 'api_endpoints.dart';
 import 'http_client.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpDataSource implements DataSource {
   final HttpClient _httpClient;

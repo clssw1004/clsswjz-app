@@ -205,7 +205,11 @@ class _ShopDialogState extends State<_ShopDialog> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: l10n.searchShopHint,
+                labelText: l10n.shopLabel,
+                hintText: l10n.shopHint,
+                hintStyle: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 prefixIcon: Icon(
                   Icons.search,
                   color: colorScheme.onSurfaceVariant,

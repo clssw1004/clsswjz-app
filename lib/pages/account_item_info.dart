@@ -100,9 +100,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
         print('Initial data: ${widget.initialData}');
         setState(() {
           _recordId = widget.initialData!['id'];
-          _transactionType = widget.initialData!['type'] == 'EXPENSE'
-              ? l10n.expenseType
-              : l10n.incomeType;
+          _transactionType =
+              widget.initialData!['type'] == 'EXPENSE' ? 'expense' : 'income';
           _provider.setTransactionType(_transactionType);
           _amountController.text = widget.initialData!['amount'].toString();
           _selectedCategory = widget.initialData!['category'];
@@ -258,14 +257,18 @@ class _AccountItemFormState extends State<AccountItemForm> {
                     ),
                     child: FilledButton(
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {
+                        print(
+                            'Form validation: ${_formKey.currentState?.validate()}');
+
+                        if (_formKey.currentState?.validate() ?? false) {
                           final amount =
                               double.tryParse(_amountController.text) ?? 0.0;
                           _saveTransaction({
                             'amount': amount,
                             'description': _descriptionController.text.trim(),
-                            'type':
-                                _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
+                            'type': _transactionType == 'expense'
+                                ? 'EXPENSE'
+                                : 'INCOME',
                             'category': _selectedCategory,
                             'accountDate': _formattedDateTime,
                             'fundId': _selectedFund?['id'],
@@ -273,6 +276,12 @@ class _AccountItemFormState extends State<AccountItemForm> {
                             if (_recordId != null) 'id': _recordId,
                             'shop': _selectedShopName,
                           });
+                        } else {
+                          print('Form validation failed');
+                          print('Amount: ${_amountController.text}');
+                          print('Category: $_selectedCategory');
+                          print('Fund: $_selectedFund');
+                          print('Book: $_selectedBook');
                         }
                       },
                       style: FilledButton.styleFrom(
@@ -345,10 +354,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
       // 收起键盘
       FocusScope.of(context).unfocus();
 
+      final type =
+          _transactionType.toUpperCase() == 'EXPENSE' ? 'EXPENSE' : 'INCOME';
+
       final accountItem = AccountItem(
         id: data['id'] ?? '',
         accountBookId: data['accountBookId'],
-        type: data['type'],
+        type: type,
         amount: data['amount'],
         category: data['category'],
         description: data['description'],
