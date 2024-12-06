@@ -95,7 +95,7 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     if (!mounted) return;
     try {
       // 先获取保存的账本ID
-      final savedBookId = await UserService.getCurrentAccountBookId();
+      final savedBookId = UserService.getCurrentAccountBookId();
 
       // 加载所有账本
       final books = await ApiService.getAccountBooks();
@@ -104,17 +104,12 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
       final booksJson = books.map((book) => book.toJson()).toList();
       Map<String, dynamic>? defaultBook;
 
-      if (savedBookId != null) {
-        // 尝试找到保存的账本
-        defaultBook = booksJson.firstWhere(
-          (book) => book['id'] == savedBookId,
-          orElse: () => _getFirstOwnedBook(booksJson) ?? booksJson.first,
-        );
-      } else {
-        // 如果没有保存的账本ID，使用第一个本人的账本或第一个可用账本
-        defaultBook = _getFirstOwnedBook(booksJson) ?? booksJson.first;
-      }
-      await StorageService.setString(StorageKeys.currentBookId, defaultBook['id']);
+      // 尝试找到保存的账本
+      defaultBook = booksJson.firstWhere(
+        (book) => book['id'] == savedBookId,
+        orElse: () => _getFirstOwnedBook(booksJson) ?? booksJson.first,
+      );
+          await StorageService.setString(StorageKeys.currentBookId, defaultBook['id']);
       await StorageService.setString(StorageKeys.currentBookName, defaultBook['name']);
       setState(() {
         _accountBooks = booksJson;

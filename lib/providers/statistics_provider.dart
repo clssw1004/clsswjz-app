@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/data_source.dart';
 import '../models/models.dart';
-import '../models/statistics_data.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
 import '../models/statistics_metric.dart';
 import '../services/storage_service.dart';

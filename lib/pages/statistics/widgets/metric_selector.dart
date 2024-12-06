@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../l10n/l10n.dart';
 import '../../../models/statistics_metric.dart';
 
 class MetricSelector extends StatelessWidget {
@@ -23,6 +22,13 @@ class MetricSelector extends StatelessWidget {
       initialValue: selectedMetric,
       tooltip: '',
       position: PopupMenuPosition.under,
+      itemBuilder: (context) => metrics.map((metric) {
+        return PopupMenuItem<StatisticsMetric>(
+          value: metric,
+          child: Text(metric.label),
+        );
+      }).toList(),
+      onSelected: onMetricChanged,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
@@ -45,13 +51,6 @@ class MetricSelector extends StatelessWidget {
           ],
         ),
       ),
-      itemBuilder: (context) => metrics.map((metric) {
-        return PopupMenuItem<StatisticsMetric>(
-          value: metric,
-          child: Text(metric.label),
-        );
-      }).toList(),
-      onSelected: onMetricChanged,
     );
   }
 } 

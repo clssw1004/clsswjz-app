@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'account_item_list.dart';
 import 'settings_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'statistics/statistics_page.dart';
 import '../l10n/l10n.dart';
 import '../constants/storage_keys.dart';

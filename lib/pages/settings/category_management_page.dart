@@ -34,7 +34,7 @@ class CategoryManagementPageState extends State<CategoryManagementPage> {
     });
 
     try {
-      _currentAccountBookId = await UserService.getCurrentAccountBookId();
+      _currentAccountBookId = UserService.getCurrentAccountBookId();
       if (!mounted) return;
 
       if (_currentAccountBookId == null) {

@@ -28,7 +28,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
     setState(() => _isLoading = true);
 
     try {
-      _currentAccountBookId = await UserService.getCurrentAccountBookId();
+      _currentAccountBookId = UserService.getCurrentAccountBookId();
       if (!mounted) return;
 
       if (_currentAccountBookId == null) {
