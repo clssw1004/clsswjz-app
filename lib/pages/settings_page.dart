@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './settings/widgets/user_card.dart';
-import './settings/widgets/theme_mode_selector.dart';
-import './settings/widgets/theme_color_selector.dart';
-import './settings/widgets/create_account_book_item.dart';
 import './settings/widgets/developer_mode_selector.dart';
+import './settings/widgets/language_selector.dart';
 import './settings/category_management_page.dart';
-import '../widgets/app_bar_factory.dart';
 import './settings/shop_management_page.dart';
 import './settings/fund_management_page.dart';
-import './settings/widgets/server_url_dialog.dart';
-import './settings/widgets/language_selector.dart';
+import '../widgets/app_bar_factory.dart';
+import '../theme/theme_provider.dart';
 import '../l10n/l10n.dart';
+import 'settings/widgets/server_url_dialog.dart';
+import 'settings/widgets/create_account_book_item.dart';
+import 'settings/widgets/theme_color_selector.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -32,81 +33,181 @@ class _SettingsPageState extends State<SettingsPage> {
         context: context,
         title: AppBarFactory.buildTitle(context, l10n.settings),
       ),
-      body: ListView(
-        children: [
-          // 用户信息卡片
-          UserCard(),
-          SizedBox(height: 16),
-
-          // 账本管理
-          _buildSection(
-            context,
-            title: l10n.accountManagement,
+      body: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return ListView(
             children: [
-              AccountBookManager(),
-              ListTile(
-                leading: Icon(Icons.category_outlined),
-                title: Text(l10n.categoryManagement),
-                trailing: Icon(Icons.chevron_right),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CategoryManagementPage(),
+              // 用户信息卡片
+              UserCard(),
+              SizedBox(height: 16),
+
+              // 账本管理
+              _buildSection(
+                context,
+                title: l10n.accountManagement,
+                children: [
+                  AccountBookManager(),
+                  ListTile(
+                    leading: Icon(Icons.category_outlined),
+                    title: Text(l10n.categoryManagement),
+                    trailing: Icon(Icons.chevron_right),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CategoryManagementPage(),
+                      ),
+                    ),
                   ),
+                  ListTile(
+                    leading: Icon(Icons.store_outlined),
+                    title: Text(l10n.shopManagement),
+                    trailing: Icon(Icons.chevron_right),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShopManagementPage(),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.account_balance_wallet_outlined),
+                    title: Text(l10n.fundManagement),
+                    trailing: Icon(Icons.chevron_right),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FundManagementPage(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // 主题设置
+              _buildSection(
+                context,
+                title: l10n.themeSettings,
+                children: [
+                  // 主题模式选择
+                  ListTile(
+                    leading: Icon(
+                      Icons.brightness_6_outlined,
+                      color: colorScheme.primary,
+                    ),
+                    title: Text(l10n.themeMode),
+                    trailing: DropdownButton<ThemeMode>(
+                      value: themeProvider.themeMode,
+                      onChanged: (ThemeMode? mode) {
+                        if (mode != null) {
+                          themeProvider.setThemeMode(mode);
+                        }
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: ThemeMode.system,
+                          child: Text(l10n.system),
+                        ),
+                        DropdownMenuItem(
+                          value: ThemeMode.light,
+                          child: Text(l10n.light),
+                        ),
+                        DropdownMenuItem(
+                          value: ThemeMode.dark,
+                          child: Text(l10n.dark),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // 主题颜色选择
+                  ListTile(
+                    leading: Icon(
+                      Icons.palette_outlined,
+                      color: colorScheme.primary,
+                    ),
+                    title: Text(l10n.themeColor),
+                    trailing: IconButton(
+                      onPressed: () => _showThemeColorPicker(context, themeProvider),
+                      icon: Icon(
+                        Icons.palette,
+                        color: themeProvider.themeColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // 系统设置
+              _buildSection(
+                context,
+                title: l10n.systemSettings,
+                children: [
+                  DeveloperModeSelector(),
+                  LanguageSelector(),
+                  ListTile(
+                    leading: Icon(Icons.dns_outlined),
+                    title: Text(l10n.serverSettings),
+                    trailing: Icon(Icons.chevron_right),
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (context) => ServerUrlDialog(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showThemeColorPicker(BuildContext context, ThemeProvider themeProvider) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          l10n.themeColorTitle,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: colorScheme.surfaceTint,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        content: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.themeColorSubtitle,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              ListTile(
-                leading: Icon(Icons.store_outlined),
-                title: Text(l10n.shopManagement),
-                trailing: Icon(Icons.chevron_right),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ShopManagementPage(),
-                  ),
-                ),
-              ),
-              ListTile(
-                leading: Icon(Icons.account_balance_wallet_outlined),
-                title: Text(l10n.fundManagement),
-                trailing: Icon(Icons.chevron_right),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FundManagementPage(),
-                  ),
-                ),
+              const SizedBox(height: 16),
+              ThemeColorSelector(
+                currentColor: themeProvider.themeColor,
+                onColorSelected: (color) {
+                  themeProvider.setThemeColor(color);
+                  Navigator.pop(context);
+                },
               ),
             ],
           ),
-
-          // 主题设置
-          _buildSection(
-            context,
-            title: l10n.themeSettings,
-            children: [
-              ThemeModeSelector(),
-              ThemeColorSelector(),
-            ],
-          ),
-
-          // 系统设置
-          _buildSection(
-            context,
-            title: l10n.systemSettings,
-            children: [
-              DeveloperModeSelector(),
-              LanguageSelector(),
-              ListTile(
-                leading: Icon(Icons.dns_outlined),
-                title: Text(l10n.serverSettings),
-                trailing: Icon(Icons.chevron_right),
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (context) => ServerUrlDialog(),
-                ),
-              ),
-            ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
           ),
         ],
       ),

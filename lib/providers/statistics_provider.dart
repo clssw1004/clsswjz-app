@@ -5,6 +5,8 @@ import '../models/statistics_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
 import '../models/statistics_metric.dart';
+import '../services/storage_service.dart';
+import '../constants/storage_keys.dart';
 
 enum TimeRange { week, month, year, custom }
 enum ChartType {
@@ -124,10 +126,9 @@ class StatisticsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final currentBookId = prefs.getString('currentBookId');
+      final currentBookId = StorageService.getString(StorageKeys.currentBookId);
 
-      if (currentBookId == null) {
+      if (currentBookId.isEmpty) {
         throw Exception('请先选择账本');
       }
 

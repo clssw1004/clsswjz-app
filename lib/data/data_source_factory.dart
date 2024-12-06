@@ -1,9 +1,9 @@
-import '../constants/global_variable.dart';
 import 'data_source.dart';
 import 'http/http_data_source.dart';
 import 'sqlite/sqlite_data_source.dart';
 import 'sqlite/database_helper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../services/storage_service.dart';
+import '../constants/storage_keys.dart';
 
 enum DataSourceType {
   http,
@@ -22,8 +22,10 @@ class DataSourceFactory {
     late final DataSource instance;
     switch (type) {
       case DataSourceType.http:
-        final prefs = await SharedPreferences.getInstance();
-        final baseUrl = prefs.getString(AppGlobalVariables.SERVER_URL) ?? 'http://localhost:3000';
+        final baseUrl = StorageService.getString(
+          StorageKeys.serverUrl,
+          defaultValue: 'http://localhost:3000'
+        );
         instance = HttpDataSource(baseUrl: baseUrl);
         break;
       case DataSourceType.sqlite:
@@ -31,7 +33,6 @@ class DataSourceFactory {
         break;
     }
 
-    // 缓存实例
     _instances[type] = instance;
     return instance;
   }

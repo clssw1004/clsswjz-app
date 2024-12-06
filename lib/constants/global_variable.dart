@@ -1,3 +1,1 @@
-class AppGlobalVariables {
-  static const SERVER_URL = 'server_url';
-}
+// 这个文件可以完全移除，常量已经移到 storage_keys.dart

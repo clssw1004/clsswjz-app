@@ -15,6 +15,8 @@ import '../l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/account_item_tile.dart';
 import '../services/account_item_cache.dart';
+import '../constants/storage_keys.dart';
+import '../services/storage_service.dart';
 
 class AccountItemList extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onBookSelected;
@@ -112,9 +114,8 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
         // 如果没有保存的账本ID，使用第一个本人的账本或第一个可用账本
         defaultBook = _getFirstOwnedBook(booksJson) ?? booksJson.first;
       }
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('currentBookId', defaultBook['id']);
-      await prefs.setString('currentBookName', defaultBook['name']);
+      await StorageService.setString(StorageKeys.currentBookId, defaultBook['id']);
+      await StorageService.setString(StorageKeys.currentBookName, defaultBook['name']);
       setState(() {
         _accountBooks = booksJson;
         _selectedBook = defaultBook;
@@ -150,9 +151,8 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     setState(() => _selectedBook = book);
 
     // 保存选中的账本ID和名称
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currentBookId', book['id']);
-    await prefs.setString('currentBookName', book['name']);
+    await StorageService.setString(StorageKeys.currentBookId, book['id']);
+    await StorageService.setString(StorageKeys.currentBookName, book['name']);
     await UserService.setCurrentAccountBookId(book['id']);
 
     // 调用回调通知父组件
@@ -480,12 +480,6 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     );
   }
 
-  Widget _buildAccountItem(BuildContext context, AccountItem item) {
-    return AccountItemTile(
-      item: item,
-      onTap: () => _editAccountItem(item),
-    );
-  }
 
   void _editAccountItem(AccountItem item) async {
     final result = await Navigator.push(
@@ -500,29 +494,6 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
 
     if (result == true) {
       _loadAccountItems();
-    }
-  }
-
-  void _addNewItem() async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider(
-          create: (_) => AccountItemProvider(),
-          child: AccountItemForm(
-            initialBook: _selectedBook,
-          ),
-        ),
-      ),
-    );
-
-    if (result == true) {
-      // 清除缓存并重新加载数据
-      AccountItemCache.clearCache();
-      await _loadAccountItems();
-      // 重置列表位置
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(0);
-      }
     }
   }
 

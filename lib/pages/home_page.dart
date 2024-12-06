@@ -4,6 +4,8 @@ import 'settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'statistics/statistics_page.dart';
 import '../l10n/l10n.dart';
+import '../constants/storage_keys.dart';
+import '../services/storage_service.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -23,10 +25,9 @@ class HomePageState extends State<HomePage>
   }
 
   Future<void> _loadCurrentBook() async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _currentBookId = prefs.getString('currentBookId');
-      _currentBookName = prefs.getString('currentBookName');
+      _currentBookId = StorageService.getString(StorageKeys.currentBookId);
+      _currentBookName = StorageService.getString(StorageKeys.currentBookName);
     });
   }
 
@@ -117,9 +118,8 @@ class HomePageState extends State<HomePage>
   }
 
   Future<void> _selectBook(Map<String, dynamic> book) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currentBookId', book['id']);
-    await prefs.setString('currentBookName', book['name']);
+    await StorageService.setString(StorageKeys.currentBookId, book['id']);
+    await StorageService.setString(StorageKeys.currentBookName, book['name']);
     setState(() {
       _currentBookId = book['id'];
       _currentBookName = book['name'];

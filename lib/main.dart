@@ -18,11 +18,15 @@ import 'generated/app_localizations.dart';
 import 'data/data_source.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
+import 'services/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 先初始化主题和语言
+  
+  // 确保 StorageService 最先初始化
+  await StorageService.init();
+  
+  // 初始化主题
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
 

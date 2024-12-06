@@ -1,9 +1,11 @@
+import '../../services/storage_service.dart';
 import 'http_method.dart';
 import 'package:dio/dio.dart';
 import '../data_source.dart';
 import '../../models/models.dart';
 import 'api_endpoints.dart';
 import 'http_client.dart';
+import '../../constants/storage_keys.dart';
 
 class HttpDataSource implements DataSource {
   final HttpClient _httpClient;
@@ -15,21 +17,26 @@ class HttpDataSource implements DataSource {
         );
 
   factory HttpDataSource({String? baseUrl}) {
-    return HttpDataSource._internal(baseUrl: baseUrl);
+    final savedUrl = StorageService.getString(StorageKeys.serverUrl);
+    return HttpDataSource._internal(
+        baseUrl: baseUrl ?? savedUrl ?? 'http://192.168.2.199:3000');
   }
 
   Future<void> initializeBaseUrl(String url) async {
+    await StorageService.setString(StorageKeys.serverUrl, url);
     _httpClient.setBaseUrl(url);
   }
 
   void setToken(String token) {
     _token = token;
     _httpClient.setToken(token);
+    StorageService.setString(StorageKeys.token, token);
   }
 
   void clearToken() {
     _token = null;
     _httpClient.clearToken();
+    StorageService.remove(StorageKeys.token);
   }
 
   // 账本相关方法

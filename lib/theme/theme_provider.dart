@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'theme_manager.dart';
+import '../services/storage_service.dart';
+import '../constants/storage_keys.dart';
 
 class ThemeProvider extends ChangeNotifier {
   Color _themeColor = Colors.blue;
@@ -7,6 +8,27 @@ class ThemeProvider extends ChangeNotifier {
   bool _isInitialized = false;
   late ThemeData _lightTheme;
   late ThemeData _darkTheme;
+
+  // 添加主题颜色列表
+  static final List<Color> themeColors = [
+    Colors.blue,
+    Colors.indigo,
+    Colors.purple,
+    Colors.deepPurple,
+    Colors.pink,
+    Colors.red,
+    Colors.orange,
+    Colors.amber,
+    Colors.yellow,
+    Colors.lime,
+    Colors.lightGreen,
+    Colors.green,
+    Colors.teal,
+    Colors.cyan,
+    Colors.lightBlue,
+    Colors.brown,
+    Colors.blueGrey,
+  ];
 
   ThemeProvider() {
     _updateThemes();
@@ -163,8 +185,21 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   Future<void> loadSavedTheme() async {
-    _themeColor = await ThemeManager.getThemeColor();
-    _themeMode = await ThemeManager.getThemeMode();
+    final savedMode = StorageService.getString(
+      StorageKeys.themeMode,
+      defaultValue: ThemeMode.system.toString()
+    );
+    _themeMode = ThemeMode.values.firstWhere(
+      (mode) => mode.toString() == savedMode,
+      orElse: () => ThemeMode.system,
+    );
+
+    final savedColor = StorageService.getString(
+      StorageKeys.themeColor,
+      defaultValue: Colors.blue.value.toString()
+    );
+    _themeColor = Color(int.parse(savedColor));
+
     _updateThemes();
     _isInitialized = true;
     notifyListeners();
@@ -173,13 +208,13 @@ class ThemeProvider extends ChangeNotifier {
   void setThemeColor(Color color) {
     _themeColor = color;
     _updateThemes();
-    ThemeManager.setThemeColor(color);
+    StorageService.setString(StorageKeys.themeColor, color.value.toString());
     notifyListeners();
   }
 
   void setThemeMode(ThemeMode mode) {
     _themeMode = mode;
-    ThemeManager.setThemeMode(mode);
+    StorageService.setString(StorageKeys.themeMode, mode.toString());
     notifyListeners();
   }
 }

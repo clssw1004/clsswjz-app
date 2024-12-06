@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../services/storage_service.dart';
+import '../constants/storage_keys.dart';
 import '../constants/language.dart';
 
 class LocaleProvider extends ChangeNotifier {
-  static const String _localeKey = 'app_locale';
   Locale _locale = const Locale('zh');
 
   Locale get locale => _locale;
@@ -14,12 +14,12 @@ class LocaleProvider extends ChangeNotifier {
 
   Future<void> _loadSavedLocale() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final savedLocale = prefs.getString(_localeKey);
-      if (savedLocale != null) {
-        final language = Language.fromCode(savedLocale);
-        _setLocale(language);
-      }
+      final savedLocale = StorageService.getString(
+        StorageKeys.locale,
+        defaultValue: 'zh'
+      );
+      final language = Language.fromCode(savedLocale);
+      _setLocale(language);
     } catch (e) {
       print('加载语言设置失败: $e');
     }
@@ -31,8 +31,7 @@ class LocaleProvider extends ChangeNotifier {
 
   Future<void> setLocale(Language language) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_localeKey, language.code);
+      await StorageService.setString(StorageKeys.locale, language.code);
       _setLocale(language);
     } catch (e) {
       print('保存语言设置失败: $e');
