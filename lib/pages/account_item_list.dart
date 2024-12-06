@@ -73,7 +73,9 @@ class _AccountItemListState extends State<AccountItemList> {
         // 如果没有保存的账本ID，使用第一个本人的账本或第一个可用账本
         defaultBook = _getFirstOwnedBook(booksJson) ?? booksJson.first;
       }
-
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('currentBookId', defaultBook['id']);
+      await prefs.setString('currentBookName', defaultBook['name']);
       setState(() {
         _accountBooks = booksJson;
         _selectedBook = defaultBook;
@@ -436,8 +438,8 @@ class _AccountItemListState extends State<AccountItemList> {
 
     final dateTime = DateTime.parse(date);
     return l10n.monthDayFormat(
-      dateTime.month.toString(),
       dateTime.day.toString(),
+      dateTime.month.toString(),
     );
   }
 

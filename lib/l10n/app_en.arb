@@ -242,5 +242,14 @@
   "statisticsTrend": "Trend",
   "statisticsExpenseByCategory": "Expense by Category",
   "statisticsIncomeByCategory": "Income by Category",
-  "statisticsNoData": "No Data"
+  "statisticsNoData": "No Data",
+  "chartTypeLine": "Line",
+  "chartTypeBar": "Bar",
+  "chartTypeArea": "Area",
+  "chartTypeStacked": "Stacked",
+  "chartNoData": "No data available",
+  "metricAmount": "Amount",
+  "metricCount": "Count",
+  "metricAverage": "Average",
+  "metricUnit": "{unit}"
 }

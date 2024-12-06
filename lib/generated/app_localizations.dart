@@ -1553,6 +1553,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Data'**
   String get statisticsNoData;
+
+  /// No description provided for @chartTypeLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Line'**
+  String get chartTypeLine;
+
+  /// No description provided for @chartTypeBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Bar'**
+  String get chartTypeBar;
+
+  /// No description provided for @chartTypeArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Area'**
+  String get chartTypeArea;
+
+  /// No description provided for @chartTypeStacked.
+  ///
+  /// In en, this message translates to:
+  /// **'Stacked'**
+  String get chartTypeStacked;
+
+  /// No description provided for @chartNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available'**
+  String get chartNoData;
+
+  /// No description provided for @metricAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get metricAmount;
+
+  /// No description provided for @metricCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Count'**
+  String get metricCount;
+
+  /// No description provided for @metricAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get metricAverage;
+
+  /// No description provided for @metricUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'{unit}'**
+  String metricUnit(Object unit);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

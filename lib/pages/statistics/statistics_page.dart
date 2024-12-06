@@ -104,7 +104,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   const SizedBox(height: 16),
                   const OverviewCard(),
                   const SizedBox(height: 16),
-                  const TrendChart(),
+                  TrendChart(chartType: provider.chartType),
                   const SizedBox(height: 16),
                   const CategoryPieChart(type: 'EXPENSE'),
                   const SizedBox(height: 16),

@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import '../data/data_source.dart';
 import '../models/models.dart';
+import '../models/statistics_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math' as math;
+import '../models/statistics_metric.dart';
 
 enum TimeRange { week, month, year, custom }
+enum ChartType {
+  line,    // 折线图
+  bar,     // 柱状图
+  area,    // 面积图
+  stacked, // 堆叠图
+}
 
 class StatisticsProvider extends ChangeNotifier {
   final DataSource _dataSource;
@@ -11,21 +20,63 @@ class StatisticsProvider extends ChangeNotifier {
   DateTime? _startDate;
   DateTime? _endDate;
   bool _loading = false;
-  AccountItemResponse? _data;
   String? _error;
+  StatisticsData? _data;
+  ChartType _chartType = ChartType.area;
+  StatisticsMetric _xMetric = StatisticsProvider.metrics[0];
+  StatisticsMetric _yMetric = StatisticsProvider.metrics[0];
+
+  static final List<StatisticsMetric> metrics = [
+    const StatisticsMetric(
+      id: 'amount',
+      type: MetricType.amount,
+      label: '金额',
+      unit: '¥',
+    ),
+    const StatisticsMetric(
+      id: 'count',
+      type: MetricType.count,
+      label: '笔数',
+      unit: '笔',
+    ),
+    const StatisticsMetric(
+      type: MetricType.average,
+      id: 'average',
+      label: '平均值',
+      unit: '¥',
+    ),
+  ];
+
+  // 预定义的颜色列表
+  static const List<int> _categoryColors = [
+    0xFF4CAF50, // 绿色
+    0xFFF44336, // 红色
+    0xFF2196F3, // 蓝色
+    0xFFFF9800, // 橙色
+    0xFF9C27B0, // 紫色
+    0xFF795548, // 棕色
+    0xFF607D8B, // 蓝灰色
+    0xFFE91E63, // 粉红色
+    0xFF673AB7, // 深紫色
+    0xFF009688, // 青色
+    0xFFFFEB3B, // 黄色
+    0xFF3F51B5, // 靛蓝色
+  ];
 
   StatisticsProvider(this._dataSource) {
-    // 初始化为本月数据
     _initMonthRange();
     loadData();
   }
 
   TimeRange get timeRange => _timeRange;
   bool get loading => _loading;
-  AccountItemResponse? get data => _data;
+  String? get error => _error;
+  StatisticsData? get data => _data;
   DateTime? get startDate => _startDate;
   DateTime? get endDate => _endDate;
-  String? get error => _error;
+  ChartType get chartType => _chartType;
+  StatisticsMetric get xMetric => _xMetric;
+  StatisticsMetric get yMetric => _yMetric;
 
   void _initMonthRange() {
     final now = DateTime.now();
@@ -39,7 +90,6 @@ class StatisticsProvider extends ChangeNotifier {
 
     switch (range) {
       case TimeRange.week:
-        // 本周第一天到最后一天
         _startDate = now.subtract(Duration(days: now.weekday - 1));
         _endDate = _startDate!.add(const Duration(days: 6));
         break;
@@ -51,7 +101,6 @@ class StatisticsProvider extends ChangeNotifier {
         _endDate = DateTime(now.year, 12, 31);
         break;
       case TimeRange.custom:
-        // 自定义时间范围保持不变
         return;
     }
 
@@ -70,11 +119,11 @@ class StatisticsProvider extends ChangeNotifier {
   Future<void> loadData() async {
     if (_startDate == null || _endDate == null) return;
 
-    try {
-      _loading = true;
-      _error = null;
-      notifyListeners();
+    _loading = true;
+    _error = null;
+    notifyListeners();
 
+    try {
       final prefs = await SharedPreferences.getInstance();
       final currentBookId = prefs.getString('currentBookId');
 
@@ -82,69 +131,160 @@ class StatisticsProvider extends ChangeNotifier {
         throw Exception('请先选择账本');
       }
 
-      _data = await _dataSource.getAccountItems(
+      final response = await _dataSource.getAccountItems(
         currentBookId,
         startDate: _startDate,
         endDate: _endDate,
       );
+
+      _data = _processData(response);
+      _error = null;
     } catch (e) {
       _error = e.toString();
-      print('加载统计数据失败: $e');
+      _data = null;
     } finally {
       _loading = false;
       notifyListeners();
     }
   }
 
-  // 获取分类统计数据
-  Map<String, double> getCategoryStatistics(String type) {
-    if (_data == null || _data!.items.isEmpty) return {};
-
-    final map = <String, double>{};
-    for (final item in _data!.items) {
-      if (item.type == type) {
-        map[item.category] = (map[item.category] ?? 0) + item.amount;
-      }
-    }
-    return map;
-  }
-
-  // 获取每日统计数据
-  List<DailyStatistics> getDailyStatistics() {
-    if (_data == null || _data!.items.isEmpty) return [];
-
-    final map = <String, DailyStatistics>{};
-
-    for (final item in _data!.items) {
+  StatisticsData _processData(AccountItemResponse response) {
+    // 处理趋势数据
+    final dailyStats = <String, TrendData>{};
+    for (final item in response.items) {
       final dateStr = item.accountDate.toString().split(' ')[0];
-      final daily = map[dateStr] ??
-          DailyStatistics(
-            date: item.accountDate,
-            income: 0,
-            expense: 0,
-          );
+      final data = dailyStats[dateStr] ?? TrendData(date: dateStr);
 
       if (item.type == 'INCOME') {
-        daily.income += item.amount;
+        data.income += item.amount;
       } else {
-        daily.expense += item.amount;
+        data.expense += item.amount;
       }
-
-      map[dateStr] = daily;
+      dailyStats[dateStr] = data;
     }
 
-    return map.values.toList()..sort((a, b) => a.date.compareTo(b.date));
+    // 据选定的指标处理数据
+    final trends = dailyStats.values.map((data) {
+      final incomeItems = response.items.where((item) => 
+        item.type == 'INCOME' && 
+        item.accountDate.toString().split(' ')[0] == data.date
+      ).toList();
+
+      final expenseItems = response.items.where((item) => 
+        item.type == 'EXPENSE' && 
+        item.accountDate.toString().split(' ')[0] == data.date
+      ).toList();
+
+      return TrendData(
+        date: data.date,
+        income: calculateMetricValue(incomeItems, _yMetric),
+        expense: calculateMetricValue(expenseItems, _yMetric),
+      );
+    }).toList()..sort((a, b) => a.date.compareTo(b.date));
+
+    // 处理分类数据
+    final expenseMap = <String, double>{};
+    final incomeMap = <String, double>{};
+    final categoryColors = <String, int>{};
+    final random = math.Random(0); // 使用固定种子以保持颜色一致
+
+    // 为每个分类分配颜色
+    void assignColor(String category) {
+      if (!categoryColors.containsKey(category)) {
+        // 如果分类数量超过预定义颜色，则随机生成颜色
+        if (categoryColors.length < _categoryColors.length) {
+          categoryColors[category] = _categoryColors[categoryColors.length];
+        } else {
+          // 生成随机颜色，但保持较高的饱度和亮度
+          final hue = random.nextDouble() * 360;
+          final saturation = 0.7 + random.nextDouble() * 0.3; // 70-100% 饱和度
+          final lightness = 0.4 + random.nextDouble() * 0.2;  // 40-60% 亮度
+          
+          final hslColor = HSLColor.fromAHSL(1.0, hue, saturation, lightness);
+          final color = hslColor.toColor();
+          categoryColors[category] = color.value;
+        }
+      }
+    }
+
+    // 处理收支数据并分配颜色
+    for (final item in response.items) {
+      if (item.type == 'EXPENSE') {
+        expenseMap[item.category] = (expenseMap[item.category] ?? 0) + item.amount;
+        assignColor(item.category);
+      } else {
+        incomeMap[item.category] = (incomeMap[item.category] ?? 0) + item.amount;
+        assignColor(item.category);
+      }
+    }
+
+    // 按金额排序并创建分类数据
+    final expenseByCategory = expenseMap.entries
+        .map((e) => CategoryData(
+              name: e.key,
+              amount: e.value,
+              color: categoryColors[e.key]!,
+            ))
+        .toList()
+      ..sort((a, b) => b.amount.compareTo(a.amount));
+
+    final incomeByCategory = incomeMap.entries
+        .map((e) => CategoryData(
+              name: e.key,
+              amount: e.value,
+              color: categoryColors[e.key]!,
+            ))
+        .toList()
+      ..sort((a, b) => b.amount.compareTo(a.amount));
+
+    // 计算总收支
+    double totalIncome = 0;
+    double totalExpense = 0;
+    for (final item in response.items) {
+      if (item.type == 'INCOME') {
+        totalIncome += item.amount;
+      } else {
+        totalExpense += item.amount;
+      }
+    }
+
+    return StatisticsData(
+      trends: trends,
+      expenseByCategory: expenseByCategory,
+      incomeByCategory: incomeByCategory,
+      totalIncome: totalIncome,
+      totalExpense: totalExpense,
+    );
   }
-}
 
-class DailyStatistics {
-  final DateTime date;
-  double income;
-  double expense;
+  void setChartType(ChartType type) {
+    _chartType = type;
+    notifyListeners();
+  }
 
-  DailyStatistics({
-    required this.date,
-    required this.income,
-    required this.expense,
-  });
+  void setXMetric(StatisticsMetric metric) {
+    _xMetric = metric;
+    notifyListeners();
+  }
+
+  void setYMetric(StatisticsMetric metric) {
+    if (_yMetric != metric) {
+      _yMetric = metric;
+      loadData();
+    }
+  }
+
+  // 根据指标计算值
+  double calculateMetricValue(List<AccountItem> items, StatisticsMetric metric) {
+    switch (metric.type) {
+      case MetricType.amount:
+        return items.fold(0.0, (sum, item) => sum + item.amount);
+      case MetricType.count:
+        return items.length.toDouble();
+      case MetricType.average:
+        if (items.isEmpty) return 0;
+        final total = items.fold(0.0, (sum, item) => sum + item.amount);
+        return total / items.length;
+    }
+  }
 }

@@ -1,14 +1,17 @@
-import '../data/data_source_factory.dart';
+import '../data/data_source.dart';
 import '../data/http/http_data_source.dart';
 
 class AuthService {
-  static final HttpDataSource _httpDataSource =
-      DataSourceFactory.create(DataSourceType.http) as HttpDataSource;
+  static late final HttpDataSource _dataSource;
+
+  static void init(DataSource dataSource) {
+    _dataSource = dataSource as HttpDataSource;
+  }
 
   static Future<Map<String, dynamic>> login(
       String username, String password) async {
     try {
-      final response = await _httpDataSource.login(username, password);
+      final response = await _dataSource.login(username, password);
       print('Login response raw: $response'); // 添加日志
 
       final token = response['access_token'] as String?;
@@ -17,7 +20,7 @@ class AuthService {
       }
 
       // 确保在这里设置 token
-      _httpDataSource.setToken(token);
+      _dataSource.setToken(token);
       print('Token set in AuthService: $token'); // 添加日志
 
       return {
@@ -37,11 +40,11 @@ class AuthService {
 
   static void setToken(String token) {
     print('Setting token in AuthService: $token'); // 添加日志
-    _httpDataSource.setToken(token);
+    _dataSource.setToken(token);
   }
 
   static void clearToken() {
     print('Clearing token in AuthService'); // 添加日志
-    _httpDataSource.clearToken();
+    _dataSource.clearToken();
   }
 }

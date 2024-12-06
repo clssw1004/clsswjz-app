@@ -17,6 +17,15 @@
     "statisticsTrend",
     "statisticsExpenseByCategory",
     "statisticsIncomeByCategory",
-    "statisticsNoData"
+    "statisticsNoData",
+    "chartTypeLine",
+    "chartTypeBar",
+    "chartTypeArea",
+    "chartTypeStacked",
+    "chartNoData",
+    "metricAmount",
+    "metricCount",
+    "metricAverage",
+    "metricUnit"
   ]
 }

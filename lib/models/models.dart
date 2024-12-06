@@ -5,3 +5,4 @@ export 'fund.dart';
 export 'member.dart';
 export 'shop.dart';
 export 'user.dart';
+export 'statistics_data.dart';

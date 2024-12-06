@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:universal_html/html.dart' as html;
+import '../data/data_source.dart';
 import '../data/data_source_factory.dart';
 import '../data/http/http_data_source.dart';
 import 'auth_service.dart';
@@ -13,9 +14,12 @@ class UserService {
   static Map<String, dynamic>? _cachedUserInfo;
   static const String _currentAccountBookKey = 'currentAccountBook';
   static const String _sessionKey = 'user_session';
-  static final HttpDataSource _httpDataSource =
-      DataSourceFactory.create(DataSourceType.http) as HttpDataSource;
   static const String _tokenKey = 'auth_token';
+  static late final HttpDataSource _httpDataSource;
+
+  static void init(DataSource dataSource) {
+    _httpDataSource = dataSource as HttpDataSource;
+  }
 
   // Web 平台的存储实现
   static Future<void> _saveToWeb(Map<String, dynamic> data) async {

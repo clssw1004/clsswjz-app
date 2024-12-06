@@ -408,7 +408,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fundExpense => '支出';
 
   @override
-  String get checkButton => '检��';
+  String get checkButton => '检';
 
   @override
   String get saveButton => '保存';
@@ -518,7 +518,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get permDeleteItem => '删除账目';
 
   @override
-  String get shopManagementTitle => '商家��理';
+  String get shopManagementTitle => '商家理';
 
   @override
   String get newShopButton => '新建商家';
@@ -628,7 +628,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get timeLabel => '时间';
 
   @override
-  String get accountLabel => '账户';
+  String get accountLabel => '账';
 
   @override
   String get accountHint => '请选择账户';
@@ -762,6 +762,35 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statisticsNoData => '暂无数据';
+
+  @override
+  String get chartTypeLine => '折线图';
+
+  @override
+  String get chartTypeBar => '柱状图';
+
+  @override
+  String get chartTypeArea => '面积图';
+
+  @override
+  String get chartTypeStacked => '堆叠图';
+
+  @override
+  String get chartNoData => '暂无数据';
+
+  @override
+  String get metricAmount => '金额';
+
+  @override
+  String get metricCount => '笔数';
+
+  @override
+  String get metricAverage => '平均值';
+
+  @override
+  String metricUnit(Object unit) {
+    return '$unit';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

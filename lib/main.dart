@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'data/data_source_factory.dart';
 import "pages/login_page.dart";
 import 'pages/home_page.dart';
 import 'pages/register_page.dart';
@@ -14,33 +15,19 @@ import 'package:flutter/services.dart';
 import 'providers/locale_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/app_localizations.dart';
-import 'data/http/http_data_source.dart';
 import 'data/data_source.dart';
-
-Future<Map<String, dynamic>?> _initializeApp() async {
-  try {
-    final hasSession = await UserService.hasValidSession();
-    if (hasSession) {
-      await UserService.initializeSession();
-      return UserService.getUserInfo();
-    }
-    return null;
-  } catch (e) {
-    print('初始化应用失败: $e');
-    return null;
-  }
-}
+import 'services/api_service.dart';
+import 'services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 先初始化主题和语言
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
 
   final localeProvider = LocaleProvider();
   await localeProvider.loadSavedLocale();
-
-  final dataSource = HttpDataSource();
 
   if (!kIsWeb && Platform.isAndroid) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -57,6 +44,15 @@ void main() async {
       overlays: [SystemUiOverlay.top],
     );
   }
+
+  // 创建 DataSource 实例并初始化服务
+  final dataSource = await DataSourceFactory.create(DataSourceType.http);
+  
+  // 初始化所有服务
+  ApiService.init(dataSource);
+  AuthService.init(dataSource);
+  UserService.init(dataSource);
+  await UserService.initializeSession();
 
   runApp(
     MultiProvider(
@@ -102,7 +98,9 @@ void main() async {
             home: Builder(
               builder: (context) {
                 return FutureBuilder<Map<String, dynamic>?>(
-                  future: _initializeApp(),
+                  future: UserService.hasValidSession().then((hasSession) {
+                    return hasSession ? UserService.getUserInfo() : null;
+                  }),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Scaffold(

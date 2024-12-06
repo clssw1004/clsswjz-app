@@ -762,4 +762,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statisticsNoData => 'No Data';
+
+  @override
+  String get chartTypeLine => 'Line';
+
+  @override
+  String get chartTypeBar => 'Bar';
+
+  @override
+  String get chartTypeArea => 'Area';
+
+  @override
+  String get chartTypeStacked => 'Stacked';
+
+  @override
+  String get chartNoData => 'No data available';
+
+  @override
+  String get metricAmount => 'Amount';
+
+  @override
+  String get metricCount => 'Count';
+
+  @override
+  String get metricAverage => 'Average';
+
+  @override
+  String metricUnit(Object unit) {
+    return '$unit';
+  }
 }
