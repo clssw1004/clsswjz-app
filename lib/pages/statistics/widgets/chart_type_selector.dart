@@ -14,12 +14,13 @@ class ChartTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = L10n.of(context);
     final theme = Theme.of(context);
+    final l10n = L10n.of(context);
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildChip(
             context,
@@ -27,21 +28,21 @@ class ChartTypeSelector extends StatelessWidget {
             Icons.show_chart,
             l10n.chartTypeLine,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           _buildChip(
             context,
             ChartType.bar,
             Icons.bar_chart,
             l10n.chartTypeBar,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           _buildChip(
             context,
             ChartType.area,
             Icons.area_chart,
             l10n.chartTypeArea,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           _buildChip(
             context,
             ChartType.stacked,
@@ -68,7 +69,7 @@ class ChartTypeSelector extends StatelessWidget {
       showCheckmark: false,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact,
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       labelPadding: EdgeInsets.zero,
       label: Row(
         mainAxisSize: MainAxisSize.min,
@@ -78,12 +79,12 @@ class ChartTypeSelector extends StatelessWidget {
             size: 14,
             color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
           ),
-          const SizedBox(width: 3),
+          const SizedBox(width: 2),
           Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
               color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
-              fontSize: 12,
+              fontSize: 11,
             ),
           ),
         ],

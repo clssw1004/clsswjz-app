@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../../models/models.dart';
 import '../../../providers/statistics_provider.dart';
 import '../../../l10n/l10n.dart';
@@ -27,12 +28,15 @@ class CategoryPieChart extends StatelessWidget {
           return _buildEmptyState(context);
         }
 
-        final total = categories.fold<double>(
-          0,
-          (sum, item) => sum + item.amount,
-        );
-
         return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: colorScheme.outlineVariant.withOpacity(0.5),
+            ),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -44,104 +48,40 @@ class CategoryPieChart extends StatelessWidget {
                       : l10n.statisticsIncomeByCategory,
                   style: theme.textTheme.titleMedium,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 SizedBox(
                   height: 240,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: SfCircularChart(
-                          margin: EdgeInsets.zero,
-                          series: <CircularSeries>[
-                            DoughnutSeries<CategoryData, String>(
-                              dataSource: categories,
-                              xValueMapper: (CategoryData data, _) => data.name,
-                              yValueMapper: (CategoryData data, _) => data.amount,
-                              pointColorMapper: (CategoryData data, _) => 
-                                  Color(data.color),
-                              dataLabelMapper: (CategoryData data, _) {
-                                final percent = data.amount / total * 100;
-                                return percent >= 5 
-                                    ? '${percent.toStringAsFixed(0)}%'
-                                    : '';
-                              },
-                              dataLabelSettings: DataLabelSettings(
-                                isVisible: true,
-                                labelPosition: ChartDataLabelPosition.outside,
-                                textStyle: theme.textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurface,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                connectorLineSettings: const ConnectorLineSettings(
-                                  type: ConnectorType.curve,
-                                  length: '15%',
-                                ),
-                              ),
-                              radius: '80%',
-                              innerRadius: '60%',
-                              explode: true,
-                              explodeOffset: '5%',
-                            ),
-                          ],
-                        ),
+                  child: SfCircularChart(
+                    legend: Legend(
+                      isVisible: true,
+                      position: LegendPosition.right,
+                      overflowMode: LegendItemOverflowMode.wrap,
+                      textStyle: theme.textTheme.bodySmall,
+                    ),
+                    tooltipBehavior: TooltipBehavior(
+                      enable: true,
+                      color: colorScheme.surfaceContainerHighest,
+                      textStyle: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurface,
                       ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: [
-                            Text(
-                              '${l10n.currencySymbol}${total.toStringAsFixed(2)}',
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                color: type == 'EXPENSE'
-                                    ? colorScheme.error
-                                    : colorScheme.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Expanded(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: categories.length,
-                                itemBuilder: (context, index) {
-                                  final category = categories[index];
-                                  final percent = category.amount / total;
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          decoration: BoxDecoration(
-                                            color: Color(category.color),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            category.name,
-                                            style: theme.textTheme.bodySmall,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          '${(percent * 100).toStringAsFixed(1)}%',
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            color: colorScheme.onSurfaceVariant,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                    ),
+                    series: <CircularSeries>[
+                      DoughnutSeries<CategoryData, String>(
+                        dataSource: categories,
+                        xValueMapper: (CategoryData data, _) => data.name,
+                        yValueMapper: (CategoryData data, _) => data.amount,
+                        pointColorMapper: (CategoryData data, _) => 
+                            Color(data.color),
+                        dataLabelMapper: (CategoryData data, _) => 
+                            '${data.name}\n${NumberFormat.compact().format(data.amount)}',
+                        dataLabelSettings: DataLabelSettings(
+                          isVisible: true,
+                          labelPosition: ChartDataLabelPosition.outside,
+                          textStyle: theme.textTheme.bodySmall,
                         ),
+                        enableTooltip: true,
+                        radius: '80%',
+                        innerRadius: '60%',
                       ),
                     ],
                   ),
@@ -159,6 +99,14 @@ class CategoryPieChart extends StatelessWidget {
     final l10n = L10n.of(context);
     
     return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+        ),
+      ),
       child: Container(
         height: 240,
         alignment: Alignment.center,

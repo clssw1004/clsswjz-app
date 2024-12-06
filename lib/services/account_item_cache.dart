@@ -3,7 +3,7 @@ import '../models/models.dart';
 class AccountItemCache {
   static final Map<String, CacheEntry> _cache = {};
   static const int _maxCacheSize = 50;  // 最大缓存账本数
-  static const Duration _maxAge = Duration(minutes: 5);  // 缓存有效期
+  static const Duration _maxAge = Duration(seconds: 30);  // 缓存有效期缩短到30秒
 
   static void cacheItems(String bookId, List<AccountItem> items) {
     _cache[bookId] = CacheEntry(
@@ -41,6 +41,13 @@ class AccountItemCache {
 
   static void clearCache() {
     _cache.clear();
+  }
+
+  static bool isCacheValid(String bookId) {
+    final entry = _cache[bookId];
+    if (entry == null) return false;
+    
+    return DateTime.now().difference(entry.timestamp) <= _maxAge;
   }
 }
 

@@ -43,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
             context,
             title: l10n.accountManagement,
             children: [
-              CreateAccountBookItem(),
+              AccountBookManager(),
               ListTile(
                 leading: Icon(Icons.category_outlined),
                 title: Text(l10n.categoryManagement),

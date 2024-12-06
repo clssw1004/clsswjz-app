@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../services/account_item_cache.dart';
 import '../services/api_service.dart';
 import '../models/models.dart';
 import '../utils/message_helper.dart';
@@ -46,12 +47,16 @@ class _AccountItemFormState extends State<AccountItemForm> {
   String? _recordId;
   String? _selectedShop;
   String? _selectedShopName;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
     _provider = AccountItemProvider(selectedBook: widget.initialBook);
     _selectedBook = widget.initialBook;
+
+    // 设置初始交易类型
+    _transactionType = widget.initialData?['type'] == 'EXPENSE' ? '支出' : '收入';
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
@@ -97,23 +102,19 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
       // 设置初始数据
       if (widget.initialData != null) {
-        print('Initial data: ${widget.initialData}');
         setState(() {
           _recordId = widget.initialData!['id'];
-          _transactionType =
-              widget.initialData!['type'] == 'EXPENSE' ? 'expense' : 'income';
-          _provider.setTransactionType(_transactionType);
+          _transactionType = widget.initialData!['type'] == 'EXPENSE' ? '支出' : '收入';
+          _provider.setTransactionType(_transactionType);  // 设置 provider 的交易类型
           _amountController.text = widget.initialData!['amount'].toString();
           _selectedCategory = widget.initialData!['category'];
 
-          // 修改商家信息的设置
           if (widget.initialData!['shop'] != null) {
-            _selectedShop = widget.initialData!['shop']; // 使用 shop 而不是 shopCode
+            _selectedShop = widget.initialData!['shop'];
             _selectedShopName = widget.initialData!['shop'];
           }
 
-          _descriptionController.text =
-              widget.initialData!['description'] ?? '';
+          _descriptionController.text = widget.initialData!['description'] ?? '';
 
           // 设置日期时间
           if (widget.initialData!['accountDate'] != null) {
@@ -266,9 +267,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                           _saveTransaction({
                             'amount': amount,
                             'description': _descriptionController.text.trim(),
-                            'type': _transactionType == 'expense'
-                                ? 'EXPENSE'
-                                : 'INCOME',
+                            'type': _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
                             'category': _selectedCategory,
                             'accountDate': _formattedDateTime,
                             'fundId': _selectedFund?['id'],
@@ -332,6 +331,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
     final l10n = L10n.of(context);
     if (!mounted) return;
+    setState(() => _isSaving = true);
+
     try {
       // 验证必填字段
       if (data['amount'] == 0.0) {
@@ -354,8 +355,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
       // 收起键盘
       FocusScope.of(context).unfocus();
 
-      final type =
-          _transactionType.toUpperCase() == 'EXPENSE' ? 'EXPENSE' : 'INCOME';
+      final type = _transactionType == '支出' ? 'EXPENSE' : 'INCOME';
 
       final accountItem = AccountItem(
         id: data['id'] ?? '',
@@ -378,16 +378,18 @@ class _AccountItemFormState extends State<AccountItemForm> {
         await ApiService.updateAccountItem(accountItem.id, accountItem);
       }
 
+      // 清除缓存
+      AccountItemCache.clearCache();
+
       if (!mounted) return;
       Navigator.pop(context, true);
-      MessageHelper.showSuccess(
-        context,
-        message: l10n.saveRecordSuccess,
-        showInRelease: true,
-      );
     } catch (e) {
       if (!mounted) return;
       MessageHelper.showError(context, message: e.toString());
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 

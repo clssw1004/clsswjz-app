@@ -292,46 +292,20 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     });
 
     try {
-      final bookId = _selectedBook!['id'];
-
-      // 尝试从缓存获取数据
-      final cachedItems = AccountItemCache.getCachedItems(bookId);
-      if (cachedItems != null &&
-          _selectedCategories.isEmpty &&
-          _selectedType == null &&
-          _startDate == null &&
-          _endDate == null) {
-        setState(() {
-          _accountItems = cachedItems;
-          _displayedItems = cachedItems.take(_pageSize).toList();
-          _updateGroupedItems(); // 更新分组
-          _isLoading = false;
-        });
-        return;
-      }
-
-      // 加载新数据
+      // 直接加载新数据，不使用缓存
       final response = await ApiService.getAccountItems(
-        bookId,
+        _selectedBook!['id'],
         categories: _selectedCategories,
         type: _selectedType,
         startDate: _startDate,
         endDate: _endDate,
       );
 
-      // 缓存未过滤的数据
-      if (_selectedCategories.isEmpty &&
-          _selectedType == null &&
-          _startDate == null &&
-          _endDate == null) {
-        AccountItemCache.cacheItems(bookId, response.items);
-      }
-
       if (!mounted) return;
       setState(() {
         _accountItems = response.items;
         _displayedItems = response.items.take(_pageSize).toList();
-        _updateGroupedItems(); // 更新分组
+        _updateGroupedItems();
         _summary = response.summary;
         _isLoading = false;
       });
@@ -355,7 +329,13 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     );
 
     if (result == true) {
-      _loadAccountItems();
+      // 清除缓存并立即重新加载数据
+      AccountItemCache.clearCache();
+      await _loadAccountItems();
+      // 重置列表位置
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
     }
   }
 
@@ -373,7 +353,13 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     );
 
     if (result == true) {
-      _loadAccountItems();
+      // 清除缓存并立即重新加载数据
+      AccountItemCache.clearCache();
+      await _loadAccountItems();
+      // 重置列表位置到顶部
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
     }
   }
 
@@ -530,7 +516,13 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     );
 
     if (result == true) {
-      _loadAccountItems();
+      // 清除缓存并重新加载数据
+      AccountItemCache.clearCache();
+      await _loadAccountItems();
+      // 重置列表位置
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
     }
   }
 
