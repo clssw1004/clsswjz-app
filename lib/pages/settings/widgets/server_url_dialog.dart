@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../constants/global_variable.dart';
 import '../../../services/api_service.dart';
 import '../../../utils/message_helper.dart';
 import '../../../constants/theme_constants.dart';
@@ -25,7 +26,8 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
   Future<void> _loadServerUrl() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final url = prefs.getString('apiGateway') ?? 'http://192.168.2.147:3000';
+      final url = prefs.getString(AppGlobalVariables.SERVER_URL) ??
+          'http://192.168.2.147:3000';
       if (!mounted) return;
       setState(() {
         _controller.text = url;
@@ -77,7 +79,7 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
     try {
       await ApiService.checkServerStatus(url);
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('apiGateway', url);
+      await prefs.setString(AppGlobalVariables.SERVER_URL, url);
 
       if (!mounted) return;
       Navigator.pop(context);

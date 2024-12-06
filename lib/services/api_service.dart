@@ -7,10 +7,14 @@ import '../data/data_source.dart';
 import '../models/register_request.dart';
 
 class ApiService {
-  static final DataSource _dataSource =
-      DataSourceFactory.create(DataSourceType.http);
+  static late final DataSource _dataSource;
 
-  // 账本相关
+  static Future<void> init() async {
+    _dataSource =
+        await DataSourceFactory.create(DataSourceType.http) as HttpDataSource;
+  }
+
+  // 确保在使用 ApiService 之前调用 init()
   static Future<List<AccountBook>> getAccountBooks() {
     return _dataSource.getAccountBooks();
   }
@@ -141,7 +145,11 @@ class ApiService {
       }
     }
 
-    // 使用当前的数据源检查状态
+    // 确保 _dataSource 已初始化
+    if (_dataSource is! HttpDataSource) {
+      throw Exception('数据源类型错误');
+    }
+
     try {
       return await _dataSource.serverStatus();
     } catch (e) {

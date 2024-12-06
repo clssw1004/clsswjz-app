@@ -13,9 +13,13 @@ class UserService {
   static Map<String, dynamic>? _cachedUserInfo;
   static const String _currentAccountBookKey = 'currentAccountBook';
   static const String _sessionKey = 'user_session';
-  static final HttpDataSource _httpDataSource =
-      DataSourceFactory.create(DataSourceType.http) as HttpDataSource;
   static const String _tokenKey = 'auth_token';
+  static late final HttpDataSource _httpDataSource;
+
+  static Future<void> init() async {
+    _httpDataSource =
+        await DataSourceFactory.create(DataSourceType.http) as HttpDataSource;
+  }
 
   // Web 平台的存储实现
   static Future<void> _saveToWeb(Map<String, dynamic> data) async {

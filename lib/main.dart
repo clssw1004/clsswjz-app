@@ -14,6 +14,8 @@ import 'package:flutter/services.dart';
 import 'providers/locale_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/app_localizations.dart';
+import 'services/api_service.dart';
+import 'services/auth_service.dart';
 
 Future<Map<String, dynamic>?> _initializeApp() async {
   try {
@@ -31,6 +33,12 @@ Future<Map<String, dynamic>?> _initializeApp() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 初始化各个服务
+  await ApiService.init();
+  await AuthService.init();
+  await UserService.init();
+  // ... 其他服务的初始化
 
   // 加载主题
   final themeProvider = ThemeProvider();
