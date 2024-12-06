@@ -28,7 +28,7 @@ class AccountItemList extends StatefulWidget {
   State<AccountItemList> createState() => _AccountItemListState();
 }
 
-class _AccountItemListState extends State<AccountItemList> {
+class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAliveClientMixin {
   static const int _pageSize = 20; // 每页加载的数据量
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
@@ -164,7 +164,11 @@ class _AccountItemListState extends State<AccountItemList> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
@@ -194,68 +198,75 @@ class _AccountItemListState extends State<AccountItemList> {
         ],
       ),
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _loadAccountItems,
-          child: Column(
-            children: [
-              FilterSection(
-                isExpanded: _isFilterExpanded,
-                selectedType: _selectedType,
-                selectedCategories: _selectedCategories,
-                minAmount: _minAmount,
-                maxAmount: _maxAmount,
-                startDate: _startDate,
-                endDate: _endDate,
-                categories: _categories,
-                onTypeChanged: (type) {
-                  setState(() => _selectedType = type);
-                  _loadAccountItems();
-                },
-                onCategoriesChanged: (categories) {
-                  setState(() => _selectedCategories = categories);
-                  _loadAccountItems();
-                },
-                onMinAmountChanged: (amount) {
-                  setState(() => _minAmount = amount);
-                  _loadAccountItems();
-                },
-                onMaxAmountChanged: (amount) {
-                  setState(() => _maxAmount = amount);
-                  _loadAccountItems();
-                },
-                onStartDateChanged: (date) {
-                  setState(() => _startDate = date);
-                  _loadAccountItems();
-                },
-                onEndDateChanged: (date) {
-                  setState(() => _endDate = date);
-                  _loadAccountItems();
-                },
-                onClearFilter: () {
-                  setState(() {
-                    _selectedType = null;
-                    _selectedCategories = [];
-                    _minAmount = null;
-                    _maxAmount = null;
-                    _startDate = null;
-                    _endDate = null;
-                  });
-                  _loadAccountItems();
-                },
+        child: Column(
+          children: [
+            FilterSection(
+              isExpanded: _isFilterExpanded,
+              selectedType: _selectedType,
+              selectedCategories: _selectedCategories,
+              minAmount: _minAmount,
+              maxAmount: _maxAmount,
+              startDate: _startDate,
+              endDate: _endDate,
+              categories: _categories,
+              onTypeChanged: (type) {
+                setState(() => _selectedType = type);
+                _loadAccountItems();
+              },
+              onCategoriesChanged: (categories) {
+                setState(() => _selectedCategories = categories);
+                _loadAccountItems();
+              },
+              onMinAmountChanged: (amount) {
+                setState(() => _minAmount = amount);
+                _loadAccountItems();
+              },
+              onMaxAmountChanged: (amount) {
+                setState(() => _maxAmount = amount);
+                _loadAccountItems();
+              },
+              onStartDateChanged: (date) {
+                setState(() => _startDate = date);
+                _loadAccountItems();
+              },
+              onEndDateChanged: (date) {
+                setState(() => _endDate = date);
+                _loadAccountItems();
+              },
+              onClearFilter: () {
+                setState(() {
+                  _selectedType = null;
+                  _selectedCategories = [];
+                  _minAmount = null;
+                  _maxAmount = null;
+                  _startDate = null;
+                  _endDate = null;
+                });
+                _loadAccountItems();
+              },
+            ),
+            if (_summary != null)
+              SummaryCard(
+                key: ValueKey('summary_card'),
+                allIn: _summary!.allIn,
+                allOut: _summary!.allOut,
+                allBalance: _summary!.allBalance,
               ),
-              if (_summary != null)
-                SummaryCard(
-                  allIn: _summary!.allIn,
-                  allOut: _summary!.allOut,
-                  allBalance: _summary!.allBalance,
-                ),
-              Expanded(
-                child: _accountItems.isEmpty
-                    ? _buildEmptyView(Theme.of(context).colorScheme)
-                    : _buildList(),
-              ),
-            ],
-          ),
+            Expanded(
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: colorScheme.primary,
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadAccountItems,
+                      child: _accountItems.isEmpty
+                          ? _buildEmptyView(colorScheme)
+                          : _buildList(),
+                    ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: _accountBooks.isNotEmpty && !_isLoading

@@ -67,20 +67,53 @@ class TimeRangeSelector extends StatelessWidget {
     BuildContext context,
     StatisticsProvider provider,
   ) async {
+    final now = DateTime.now();
+    final lastDate = DateTime(now.year, now.month, now.day);  // 设置为今天的开始时间
+    
+    // 确保初始日期范围不超过今天
+    final initialStart = provider.startDate ?? now;
+    final initialEnd = provider.endDate ?? now;
+    
     final initialDateRange = DateTimeRange(
-      start: provider.startDate ?? DateTime.now(),
-      end: provider.endDate ?? DateTime.now(),
+      start: initialStart.isAfter(lastDate) ? lastDate : initialStart,
+      end: initialEnd.isAfter(lastDate) ? lastDate : initialEnd,
     );
 
     final picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
+      lastDate: lastDate,  // 使用今天作为最后日期
       initialDateRange: initialDateRange,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme,
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
-      provider.setCustomRange(picked.start, picked.end);
+      // 设置时间为当天的开始和结束
+      final start = DateTime(
+        picked.start.year,
+        picked.start.month,
+        picked.start.day,
+      );
+      final end = DateTime(
+        picked.end.year,
+        picked.end.month,
+        picked.end.day,
+        23, 59, 59,  // 设置为当天的最后一秒
+      );
+      
+      provider.setCustomRange(start, end);
     }
   }
 }

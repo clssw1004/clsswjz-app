@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/l10n.dart';
+import '../../../utils/amount_formatter.dart';
 
 class SummaryCard extends StatelessWidget {
   final double allIn;
@@ -46,35 +47,28 @@ class SummaryCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(16),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildSummaryItem(
-                    context,
-                    label: l10n.summaryIncome,
-                    amount: allIn,
-                    color: Color(0xFF43A047), // Material Green 600
+                  Expanded(
+                    child: _buildSummaryItem(
+                      context,
+                      label: l10n.summaryIncome,
+                      amount: allIn,
+                      color: Color(0xFF43A047), // Material Green 600
+                    ),
                   ),
                   Container(
                     height: 32,
                     width: 1,
                     color: colorScheme.outlineVariant,
                   ),
-                  _buildSummaryItem(
-                    context,
-                    label: l10n.summaryExpense,
-                    amount: allOut,
-                    color: Color(0xFFE53935), // Material Red 600
-                  ),
-                  Container(
-                    height: 32,
-                    width: 1,
-                    color: colorScheme.outlineVariant,
-                  ),
-                  _buildSummaryItem(
-                    context,
-                    label: l10n.summaryBalance,
-                    amount: allBalance,
-                    color: colorScheme.primary,
+                  Expanded(
+                    child: _buildSummaryItem(
+                      context,
+                      label: l10n.summaryExpense,
+                      amount: allOut,
+                      color: Color(0xFFE53935), // Material Red 600
+                    ),
                   ),
                 ],
               ),
@@ -92,6 +86,7 @@ class SummaryCard extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
     final l10n = L10n.of(context);
+    final locale = Localizations.localeOf(context).toString();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -103,27 +98,14 @@ class SummaryCard extends StatelessWidget {
           ),
         ),
         SizedBox(height: 4),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              l10n.currencySymbol,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: color,
-                fontWeight: FontWeight.w500,
-              ),
+        FittedBox(
+          child: Text(
+            AmountFormatter.formatFullWithSymbol(amount, l10n.currencySymbol, locale),
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w500,
             ),
-            SizedBox(width: 2),
-            Text(
-              amount.toStringAsFixed(2),
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: color,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+          ),
         ),
       ],
     );

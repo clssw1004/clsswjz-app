@@ -15,6 +15,8 @@ class AppBarFactory {
     required BuildContext context,
     required Widget title,
     List<Widget>? actions,
+    Color? backgroundColor,
+    double? elevation,
     Widget? leading,
     bool automaticallyImplyLeading = true,
     PreferredSizeWidget? bottom = const PreferredSize(
@@ -39,9 +41,9 @@ class AppBarFactory {
 
     return AppBar(
       title: title,
-      elevation: 0,
+      elevation: elevation ?? 0,
       scrolledUnderElevation: 0,
-      backgroundColor: colorScheme.surface.withOpacity(0.95),
+      backgroundColor: backgroundColor ?? colorScheme.surface.withOpacity(0.95),
       surfaceTintColor: Colors.transparent,
       leading: leading,
       actions: actions,
@@ -62,6 +64,7 @@ class AppBarFactory {
             : Brightness.light,
       ),
       bottom: bottom,
+      centerTitle: true,
     );
   }
 }

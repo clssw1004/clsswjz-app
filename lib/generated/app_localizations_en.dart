@@ -312,7 +312,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get balance => 'Balance';
 
   @override
-  String get accountBookList => 'Account Books';
+  String get accountBookList => 'Transactions';
 
   @override
   String get newAccountBook => 'New Account Book';

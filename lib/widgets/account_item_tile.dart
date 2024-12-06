@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../constants/app_colors.dart';
+import '../utils/amount_formatter.dart';
 
 class AccountItemTile extends StatelessWidget {
   final AccountItem item;
@@ -17,6 +18,7 @@ class AccountItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final locale = Localizations.localeOf(context).toString();
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -65,7 +67,11 @@ class AccountItemTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
                 Text(
-                  '${item.type == 'EXPENSE' ? '-' : '+'}¥${item.amount.toStringAsFixed(2)}',
+                  '${item.type == 'EXPENSE' ? '-' : '+'}${AmountFormatter.formatWithSymbol(
+                    item.amount,
+                    '¥',
+                    locale,
+                  )}',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: item.type == 'EXPENSE'
                         ? AppColors.expense

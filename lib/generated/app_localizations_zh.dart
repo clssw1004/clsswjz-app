@@ -312,7 +312,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get balance => '结余';
 
   @override
-  String get accountBookList => '账本列表';
+  String get accountBookList => '账目';
 
   @override
   String get newAccountBook => '新建账本';
@@ -628,7 +628,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get timeLabel => '时间';
 
   @override
-  String get accountLabel => '账';
+  String get accountLabel => '账户';
 
   @override
   String get accountHint => '请选择账户';
@@ -1103,7 +1103,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get balance => '結餘';
 
   @override
-  String get accountBookList => '賬本列表';
+  String get accountBookList => '賬目';
 
   @override
   String get newAccountBook => '新建賬本';
@@ -1205,7 +1205,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get saveButton => '保存';
 
   @override
-  String get serverUrlLabel => '伺服器地址';
+  String get serverUrlLabel => '��服器地址';
 
   @override
   String get serverUrlHint => 'http://example.com:3000';
@@ -1419,7 +1419,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get accountHint => '請選擇賬戶';
 
   @override
-  String get descriptionLabel => '備註';
+  String get descriptionLabel => '備��';
 
   @override
   String get descriptionHint => '請輸入備註（選填）';

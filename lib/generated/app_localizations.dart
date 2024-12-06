@@ -693,7 +693,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountBookList.
   ///
   /// In en, this message translates to:
-  /// **'Account Books'**
+  /// **'Transactions'**
   String get accountBookList;
 
   /// No description provided for @newAccountBook.

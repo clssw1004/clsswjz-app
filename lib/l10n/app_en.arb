@@ -99,7 +99,7 @@
   "totalIncome": "Income",
   "totalExpense": "Expense",
   "balance": "Balance",
-  "accountBookList": "Account Books",
+  "accountBookList": "Transactions",
   "newAccountBook": "New Account Book",
   "retryLoading": "Retry",
   "noAccountBooks": "No account books",
