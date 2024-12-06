@@ -9,11 +9,12 @@ import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
 import '../widgets/global_book_selector.dart';
 import '../utils/message_helper.dart';
-import '../constants/app_colors.dart';
 import 'account_item/widgets/summary_card.dart';
 import '../models/account_item.dart';
 import '../l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/account_item_tile.dart';
+import '../services/account_item_cache.dart';
 
 class AccountItemList extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onBookSelected;
@@ -28,6 +29,11 @@ class AccountItemList extends StatefulWidget {
 }
 
 class _AccountItemListState extends State<AccountItemList> {
+  static const int _pageSize = 20; // 每页加载的数据量
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
+  bool _hasMoreData = true;
+  List<AccountItem> _displayedItems = []; // 当前显示的数据
   List<AccountItem> _accountItems = [];
   List<Map<String, dynamic>> _accountBooks = [];
   List<String> _categories = [];
@@ -42,12 +48,45 @@ class _AccountItemListState extends State<AccountItemList> {
   double? _maxAmount;
   AccountSummary? _summary;
   late AccountItemProvider _provider;
+  Map<String, List<AccountItem>> _groupedItems = {}; // 添加分组缓存
 
   @override
   void initState() {
     super.initState();
     _provider = AccountItemProvider();
+    _scrollController.addListener(_onScroll);
     _initializeAccountBooks();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMoreItems();
+    }
+  }
+
+  Future<void> _loadMoreItems() async {
+    if (_isLoadingMore || !_hasMoreData) return;
+
+    setState(() => _isLoadingMore = true);
+
+    final nextItems =
+        _accountItems.skip(_displayedItems.length).take(_pageSize).toList();
+
+    if (nextItems.isEmpty) {
+      _hasMoreData = false;
+    } else {
+      _displayedItems.addAll(nextItems);
+      _updateGroupedItems(); // 更新分组
+    }
+
+    setState(() => _isLoadingMore = false);
   }
 
   Future<void> _initializeAccountBooks() async {
@@ -213,35 +252,7 @@ class _AccountItemListState extends State<AccountItemList> {
               Expanded(
                 child: _accountItems.isEmpty
                     ? _buildEmptyView(Theme.of(context).colorScheme)
-                    : ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics(),
-                        ),
-                        padding: EdgeInsets.only(
-                          bottom: 80,
-                          left: isLargeScreen ? 32 : 16,
-                          right: isLargeScreen ? 32 : 16,
-                        ),
-                        itemCount:
-                            _accountItems.length + _getDateHeaders().length,
-                        itemBuilder: (context, index) {
-                          final dateHeaders = _getDateHeaders();
-                          final headerIndex = _getHeaderIndexForPosition(index);
-
-                          if (headerIndex != -1) {
-                            // 渲染日期头部
-                            return _buildDateHeader(
-                                context, dateHeaders[headerIndex]);
-                          }
-
-                          // 渲染账目项
-                          final itemIndex = _getItemIndexForPosition(index);
-                          return _buildAccountItem(
-                            context,
-                            _accountItems[itemIndex],
-                          );
-                        },
-                      ),
+                    : _buildList(),
               ),
             ],
           ),
@@ -262,25 +273,54 @@ class _AccountItemListState extends State<AccountItemList> {
 
   Future<void> _loadAccountItems() async {
     if (!mounted) return;
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _displayedItems = [];
+      _groupedItems.clear();
+      _hasMoreData = true;
+    });
 
     try {
-      // 加载账目数据
+      final bookId = _selectedBook!['id'];
+
+      // 尝试从缓存获取数据
+      final cachedItems = AccountItemCache.getCachedItems(bookId);
+      if (cachedItems != null &&
+          _selectedCategories.isEmpty &&
+          _selectedType == null &&
+          _startDate == null &&
+          _endDate == null) {
+        setState(() {
+          _accountItems = cachedItems;
+          _displayedItems = cachedItems.take(_pageSize).toList();
+          _updateGroupedItems(); // 更新分组
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // 加载新数据
       final response = await ApiService.getAccountItems(
-        _selectedBook!['id'],
+        bookId,
         categories: _selectedCategories,
         type: _selectedType,
         startDate: _startDate,
         endDate: _endDate,
       );
 
-      // 加载资金账户数据
-      await _provider.setSelectedBook(_selectedBook);
-      await _provider.loadData();
+      // 缓存未过滤的数据
+      if (_selectedCategories.isEmpty &&
+          _selectedType == null &&
+          _startDate == null &&
+          _endDate == null) {
+        AccountItemCache.cacheItems(bookId, response.items);
+      }
 
       if (!mounted) return;
       setState(() {
         _accountItems = response.items;
+        _displayedItems = response.items.take(_pageSize).toList();
+        _updateGroupedItems(); // 更新分组
         _summary = response.summary;
         _isLoading = false;
       });
@@ -363,23 +403,26 @@ class _AccountItemListState extends State<AccountItemList> {
     );
   }
 
-  List<String> _getDateHeaders() {
-    final Set<String> dates = {};
-    for (var item in _accountItems) {
+  // 优化分组计算
+  void _updateGroupedItems() {
+    _groupedItems.clear();
+    for (var item in _displayedItems) {
       final dateStr = DateFormat('yyyy-MM-dd').format(item.accountDate);
-      dates.add(dateStr);
+      _groupedItems.putIfAbsent(dateStr, () => []).add(item);
     }
-    return dates.toList()..sort((a, b) => b.compareTo(a));
+  }
+
+  List<String> _getDateHeaders() {
+    return _groupedItems.keys.toList()..sort((a, b) => b.compareTo(a));
   }
 
   int _getHeaderIndexForPosition(int position) {
     final headers = _getDateHeaders();
     int itemCount = 0;
     for (int i = 0; i < headers.length; i++) {
-      if (position == itemCount) {
-        return i;
-      }
-      itemCount += 1 + _getItemsForDate(headers[i]).length;
+      if (position == itemCount) return i;
+      itemCount += 1 + (_groupedItems[headers[i]]?.length ?? 0);
+      if (position < itemCount) return -1;
     }
     return -1;
   }
@@ -388,23 +431,20 @@ class _AccountItemListState extends State<AccountItemList> {
     final headers = _getDateHeaders();
     int itemCount = 0;
     int itemIndex = 0;
+
     for (String header in headers) {
       itemCount++; // 头部
-      final items = _getItemsForDate(header);
-      if (position < itemCount + items.length) {
+      if (position == itemCount - 1) return -1;
+
+      final itemsInSection = _groupedItems[header]?.length ?? 0;
+      if (position < itemCount + itemsInSection) {
         return itemIndex + (position - itemCount);
       }
-      itemCount += items.length;
-      itemIndex += items.length;
+
+      itemCount += itemsInSection;
+      itemIndex += itemsInSection;
     }
     return itemIndex;
-  }
-
-  List<AccountItem> _getItemsForDate(String date) {
-    return _accountItems.where((item) {
-      final itemDate = DateFormat('yyyy-MM-dd').format(item.accountDate);
-      return itemDate == date;
-    }).toList();
   }
 
   Widget _buildDateHeader(BuildContext context, String date) {
@@ -444,147 +484,9 @@ class _AccountItemListState extends State<AccountItemList> {
   }
 
   Widget _buildAccountItem(BuildContext context, AccountItem item) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 4),
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // 分类名称
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          item.category,
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                      ),
-                      if (item.description?.isNotEmpty == true) ...[
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            item.description!,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                SizedBox(width: 16),
-                // 金额
-                Text(
-                  '${item.type == 'EXPENSE' ? '-' : '+'}¥${item.amount.toStringAsFixed(2)}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: item.type == 'EXPENSE'
-                        ? AppColors.expense
-                        : AppColors.income,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 4),
-            // 底部信息行
-            Row(
-              children: [
-                // 账户标签
-                if (item.fundId != null) ...[
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 1,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.account_balance_wallet_outlined,
-                          size: 12,
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          item.fundName!,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onPrimaryContainer,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                ],
-                // 商家标签
-                if (item.shop != null) ...[
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 1,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.tertiaryContainer.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.store_outlined,
-                          size: 12,
-                          color: colorScheme.onTertiaryContainer,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          item.shop!,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onTertiaryContainer,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                Spacer(),
-                // 时间
-                Text(
-                  DateFormat('HH:mm').format(item.accountDate),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        onTap: () => _editAccountItem(item),
-      ),
+    return AccountItemTile(
+      item: item,
+      onTap: () => _editAccountItem(item),
     );
   }
 
@@ -619,5 +521,59 @@ class _AccountItemListState extends State<AccountItemList> {
     if (result == true) {
       _loadAccountItems();
     }
+  }
+
+  Widget _buildList() {
+    return ListView.custom(
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      padding: EdgeInsets.only(
+        bottom: 80,
+        left: MediaQuery.of(context).size.width > 600 ? 32 : 16,
+        right: MediaQuery.of(context).size.width > 600 ? 32 : 16,
+      ),
+      childrenDelegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final dateHeaders = _getDateHeaders();
+          final headerIndex = _getHeaderIndexForPosition(index);
+
+          if (headerIndex != -1) {
+            return _buildDateHeader(context, dateHeaders[headerIndex]);
+          }
+
+          final itemIndex = _getItemIndexForPosition(index);
+          if (itemIndex >= _displayedItems.length) {
+            return _buildLoadingIndicator();
+          }
+
+          final item = _displayedItems[itemIndex];
+          return RepaintBoundary(
+            child: AccountItemTile(
+              key: ValueKey(item.id),
+              item: item,
+              onTap: () => _editAccountItem(item),
+            ),
+          );
+        },
+        childCount: _displayedItems.length +
+            _getDateHeaders().length +
+            (_hasMoreData ? 1 : 0),
+      ),
+      cacheExtent: 1000, // 增加缓存范围
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      alignment: Alignment.center,
+      child: const SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+    );
   }
 }

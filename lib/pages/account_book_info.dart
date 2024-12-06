@@ -20,6 +20,11 @@ class AccountBookInfo extends StatefulWidget {
 
   @override
   State<AccountBookInfo> createState() => _AccountBookInfoState();
+
+  static const IconData editIcon = Icons.edit;
+  static const IconData deleteIcon = Icons.delete;
+  static const IconData checkIcon = Icons.check;
+  static const IconData peopleIcon = Icons.people_outline;
 }
 
 class _AccountBookInfoState extends State<AccountBookInfo> {
@@ -332,3 +337,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
     );
   }
 }
+
+const IconData bookIcon = Icons.book;
+const IconData editIcon = Icons.edit;
+const IconData deleteIcon = Icons.delete;

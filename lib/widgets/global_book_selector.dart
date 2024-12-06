@@ -7,6 +7,11 @@ class GlobalBookSelector extends StatelessWidget {
   final List<Map<String, dynamic>> books;
   final ValueChanged<Map<String, dynamic>> onBookSelected;
 
+  static const IconData dropdownIcon = Icons.arrow_drop_down;
+  static const IconData bookIcon = Icons.book;
+  static const IconData editIcon = Icons.edit_outlined;
+  static const IconData peopleIcon = Icons.people_outline;
+
   const GlobalBookSelector({
     Key? key,
     required this.selectedBook,
@@ -63,7 +68,7 @@ class GlobalBookSelector extends StatelessWidget {
             ),
           ),
           Icon(
-            Icons.arrow_drop_down,
+            dropdownIcon,
             color: colorScheme.onSurface,
           ),
         ],
@@ -146,7 +151,7 @@ class GlobalBookSelector extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.edit_outlined,
+                              editIcon,
                               size: 14,
                               color: colorScheme.primary,
                             ),
@@ -172,7 +177,7 @@ class GlobalBookSelector extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.people_outline,
+                              peopleIcon,
                               size: 14,
                               color: colorScheme.primary,
                             ),

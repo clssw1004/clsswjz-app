@@ -8,11 +8,18 @@ import '../widgets/app_bar_factory.dart';
 import '../l10n/l10n.dart';
 
 class AccountBookList extends StatefulWidget {
+  static const IconData addIcon = Icons.add;
+  static const IconData bookIcon = Icons.book;
+  static const IconData sharedIcon = Icons.people_outline;
+  static const IconData visibilityIcon = Icons.visibility;
+  static const IconData editIcon = Icons.edit_outlined;
+  static const IconData deleteIcon = Icons.delete_outline;
+
   @override
-  State<AccountBookList> createState() => AccountBookListState();
+  State<AccountBookList> createState() => _AccountBookListState();
 }
 
-class AccountBookListState extends State<AccountBookList> {
+class _AccountBookListState extends State<AccountBookList> {
   List<dynamic> _accountBooks = [];
   bool _isLoading = true;
   String? _error;
@@ -37,7 +44,7 @@ class AccountBookListState extends State<AccountBookList> {
       });
     } catch (e) {
       setState(() {
-        _error = '获取账本列表失败：$e';
+        _error = e.toString();
         _isLoading = false;
       });
 
