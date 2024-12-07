@@ -1,35 +1,57 @@
-import '../data/http/api_endpoints.dart';
-import '../data/http/http_data_source.dart';
-import '../data/http/http_method.dart';
-import '../models/models.dart';
 import '../data/data_source.dart';
-import '../models/register_request.dart';
+import '../data/http/http_data_source.dart';
+import '../models/models.dart';
+import '../models/server_status.dart';
+import '../services/storage_service.dart';
 
 class ApiService {
-  static late final DataSource _dataSource;
+  static DataSource? _dataSource;
+  static String? _token;
 
   static void init(DataSource dataSource) {
-    _dataSource = dataSource as HttpDataSource;
+    _dataSource = dataSource;
+    
+    final savedToken = StorageService.getString('token');
+    if (savedToken != null) {
+      setToken(savedToken);
+    }
   }
 
-  // 确保在使用 ApiService 之前调用 init()
+  static DataSource get dataSource {
+    if (_dataSource == null) {
+      throw Exception('ApiService not initialized');
+    }
+    return _dataSource!;
+  }
+
   static Future<List<AccountBook>> getAccountBooks() {
-    return _dataSource.getAccountBooks();
+    return dataSource.getAccountBooks();
   }
 
   static Future<AccountBook> createAccountBook(AccountBook book) {
-    return _dataSource.createAccountBook(book);
+    return dataSource.createAccountBook(book);
   }
 
   static Future<AccountBook> updateAccountBook(String id, AccountBook book) {
-    return _dataSource.updateAccountBook(id, book);
+    return dataSource.updateAccountBook(id, book);
   }
 
   static Future<void> deleteAccountBook(String id) {
-    return _dataSource.deleteAccountBook(id);
+    return dataSource.deleteAccountBook(id);
   }
 
-  // 账目相关
+  static Future<List<Category>> getCategories(String bookId) {
+    return dataSource.getCategories(bookId);
+  }
+
+  static Future<Category> createCategory(Category category) {
+    return dataSource.createCategory(category);
+  }
+
+  static Future<Category> updateCategory(String id, Category category) {
+    return dataSource.updateCategory(id, category);
+  }
+
   static Future<AccountItemResponse> getAccountItems(
     String bookId, {
     List<String>? categories,
@@ -37,7 +59,7 @@ class ApiService {
     DateTime? startDate,
     DateTime? endDate,
   }) {
-    return _dataSource.getAccountItems(
+    return dataSource.getAccountItems(
       bookId,
       categories: categories,
       type: type,
@@ -47,111 +69,101 @@ class ApiService {
   }
 
   static Future<AccountItem> createAccountItem(AccountItem item) {
-    return _dataSource.createAccountItem(item);
+    return dataSource.createAccountItem(item);
   }
 
   static Future<AccountItem> updateAccountItem(String id, AccountItem item) {
-    return _dataSource.updateAccountItem(id, item);
+    return dataSource.updateAccountItem(id, item);
   }
 
   static Future<void> deleteAccountItem(String id) {
-    return _dataSource.deleteAccountItem(id);
+    return dataSource.deleteAccountItem(id);
   }
 
-  // 分类相关
-  static Future<List<Category>> getCategories(String bookId) {
-    return _dataSource.getCategories(bookId);
-  }
-
-  static Future<Category> createCategory(Category category) {
-    return _dataSource.createCategory(category);
-  }
-
-  static Future<Category> updateCategory(String id, Category category) {
-    return _dataSource.updateCategory(id, category);
-  }
-
-  // 商家相关
-  static Future<List<Shop>> getShops(String bookId) {
-    return _dataSource.getShops(bookId);
-  }
-
-  static Future<Shop> createShop(Shop shop) {
-    return _dataSource.createShop(shop);
-  }
-
-  static Future<Shop> updateShop(String id, Shop shop) {
-    return _dataSource.updateShop(id, shop);
-  }
-
-  // 资金账户相关
   static Future<List<AccountBookFund>> getBookFunds(String bookId) {
-    return _dataSource.getBookFunds(bookId);
-  }
-
-  static Future<UserFund> createFund(UserFund fund) {
-    return _dataSource.createFund(fund);
-  }
-
-  static Future<UserFund> updateFund(String id, UserFund fund) {
-    return _dataSource.updateFund(id, fund);
+    return dataSource.getBookFunds(bookId);
   }
 
   static Future<List<UserFund>> getUserFunds() {
-    return _dataSource.getUserFunds();
+    return dataSource.getUserFunds();
   }
 
-  // 用户相关
-  static Future<Map<String, dynamic>> getUserByInviteCode(
-      String inviteCode) async {
-    final response = await _dataSource.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/invite/$inviteCode',
-      method: HttpMethod.get,
-    );
-    return response;
+  static Future<UserFund> createFund(UserFund fund) {
+    return dataSource.createFund(fund);
   }
 
-  static Future<Map<String, dynamic>> register(RegisterRequest request) async {
-    return _dataSource.request<Map<String, dynamic>>(
-      path: '${ApiEndpoints.users}/register',
-      method: HttpMethod.post,
-      data: request.toJson(),
-    );
+  static Future<UserFund> updateFund(String id, UserFund fund) {
+    return dataSource.updateFund(id, fund);
+  }
+
+  static Future<List<Shop>> getShops(String bookId) {
+    return dataSource.getShops(bookId);
+  }
+
+  static Future<Shop> createShop(Shop shop) {
+    return dataSource.createShop(shop);
+  }
+
+  static Future<Shop> updateShop(String id, Shop shop) {
+    return dataSource.updateShop(id, shop);
   }
 
   static Future<Map<String, dynamic>> getUserInfo() {
-    return _dataSource.getUserInfo();
+    return dataSource.getUserInfo();
   }
 
-  static Future<Map<String, dynamic>> updateUserInfo(
-      Map<String, dynamic> data) {
-    return _dataSource.updateUserInfo(data);
+  static Future<Map<String, dynamic>> updateUserInfo(Map<String, dynamic> data) {
+    return dataSource.updateUserInfo(data);
   }
 
   static Future<String> resetInviteCode() {
-    return _dataSource.resetInviteCode();
+    return dataSource.resetInviteCode();
   }
 
-  static Future<ServerStatus> checkServerStatus([String? customUrl]) async {
-    if (customUrl != null) {
-      // 创建一个新的 HttpDataSource 实例用于检查
-      final dataSource = HttpDataSource(baseUrl: customUrl);
-      try {
-        return await dataSource.serverStatus();
-      } catch (e) {
-        throw Exception('无法连接到服务器: $e');
-      }
-    }
+  static Future<void> setBaseUrl(String baseUrl) async {
+    await dataSource.setBaseUrl(baseUrl);
+  }
 
-    // 确保 _dataSource 已初始化
-    if (_dataSource is! HttpDataSource) {
-      throw Exception('数据源类型错误');
+  static void setToken(String token) {
+    _token = token;
+    if (dataSource is HttpDataSource) {
+      (dataSource as HttpDataSource).setToken(token);
     }
+    print('ApiService setToken: $token');
+  }
 
-    try {
-      return await _dataSource.serverStatus();
-    } catch (e) {
-      throw Exception('无法连接到服务器: $e');
+  static void clearToken() {
+    _token = null;
+    if (dataSource is HttpDataSource) {
+      (dataSource as HttpDataSource).clearToken();
     }
+  }
+
+  // 服务器状态相关
+  static Future<ServerStatus> checkServerStatus() {
+    return dataSource.serverStatus();
+  }
+
+  // 用户认证相关
+  static Future<void> register({
+    required String username,
+    required String password,
+    required String email,
+    String? nickname,
+  }) {
+    return dataSource.register(
+      username: username,
+      password: password,
+      email: email,
+      nickname: nickname,
+    );
+  }
+
+  static Future<Map<String, dynamic>?> validateToken(String token) {
+    return dataSource.validateToken(token);
+  }
+
+  static Future<Map<String, dynamic>?> getUserByInviteCode(String inviteCode) {
+    return dataSource.getUserByInviteCode(inviteCode);
   }
 }

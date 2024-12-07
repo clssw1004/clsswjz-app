@@ -1,29 +1,6 @@
 import '../models/models.dart';
+import '../models/server_status.dart';
 import 'http/http_method.dart';
-
-class ServerStatus {
-  final String status;
-  final String timestamp;
-  final int uptime;
-  final ServerMemory memory;
-  final DatabaseStatus database;
-
-  ServerStatus({
-    required this.status,
-    required this.timestamp,
-    required this.uptime,
-    required this.memory,
-    required this.database,
-  });
-
-  factory ServerStatus.fromJson(Map<String, dynamic> json) => ServerStatus(
-        status: json['status'],
-        timestamp: json['timestamp'],
-        uptime: json['uptime'],
-        memory: ServerMemory.fromJson(json['memory']),
-        database: DatabaseStatus.fromJson(json['database']),
-      );
-}
 
 class ServerMemory {
   final String heapUsed;
@@ -101,4 +78,24 @@ abstract class DataSource {
   Future<UserFund> updateFund(String id, UserFund fund);
 
   Future<ServerStatus> serverStatus();
+
+  Future<Map<String, dynamic>?> login({
+    required String username,
+    required String password,
+    bool isLocalStorage = false,
+  });
+
+  Future<Map<String, dynamic>?> validateToken(String token);
+
+  Future<void> register({
+    required String username,
+    required String password,
+    required String email,
+    String? nickname,
+  });
+
+  Future<Map<String, dynamic>?> getUserByInviteCode(String inviteCode);
+
+  // 添加基础 URL 设置方法
+  Future<void> setBaseUrl(String url);
 }

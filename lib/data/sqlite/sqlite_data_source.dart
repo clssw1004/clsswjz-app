@@ -1,7 +1,9 @@
+import '../../models/server_status.dart';
 import '../data_source.dart';
 import '../../models/models.dart';
 import 'database_helper.dart';
 import '../http/http_method.dart';
+import '../../services/api_config_service.dart';
 
 class SqliteDataSource implements DataSource {
   final DatabaseHelper _dbHelper;
@@ -479,5 +481,57 @@ class SqliteDataSource implements DataSource {
   @override
   Future<ServerStatus> serverStatus() {
     throw UnimplementedError('SQLite does not support server status check');
+  }
+
+  @override
+  Future<Map<String, dynamic>?> login({
+    required String username,
+    required String password,
+    bool isLocalStorage = false,
+  }) async {
+    if (isLocalStorage) {
+      // 本地存储模式下，只需验证用户是否存在
+      final db = await _dbHelper.database;
+      final result = await db.query(
+        'users',
+        where: 'username = ? AND password = ?',
+        whereArgs: [username, password],
+      );
+      
+      return result.isNotEmpty ? {'valid': true} : null;
+    }
+
+    // 远程服务器模式的实现...
+    return null;
+  }
+
+  @override
+  Future<Map<String, dynamic>?> validateToken(String token) async {
+    if (ApiConfigService.isLocalStorage) {
+      // 本地存储模式下，token 验证始终返回有效
+      return {'valid': true};
+    }
+    return null;
+  }
+
+  @override
+  Future<void> register({
+    required String username,
+    required String password,
+    required String email,
+    String? nickname,
+  }) async {
+    throw UnimplementedError('SQLite does not support user registration');
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getUserByInviteCode(String inviteCode) async {
+    throw UnimplementedError('SQLite does not support invite code');
+  }
+
+  @override
+  Future<void> setBaseUrl(String url) async {
+    // SQLite 数据源不需要设置 URL
+    return;
   }
 }

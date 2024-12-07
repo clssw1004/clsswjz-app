@@ -19,13 +19,20 @@ import 'data/data_source.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
 import 'services/storage_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'services/server_config_service.dart';
+import 'providers/server_config_provider.dart';
+import 'pages/settings/widgets/server_url_dialog.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  final prefs = await SharedPreferences.getInstance();
+  final serverConfigService = ServerConfigService(prefs);
+
   // 确保 StorageService 最先初始化
   await StorageService.init();
-  
+
   // 初始化主题
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
@@ -51,9 +58,11 @@ void main() async {
 
   // 创建 DataSource 实例并初始化服务
   final dataSource = await DataSourceFactory.create(DataSourceType.http);
-  
-  // 初始化所有服务
+
+  // 初始化 API 服务
   ApiService.init(dataSource);
+
+  // 初始化其他服务
   AuthService.init(dataSource);
   UserService.init(dataSource);
   await UserService.initializeSession();
@@ -64,6 +73,9 @@ void main() async {
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: localeProvider),
         Provider<DataSource>.value(value: dataSource),
+        ChangeNotifierProvider(
+          create: (_) => ServerConfigProvider(serverConfigService),
+        ),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, _) {
@@ -73,8 +85,9 @@ void main() async {
             themeMode: themeProvider.themeMode,
             title: '记账本',
             routes: {
-              '/login': (context) => LoginPage(),
               '/register': (context) => RegisterPage(),
+              '/home': (context) => HomePage(),
+              '/server_config': (context) => ServerUrlDialog(),
               '/account-books': (context) => AccountBookList(),
               '/create-account-book': (context) => CreateAccountBookPage(),
               '/user-info': (context) => UserInfoPage(),

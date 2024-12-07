@@ -1,3 +1,4 @@
+import '../../models/server_status.dart';
 import '../../services/storage_service.dart';
 import 'http_method.dart';
 import 'package:dio/dio.dart';
@@ -339,22 +340,28 @@ class HttpDataSource implements DataSource {
   }
 
   // 用户相关方法
-  Future<Map<String, dynamic>> login(String username, String password) async {
-    try {
-      final response = await _httpClient.request<Map<String, dynamic>>(
-        path: '${ApiEndpoints.auth}/login',
-        method: HttpMethod.post,
-        data: {
-          'username': username,
-          'password': password,
-        },
-      );
-      return response;
-    } catch (e) {
-      rethrow;
-    }
+  @override
+  Future<Map<String, dynamic>?> login({
+    required String username,
+    required String password,
+    bool isLocalStorage = false,
+  }) async {
+    if (isLocalStorage) return null;
+
+    final response = await _httpClient.request<Map<String, dynamic>>(
+      path: '${ApiEndpoints.auth}/login',
+      method: HttpMethod.post,
+      data: {
+        'username': username,
+        'password': password,
+      },
+    );
+
+    // 直接返回 data 部分
+    return response;
   }
 
+  @override
   Future<void> register({
     required String username,
     required String password,
@@ -401,6 +408,19 @@ class HttpDataSource implements DataSource {
     return response['inviteCode'];
   }
 
+  @override
+  Future<Map<String, dynamic>?> getUserByInviteCode(String inviteCode) async {
+    try {
+      final response = await _httpClient.request<Map<String, dynamic>>(
+        path: '${ApiEndpoints.users}/invite/$inviteCode',
+        method: HttpMethod.get,
+      );
+      return response;
+    } catch (e) {
+      return null;
+    }
+  }
+
   // 错误处理
   Exception _handleDioError(DioException e) {
     if (e.response?.data != null && e.response?.data is Map) {
@@ -439,6 +459,29 @@ class HttpDataSource implements DataSource {
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> validateToken(String token) async {
+    try {
+      final response = await _httpClient.request<Map<String, dynamic>>(
+        path: '${ApiEndpoints.auth}/validate',
+        method: HttpMethod.post,
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+          method: HttpMethod.post.value,
+        ),
+      );
+      return response;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> setBaseUrl(String url) async {
+    await StorageService.setString(StorageKeys.serverUrl, url);
+    _httpClient.setBaseUrl(url);
   }
 
   // 继续实现其他方法...

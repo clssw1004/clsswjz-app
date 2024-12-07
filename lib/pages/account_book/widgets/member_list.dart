@@ -328,8 +328,20 @@ class _MemberListState extends State<MemberList> {
       final userInfo = await ApiService.getUserByInviteCode(inviteCode);
       if (!mounted) return;
 
-      final userId = userInfo['id'] as String?;
-      if (userId == null) throw '无效的用户信息';
+      if (userInfo == null) {
+        ScaffoldMessenger.of(dialogContext).showSnackBar(
+          SnackBar(content: Text('邀请码无效')),
+        );
+        return;
+      }
+
+      final userId = userInfo['userId'] as String?;
+      if (userId == null) {
+        ScaffoldMessenger.of(dialogContext).showSnackBar(
+          SnackBar(content: Text('无效的用户信息')),
+        );
+        return;
+      }
 
       final isAlreadyMember = widget.members.any((m) => m.userId == userId);
       if (isAlreadyMember) {
@@ -343,8 +355,7 @@ class _MemberListState extends State<MemberList> {
       // 添加新成员
       final newMember = Member(
         userId: userId,
-        nickname:
-            userInfo['nickname'] as String? ?? userInfo['username'] as String,
+        nickname: userInfo['nickname'] as String? ?? userInfo['username'] as String? ?? l10n.unknownMember,
         canViewBook: true,
         canEditBook: false,
         canDeleteBook: false,

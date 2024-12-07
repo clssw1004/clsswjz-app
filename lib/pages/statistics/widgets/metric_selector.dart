@@ -25,27 +25,37 @@ class MetricSelector extends StatelessWidget {
       itemBuilder: (context) => metrics.map((metric) {
         return PopupMenuItem<StatisticsMetric>(
           value: metric,
-          child: Text(metric.label),
+          child: Text(
+            metric.label,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+          ),
         );
       }).toList(),
       onSelected: onMetricChanged,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceVariant.withOpacity(0.5),
+          color: colorScheme.surfaceVariant,
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: colorScheme.outline.withOpacity(0.2),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               selectedMetric.label,
-              style: theme.textTheme.bodySmall,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
-            const SizedBox(width: 2),
+            const SizedBox(width: 4),
             Icon(
-              Icons.arrow_drop_down,
-              size: 14,
+              Icons.arrow_drop_down_rounded,
+              size: 18,
               color: colorScheme.onSurfaceVariant,
             ),
           ],

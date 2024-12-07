@@ -35,32 +35,29 @@ class RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
-      final request = RegisterRequest(
+      await ApiService.register(
         username: _usernameController.text,
         password: _passwordController.text,
-        nickname: _nicknameController.text.isNotEmpty
-            ? _nicknameController.text
-            : null,
-        email: _emailController.text.isNotEmpty ? _emailController.text : null,
-        phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
-        language: _selectedLanguage,
-        timezone: _selectedTimeZone,
+        email: _emailController.text,
+        nickname: _nicknameController.text,
       );
 
-      await ApiService.register(request);
-
-      if (!mounted) return;
-      MessageHelper.showSuccess(
-        context,
-        message: '注册成功，请登录',
-        showInRelease: true,
-      );
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('注册成功')),
+        );
+      }
     } catch (e) {
-      if (!mounted) return;
-      MessageHelper.showError(context, message: e.toString());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('注册失败：${e.toString()}')),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
