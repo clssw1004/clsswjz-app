@@ -808,6 +808,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String confirmDeleteServerMessage(String name) {
     return '确定要删除服务器\"$name\"吗？';
   }
+
+  @override
+  String get pleaseSelectServer => '请先选择服务器';
+
+  @override
+  String loginFailed(String error) {
+    return '登录失败：$error';
+  }
+
+  @override
+  String get wrongCredentials => '用户名或密码错误';
+
+  @override
+  String get rememberLogin => '记住登录信息';
+
+  @override
+  String get selectServer => '选择服务器';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

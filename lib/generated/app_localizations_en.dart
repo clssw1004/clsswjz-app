@@ -808,4 +808,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String confirmDeleteServerMessage(String name) {
     return 'Are you sure you want to delete server \"$name\"?';
   }
+
+  @override
+  String get pleaseSelectServer => 'Please select a server first';
+
+  @override
+  String loginFailed(String error) {
+    return 'Login failed: $error';
+  }
+
+  @override
+  String get wrongCredentials => 'Wrong username or password';
+
+  @override
+  String get rememberLogin => 'Remember login';
+
+  @override
+  String get selectServer => 'Select Server';
 }

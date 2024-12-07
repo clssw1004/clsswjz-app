@@ -263,5 +263,17 @@
         "type": "String"
       }
     }
-  }
+  },
+  "pleaseSelectServer": "Please select a server first",
+  "loginFailed": "Login failed: {error}",
+  "@loginFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "wrongCredentials": "Wrong username or password",
+  "rememberLogin": "Remember login",
+  "selectServer": "Select Server"
 }

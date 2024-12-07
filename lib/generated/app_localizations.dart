@@ -1637,6 +1637,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete server \"{name}\"?'**
   String confirmDeleteServerMessage(String name);
+
+  /// No description provided for @pleaseSelectServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a server first'**
+  String get pleaseSelectServer;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed: {error}'**
+  String loginFailed(String error);
+
+  /// No description provided for @wrongCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong username or password'**
+  String get wrongCredentials;
+
+  /// No description provided for @rememberLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember login'**
+  String get rememberLogin;
+
+  /// No description provided for @selectServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Server'**
+  String get selectServer;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

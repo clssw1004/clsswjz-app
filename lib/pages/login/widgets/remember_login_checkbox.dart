@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/l10n.dart';
 
 class RememberLoginCheckbox extends StatelessWidget {
   final bool value;
@@ -14,6 +15,7 @@ class RememberLoginCheckbox extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Row(
       children: [
@@ -23,7 +25,7 @@ class RememberLoginCheckbox extends StatelessWidget {
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         Text(
-          '记住登录信息',
+          l10n.rememberLogin,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: colorScheme.onSurface,
           ),

@@ -8,6 +8,8 @@ class LocaleProvider extends ChangeNotifier {
 
   Locale get locale => _locale;
 
+  Language get currentLanguage => Language.fromCode(_locale.languageCode);
+
   LocaleProvider() {
     _loadSavedLocale();
   }

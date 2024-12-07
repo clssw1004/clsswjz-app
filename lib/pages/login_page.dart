@@ -7,6 +7,7 @@ import '../l10n/l10n.dart';
 import 'login/widgets/remember_login_checkbox.dart';
 import 'settings/widgets/server_selector.dart';
 import 'settings/widgets/server_url_dialog.dart';
+import 'settings/widgets/language_selector_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -44,9 +45,11 @@ class _LoginPageState extends State<LoginPage> {
 
     final provider = context.read<ServerConfigProvider>();
     final selectedConfig = provider.selectedConfig;
+    final l10n = L10n.of(context);
+
     if (selectedConfig == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请先选择服务器')),
+        SnackBar(content: Text(l10n.pleaseSelectServer)),
       );
       return;
     }
@@ -76,14 +79,15 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('用户名或密码错误')),
+            SnackBar(content: Text(l10n.wrongCredentials)),
           );
         }
       }
     } catch (e) {
       if (mounted) {
+        final l10n = L10n.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('登录失败: ${e.toString()}')),
+          SnackBar(content: Text(l10n.loginFailed(e.toString()))),
         );
       }
     } finally {
@@ -97,21 +101,16 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(L10n.of(context).appName),
+        title: Text(l10n.appName),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: '服务器设置',
-            onPressed: () {
-              print('Settings button pressed');
-              showDialog(
-                context: context,
-                builder: (context) => const ServerUrlDialog(),
-              );
-            },
+            icon: const Icon(Icons.language_outlined),
+            tooltip: l10n.languageSettings,
+            onPressed: () => _showLanguageDialog(context),
           ),
         ],
       ),
@@ -126,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    '登录',
+                    l10n.login,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
@@ -138,13 +137,13 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _usernameController,
-                    decoration: const InputDecoration(
-                      labelText: '用户名',
-                      prefixIcon: Icon(Icons.person_outline),
+                    decoration: InputDecoration(
+                      labelText: l10n.username,
+                      prefixIcon: const Icon(Icons.person_outline),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return '请输入用户名';
+                        return l10n.usernameRequired;
                       }
                       return null;
                     },
@@ -152,14 +151,14 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: '密码',
-                      prefixIcon: Icon(Icons.lock_outline),
+                    decoration: InputDecoration(
+                      labelText: l10n.password,
+                      prefixIcon: const Icon(Icons.lock_outline),
                     ),
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return '请输入密码';
+                        return l10n.passwordRequired;
                       }
                       return null;
                     },
@@ -182,14 +181,14 @@ class _LoginPageState extends State<LoginPage> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text('登录'),
+                        : Text(l10n.login),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed('/register');
                     },
-                    child: const Text('注册新账号'),
+                    child: Text(l10n.noAccount),
                   ),
                 ],
               ),
@@ -206,5 +205,12 @@ class _LoginPageState extends State<LoginPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadSavedCredentials();
     });
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const LanguageSelectorDialog(),
+    );
   }
 }

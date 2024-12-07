@@ -31,6 +31,11 @@
     "addServer",
     "edit",
     "confirmDeleteServer",
-    "confirmDeleteServerMessage"
+    "confirmDeleteServerMessage",
+    "pleaseSelectServer",
+    "loginFailed",
+    "wrongCredentials",
+    "rememberLogin",
+    "selectServer"
   ]
 }
