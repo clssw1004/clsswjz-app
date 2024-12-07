@@ -153,7 +153,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverSettings.
   ///
   /// In en, this message translates to:
-  /// **'Server Settings'**
+  /// **'Server Configuration'**
   String get serverSettings;
 
   /// No description provided for @logout.
@@ -741,7 +741,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverStatusNormal.
   ///
   /// In en, this message translates to:
-  /// **'Server Status: Normal\nDatabase Status: {dbStatus}\nMemory Usage: {memUsed}/{memTotal}'**
+  /// **'Server Status: OK\nDatabase: {dbStatus}\nMemory: {memUsed}/{memTotal}'**
   String serverStatusNormal(Object dbStatus, Object memTotal, Object memUsed);
 
   /// No description provided for @serverStatusError.
@@ -759,7 +759,7 @@ abstract class AppLocalizations {
   /// No description provided for @saveSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Save successful, please restart app'**
+  /// **'Configuration saved'**
   String get saveSuccess;
 
   /// No description provided for @saveFailed.
@@ -777,7 +777,7 @@ abstract class AppLocalizations {
   /// No description provided for @checkServer.
   ///
   /// In en, this message translates to:
-  /// **'Check Server'**
+  /// **'Check Connection'**
   String get checkServer;
 
   /// No description provided for @linkedBooksCount.
@@ -879,7 +879,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverUrlHint.
   ///
   /// In en, this message translates to:
-  /// **'http://example.com:3000'**
+  /// **'e.g. https://api.example.com'**
   String get serverUrlHint;
 
   /// No description provided for @normalStatus.
@@ -1641,25 +1641,25 @@ abstract class AppLocalizations {
   /// No description provided for @pleaseSelectServer.
   ///
   /// In en, this message translates to:
-  /// **'Please select a server first'**
+  /// **'Server selection required'**
   String get pleaseSelectServer;
 
   /// No description provided for @loginFailed.
   ///
   /// In en, this message translates to:
-  /// **'Login failed: {error}'**
+  /// **'Authentication failed: {error}'**
   String loginFailed(String error);
 
   /// No description provided for @wrongCredentials.
   ///
   /// In en, this message translates to:
-  /// **'Wrong username or password'**
+  /// **'Invalid username or password'**
   String get wrongCredentials;
 
   /// No description provided for @rememberLogin.
   ///
   /// In en, this message translates to:
-  /// **'Remember login'**
+  /// **'Remember credentials'**
   String get rememberLogin;
 
   /// No description provided for @selectServer.
@@ -1677,13 +1677,13 @@ abstract class AppLocalizations {
   /// No description provided for @serverNameHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. Local Server'**
+  /// **'e.g. Production Server'**
   String get serverNameHint;
 
   /// No description provided for @serverNameRequired.
   ///
   /// In en, this message translates to:
-  /// **'Please enter server name'**
+  /// **'Server name is required'**
   String get serverNameRequired;
 
   /// No description provided for @serverType.
@@ -1695,13 +1695,13 @@ abstract class AppLocalizations {
   /// No description provided for @serverUrlRequired.
   ///
   /// In en, this message translates to:
-  /// **'Please enter server URL'**
+  /// **'Server URL is required'**
   String get serverUrlRequired;
 
   /// No description provided for @serverTypeLabel.
   ///
   /// In en, this message translates to:
-  /// **'{type, select, selfHosted{Self-hosted Server} clsswjzCloud{Clssw Cloud} localStorage{Local Storage} other{Unknown}}'**
+  /// **'{type, select, selfHosted{Self-hosted} clsswjzCloud{Clsswjz Cloud} localStorage{Local Storage} other{Unknown}}'**
   String serverTypeLabel(String type);
 }
 

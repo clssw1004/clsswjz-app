@@ -36,7 +36,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createAccountBook => 'Create Account Book';
 
   @override
-  String get serverSettings => 'Server Settings';
+  String get serverSettings => 'Server Configuration';
 
   @override
   String get logout => 'Logout';
@@ -341,7 +341,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String serverStatusNormal(Object dbStatus, Object memTotal, Object memUsed) {
-    return 'Server Status: Normal\nDatabase Status: $dbStatus\nMemory Usage: $memUsed/$memTotal';
+    return 'Server Status: OK\nDatabase: $dbStatus\nMemory: $memUsed/$memTotal';
   }
 
   @override
@@ -353,7 +353,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseInputServerUrl => 'Please input server address';
 
   @override
-  String get saveSuccess => 'Save successful, please restart app';
+  String get saveSuccess => 'Configuration saved';
 
   @override
   String saveFailed(Object error) {
@@ -364,7 +364,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restartAppAfterChange => 'Modified, please restart the app to take effect';
 
   @override
-  String get checkServer => 'Check Server';
+  String get checkServer => 'Check Connection';
 
   @override
   String linkedBooksCount(Object count) {
@@ -419,7 +419,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverUrlLabel => 'Server URL';
 
   @override
-  String get serverUrlHint => 'http://example.com:3000';
+  String get serverUrlHint => 'e.g. https://api.example.com';
 
   @override
   String get normalStatus => 'Normal';
@@ -812,18 +812,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get pleaseSelectServer => 'Please select a server first';
+  String get pleaseSelectServer => 'Server selection required';
 
   @override
   String loginFailed(String error) {
-    return 'Login failed: $error';
+    return 'Authentication failed: $error';
   }
 
   @override
-  String get wrongCredentials => 'Wrong username or password';
+  String get wrongCredentials => 'Invalid username or password';
 
   @override
-  String get rememberLogin => 'Remember login';
+  String get rememberLogin => 'Remember credentials';
 
   @override
   String get selectServer => 'Select Server';
@@ -832,24 +832,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverName => 'Server Name';
 
   @override
-  String get serverNameHint => 'e.g. Local Server';
+  String get serverNameHint => 'e.g. Production Server';
 
   @override
-  String get serverNameRequired => 'Please enter server name';
+  String get serverNameRequired => 'Server name is required';
 
   @override
   String get serverType => 'Server Type';
 
   @override
-  String get serverUrlRequired => 'Please enter server URL';
+  String get serverUrlRequired => 'Server URL is required';
 
   @override
   String serverTypeLabel(String type) {
     String _temp0 = intl.Intl.selectLogic(
       type,
       {
-        'selfHosted': 'Self-hosted Server',
-        'clsswjzCloud': 'Clssw Cloud',
+        'selfHosted': 'Self-hosted',
+        'clsswjzCloud': 'Clsswjz Cloud',
         'localStorage': 'Local Storage',
         'other': 'Unknown',
       },

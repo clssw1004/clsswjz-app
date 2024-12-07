@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../generated/app_localizations.dart';
 import '../services/account_item_cache.dart';
 import '../services/api_service.dart';
 import '../models/models.dart';
@@ -38,7 +39,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
   final _descriptionController = TextEditingController();
   List<Category> _categories = [];
 
-  String _transactionType = '支出';
+  static const TYPE_EXPENSE = 'EXPENSE';
+  static const TYPE_INCOME = 'INCOME';
+
+  late String _transactionType;
+
   String? _selectedCategory;
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
@@ -55,21 +60,22 @@ class _AccountItemFormState extends State<AccountItemForm> {
     _provider = AccountItemProvider(selectedBook: widget.initialBook);
     _selectedBook = widget.initialBook;
 
-    // 设置初始交易类型
-    _transactionType = widget.initialData?['type'] == 'EXPENSE' ? '支出' : '收入';
+    if (widget.initialData != null) {
+      _transactionType = widget.initialData!['type'] == TYPE_EXPENSE ? TYPE_EXPENSE : TYPE_INCOME;
+    } else {
+      _transactionType = TYPE_EXPENSE;
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       final l10n = L10n.of(context);
 
-      // 设置provider中的账本并加载相关数据
       await _provider.setSelectedBook(widget.initialBook);
       if (widget.initialBook != null) {
         setState(() => _selectedBook = widget.initialBook);
         await _loadCategories();
         await _provider.loadData();
 
-        // 如果是编辑模式，设置选中的账户
         if (widget.initialData != null &&
             widget.initialData!['fundId'] != null) {
           final fund = _provider.funds.firstWhere(
@@ -100,12 +106,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
         }
       }
 
-      // 设置初始数据
       if (widget.initialData != null) {
         setState(() {
           _recordId = widget.initialData!['id'];
-          _transactionType = widget.initialData!['type'] == 'EXPENSE' ? '支出' : '收入';
-          _provider.setTransactionType(_transactionType);  // 设置 provider 的交易类型
+          _transactionType = widget.initialData!['type'] == TYPE_EXPENSE ? TYPE_EXPENSE : TYPE_INCOME;
+          _provider.setTransactionType(_getLocalizedType(l10n, _transactionType));
           _amountController.text = widget.initialData!['amount'].toString();
           _selectedCategory = widget.initialData!['category'];
 
@@ -116,7 +121,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
           _descriptionController.text = widget.initialData!['description'] ?? '';
 
-          // 设置日期时间
           if (widget.initialData!['accountDate'] != null) {
             final dateTime = DateTime.parse(widget.initialData!['accountDate']);
             _selectedDate = dateTime;
@@ -125,6 +129,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
         });
       }
     });
+  }
+
+  String _getLocalizedType(AppLocalizations l10n, String type) {
+    return type == TYPE_EXPENSE ? l10n.expense : l10n.income;
+  }
+
+  String _getTypeValue(String localizedType, AppLocalizations l10n) {
+    return localizedType == l10n.expense ? TYPE_EXPENSE : TYPE_INCOME;
   }
 
   @override
@@ -158,7 +170,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
             body: SafeArea(
               child: Column(
                 children: [
-                  // 账本头部
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
@@ -170,7 +181,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
                     ),
                     child: BookHeader(book: _selectedBook),
                   ),
-                  // 主要内容区域
                   Expanded(
                     child: SingleChildScrollView(
                       child: Form(
@@ -182,9 +192,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
                               child: Column(
                                 children: [
                                   TypeSelector(
-                                    value: _transactionType,
+                                    value: _getLocalizedType(l10n, _transactionType),
                                     onChanged: (value) {
-                                      setState(() => _transactionType = value);
+                                      setState(() {
+                                        _transactionType = _getTypeValue(value, l10n);
+                                      });
                                       _provider.setTransactionType(value);
                                     },
                                   ),
@@ -197,7 +209,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                         : null,
                                     onChanged: (value) => _amountController
                                         .text = value.toString(),
-                                    type: _transactionType,
+                                    type: _getLocalizedType(l10n, _transactionType),
                                     focusNode: _amountFocusNode,
                                     controller: _amountController,
                                   ),
@@ -245,7 +257,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
                       ),
                     ),
                   ),
-                  // 底部按钮区域
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
@@ -267,7 +278,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                           _saveTransaction({
                             'amount': amount,
                             'description': _descriptionController.text.trim(),
-                            'type': _transactionType == '支出' ? 'EXPENSE' : 'INCOME',
+                            'type': _transactionType,
                             'category': _selectedCategory,
                             'accountDate': _formattedDateTime,
                             'fundId': _selectedFund?['id'],
@@ -334,7 +345,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
     setState(() => _isSaving = true);
 
     try {
-      // 验证必填字段
       if (data['amount'] == 0.0) {
         MessageHelper.showError(context, message: l10n.pleaseInputAmount);
         return;
@@ -352,10 +362,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
         return;
       }
 
-      // 收起键盘
       FocusScope.of(context).unfocus();
 
-      final type = _transactionType == '支出' ? 'EXPENSE' : 'INCOME';
+      final type = _transactionType;
 
       final accountItem = AccountItem(
         id: data['id'] ?? '',
@@ -378,7 +387,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
         await ApiService.updateAccountItem(accountItem.id, accountItem);
       }
 
-      // 清除缓存
       AccountItemCache.clearCache();
 
       if (!mounted) return;
