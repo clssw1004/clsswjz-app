@@ -12,6 +12,7 @@ import '../l10n/l10n.dart';
 import 'settings/widgets/server_url_dialog.dart';
 import 'settings/widgets/create_account_book_item.dart';
 import 'settings/widgets/theme_color_selector.dart';
+import './settings/server_management_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -147,9 +148,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     leading: Icon(Icons.dns_outlined),
                     title: Text(l10n.serverSettings),
                     trailing: Icon(Icons.chevron_right),
-                    onTap: () => showDialog(
-                      context: context,
-                      builder: (context) => ServerUrlDialog(),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ServerManagementPage(),
+                      ),
                     ),
                   ),
                 ],

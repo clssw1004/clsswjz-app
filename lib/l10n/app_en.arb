@@ -251,5 +251,17 @@
   "metricAmount": "Amount",
   "metricCount": "Count",
   "metricAverage": "Average",
-  "metricUnit": "{unit}"
+  "metricUnit": "{unit}",
+  "serverManagement": "Server Management",
+  "addServer": "Add Server",
+  "edit": "Edit",
+  "confirmDeleteServer": "Delete Server",
+  "confirmDeleteServerMessage": "Are you sure you want to delete server \"{name}\"?",
+  "@confirmDeleteServerMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

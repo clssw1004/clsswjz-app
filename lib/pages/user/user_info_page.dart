@@ -92,19 +92,32 @@ class UserInfoPageState extends State<UserInfoPage> {
         () => ApiService.getUserInfo(),
       );
 
-      setState(() {
-        _userInfo = userInfo;
-        _nicknameController.text = userInfo['nickname'] ?? '';
-        _emailController.text = userInfo['email'] ?? '';
-        _phoneController.text = userInfo['phone'] ?? '';
-        _inviteCode = userInfo['inviteCode'] ?? '';
-        _selectedLanguage = Language.fromCode(userInfo['language'] ?? 'zh-CN');
-        _selectedTimeZone =
-            userInfo['timezone'] ?? TimeZone.getDefaultTimeZone();
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _userInfo = userInfo;
+          _nicknameController.text = userInfo['nickname'] ?? '';
+          _emailController.text = userInfo['email'] ?? '';
+          _phoneController.text = userInfo['phone'] ?? '';
+          _inviteCode = userInfo['inviteCode'];
+          _selectedLanguage = Language.fromCode(userInfo['language'] ?? 'zh-CN');
+          _selectedTimeZone = userInfo['timezone'] ?? TimeZone.getDefaultTimeZone();
+          
+          // 记录初始值
+          _initialNickname = _nicknameController.text;
+          _initialEmail = _emailController.text;
+          _initialPhone = _phoneController.text;
+          
+          _isLoading = false;
+        });
+        await UserService.updateUserInfo(userInfo);
+      }
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() {
+          _userInfo = null;
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -112,32 +125,36 @@ class UserInfoPageState extends State<UserInfoPage> {
     try {
       final updatedInfo = await ApiErrorHandler.wrapRequest(
         context,
-        () => ApiService.updateUserInfo({
-          ...data,
-          if (!data.containsKey('nickname'))
-            'nickname': _nicknameController.text,
-          if (!data.containsKey('email')) 'email': _emailController.text,
-          if (!data.containsKey('phone')) 'phone': _phoneController.text,
-          if (!data.containsKey('language')) 'language': _selectedLanguage.code,
-          if (!data.containsKey('timezone')) 'timezone': _selectedTimeZone,
-        }),
+        () => ApiService.updateUserInfo(data),
       );
 
-      setState(() {
-        _userInfo = updatedInfo;
-        if (data.containsKey('language')) {
-          _selectedLanguage =
-              Language.fromCode(updatedInfo['language'] ?? 'zh-CN');
-        }
-        if (data.containsKey('timezone')) {
-          _selectedTimeZone =
-              updatedInfo['timezone'] ?? TimeZone.getDefaultTimeZone();
-        }
-      });
-      await UserService.updateUserInfo(updatedInfo);
-
-      if (!mounted) return;
-      MessageHelper.showSuccess(context, message: '更新成功');
+      if (mounted) {
+        setState(() {
+          _userInfo = updatedInfo;
+          if (data.containsKey('nickname')) {
+            _nicknameController.text = updatedInfo['nickname'] ?? '';
+            _initialNickname = _nicknameController.text;
+          }
+          if (data.containsKey('email')) {
+            _emailController.text = updatedInfo['email'] ?? '';
+            _initialEmail = _emailController.text;
+          }
+          if (data.containsKey('phone')) {
+            _phoneController.text = updatedInfo['phone'] ?? '';
+            _initialPhone = _phoneController.text;
+          }
+          if (data.containsKey('language')) {
+            _selectedLanguage = Language.fromCode(updatedInfo['language'] ?? 'zh-CN');
+          }
+          if (data.containsKey('timezone')) {
+            _selectedTimeZone = updatedInfo['timezone'] ?? TimeZone.getDefaultTimeZone();
+          }
+        });
+        await UserService.updateUserInfo(updatedInfo);
+        
+        if (!mounted) return;
+        MessageHelper.showSuccess(context, message: '更新成功');
+      }
     } catch (e) {
       // 错误已由 ApiErrorHandler 处理
     }
@@ -617,11 +634,7 @@ class UserInfoPageState extends State<UserInfoPage> {
       await UserService.logout();
       if (!mounted) return;
 
-      // 清除导航并跳转到登录页
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        '/login',
-        (route) => false,
-      );
+      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 

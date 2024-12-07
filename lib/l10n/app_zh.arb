@@ -199,7 +199,7 @@
   "dateLabel": "日期",
   "timeLabel": "时间",
   "accountLabel": "账户",
-  "accountHint": "请选择账户",
+  "accountHint": "请选择��户",
   "descriptionLabel": "备注",
   "descriptionHint": "请输入备注（选填）",
   "shopLabel": "商家",
@@ -250,5 +250,10 @@
   "metricAmount": "金额",
   "metricCount": "笔数",
   "metricAverage": "平均值",
-  "metricUnit": "{unit}"
+  "metricUnit": "{unit}",
+  "serverManagement": "服务器管理",
+  "addServer": "添加服务器",
+  "edit": "编辑",
+  "confirmDeleteServer": "删除服务器",
+  "confirmDeleteServerMessage": "确定要删除服务器\"{name}\"吗？"
 }

@@ -791,4 +791,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String metricUnit(Object unit) {
     return '$unit';
   }
+
+  @override
+  String get serverManagement => 'Server Management';
+
+  @override
+  String get addServer => 'Add Server';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get confirmDeleteServer => 'Delete Server';
+
+  @override
+  String confirmDeleteServerMessage(String name) {
+    return 'Are you sure you want to delete server \"$name\"?';
+  }
 }

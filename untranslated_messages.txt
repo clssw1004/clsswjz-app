@@ -26,6 +26,11 @@
     "metricAmount",
     "metricCount",
     "metricAverage",
-    "metricUnit"
+    "metricUnit",
+    "serverManagement",
+    "addServer",
+    "edit",
+    "confirmDeleteServer",
+    "confirmDeleteServerMessage"
   ]
 }

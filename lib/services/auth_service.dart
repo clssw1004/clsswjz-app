@@ -2,6 +2,7 @@ import '../data/data_source.dart';
 import 'api_config_service.dart';
 import 'storage_service.dart';
 import 'api_config_manager.dart';
+import 'user_service.dart';
 
 class AuthService {
   static late final DataSource _dataSource;
@@ -32,17 +33,21 @@ class AuthService {
         password: password,
       );
 
-      if (response != null && response['data'] != null) {
-        final data = response['data'] as Map<String, dynamic>;
-        final token = data['access_token'] as String?;
-        
+      if (response != null && response['access_token'] != null) {
+        final token = response['access_token'] as String?;
+
         if (token != null) {
           // 保存用户信息
-          await StorageService.setString('username', data['username'] as String);
-          await StorageService.setString('userId', data['userId'] as String);
-          
+          await StorageService.setString(
+              'username', response['username'] as String);
+          await StorageService.setString(
+              'userId', response['userId'] as String);
+
           // 设置 token
           await ApiConfigManager.setToken(token);
+
+          // 更新用户信息缓存
+          await UserService.updateUserInfo(response);
           return true;
         }
       }
@@ -53,32 +58,7 @@ class AuthService {
     }
   }
 
-  static void setToken(String token) {
-    ApiConfigManager.setToken(token);
-  }
-
-  static void clearToken() {
-    ApiConfigManager.clearToken();
-  }
-
   static Future<void> logout() async {
-    clearToken();
-    await StorageService.remove('username');
-  }
-
-  static Future<bool> hasValidSession() async {
-    if (ApiConfigService.isLocalStorage) {
-      return StorageService.getString('username') != null;
-    }
-    
-    final token = await StorageService.getString('token');
-    if (token == null) return false;
-
-    try {
-      final response = await _dataSource.validateToken(token);
-      return response != null && response['valid'] == true;
-    } catch (e) {
-      return false;
-    }
+    await UserService.logout();
   }
 }

@@ -3,7 +3,6 @@ import '../../../services/storage_service.dart';
 import '../../../constants/storage_keys.dart';
 import '../../../services/api_service.dart';
 import '../../../utils/message_helper.dart';
-import '../../../constants/theme_constants.dart';
 import '../../../l10n/l10n.dart';
 import '../../../models/server_status.dart';
 
@@ -29,10 +28,8 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
 
   Future<void> _loadServerUrl() async {
     try {
-      final url = StorageService.getString(
-        StorageKeys.serverUrl,
-        defaultValue: 'http://192.168.2.147:3000'
-      );
+      final url = StorageService.getString(StorageKeys.serverUrl,
+          defaultValue: 'http://192.168.2.147:3000');
       if (!mounted) return;
       setState(() {
         _controller.text = url;

@@ -1607,6 +1607,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{unit}'**
   String metricUnit(Object unit);
+
+  /// No description provided for @serverManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Management'**
+  String get serverManagement;
+
+  /// No description provided for @addServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Server'**
+  String get addServer;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @confirmDeleteServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Server'**
+  String get confirmDeleteServer;
+
+  /// No description provided for @confirmDeleteServerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete server \"{name}\"?'**
+  String confirmDeleteServerMessage(String name);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

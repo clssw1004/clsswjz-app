@@ -42,7 +42,7 @@ Future<void> main() async {
   
   // 初始化其他服务
   AuthService.init(dataSource);
-  UserService.init(dataSource);
+  await UserService.init();
   await UserService.initializeSession();
 
   final prefs = await SharedPreferences.getInstance();
@@ -88,7 +88,9 @@ Future<void> main() async {
             darkTheme: themeProvider.darkTheme,
             themeMode: themeProvider.themeMode,
             title: '记账本',
+            initialRoute: '/',
             routes: {
+              '/': (context) => LoginPage(),
               '/register': (context) => RegisterPage(),
               '/home': (context) => HomePage(),
               '/server_config': (context) => ServerUrlDialog(),
@@ -116,27 +118,6 @@ Future<void> main() async {
               Locale('en'),
             ],
             locale: localeProvider.locale,
-            home: Builder(
-              builder: (context) {
-                return FutureBuilder<Map<String, dynamic>?>(
-                  future: UserService.hasValidSession().then((hasSession) {
-                    return hasSession ? UserService.getUserInfo() : null;
-                  }),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Scaffold(
-                        body: Center(
-                          child: CircularProgressIndicator(
-                            color: themeProvider.themeColor,
-                          ),
-                        ),
-                      );
-                    }
-                    return snapshot.data != null ? HomePage() : LoginPage();
-                  },
-                );
-              },
-            ),
           );
         },
       ),

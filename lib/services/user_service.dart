@@ -1,169 +1,66 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
-import '../data/data_source.dart';
-import '../data/http/http_data_source.dart';
-import 'auth_service.dart';
-import '../services/storage_service.dart';
+import 'api_service.dart';
+import 'storage_service.dart';
+import 'api_config_manager.dart';
 import '../constants/storage_keys.dart';
 
 class UserService {
-  static Map<String, dynamic>? _cachedUserInfo;
-  static late final HttpDataSource _httpDataSource;
+  static Map<String, dynamic>? _userInfo;
+  static bool _initialized = false;
+  static String? _currentAccountBookId;
 
-  static void init(DataSource dataSource) {
-    _httpDataSource = dataSource as HttpDataSource;
+  static Future<void> init() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    // 恢复会话和当前账本ID
+    await initializeSession();
+    _currentAccountBookId = StorageService.getString(StorageKeys.currentBookId);
   }
 
-  // 检查是否有有效的会话
+  static Future<void> initializeSession() async {
+    final hasSession = await hasValidSession();
+    if (hasSession) {
+      _userInfo = await ApiService.getUserInfo();
+    }
+  }
+
   static Future<bool> hasValidSession() async {
     final token = StorageService.getString(StorageKeys.token);
-    return token.isNotEmpty;
-  }
+    if (token == null) return false;
 
-  // 初始化会话
-  static Future<void> initializeSession() async {
-    final token = StorageService.getString(StorageKeys.token);
-    if (token.isNotEmpty) {
-      final userId = StorageService.getString(StorageKeys.userId);
-      final username = StorageService.getString(StorageKeys.username);
-      
-      _cachedUserInfo = {
-        'id': userId,
-        'username': username,
-      };
-      
-      AuthService.setToken(token);
-    }
-  }
-
-  // 获取用户信息
-  static Map<String, dynamic>? getUserInfo() {
-    return _cachedUserInfo;
-  }
-
-  // 保存用户会话信息
-  static Future<void> saveUserSession(
-    String token,
-    Map<String, dynamic> userInfo,
-  ) async {
     try {
-      await StorageService.setString(StorageKeys.token, token);
-      await StorageService.setString(StorageKeys.userId, userInfo['id']?.toString() ?? '');
-      await StorageService.setString(StorageKeys.username, userInfo['username']?.toString() ?? '');
-      
-      _cachedUserInfo = userInfo;
-      _httpDataSource.setToken(token);
+      final response = await ApiService.validateToken(token);
+      return response != null && response['valid'] == true;
     } catch (e) {
-      print('Error saving session: $e');
-      rethrow;
+      return false;
     }
   }
 
-  // 获取用户会话信息
-  static Future<Map<String, dynamic>?> getUserSession() async {
-    try {
-      final token = StorageService.getString(StorageKeys.token);
-      if (token.isNotEmpty) {
-        final userId = StorageService.getString(StorageKeys.userId);
-        final username = StorageService.getString(StorageKeys.username);
-        
-        final sessionData = {
-          'token': token,
-          'userInfo': {
-            'id': userId,
-            'username': username,
-          }
-        };
+  static Map<String, dynamic>? getUserInfo() => _userInfo;
 
-        _cachedUserInfo = sessionData['userInfo'] as Map<String, dynamic>;
-        AuthService.setToken(token);
-        return sessionData;
-      }
-    } catch (e) {
-      print('获取用户会话失败: $e');
-    }
-    return null;
+  static Future<void> updateUserInfo(Map<String, dynamic> info) async {
+    _userInfo = info;
   }
 
-  // 刷新会话
-  static Future<void> refreshSession() async {
-    try {
-      final sessionData = await getUserSession();
-      if (sessionData != null) {
-        await saveUserSession(
-          sessionData['token'],
-          sessionData['userInfo'],
-        );
-      }
-    } catch (e) {
-      print('刷新会话失败: $e');
-    }
-  }
-
-  // 退出登录
   static Future<void> logout() async {
-    try {
-      await StorageService.remove(StorageKeys.token);
-      await StorageService.remove(StorageKeys.userId);
-      await StorageService.remove(StorageKeys.username);
-      
-      _cachedUserInfo = null;
-      AuthService.clearToken();
-    } catch (e) {
-      print('退出登录失败: $e');
-    }
+    _userInfo = null;
+    _currentAccountBookId = null;
+    ApiConfigManager.clearToken();
+    await StorageService.remove(StorageKeys.token);
+    await StorageService.remove(StorageKeys.username);
+    await StorageService.remove(StorageKeys.currentBookId);
   }
 
-  // 账本相关方法
-  static Future<void> setCurrentAccountBookId(String bookId) async {
-    await StorageService.setString(StorageKeys.lastUsedBookId, bookId);
+  static String? getCurrentAccountBookId() {
+    return _currentAccountBookId;
   }
 
-  static String getCurrentAccountBookId({String defaultId = ''}) {
-    return StorageService.getString(StorageKeys.lastUsedBookId, defaultValue: defaultId);
-  }
-
-  static Future<void> saveToken(String token) async {
-    await StorageService.setString(StorageKeys.token, token);
-  }
-
-  static String? getToken() {
-    return StorageService.getString(StorageKeys.token);
-  }
-
-  // 更新缓存的用户信息
-  static Future<void> updateUserInfo(Map<String, dynamic> newInfo) async {
-    if (_cachedUserInfo != null) {
-      _cachedUserInfo = {
-        ..._cachedUserInfo!,
-        ...newInfo,
-      };
-
-      await StorageService.setString(
-        StorageKeys.userId, 
-        newInfo['id']?.toString() ?? ''
-      );
-      await StorageService.setString(
-        StorageKeys.username, 
-        newInfo['username']?.toString() ?? ''
-      );
-    }
-  }
-
-  static void setToken(String token) {
-    _httpDataSource.setToken(token);
-  }
-
-  static void clearToken() {
-    _httpDataSource.clearToken();
-  }
-
-  static String? getStoredToken() {
-    if (kIsWeb) {
-      return StorageService.getString(StorageKeys.token);
+  static Future<void> setCurrentAccountBookId(String? bookId) async {
+    _currentAccountBookId = bookId;
+    if (bookId != null) {
+      await StorageService.setString(StorageKeys.currentBookId, bookId);
     } else {
-      // 从缓存获取 token
-      final sessionData = _cachedUserInfo;
-      return sessionData?['token'];
+      await StorageService.remove(StorageKeys.currentBookId);
     }
   }
 }

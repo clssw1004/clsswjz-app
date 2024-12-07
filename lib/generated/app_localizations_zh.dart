@@ -631,7 +631,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accountLabel => '账户';
 
   @override
-  String get accountHint => '请选择账户';
+  String get accountHint => '请选择��户';
 
   @override
   String get descriptionLabel => '备注';
@@ -790,6 +790,23 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String metricUnit(Object unit) {
     return '$unit';
+  }
+
+  @override
+  String get serverManagement => '服务器管理';
+
+  @override
+  String get addServer => '添加服务器';
+
+  @override
+  String get edit => '编辑';
+
+  @override
+  String get confirmDeleteServer => '删除服务器';
+
+  @override
+  String confirmDeleteServerMessage(String name) {
+    return '确定要删除服务器\"$name\"吗？';
   }
 }
 
