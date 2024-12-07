@@ -275,5 +275,18 @@
   },
   "wrongCredentials": "Wrong username or password",
   "rememberLogin": "Remember login",
-  "selectServer": "Select Server"
+  "selectServer": "Select Server",
+  "serverName": "Server Name",
+  "serverNameHint": "e.g. Local Server",
+  "serverNameRequired": "Please enter server name",
+  "serverType": "Server Type",
+  "serverUrlRequired": "Please enter server URL",
+  "serverTypeLabel": "{type, select, selfHosted{Self-hosted Server} clsswjzCloud{Clssw Cloud} localStorage{Local Storage} other{Unknown}}",
+  "@serverTypeLabel": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  }
 }

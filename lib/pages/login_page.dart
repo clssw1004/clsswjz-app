@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/server_config_provider.dart';
 import '../services/auth_service.dart';
-import '../services/api_service.dart';
 import '../l10n/l10n.dart';
+import '../widgets/app_bar_factory.dart';
 import 'login/widgets/remember_login_checkbox.dart';
-import 'settings/widgets/server_selector.dart';
-import 'settings/widgets/server_url_dialog.dart';
 import 'settings/widgets/language_selector_dialog.dart';
+import 'settings/widgets/add_server_dialog.dart';
+
 
 class LoginPage extends StatefulWidget {
   @override
@@ -102,10 +102,84 @@ class _LoginPageState extends State<LoginPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 600;
+
+    final inputDecoration = InputDecoration(
+      filled: true,
+      fillColor: colorScheme.surfaceVariant,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: colorScheme.primary,
+          width: 2,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
+    );
+
+    Widget buildServerSelector() {
+      final provider = context.watch<ServerConfigProvider>();
+      return Row(
+        children: [
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              value: provider.selectedConfig?.id,
+              decoration: inputDecoration.copyWith(
+                labelText: l10n.selectServer,
+                prefixIcon: const Icon(Icons.dns_outlined, size: 20),
+                isDense: true,
+                contentPadding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+              ),
+              items: provider.configs.map((config) {
+                return DropdownMenuItem(
+                  value: config.id,
+                  child: Text(
+                    config.name,
+                    style: theme.textTheme.bodyMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              }).toList(),
+              onChanged: (id) {
+                if (id != null) {
+                  provider.selectConfig(id);
+                }
+              },
+            ),
+          ),
+          IconButton(
+            onPressed: () => _showAddServerDialog(context),
+            icon: const Icon(Icons.add, size: 20),
+            tooltip: l10n.addServer,
+            visualDensity: VisualDensity.compact,
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.all(8),
+              foregroundColor: colorScheme.primary,
+            ),
+          ),
+        ],
+      );
+    }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.appName),
+      appBar: AppBarFactory.buildAppBar(
+        context: context,
+        title: AppBarFactory.buildTitle(context, l10n.appName),
         actions: [
           IconButton(
             icon: const Icon(Icons.language_outlined),
@@ -114,83 +188,127 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    l10n.login,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 16 : 24,
+            ),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 360),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 32),
+                    Text(
+                      l10n.login,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  const ServerSelector(),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: l10n.username,
-                      prefixIcon: const Icon(Icons.person_outline),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return l10n.usernameRequired;
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: l10n.password,
-                      prefixIcon: const Icon(Icons.lock_outline),
-                    ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return l10n.passwordRequired;
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  RememberLoginCheckbox(
-                    value: _rememberLogin,
-                    onChanged: (value) {
-                      setState(() => _rememberLogin = value ?? false);
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: _isLoading ? null : _handleLogin,
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                    const SizedBox(height: 32),
+
+                    // 登录表单卡片
+                    Card(
+                      elevation: 0,
+                      color: colorScheme.surface,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(
+                          color: colorScheme.outline.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // 使用新的服务器选择器
+                            buildServerSelector(),
+                            const SizedBox(height: 16),
+
+                            // 用户名输入框
+                            TextFormField(
+                              controller: _usernameController,
+                              decoration: inputDecoration.copyWith(
+                                labelText: l10n.username,
+                                prefixIcon: const Icon(Icons.person_outline),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return l10n.usernameRequired;
+                                }
+                                return null;
+                              },
                             ),
-                          )
-                        : Text(l10n.login),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/register');
-                    },
-                    child: Text(l10n.noAccount),
-                  ),
-                ],
+                            const SizedBox(height: 16),
+
+                            // 密码输入框
+                            TextFormField(
+                              controller: _passwordController,
+                              decoration: inputDecoration.copyWith(
+                                labelText: l10n.password,
+                                prefixIcon: const Icon(Icons.lock_outline),
+                              ),
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return l10n.passwordRequired;
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 8),
+
+                            // 记住登录选项
+                            RememberLoginCheckbox(
+                              value: _rememberLogin,
+                              onChanged: (value) {
+                                setState(() => _rememberLogin = value ?? false);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // 登录按钮
+                    FilledButton(
+                      onPressed: _isLoading ? null : _handleLogin,
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.onPrimary,
+                              ),
+                            )
+                          : Text(l10n.login),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 注册链接
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/register');
+                      },
+                      child: Text(l10n.noAccount),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -211,6 +329,16 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       context: context,
       builder: (context) => const LanguageSelectorDialog(),
+    );
+  }
+
+  void _showAddServerDialog(BuildContext context) {
+    final provider = context.read<ServerConfigProvider>();
+    showDialog(
+      context: context,
+      builder: (context) => AddServerDialog(
+        existingServers: provider.configs,
+      ),
     );
   }
 }

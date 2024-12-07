@@ -199,7 +199,7 @@
   "dateLabel": "日期",
   "timeLabel": "时间",
   "accountLabel": "账户",
-  "accountHint": "请选择��户",
+  "accountHint": "请选择账户",
   "descriptionLabel": "备注",
   "descriptionHint": "请输入备注（选填）",
   "shopLabel": "商家",
@@ -260,5 +260,11 @@
   "loginFailed": "登录失败：{error}",
   "wrongCredentials": "用户名或密码错误",
   "rememberLogin": "记住登录信息",
-  "selectServer": "选择服务器"
+  "selectServer": "选择服务器",
+  "serverName": "服务器名称",
+  "serverNameHint": "例如：本地服务器",
+  "serverNameRequired": "请输入服务器名称",
+  "serverType": "服务器类型",
+  "serverUrlRequired": "请输入服务器地址",
+  "serverTypeLabel": "{type, select, selfHosted{自托管服务器} clsswjzCloud{Clsswjz云} localStorage{本地存储} other{未知}}"
 }

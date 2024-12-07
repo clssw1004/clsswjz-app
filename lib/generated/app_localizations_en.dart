@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -825,4 +827,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectServer => 'Select Server';
+
+  @override
+  String get serverName => 'Server Name';
+
+  @override
+  String get serverNameHint => 'e.g. Local Server';
+
+  @override
+  String get serverNameRequired => 'Please enter server name';
+
+  @override
+  String get serverType => 'Server Type';
+
+  @override
+  String get serverUrlRequired => 'Please enter server URL';
+
+  @override
+  String serverTypeLabel(String type) {
+    String _temp0 = intl.Intl.selectLogic(
+      type,
+      {
+        'selfHosted': 'Self-hosted Server',
+        'clsswjzCloud': 'Clssw Cloud',
+        'localStorage': 'Local Storage',
+        'other': 'Unknown',
+      },
+    );
+    return '$_temp0';
+  }
 }

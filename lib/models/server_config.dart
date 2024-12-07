@@ -1,12 +1,19 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+import '../l10n/l10n.dart';
 
 enum ServerType {
-  selfHosted('自托管服务器'),
-  clsswjzCloud('云服务'),
-  localStorage('本地存储');
+  selfHosted('selfHosted'),
+  clsswjzCloud('clsswjzCloud'),
+  localStorage('localStorage');
 
-  final String label;
-  const ServerType(this.label);
+  final String key;
+  const ServerType(this.key);
+
+  String getLabel(BuildContext context) {
+    return L10n.of(context).serverTypeLabel(key);
+  }
 }
 
 @immutable

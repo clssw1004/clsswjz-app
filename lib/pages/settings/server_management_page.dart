@@ -48,82 +48,7 @@ class ServerManagementPage extends StatelessWidget {
                     final config = provider.configs[index];
                     final isSelected = config.id == provider.selectedConfig?.id;
 
-                    return Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: isSelected
-                              ? colorScheme.primary
-                              : colorScheme.outlineVariant,
-                        ),
-                      ),
-                      child: InkWell(
-                        onTap: () => provider.selectConfig(config.id),
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    _getServerIcon(config.type),
-                                    color: colorScheme.primary,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      config.name,
-                                      style: theme.textTheme.titleMedium,
-                                    ),
-                                  ),
-                                  if (isSelected)
-                                    Icon(
-                                      Icons.check_circle,
-                                      color: colorScheme.primary,
-                                    ),
-                                ],
-                              ),
-                              if (config.type == ServerType.selfHosted &&
-                                  config.serverUrl != null) ...[
-                                SizedBox(height: 8),
-                                Text(
-                                  config.serverUrl!,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                              if (isSelected) ...[
-                                SizedBox(height: 16),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    TextButton.icon(
-                                      onPressed: () => _editServer(context, config),
-                                      icon: Icon(Icons.edit_outlined),
-                                      label: Text(l10n.edit),
-                                    ),
-                                    SizedBox(width: 8),
-                                    TextButton.icon(
-                                      onPressed: () =>
-                                          _deleteServer(context, provider, config),
-                                      icon: Icon(Icons.delete_outline),
-                                      label: Text(l10n.delete),
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: colorScheme.error,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
+                    return _buildServerCard(context, config);
                   },
                 ),
               ),
@@ -146,9 +71,12 @@ class ServerManagementPage extends StatelessWidget {
   }
 
   void _showAddServerDialog(BuildContext context) {
+    final provider = context.read<ServerConfigProvider>();
     showDialog(
       context: context,
-      builder: (context) => AddServerDialog(),
+      builder: (context) => AddServerDialog(
+        existingServers: provider.configs,
+      ),
     );
   }
 
@@ -187,4 +115,104 @@ class ServerManagementPage extends StatelessWidget {
       ),
     );
   }
-} 
+
+  Widget _buildServerCard(BuildContext context, ServerConfig config) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: config.id ==
+                  Provider.of<ServerConfigProvider>(context).selectedConfig?.id
+              ? colorScheme.primary
+              : colorScheme.outlineVariant,
+        ),
+      ),
+      child: InkWell(
+        onTap: () => Provider.of<ServerConfigProvider>(context, listen: false)
+            .selectConfig(config.id),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    _getServerIcon(config.type),
+                    color: colorScheme.primary,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      config.name,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
+                  if (config.id ==
+                      Provider.of<ServerConfigProvider>(context)
+                          .selectedConfig
+                          ?.id)
+                    Icon(
+                      Icons.check_circle,
+                      color: colorScheme.primary,
+                    ),
+                ],
+              ),
+              if (config.type == ServerType.selfHosted &&
+                  config.serverUrl != null) ...[
+                SizedBox(height: 8),
+                Text(
+                  config.serverUrl!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+              if (config.id ==
+                  Provider.of<ServerConfigProvider>(context)
+                      .selectedConfig
+                      ?.id) ...[
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => _editServer(context, config),
+                      icon: Icon(Icons.edit_outlined),
+                      label: Text(L10n.of(context).edit),
+                    ),
+                    SizedBox(width: 8),
+                    TextButton.icon(
+                      onPressed: () => _deleteServer(
+                          context,
+                          Provider.of<ServerConfigProvider>(context,
+                              listen: false),
+                          config),
+                      icon: Icon(Icons.delete_outline),
+                      label: Text(L10n.of(context).delete),
+                      style: TextButton.styleFrom(
+                        foregroundColor: colorScheme.error,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              Text(
+                config.type.getLabel(context),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

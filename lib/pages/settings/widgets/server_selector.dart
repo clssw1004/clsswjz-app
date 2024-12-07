@@ -10,6 +10,8 @@ class ServerSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Consumer<ServerConfigProvider>(
       builder: (context, provider, _) {
@@ -18,18 +20,27 @@ class ServerSelector extends StatelessWidget {
         }
 
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
             DropdownButtonFormField<String>(
               value: provider.selectedConfig?.id,
               decoration: InputDecoration(
                 labelText: l10n.selectServer,
-                prefixIcon: const Icon(Icons.dns_outlined),
+                prefixIcon: const Icon(Icons.dns_outlined, size: 20),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                border: InputBorder.none,
+                isDense: true,
               ),
               items: provider.configs.map((config) {
                 return DropdownMenuItem(
                   value: config.id,
-                  child: Text(config.name),
+                  child: Text(
+                    config.name,
+                    style: theme.textTheme.bodyMedium,
+                  ),
                 );
               }).toList(),
               onChanged: (id) {
@@ -38,11 +49,18 @@ class ServerSelector extends StatelessWidget {
                 }
               },
             ),
-            const SizedBox(height: 8),
-            TextButton.icon(
-              onPressed: () => _showAddServerDialog(context),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.addServer),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => _showAddServerDialog(context),
+                icon: const Icon(Icons.add, size: 16),
+                label: Text(l10n.addServer),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.fromLTRB(8, 0, 4, 4),
+                  textStyle: theme.textTheme.bodySmall,
+                ),
+              ),
             ),
           ],
         );
@@ -51,9 +69,12 @@ class ServerSelector extends StatelessWidget {
   }
 
   void _showAddServerDialog(BuildContext context) {
+    final provider = context.read<ServerConfigProvider>();
     showDialog(
       context: context,
-      builder: (context) => AddServerDialog(),
+      builder: (context) => AddServerDialog(
+        existingServers: provider.configs,
+      ),
     );
   }
 } 

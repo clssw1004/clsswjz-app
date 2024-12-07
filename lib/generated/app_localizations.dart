@@ -1667,6 +1667,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Server'**
   String get selectServer;
+
+  /// No description provided for @serverName.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Name'**
+  String get serverName;
+
+  /// No description provided for @serverNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Local Server'**
+  String get serverNameHint;
+
+  /// No description provided for @serverNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter server name'**
+  String get serverNameRequired;
+
+  /// No description provided for @serverType.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Type'**
+  String get serverType;
+
+  /// No description provided for @serverUrlRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter server URL'**
+  String get serverUrlRequired;
+
+  /// No description provided for @serverTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{type, select, selfHosted{Self-hosted Server} clsswjzCloud{Clssw Cloud} localStorage{Local Storage} other{Unknown}}'**
+  String serverTypeLabel(String type);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
