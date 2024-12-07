@@ -12,7 +12,6 @@ import '../utils/message_helper.dart';
 import 'account_item/widgets/summary_card.dart';
 import '../models/account_item.dart';
 import '../l10n/l10n.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/account_item_tile.dart';
 import '../services/account_item_cache.dart';
 import '../constants/storage_keys.dart';
@@ -168,7 +167,6 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth > 600;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,

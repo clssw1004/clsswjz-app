@@ -221,6 +221,8 @@
     "metricCount",
     "metricAverage",
     "metricUnit",
-    "serverManagement"
+    "serverManagement",
+    "pin",
+    "unpin"
   ]
 }

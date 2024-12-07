@@ -20,14 +20,32 @@ class DateRangeDialog extends StatefulWidget {
 }
 
 class _DateRangeDialogState extends State<DateRangeDialog> {
-  DateTime? _startDate;
-  DateTime? _endDate;
+  late DateTime? _startDate;
+  late DateTime? _endDate;
 
   @override
   void initState() {
     super.initState();
     _startDate = widget.startDate;
     _endDate = widget.endDate;
+  }
+
+  void _handleSave() {
+    // 开始日期设置为当天 00:00:00.000
+    final startDate = _startDate != null 
+        ? DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
+            .parse('${DateFormat('yyyy-MM-dd').format(_startDate!)} 00:00:00.000')
+        : null;
+
+    // 结束日期设置为当天 23:59:59.999
+    final endDate = _endDate != null
+        ? DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
+            .parse('${DateFormat('yyyy-MM-dd').format(_endDate!)} 23:59:59.999')
+        : null;
+
+    widget.onStartDateChanged(startDate);
+    widget.onEndDateChanged(endDate);
+    Navigator.pop(context);
   }
 
   @override
@@ -95,11 +113,7 @@ class _DateRangeDialogState extends State<DateRangeDialog> {
           child: Text('取消'),
         ),
         FilledButton(
-          onPressed: () {
-            widget.onStartDateChanged(_startDate);
-            widget.onEndDateChanged(_endDate);
-            Navigator.pop(context);
-          },
+          onPressed: _handleSave,
           child: Text('确定'),
         ),
       ],

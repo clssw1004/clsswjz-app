@@ -31,6 +31,9 @@ class StorageKeys {
   static const String currentBookId = 'current_book_id';
   static const String currentBookName = 'current_book_name';
 
+  // 筛选面板相关
+  static const String filterPanelPinned = 'filter_panel_pinned';
+
   // 禁止实例化
   StorageKeys._();
 } 

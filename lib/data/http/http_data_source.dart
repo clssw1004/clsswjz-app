@@ -7,10 +7,10 @@ import '../../models/models.dart';
 import 'api_endpoints.dart';
 import 'http_client.dart';
 import '../../constants/storage_keys.dart';
+import 'package:intl/intl.dart';
 
 class HttpDataSource implements DataSource {
   final HttpClient _httpClient;
-  String? _token;
 
   HttpDataSource._internal({String? baseUrl})
       : _httpClient = HttpClient(
@@ -24,13 +24,11 @@ class HttpDataSource implements DataSource {
   }
 
   void setToken(String token) {
-    _token = token;
     _httpClient.setToken(token);
     StorageService.setString(StorageKeys.token, token);
   }
 
   void clearToken() {
-    _token = null;
     _httpClient.clearToken();
     StorageService.remove(StorageKeys.token);
   }
@@ -99,6 +97,13 @@ class HttpDataSource implements DataSource {
     DateTime? endDate,
   }) async {
     try {
+      final formattedStartDate = startDate != null 
+          ? DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(startDate)
+          : null;
+      final formattedEndDate = endDate != null 
+          ? DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(endDate)
+          : null;
+
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.accountItems}/list',
         method: HttpMethod.post,
@@ -106,8 +111,8 @@ class HttpDataSource implements DataSource {
           'accountBookId': bookId,
           if (categories != null) 'categories': categories,
           if (type != null) 'type': type,
-          if (startDate != null) 'startDate': startDate.toIso8601String(),
-          if (endDate != null) 'endDate': endDate.toIso8601String(),
+          if (formattedStartDate != null) 'startDate': formattedStartDate,
+          if (formattedEndDate != null) 'endDate': formattedEndDate,
         },
       );
       return AccountItemResponse.fromJson(response);

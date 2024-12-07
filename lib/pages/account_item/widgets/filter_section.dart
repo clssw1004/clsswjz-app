@@ -4,8 +4,10 @@ import 'dialogs/category_selector_dialog.dart';
 import 'dialogs/amount_range_dialog.dart';
 import 'dialogs/date_range_dialog.dart';
 import '../../../l10n/l10n.dart';
+import '../../../services/storage_service.dart';
+import '../../../constants/storage_keys.dart';
 
-class FilterSection extends StatelessWidget {
+class FilterSection extends StatefulWidget {
   final bool isExpanded;
   final String? selectedType;
   final List<String> selectedCategories;
@@ -41,41 +43,97 @@ class FilterSection extends StatelessWidget {
     required this.onClearFilter,
   }) : super(key: key);
 
+  @override
+  State<FilterSection> createState() => _FilterSectionState();
+}
+
+class _FilterSectionState extends State<FilterSection> {
+  bool _isPinned = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPinnedState();
+  }
+
+  Future<void> _loadPinnedState() async {
+    final isPinned = StorageService.getBool(StorageKeys.filterPanelPinned, defaultValue: false);
+    if (mounted) {
+      setState(() => _isPinned = isPinned);
+    }
+  }
+
+  Future<void> _togglePinned() async {
+    final newState = !_isPinned;
+    await StorageService.setBool(StorageKeys.filterPanelPinned, newState);
+    if (mounted) {
+      setState(() => _isPinned = newState);
+    }
+  }
+
   bool get _hasAnyFilter =>
-      selectedType != null ||
-      selectedCategories.isNotEmpty ||
-      minAmount != null ||
-      maxAmount != null ||
-      startDate != null ||
-      endDate != null;
+      widget.selectedType != null ||
+      widget.selectedCategories.isNotEmpty ||
+      widget.minAmount != null ||
+      widget.maxAmount != null ||
+      widget.startDate != null ||
+      widget.endDate != null;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = L10n.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
-      height: isExpanded ? 220 : 0,
+      duration: const Duration(milliseconds: 200),
+      height: (_isPinned || widget.isExpanded) ? null : 0,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outlineVariant),
+        margin: EdgeInsets.symmetric(
+          horizontal: screenWidth > 600 ? 32 : 12,
+          vertical: 4,
         ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(12, 8, 12, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(context),
-                SizedBox(height: 8),
-                _buildFilterButtons(context),
-              ],
-            ),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withOpacity(0.5),
           ),
+        ),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 36),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildHeader(context),
+                  const SizedBox(height: 8),
+                  _buildFilterGrid(context),
+                ],
+              ),
+            ),
+            Positioned(
+              right: 8,
+              bottom: 8,
+              child: IconButton(
+                onPressed: _togglePinned,
+                icon: Icon(
+                  _isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                  size: 16,
+                ),
+                tooltip: _isPinned ? l10n.unpin : l10n.pin,
+                style: IconButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.all(8),
+                  minimumSize: const Size(32, 32),
+                  foregroundColor: _isPinned ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -97,10 +155,11 @@ class FilterSection extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: _hasAnyFilter ? onClearFilter : null,
+          onPressed: _hasAnyFilter ? widget.onClearFilter : null,
           style: TextButton.styleFrom(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            minimumSize: Size(0, 28),
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            minimumSize: const Size(0, 28),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           child: Text(
@@ -114,16 +173,33 @@ class FilterSection extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterButtons(BuildContext context) {
-    return Row(
+  Widget _buildFilterGrid(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
+    final buttonWidth = isSmallScreen 
+        ? (screenWidth - 44) / 2
+        : 120.0;
+
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
       children: [
-        Expanded(child: _buildTypeButton(context)),
-        SizedBox(width: 6),
-        Expanded(child: _buildCategoryButton(context)),
-        SizedBox(width: 6),
-        Expanded(child: _buildAmountButton(context)),
-        SizedBox(width: 6),
-        Expanded(child: _buildDateButton(context)),
+        SizedBox(
+          width: buttonWidth.toDouble(),
+          child: _buildTypeButton(context),
+        ),
+        SizedBox(
+          width: buttonWidth.toDouble(),
+          child: _buildCategoryButton(context),
+        ),
+        SizedBox(
+          width: buttonWidth.toDouble(),
+          child: _buildAmountButton(context),
+        ),
+        SizedBox(
+          width: buttonWidth.toDouble(),
+          child: _buildDateButton(context),
+        ),
       ],
     );
   }
@@ -131,12 +207,12 @@ class FilterSection extends StatelessWidget {
   Widget _buildTypeButton(BuildContext context) {
     final l10n = L10n.of(context);
     return _FilterButton(
-      label: selectedType == null
+      label: widget.selectedType == null
           ? l10n.type
-          : selectedType == 'EXPENSE'
+          : widget.selectedType == 'EXPENSE'
               ? l10n.expense
               : l10n.income,
-      isSelected: selectedType != null,
+      isSelected: widget.selectedType != null,
       onPressed: () => _showTypeSelector(context),
     );
   }
@@ -144,17 +220,17 @@ class FilterSection extends StatelessWidget {
   Widget _buildCategoryButton(BuildContext context) {
     final l10n = L10n.of(context);
     return _FilterButton(
-      label: selectedCategories.isEmpty
+      label: widget.selectedCategories.isEmpty
           ? l10n.category
-          : l10n.selectedCount(selectedCategories.length),
-      isSelected: selectedCategories.isNotEmpty,
+          : l10n.selectedCount(widget.selectedCategories.length),
+      isSelected: widget.selectedCategories.isNotEmpty,
       onPressed: () => _showCategorySelector(context),
     );
   }
 
   Widget _buildAmountButton(BuildContext context) {
     final l10n = L10n.of(context);
-    final hasAmountFilter = minAmount != null || maxAmount != null;
+    final hasAmountFilter = widget.minAmount != null || widget.maxAmount != null;
     return _FilterButton(
       label: hasAmountFilter ? l10n.filtered : l10n.amount,
       isSelected: hasAmountFilter,
@@ -164,7 +240,7 @@ class FilterSection extends StatelessWidget {
 
   Widget _buildDateButton(BuildContext context) {
     final l10n = L10n.of(context);
-    final hasDateFilter = startDate != null || endDate != null;
+    final hasDateFilter = widget.startDate != null || widget.endDate != null;
     return _FilterButton(
       label: hasDateFilter ? l10n.filtered : l10n.date,
       isSelected: hasDateFilter,
@@ -176,9 +252,9 @@ class FilterSection extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => TypeSelectorDialog(
-        selectedType: selectedType,
+        selectedType: widget.selectedType,
         onTypeSelected: (type) {
-          onTypeChanged(type);
+          widget.onTypeChanged(type);
           Navigator.pop(context);
         },
       ),
@@ -189,9 +265,9 @@ class FilterSection extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => CategorySelectorDialog(
-        categories: categories,
-        selectedCategories: selectedCategories,
-        onCategoriesChanged: onCategoriesChanged,
+        categories: widget.categories,
+        selectedCategories: widget.selectedCategories,
+        onCategoriesChanged: widget.onCategoriesChanged,
       ),
     );
   }
@@ -200,10 +276,10 @@ class FilterSection extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AmountRangeDialog(
-        minAmount: minAmount,
-        maxAmount: maxAmount,
-        onMinAmountChanged: onMinAmountChanged,
-        onMaxAmountChanged: onMaxAmountChanged,
+        minAmount: widget.minAmount,
+        maxAmount: widget.maxAmount,
+        onMinAmountChanged: widget.onMinAmountChanged,
+        onMaxAmountChanged: widget.onMaxAmountChanged,
       ),
     );
   }
@@ -212,10 +288,10 @@ class FilterSection extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => DateRangeDialog(
-        startDate: startDate,
-        endDate: endDate,
-        onStartDateChanged: onStartDateChanged,
-        onEndDateChanged: onEndDateChanged,
+        startDate: widget.startDate,
+        endDate: widget.endDate,
+        onStartDateChanged: widget.onStartDateChanged,
+        onEndDateChanged: widget.onEndDateChanged,
       ),
     );
   }
@@ -227,11 +303,10 @@ class _FilterButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const _FilterButton({
-    Key? key,
     required this.label,
     required this.isSelected,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -240,23 +315,26 @@ class _FilterButton extends StatelessWidget {
 
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        minimumSize: Size(0, 32),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        minimumSize: const Size(0, 28),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         side: BorderSide(
           color: isSelected ? colorScheme.primary : colorScheme.outline,
-          width: 1,
+          width: isSelected ? 1.5 : 1,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(6),
         ),
+        backgroundColor: isSelected 
+            ? colorScheme.primary.withOpacity(0.08)
+            : Colors.transparent,
       ),
       onPressed: onPressed,
       child: Text(
         label,
         style: theme.textTheme.labelSmall?.copyWith(
-          color:
-              isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+          color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+          fontWeight: isSelected ? FontWeight.w500 : null,
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,

@@ -856,6 +856,12 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get pin => '固定';
+
+  @override
+  String get unpin => '取消固定';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

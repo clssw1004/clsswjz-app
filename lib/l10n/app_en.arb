@@ -288,5 +288,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "pin": "Pin",
+  "unpin": "Unpin"
 }

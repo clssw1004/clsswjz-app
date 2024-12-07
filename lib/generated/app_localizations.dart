@@ -1703,6 +1703,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{type, select, selfHosted{Self-hosted} clsswjzCloud{Clsswjz Cloud} localStorage{Local Storage} other{Unknown}}'**
   String serverTypeLabel(String type);
+
+  /// No description provided for @pin.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin'**
+  String get pin;
+
+  /// No description provided for @unpin.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get unpin;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
