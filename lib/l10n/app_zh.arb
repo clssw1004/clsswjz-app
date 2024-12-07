@@ -96,7 +96,7 @@
   "expense": "支出",
   "income": "收入",
   "category": "分类",
-  "selectedCount": "已选{count}项",
+  "selectedCount": "已选 {count} 项",
   "amount": "金额",
   "date": "日期",
   "filtered": "已筛选",
@@ -224,7 +224,7 @@
   "addCategoryButton": "添加\"{name}\"",
   "selectShopTitle": "选择商家",
   "noAvailableShops": "暂无可用商家",
-  "searchShopHint": "搜索或输入新商家",
+  "searchShopHint": "搜索或输入新��家",
   "addShopButton": "添加\"{name}\"",
   "summaryIncome": "收入",
   "summaryExpense": "支出",
@@ -268,5 +268,6 @@
   "serverUrlRequired": "请输入服务器地址",
   "serverTypeLabel": "{type, select, selfHosted{自托管服务器} clsswjzCloud{Clsswjz云} localStorage{本地存储} other{未知}}",
   "pin": "固定",
-  "unpin": "取消固定"
+  "unpin": "取消固定",
+  "shop": "商家"
 }

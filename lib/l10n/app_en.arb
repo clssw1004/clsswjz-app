@@ -290,5 +290,6 @@
     }
   },
   "pin": "Pin",
-  "unpin": "Unpin"
+  "unpin": "Unpin",
+  "shop": "Shop"
 }

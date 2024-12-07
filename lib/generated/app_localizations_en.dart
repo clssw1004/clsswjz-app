@@ -862,4 +862,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unpin => 'Unpin';
+
+  @override
+  String get shop => 'Shop';
 }

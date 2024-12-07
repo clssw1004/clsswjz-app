@@ -95,6 +95,7 @@ class HttpDataSource implements DataSource {
     String? type,
     DateTime? startDate,
     DateTime? endDate,
+    List<String>? shopCodes,
   }) async {
     try {
       final formattedStartDate = startDate != null 
@@ -113,6 +114,7 @@ class HttpDataSource implements DataSource {
           if (type != null) 'type': type,
           if (formattedStartDate != null) 'startDate': formattedStartDate,
           if (formattedEndDate != null) 'endDate': formattedEndDate,
+          if (shopCodes != null) 'shopCodes': shopCodes,
         },
       );
       return AccountItemResponse.fromJson(response);

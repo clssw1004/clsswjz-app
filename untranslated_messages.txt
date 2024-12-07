@@ -223,6 +223,7 @@
     "metricUnit",
     "serverManagement",
     "pin",
-    "unpin"
+    "unpin",
+    "shop"
   ]
 }

@@ -292,7 +292,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String selectedCount(Object count) {
-    return '已选$count项';
+    return '已选 $count 项';
   }
 
   @override
@@ -710,7 +710,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noAvailableShops => '暂无可用商家';
 
   @override
-  String get searchShopHint => '搜索或输入新商家';
+  String get searchShopHint => '搜索或输入新��家';
 
   @override
   String addShopButton(Object name) {
@@ -862,6 +862,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unpin => '取消固定';
+
+  @override
+  String get shop => '商家';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

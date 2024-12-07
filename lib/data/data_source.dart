@@ -56,6 +56,7 @@ abstract class DataSource {
     String? type,
     DateTime? startDate,
     DateTime? endDate,
+    List<String>? shopCodes,
   });
   Future<AccountItem> createAccountItem(AccountItem item);
   Future<AccountItem> updateAccountItem(String id, AccountItem item);

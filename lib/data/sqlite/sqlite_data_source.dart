@@ -96,6 +96,7 @@ class SqliteDataSource implements DataSource {
     String? type,
     DateTime? startDate,
     DateTime? endDate,
+    List<String>? shopCodes,
   }) async {
     final db = await _dbHelper.database;
 

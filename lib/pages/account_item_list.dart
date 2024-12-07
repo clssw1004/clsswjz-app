@@ -16,6 +16,7 @@ import '../widgets/account_item_tile.dart';
 import '../services/account_item_cache.dart';
 import '../constants/storage_keys.dart';
 import '../services/storage_service.dart';
+import '../models/shop.dart';
 
 class AccountItemList extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onBookSelected;
@@ -50,12 +51,20 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
   AccountSummary? _summary;
   late AccountItemProvider _provider;
   Map<String, List<AccountItem>> _groupedItems = {}; // 添加分组缓存
+  List<String> _selectedShopCodes = [];
+  List<ShopOption> _shops = [];
 
   @override
   void initState() {
     super.initState();
     _provider = AccountItemProvider();
     _scrollController.addListener(_onScroll);
+    _loadFilterState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _initializeAccountBooks();
   }
 
@@ -119,11 +128,16 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
         // 保存选中的账本ID
         await UserService.setCurrentAccountBookId(_selectedBook!['id']);
         await _loadCategories();
+        await _loadShops();
         await _loadAccountItems();
       }
     } catch (e) {
       if (!mounted) return;
-      MessageHelper.showError(context, message: e.toString());
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          MessageHelper.showError(context, message: e.toString());
+        }
+      });
     }
   }
 
@@ -180,13 +194,12 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list),
+            icon: Icon(
+              _isFilterExpanded ? Icons.filter_list : Icons.filter_alt_outlined,
+              color: _hasAnyFilter ? colorScheme.primary : null,
+            ),
             tooltip: l10n.filter,
-            onPressed: () {
-              setState(() {
-                _isFilterExpanded = !_isFilterExpanded;
-              });
-            },
+            onPressed: _toggleFilter,
           ),
         ],
       ),
@@ -235,6 +248,12 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
                   _startDate = null;
                   _endDate = null;
                 });
+                _loadAccountItems();
+              },
+              selectedShopCodes: _selectedShopCodes,
+              shops: _shops,
+              onShopCodesChanged: (codes) {
+                setState(() => _selectedShopCodes = codes);
                 _loadAccountItems();
               },
             ),
@@ -292,6 +311,7 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
         type: _selectedType,
         startDate: _startDate,
         endDate: _endDate,
+        shopCodes: _selectedShopCodes,
       );
 
       if (!mounted) return;
@@ -542,5 +562,49 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
     );
+  }
+
+  Future<void> _loadFilterState() async {
+    final isExpanded = StorageService.getBool(StorageKeys.filterPanelPinned, defaultValue: false);
+    if (mounted) {
+      setState(() => _isFilterExpanded = isExpanded);
+    }
+  }
+
+  Future<void> _toggleFilter() async {
+    final newState = !_isFilterExpanded;
+    await StorageService.setBool(StorageKeys.filterPanelPinned, newState);
+    if (mounted) {
+      setState(() => _isFilterExpanded = newState);
+    }
+  }
+
+  bool get _hasAnyFilter =>
+      _selectedType != null ||
+      _selectedCategories.isNotEmpty ||
+      _minAmount != null ||
+      _maxAmount != null ||
+      _startDate != null ||
+      _endDate != null ||
+      _selectedShopCodes.isNotEmpty;
+
+  Future<void> _loadShops() async {
+    try {
+      final shops = await ApiService.getShops(_selectedBook!['id']);
+      if (!mounted) return;
+      setState(() {
+        _shops = shops.map((s) => ShopOption(
+          code: s.shopCode ?? '',
+          name: s.name,
+        )).toList();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          MessageHelper.showError(context, message: e.toString());
+        }
+      });
+    }
   }
 }

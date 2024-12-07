@@ -3,11 +3,11 @@ import 'dialogs/type_selector_dialog.dart';
 import 'dialogs/category_selector_dialog.dart';
 import 'dialogs/amount_range_dialog.dart';
 import 'dialogs/date_range_dialog.dart';
+import 'dialogs/shop_selector_dialog.dart';
 import '../../../l10n/l10n.dart';
-import '../../../services/storage_service.dart';
-import '../../../constants/storage_keys.dart';
+import '../../../models/shop.dart';
 
-class FilterSection extends StatefulWidget {
+class FilterSection extends StatelessWidget {
   final bool isExpanded;
   final String? selectedType;
   final List<String> selectedCategories;
@@ -23,6 +23,9 @@ class FilterSection extends StatefulWidget {
   final Function(DateTime?) onStartDateChanged;
   final Function(DateTime?) onEndDateChanged;
   final VoidCallback onClearFilter;
+  final List<String> selectedShopCodes;
+  final List<ShopOption> shops;
+  final Function(List<String>) onShopCodesChanged;
 
   const FilterSection({
     Key? key,
@@ -41,43 +44,10 @@ class FilterSection extends StatefulWidget {
     required this.onStartDateChanged,
     required this.onEndDateChanged,
     required this.onClearFilter,
+    required this.selectedShopCodes,
+    required this.shops,
+    required this.onShopCodesChanged,
   }) : super(key: key);
-
-  @override
-  State<FilterSection> createState() => _FilterSectionState();
-}
-
-class _FilterSectionState extends State<FilterSection> {
-  bool _isPinned = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPinnedState();
-  }
-
-  Future<void> _loadPinnedState() async {
-    final isPinned = StorageService.getBool(StorageKeys.filterPanelPinned, defaultValue: false);
-    if (mounted) {
-      setState(() => _isPinned = isPinned);
-    }
-  }
-
-  Future<void> _togglePinned() async {
-    final newState = !_isPinned;
-    await StorageService.setBool(StorageKeys.filterPanelPinned, newState);
-    if (mounted) {
-      setState(() => _isPinned = newState);
-    }
-  }
-
-  bool get _hasAnyFilter =>
-      widget.selectedType != null ||
-      widget.selectedCategories.isNotEmpty ||
-      widget.minAmount != null ||
-      widget.maxAmount != null ||
-      widget.startDate != null ||
-      widget.endDate != null;
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +58,7 @@ class _FilterSectionState extends State<FilterSection> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      height: (_isPinned || widget.isExpanded) ? null : 0,
+      height: isExpanded ? null : 0,
       child: Container(
         margin: EdgeInsets.symmetric(
           horizontal: screenWidth > 600 ? 32 : 12,
@@ -96,44 +66,29 @@ class _FilterSectionState extends State<FilterSection> {
         ),
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: colorScheme.outlineVariant.withOpacity(0.5),
+            color: colorScheme.outlineVariant.withOpacity(0.3),
           ),
-        ),
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 36),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 8),
-                  _buildFilterGrid(context),
-                ],
-              ),
-            ),
-            Positioned(
-              right: 8,
-              bottom: 8,
-              child: IconButton(
-                onPressed: _togglePinned,
-                icon: Icon(
-                  _isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  size: 16,
-                ),
-                tooltip: _isPinned ? l10n.unpin : l10n.pin,
-                style: IconButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.all(8),
-                  minimumSize: const Size(32, 32),
-                  foregroundColor: _isPinned ? colorScheme.primary : colorScheme.onSurfaceVariant,
-                ),
-              ),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withOpacity(0.03),
+              blurRadius: 1,
+              offset: const Offset(0, 1),
             ),
           ],
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 6),
+              _buildFilterGrid(context),
+            ],
+          ),
         ),
       ),
     );
@@ -149,22 +104,23 @@ class _FilterSectionState extends State<FilterSection> {
       children: [
         Text(
           l10n.filterConditions,
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: colorScheme.onSurface,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
           ),
         ),
         TextButton(
-          onPressed: _hasAnyFilter ? widget.onClearFilter : null,
+          onPressed: _hasAnyFilter ? onClearFilter : null,
           style: TextButton.styleFrom(
             visualDensity: VisualDensity.compact,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            minimumSize: const Size(0, 28),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            minimumSize: const Size(0, 24),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           child: Text(
             l10n.clearFilter,
             style: theme.textTheme.labelSmall?.copyWith(
+              fontSize: 11,
               color: _hasAnyFilter ? colorScheme.primary : colorScheme.outline,
             ),
           ),
@@ -177,27 +133,42 @@ class _FilterSectionState extends State<FilterSection> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 600;
     final buttonWidth = isSmallScreen 
-        ? (screenWidth - 44) / 2
-        : 120.0;
+        ? (screenWidth - 52) / 3
+        : 100.0;
 
     return Wrap(
       spacing: 4,
       runSpacing: 4,
+      alignment: WrapAlignment.start,
       children: [
-        SizedBox(
-          width: buttonWidth.toDouble(),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isSmallScreen ? buttonWidth : 100,
+          ),
           child: _buildTypeButton(context),
         ),
-        SizedBox(
-          width: buttonWidth.toDouble(),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isSmallScreen ? buttonWidth : 120,
+          ),
           child: _buildCategoryButton(context),
         ),
-        SizedBox(
-          width: buttonWidth.toDouble(),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isSmallScreen ? buttonWidth : 120,
+          ),
+          child: _buildShopButton(context),
+        ),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isSmallScreen ? buttonWidth : 100,
+          ),
           child: _buildAmountButton(context),
         ),
-        SizedBox(
-          width: buttonWidth.toDouble(),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isSmallScreen ? buttonWidth : 100,
+          ),
           child: _buildDateButton(context),
         ),
       ],
@@ -207,12 +178,12 @@ class _FilterSectionState extends State<FilterSection> {
   Widget _buildTypeButton(BuildContext context) {
     final l10n = L10n.of(context);
     return _FilterButton(
-      label: widget.selectedType == null
+      label: selectedType == null
           ? l10n.type
-          : widget.selectedType == 'EXPENSE'
+          : selectedType == 'EXPENSE'
               ? l10n.expense
               : l10n.income,
-      isSelected: widget.selectedType != null,
+      isSelected: selectedType != null,
       onPressed: () => _showTypeSelector(context),
     );
   }
@@ -220,17 +191,17 @@ class _FilterSectionState extends State<FilterSection> {
   Widget _buildCategoryButton(BuildContext context) {
     final l10n = L10n.of(context);
     return _FilterButton(
-      label: widget.selectedCategories.isEmpty
+      label: selectedCategories.isEmpty
           ? l10n.category
-          : l10n.selectedCount(widget.selectedCategories.length),
-      isSelected: widget.selectedCategories.isNotEmpty,
+          : l10n.selectedCount(selectedCategories.length),
+      isSelected: selectedCategories.isNotEmpty,
       onPressed: () => _showCategorySelector(context),
     );
   }
 
   Widget _buildAmountButton(BuildContext context) {
     final l10n = L10n.of(context);
-    final hasAmountFilter = widget.minAmount != null || widget.maxAmount != null;
+    final hasAmountFilter = minAmount != null || maxAmount != null;
     return _FilterButton(
       label: hasAmountFilter ? l10n.filtered : l10n.amount,
       isSelected: hasAmountFilter,
@@ -240,7 +211,7 @@ class _FilterSectionState extends State<FilterSection> {
 
   Widget _buildDateButton(BuildContext context) {
     final l10n = L10n.of(context);
-    final hasDateFilter = widget.startDate != null || widget.endDate != null;
+    final hasDateFilter = startDate != null || endDate != null;
     return _FilterButton(
       label: hasDateFilter ? l10n.filtered : l10n.date,
       isSelected: hasDateFilter,
@@ -248,13 +219,24 @@ class _FilterSectionState extends State<FilterSection> {
     );
   }
 
+  Widget _buildShopButton(BuildContext context) {
+    final l10n = L10n.of(context);
+    return _FilterButton(
+      label: selectedShopCodes.isEmpty
+          ? l10n.shop
+          : l10n.selectedCount(selectedShopCodes.length),
+      isSelected: selectedShopCodes.isNotEmpty,
+      onPressed: () => _showShopSelector(context),
+    );
+  }
+
   void _showTypeSelector(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => TypeSelectorDialog(
-        selectedType: widget.selectedType,
+        selectedType: selectedType,
         onTypeSelected: (type) {
-          widget.onTypeChanged(type);
+          onTypeChanged(type);
           Navigator.pop(context);
         },
       ),
@@ -265,9 +247,9 @@ class _FilterSectionState extends State<FilterSection> {
     showDialog(
       context: context,
       builder: (context) => CategorySelectorDialog(
-        categories: widget.categories,
-        selectedCategories: widget.selectedCategories,
-        onCategoriesChanged: widget.onCategoriesChanged,
+        categories: categories,
+        selectedCategories: selectedCategories,
+        onCategoriesChanged: onCategoriesChanged,
       ),
     );
   }
@@ -276,10 +258,10 @@ class _FilterSectionState extends State<FilterSection> {
     showDialog(
       context: context,
       builder: (context) => AmountRangeDialog(
-        minAmount: widget.minAmount,
-        maxAmount: widget.maxAmount,
-        onMinAmountChanged: widget.onMinAmountChanged,
-        onMaxAmountChanged: widget.onMaxAmountChanged,
+        minAmount: minAmount,
+        maxAmount: maxAmount,
+        onMinAmountChanged: onMinAmountChanged,
+        onMaxAmountChanged: onMaxAmountChanged,
       ),
     );
   }
@@ -288,13 +270,33 @@ class _FilterSectionState extends State<FilterSection> {
     showDialog(
       context: context,
       builder: (context) => DateRangeDialog(
-        startDate: widget.startDate,
-        endDate: widget.endDate,
-        onStartDateChanged: widget.onStartDateChanged,
-        onEndDateChanged: widget.onEndDateChanged,
+        startDate: startDate,
+        endDate: endDate,
+        onStartDateChanged: onStartDateChanged,
+        onEndDateChanged: onEndDateChanged,
       ),
     );
   }
+
+  void _showShopSelector(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => ShopSelectorDialog(
+        shops: shops,
+        selectedShopCodes: selectedShopCodes,
+        onShopCodesChanged: onShopCodesChanged,
+      ),
+    );
+  }
+
+  bool get _hasAnyFilter =>
+      selectedType != null ||
+      selectedCategories.isNotEmpty ||
+      minAmount != null ||
+      maxAmount != null ||
+      startDate != null ||
+      endDate != null ||
+      selectedShopCodes.isNotEmpty;
 }
 
 class _FilterButton extends StatelessWidget {
@@ -333,6 +335,7 @@ class _FilterButton extends StatelessWidget {
       child: Text(
         label,
         style: theme.textTheme.labelSmall?.copyWith(
+          fontSize: 12,
           color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
           fontWeight: isSelected ? FontWeight.w500 : null,
         ),

@@ -54,13 +54,15 @@ class ApiService {
     String? type,
     DateTime? startDate,
     DateTime? endDate,
-  }) {
+    List<String>? shopCodes,
+  }) async {
     return dataSource.getAccountItems(
       bookId,
       categories: categories,
       type: type,
       startDate: startDate,
       endDate: endDate,
+      shopCodes: shopCodes,
     );
   }
 

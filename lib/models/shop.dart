@@ -68,3 +68,13 @@ class Shop {
     );
   }
 }
+
+class ShopOption {
+  final String code;
+  final String name;
+
+  const ShopOption({
+    required this.code,
+    required this.name,
+  });
+}
