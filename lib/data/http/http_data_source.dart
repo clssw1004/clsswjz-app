@@ -461,10 +461,9 @@ class HttpDataSource implements DataSource {
     try {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.auth}/validate',
-        method: HttpMethod.post,
+        method: HttpMethod.get,
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
-          method: HttpMethod.post.value,
         ),
       );
       return response;

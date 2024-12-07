@@ -14,7 +14,7 @@ class StorageKeys {
   
   // 用户相关
   static const String token = 'token';
-  static const String userId = 'user_id';
+  static const String userId = 'userId';
   static const String username = 'username';
   
   // 账本相关

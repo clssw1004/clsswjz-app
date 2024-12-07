@@ -88,23 +88,37 @@ Future<void> main() async {
             darkTheme: themeProvider.darkTheme,
             themeMode: themeProvider.themeMode,
             title: '记账本',
-            initialRoute: '/',
+            home: Builder(
+              builder: (context) {
+                return FutureBuilder<bool>(
+                  future: UserService.hasValidSession(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Scaffold(
+                        body: Center(
+                          child: CircularProgressIndicator(
+                            color: themeProvider.themeColor,
+                          ),
+                        ),
+                      );
+                    }
+                    
+                    if (snapshot.data == true) {
+                      return HomePage();
+                    }
+                    
+                    return LoginPage();
+                  },
+                );
+              },
+            ),
             routes: {
-              '/': (context) => LoginPage(),
               '/register': (context) => RegisterPage(),
               '/home': (context) => HomePage(),
               '/server_config': (context) => ServerUrlDialog(),
               '/account-books': (context) => AccountBookList(),
               '/create-account-book': (context) => CreateAccountBookPage(),
               '/user-info': (context) => UserInfoPage(),
-            },
-            onGenerateRoute: (settings) {
-              if (settings.name == '/home') {
-                return MaterialPageRoute(
-                  builder: (context) => HomePage(),
-                );
-              }
-              return null;
             },
             localizationsDelegates: const [
               AppLocalizations.delegate,

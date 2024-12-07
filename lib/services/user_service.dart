@@ -12,7 +12,6 @@ class UserService {
     if (_initialized) return;
     _initialized = true;
 
-    // 恢复会话和当前账本ID
     await initializeSession();
     _currentAccountBookId = StorageService.getString(StorageKeys.currentBookId);
   }
