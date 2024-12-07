@@ -23,11 +23,6 @@ class HttpDataSource implements DataSource {
         baseUrl: baseUrl ?? savedUrl ?? 'http://192.168.2.199:3000');
   }
 
-  Future<void> initializeBaseUrl(String url) async {
-    await StorageService.setString(StorageKeys.serverUrl, url);
-    _httpClient.setBaseUrl(url);
-  }
-
   void setToken(String token) {
     _token = token;
     _httpClient.setToken(token);

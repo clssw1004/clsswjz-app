@@ -23,15 +23,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'services/server_config_service.dart';
 import 'providers/server_config_provider.dart';
 import 'pages/settings/widgets/server_url_dialog.dart';
+import 'services/api_config_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 初始化存储服务
+  await StorageService.init();
+
+  // 创建数据源
+  final dataSource = await DataSourceFactory.create(DataSourceType.http);
+  
+  // 初始化 API 服务
+  ApiService.init(dataSource);
+  
+  // 初始化 API 配置
+  await ApiConfigManager.initialize();
+  
+  // 初始化其他服务
+  AuthService.init(dataSource);
+  UserService.init(dataSource);
+  await UserService.initializeSession();
+
   final prefs = await SharedPreferences.getInstance();
   final serverConfigService = ServerConfigService(prefs);
-
-  // 确保 StorageService 最先初始化
-  await StorageService.init();
 
   // 初始化主题
   final themeProvider = ThemeProvider();
@@ -55,17 +70,6 @@ Future<void> main() async {
       overlays: [SystemUiOverlay.top],
     );
   }
-
-  // 创建 DataSource 实例并初始化服务
-  final dataSource = await DataSourceFactory.create(DataSourceType.http);
-
-  // 初始化 API 服务
-  ApiService.init(dataSource);
-
-  // 初始化其他服务
-  AuthService.init(dataSource);
-  UserService.init(dataSource);
-  await UserService.initializeSession();
 
   runApp(
     MultiProvider(

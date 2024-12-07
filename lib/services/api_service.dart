@@ -6,15 +6,9 @@ import '../services/storage_service.dart';
 
 class ApiService {
   static DataSource? _dataSource;
-  static String? _token;
 
   static void init(DataSource dataSource) {
     _dataSource = dataSource;
-    
-    final savedToken = StorageService.getString('token');
-    if (savedToken != null) {
-      setToken(savedToken);
-    }
   }
 
   static DataSource get dataSource {
@@ -22,6 +16,10 @@ class ApiService {
       throw Exception('ApiService not initialized');
     }
     return _dataSource!;
+  }
+
+  static Future<void> setBaseUrl(String baseUrl) async {
+    await dataSource.setBaseUrl(baseUrl);
   }
 
   static Future<List<AccountBook>> getAccountBooks() {
@@ -118,25 +116,6 @@ class ApiService {
 
   static Future<String> resetInviteCode() {
     return dataSource.resetInviteCode();
-  }
-
-  static Future<void> setBaseUrl(String baseUrl) async {
-    await dataSource.setBaseUrl(baseUrl);
-  }
-
-  static void setToken(String token) {
-    _token = token;
-    if (dataSource is HttpDataSource) {
-      (dataSource as HttpDataSource).setToken(token);
-    }
-    print('ApiService setToken: $token');
-  }
-
-  static void clearToken() {
-    _token = null;
-    if (dataSource is HttpDataSource) {
-      (dataSource as HttpDataSource).clearToken();
-    }
   }
 
   // 服务器状态相关

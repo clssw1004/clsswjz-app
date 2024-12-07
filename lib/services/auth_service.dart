@@ -1,7 +1,7 @@
 import '../data/data_source.dart';
 import 'api_config_service.dart';
 import 'storage_service.dart';
-import 'api_service.dart';
+import 'api_config_manager.dart';
 
 class AuthService {
   static late final DataSource _dataSource;
@@ -32,37 +32,37 @@ class AuthService {
         password: password,
       );
 
-      if (response != null && response['access_token'] != null) {
-        final token = response['access_token'] as String;
-        print('Login success, token: $token'); // 添加调试日志
+      if (response != null && response['data'] != null) {
+        final data = response['data'] as Map<String, dynamic>;
+        final token = data['access_token'] as String?;
         
-        // 保存用户信息
-        await StorageService.setString('token', token);
-        await StorageService.setString('username', response['username'] as String);
-        await StorageService.setString('userId', response['userId'] as String);
-        
-        // 设置 token 到 API 服务
-        ApiService.setToken(token);
-        return true;
+        if (token != null) {
+          // 保存用户信息
+          await StorageService.setString('username', data['username'] as String);
+          await StorageService.setString('userId', data['userId'] as String);
+          
+          // 设置 token
+          await ApiConfigManager.setToken(token);
+          return true;
+        }
       }
       return false;
     } catch (e) {
-      print('Login error: $e'); // 添加调试日志
+      print('Login error: $e');
       return false;
     }
   }
 
   static void setToken(String token) {
-    ApiService.setToken(token);
+    ApiConfigManager.setToken(token);
   }
 
   static void clearToken() {
-    ApiService.clearToken();
+    ApiConfigManager.clearToken();
   }
 
   static Future<void> logout() async {
     clearToken();
-    await StorageService.remove('token');
     await StorageService.remove('username');
   }
 
