@@ -25,13 +25,25 @@ class CategorySelector extends StatelessWidget {
 
     return FormField<String>(
       initialValue: selectedCategory,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
         if (isRequired && (value == null || value.isEmpty)) {
+          print(
+              'Category validation failed: value=$value, selectedCategory=$selectedCategory');
           return l10n.pleaseSelectCategory;
         }
         return null;
       },
+      onSaved: (value) {
+        if (value != selectedCategory) {
+          onChanged(value ?? '');
+        }
+      },
       builder: (FormFieldState<String> field) {
+        if (field.value != selectedCategory) {
+          Future.microtask(() => field.didChange(selectedCategory));
+        }
+
         return Container(
           height: 48,
           padding: EdgeInsets.symmetric(vertical: 12),
@@ -78,11 +90,8 @@ class CategorySelector extends StatelessWidget {
                 ),
               ),
               IconButton(
-                icon: Icon(
-                  Icons.chevron_right,
-                  size: 18,
-                ),
-                onPressed: () {},
+                icon: Icon(Icons.chevron_right, size: 18),
+                onPressed: () => _showCategoryDialog(context),
                 color: colorScheme.onSurfaceVariant,
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
@@ -106,9 +115,6 @@ class CategorySelector extends StatelessWidget {
         categories: provider.filteredCategories.map((c) => c.name).toList(),
         selectedCategory: selectedCategory,
         onSelected: (category) {
-          if (!provider.categories.any((c) => c.name == category)) {
-            provider.updateDisplayCategories(category);
-          }
           onChanged(category);
           Navigator.pop(context);
         },
