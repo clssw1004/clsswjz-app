@@ -52,7 +52,7 @@ class CategoryGridSelector extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
