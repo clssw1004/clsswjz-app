@@ -9,9 +9,14 @@ import './settings/fund_management_page.dart';
 import '../widgets/app_bar_factory.dart';
 import '../theme/theme_provider.dart';
 import '../l10n/l10n.dart';
+import '../services/storage_service.dart';
+import '../constants/storage_keys.dart';
+import 'settings/providers/category_management_provider.dart';
 import 'settings/widgets/create_account_book_item.dart';
 import 'settings/widgets/theme_color_selector.dart';
 import './settings/server_management_page.dart';
+import '../data/data_source_factory.dart';
+import '../data/data_source.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -51,12 +56,41 @@ class _SettingsPageState extends State<SettingsPage> {
                     leading: Icon(Icons.category_outlined),
                     title: Text(l10n.categoryManagement),
                     trailing: Icon(Icons.chevron_right),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CategoryManagementPage(),
-                      ),
-                    ),
+                    onTap: () async {
+                      // 从 StorageService 获取当前账本ID
+                      final currentBookId = StorageService.getString(
+                        StorageKeys.currentBookId,
+                      );
+
+                      if (currentBookId.isEmpty) {
+                        // 如果没有当前账本，显示提示
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.noDefaultBook),
+                          ),
+                        );
+                        return;
+                      }
+
+                      // 获取数据源
+                      final dataSource =
+                          await DataSourceFactory.create(DataSourceType.http);
+
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChangeNotifierProvider(
+                              create: (_) =>
+                                  CategoryManagementProvider(dataSource),
+                              child: CategoryManagementPage(
+                                bookId: currentBookId,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
                   ListTile(
                     leading: Icon(Icons.store_outlined),

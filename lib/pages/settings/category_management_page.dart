@@ -1,214 +1,204 @@
 import 'package:flutter/material.dart';
-import '../../services/api_service.dart';
-import '../../services/user_service.dart';
-import '../../utils/message_helper.dart';
-import '../../widgets/app_bar_factory.dart';
-import '../../widgets/dialog_factory.dart';
-import '../../widgets/list_item_card.dart';
-import '../../widgets/avatar_factory.dart';
-import '../../models/models.dart';
-import '../../l10n/l10n.dart';
+import 'package:provider/provider.dart';
+import '../../generated/app_localizations.dart';
+import '../../models/category.dart';
+import 'providers/category_management_provider.dart';
 
 class CategoryManagementPage extends StatefulWidget {
+  final String bookId;
+
+  const CategoryManagementPage({super.key, required this.bookId});
+
   @override
-  State<CategoryManagementPage> createState() => CategoryManagementPageState();
+  State<CategoryManagementPage> createState() => _CategoryManagementPageState();
 }
 
-class CategoryManagementPageState extends State<CategoryManagementPage> {
-  List<Category> _categories = [];
-  bool _isLoading = true;
-  String? _currentAccountBookId;
-  String? _errorMessage;
-
+class _CategoryManagementPageState extends State<CategoryManagementPage> {
   @override
   void initState() {
     super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
+    Future.microtask(() {
+      context.read<CategoryManagementProvider>().loadCategories(widget.bookId);
     });
-
-    try {
-      _currentAccountBookId = UserService.getCurrentAccountBookId();
-      if (!mounted) return;
-
-      if (_currentAccountBookId == null) {
-        setState(() {
-          _errorMessage = 'noDefaultBook';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final categories = await ApiService.getCategories(_currentAccountBookId!);
-      if (!mounted) return;
-      setState(() {
-        _categories = categories;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _createCategory() async {
-    final l10n = L10n.of(context);
-    final name = await _showNameDialog(context);
-    if (name == null || name.isEmpty || !mounted) return;
-
-    try {
-      final category = Category(
-        id: '', // 由后端生成
-        name: name,
-        accountBookId: _currentAccountBookId!,
-      );
-
-      await ApiService.createCategory(category);
-      await _loadData();
-      if (!mounted) return;
-      MessageHelper.showSuccess(context, message: l10n.createCategorySuccess);
-    } catch (e) {
-      if (!mounted) return;
-      MessageHelper.showError(context, message: e.toString());
-    }
-  }
-
-  Future<void> _updateCategory(Category category, String newName) async {
-    final l10n = L10n.of(context);
-    try {
-      final updatedCategory = category.copyWith(
-        name: newName,
-      );
-
-      await ApiService.updateCategory(category.id, updatedCategory);
-      await _loadData();
-      if (!mounted) return;
-      MessageHelper.showSuccess(context, message: l10n.updateCategorySuccess);
-    } catch (e) {
-      if (!mounted) return;
-      MessageHelper.showError(context, message: e.toString());
-    }
-  }
-
-  Future<String?> _showNameDialog(BuildContext context, [String? initialName]) {
-    final controller = TextEditingController(text: initialName);
-    final l10n = L10n.of(context);
-
-    return DialogFactory.showFormDialog<String>(
-      context: context,
-      title: initialName == null ? l10n.newCategory : l10n.editCategory,
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        decoration: DialogFactory.getInputDecoration(
-          context: context,
-          label: l10n.categoryName,
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          style: DialogFactory.getDialogButtonStyle(context: context),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, controller.text.trim()),
-          style: DialogFactory.getDialogButtonStyle(
-            context: context,
-            isPrimary: true,
-          ),
-          child: Text(initialName == null ? l10n.create : l10n.save),
-        ),
-      ],
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final l10n = L10n.of(context);
-
-    if (_errorMessage != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_errorMessage == 'noDefaultBook') {
-          MessageHelper.showError(context, message: l10n.noDefaultBook);
-        } else {
-          MessageHelper.showError(context, message: _errorMessage!);
-        }
-      });
-    }
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
-      extendBodyBehindAppBar: true,
-      appBar: AppBarFactory.buildAppBar(
-        context: context,
-        title: AppBarFactory.buildTitle(context, l10n.categoryTitle),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            tooltip: l10n.addCategory,
-            onPressed: _createCategory,
+      appBar: AppBar(
+        title: Text(l10n.categoryTitle),
+      ),
+      body: Column(
+        children: [
+          _buildTypeSelector(context),
+          Expanded(
+            child: _buildCategoryList(),
           ),
         ],
       ),
-      body: SafeArea(
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : _categories.isEmpty
-                ? Center(
-                    child: Text(
-                      l10n.noCategories,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: _categories.length,
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    itemBuilder: (context, index) {
-                      final isLastItem = index == _categories.length - 1;
-                      final category = _categories[index];
-                      return Column(
-                        children: [
-                          ListItemCard(
-                            title: category.name,
-                            onTap: () async {
-                              final currentContext = context;
-                              final newName = await _showNameDialog(
-                                currentContext,
-                                category.name,
-                              );
-                              if (newName != null && newName.isNotEmpty) {
-                                await _updateCategory(category, newName);
-                              }
-                            },
-                            leading: AvatarFactory.buildCircleAvatar(
-                              context: context,
-                              text: category.name,
-                            ),
-                            trailing: Icon(
-                              Icons.edit_outlined,
-                              color: colorScheme.onSurfaceVariant,
-                              size: 20,
-                            ),
-                          ),
-                          if (!isLastItem) SizedBox(height: 8),
-                        ],
-                      );
-                    },
-                  ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddCategoryDialog(context),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildTypeSelector(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = context.watch<CategoryManagementProvider>();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SegmentedButton<String>(
+        segments: [
+          ButtonSegment<String>(
+            value: 'EXPENSE',
+            label: Text(l10n.expense),
+          ),
+          ButtonSegment<String>(
+            value: 'INCOME',
+            label: Text(l10n.income),
+          ),
+        ],
+        selected: {provider.selectedType},
+        onSelectionChanged: (Set<String> newSelection) {
+          provider.setSelectedType(newSelection.first);
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategoryList() {
+    return Consumer<CategoryManagementProvider>(
+      builder: (context, provider, child) {
+        if (provider.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (provider.error != null) {
+          return Center(child: Text(provider.error!));
+        }
+
+        final categories = provider.categories;
+
+        if (categories.isEmpty) {
+          return Center(
+            child: Text(AppLocalizations.of(context)!.noCategories),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            final category = categories[index];
+            return ListTile(
+              title: Text(category.name),
+              trailing: IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () => _showEditCategoryDialog(context, category),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _showAddCategoryDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = context.read<CategoryManagementProvider>();
+    final controller = TextEditingController();
+
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.newCategory),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: l10n.categoryName,
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (controller.text.trim().isEmpty) {
+                return;
+              }
+
+              final newCategory = Category(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                name: controller.text.trim(),
+                accountBookId: widget.bookId,
+                categoryType: provider.selectedType,
+              );
+
+              await provider.createCategory(newCategory);
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.createCategorySuccess)),
+                );
+              }
+            },
+            child: Text(l10n.create),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showEditCategoryDialog(
+      BuildContext context, Category category) async {
+    final l10n = AppLocalizations.of(context)!;
+    final provider = context.read<CategoryManagementProvider>();
+    final controller = TextEditingController(text: category.name);
+
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.editCategory),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: l10n.categoryName,
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (controller.text.trim().isEmpty) {
+                return;
+              }
+
+              final updatedCategory = category.copyWith(
+                name: controller.text.trim(),
+              );
+
+              await provider.updateCategory(category.id, updatedCategory);
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.updateCategorySuccess)),
+                );
+              }
+            },
+            child: Text(l10n.save),
+          ),
+        ],
       ),
     );
   }
