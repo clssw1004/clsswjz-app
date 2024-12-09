@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../providers/account_item_provider.dart';
 import './category_dialog.dart';
 import '../../../l10n/l10n.dart';
-import '../../../models/category.dart';
 
 class CategorySelector extends StatelessWidget {
   final String? selectedCategory;

@@ -871,4 +871,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noShop => 'No Shop';
+
+  @override
+  String get more => 'More';
 }

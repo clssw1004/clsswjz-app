@@ -235,7 +235,7 @@
   "statistics": "Statistics",
   "statisticsTimeRange": "Time Range",
   "statisticsWeek": "This Week",
-  "statisticsMonth": "This Month", 
+  "statisticsMonth": "This Month",
   "statisticsYear": "This Year",
   "statisticsCustom": "Custom",
   "statisticsOverview": "Overview",
@@ -293,5 +293,6 @@
   "unpin": "Unpin",
   "shop": "Shop",
   "noFund": "No Account",
-  "noShop": "No Shop"
+  "noShop": "No Shop",
+  "more": "More"
 }

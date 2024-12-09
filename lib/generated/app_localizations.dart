@@ -1733,6 +1733,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Shop'**
   String get noShop;
+
+  /// No description provided for @more.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get more;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

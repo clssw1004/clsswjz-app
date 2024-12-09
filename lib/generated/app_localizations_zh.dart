@@ -871,6 +871,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noShop => '无商家';
+
+  @override
+  String get more => '更多';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -988,6 +991,219 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get add => '添加';
 
   @override
+  String get newRecordTitle => '記一筆';
+
+  @override
+  String get editRecordTitle => '編輯記錄';
+
+  @override
+  String get expenseType => '支出';
+
+  @override
+  String get incomeType => '收入';
+
+  @override
+  String get pleaseInputAmount => '請輸入金額';
+
+  @override
+  String get pleaseSelectCategory => '請選擇分類';
+
+  @override
+  String get pleaseSelectAccount => '請選擇賬戶';
+
+  @override
+  String get pleaseSelectBook => '請選擇賬本';
+
+  @override
+  String get saveRecord => '保存';
+
+  @override
+  String get saveRecordSuccess => '保存成功';
+
+  @override
+  String get amountLabel => '金額';
+
+  @override
+  String get amountHint => '請輸入金額';
+
+  @override
+  String get categoryLabel => '分類';
+
+  @override
+  String get categoryHint => '請選擇分類';
+
+  @override
+  String get dateLabel => '日期';
+
+  @override
+  String get timeLabel => '時間';
+
+  @override
+  String get accountLabel => '賬戶';
+
+  @override
+  String get accountHint => '請選擇賬戶';
+
+  @override
+  String get descriptionLabel => '備註';
+
+  @override
+  String get descriptionHint => '請輸入備註（選填）';
+
+  @override
+  String get shopLabel => '商家';
+
+  @override
+  String get shopHint => '請選擇商家';
+
+  @override
+  String get selectFund => '選擇賬戶';
+
+  @override
+  String get noAvailableFunds => '暫無可用賬戶';
+
+  @override
+  String get defaultFund => '默認賬戶';
+
+  @override
+  String get searchFund => '搜索賬戶';
+
+  @override
+  String get selectFundHint => '請選擇賬戶';
+
+  @override
+  String get selectBookTitle => '選擇賬本';
+
+  @override
+  String get noAvailableBooks => '暫無可用賬本';
+
+  @override
+  String get defaultBook => '默認賬本';
+
+  @override
+  String get searchBook => '搜索賬本';
+
+  @override
+  String get selectBookHint => '選擇賬本';
+
+  @override
+  String get sharedBook => '共享賬本';
+
+  @override
+  String get selectBookHeader => '選擇賬本';
+
+  @override
+  String get sharedBookLabel => '共享';
+
+  @override
+  String get cancelButton => '取消';
+
+  @override
+  String get selectCategoryTitle => '選擇分類';
+
+  @override
+  String get noAvailableCategories => '暫無可用分類';
+
+  @override
+  String get searchCategoryHint => '搜索或輸入新分類';
+
+  @override
+  String addCategoryButton(Object name) {
+    return '添加\"$name\"';
+  }
+
+  @override
+  String get selectShopTitle => '選擇商家';
+
+  @override
+  String get noAvailableShops => '暫無可用商家';
+
+  @override
+  String get searchShopHint => '搜索或輸入新商家';
+
+  @override
+  String addShopButton(Object name) {
+    return '添加\"$name\"';
+  }
+
+  @override
+  String get summaryIncome => '收入';
+
+  @override
+  String get summaryExpense => '支出';
+
+  @override
+  String get summaryBalance => '結餘';
+
+  @override
+  String get currencySymbol => '¥';
+
+  @override
+  String get noTransactions => '暫無交易';
+
+  @override
+  String get statistics => '統計';
+
+  @override
+  String get statisticsTimeRange => '時間範圍';
+
+  @override
+  String get statisticsWeek => '本週';
+
+  @override
+  String get statisticsMonth => '本月';
+
+  @override
+  String get statisticsYear => '本年';
+
+  @override
+  String get statisticsCustom => '自定義';
+
+  @override
+  String get statisticsOverview => '收支總覽';
+
+  @override
+  String get statisticsTrend => '收支趨勢';
+
+  @override
+  String get statisticsExpenseByCategory => '支出分類';
+
+  @override
+  String get statisticsIncomeByCategory => '收入分類';
+
+  @override
+  String get statisticsNoData => '暫無數據';
+
+  @override
+  String get chartTypeLine => '折線圖';
+
+  @override
+  String get chartTypeBar => '柱狀圖';
+
+  @override
+  String get chartTypeArea => '面積圖';
+
+  @override
+  String get chartTypeStacked => '堆疊圖';
+
+  @override
+  String get chartNoData => '暫無數據';
+
+  @override
+  String get metricAmount => '金額';
+
+  @override
+  String get metricCount => '筆數';
+
+  @override
+  String get metricAverage => '平均值';
+
+  @override
+  String metricUnit(Object unit) {
+    return '$unit';
+  }
+
+  @override
   String get addServer => '添加服務器';
 
   @override
@@ -1046,4 +1262,22 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     );
     return '$_temp0';
   }
+
+  @override
+  String get pin => '固定';
+
+  @override
+  String get unpin => '取消固定';
+
+  @override
+  String get shop => '商家';
+
+  @override
+  String get noFund => '無賬戶';
+
+  @override
+  String get noShop => '無商家';
+
+  @override
+  String get more => '更多';
 }
