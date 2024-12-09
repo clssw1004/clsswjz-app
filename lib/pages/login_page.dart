@@ -8,7 +8,6 @@ import 'login/widgets/remember_login_checkbox.dart';
 import 'settings/widgets/language_selector_dialog.dart';
 import 'settings/widgets/add_server_dialog.dart';
 
-
 class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -107,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
 
     final inputDecoration = InputDecoration(
       filled: true,
-      fillColor: colorScheme.surfaceVariant,
+      fillColor: colorScheme.surfaceContainerHighest,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,

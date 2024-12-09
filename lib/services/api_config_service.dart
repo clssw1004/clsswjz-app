@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import '../models/server_config.dart';
 import 'api_service.dart';
 
@@ -9,7 +8,7 @@ class ApiConfigService {
 
   static void setConfig(ServerConfig config) {
     _currentConfig = config;
-    
+
     // 根据服务器类型设置不同的API基础URL
     switch (config.type) {
       case ServerType.selfHosted:
@@ -30,6 +29,6 @@ class ApiConfigService {
     _currentConfig = null;
   }
 
-  static bool get isLocalStorage => 
+  static bool get isLocalStorage =>
       _currentConfig?.type == ServerType.localStorage;
-} 
+}

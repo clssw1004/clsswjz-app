@@ -4,12 +4,10 @@ import 'storage_service.dart';
 
 class ApiConfigManager {
   static String? _token;
-  
+
   static Future<void> initialize() async {
     final savedToken = StorageService.getString('token');
-    if (savedToken != null) {
-      await setToken(savedToken);
-    }
+    await setToken(savedToken);
   }
 
   static Future<void> setToken(String token) async {
@@ -29,4 +27,4 @@ class ApiConfigManager {
   }
 
   static String? get token => _token;
-} 
+}

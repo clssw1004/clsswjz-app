@@ -45,7 +45,7 @@ class _AddServerDialogState extends State<AddServerDialog> {
 
     final inputDecoration = InputDecoration(
       filled: true,
-      fillColor: colorScheme.surfaceVariant,
+      fillColor: colorScheme.surfaceContainerHighest,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
@@ -107,8 +107,8 @@ class _AddServerDialogState extends State<AddServerDialog> {
                   prefixIcon: const Icon(Icons.storage_outlined),
                 ),
                 items: ServerType.values.map((type) {
-                  final isEnabled = !_isCloudOrLocalExists || 
-                    widget.initialValue?.type == type;
+                  final isEnabled = !_isCloudOrLocalExists ||
+                      widget.initialValue?.type == type;
                   return DropdownMenuItem(
                     value: type,
                     enabled: isEnabled,
@@ -116,8 +116,8 @@ class _AddServerDialogState extends State<AddServerDialog> {
                       type.getLabel(context),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isEnabled
-                          ? colorScheme.onSurface
-                          : colorScheme.onSurface.withOpacity(0.38),
+                            ? colorScheme.onSurface
+                            : colorScheme.onSurface.withOpacity(0.38),
                       ),
                     ),
                   );

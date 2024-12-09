@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../services/user_service.dart';
 import '../../../utils/api_error_handler.dart';
 import '../../../services/api_service.dart';
 
@@ -120,7 +119,9 @@ class _UserCardState extends State<UserCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _userInfo?['nickname'] ?? _userInfo?['username'] ?? '未登录',
+                        _userInfo?['nickname'] ??
+                            _userInfo?['username'] ??
+                            '未登录',
                         style: theme.textTheme.titleLarge?.copyWith(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w500,

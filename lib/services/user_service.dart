@@ -25,7 +25,6 @@ class UserService {
 
   static Future<bool> hasValidSession() async {
     final token = StorageService.getString(StorageKeys.token);
-    if (token == null) return false;
 
     try {
       final response = await ApiService.validateToken(token);

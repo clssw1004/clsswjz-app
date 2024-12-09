@@ -112,7 +112,7 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
             const SizedBox(height: 16),
             if (_isChecking)
               const CircularProgressIndicator()
-            else if (_serverStatus != null)
+            else
               Text(
                 _serverStatus.status == 'ok'
                     ? '服务器正常'

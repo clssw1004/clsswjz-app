@@ -106,10 +106,10 @@ class ServerManagementPage extends StatelessWidget {
               provider.deleteConfig(config.id);
               Navigator.pop(context);
             },
-            child: Text(l10n.delete),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
+            child: Text(l10n.delete),
           ),
         ],
       ),

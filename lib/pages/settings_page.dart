@@ -9,7 +9,6 @@ import './settings/fund_management_page.dart';
 import '../widgets/app_bar_factory.dart';
 import '../theme/theme_provider.dart';
 import '../l10n/l10n.dart';
-import 'settings/widgets/server_url_dialog.dart';
 import 'settings/widgets/create_account_book_item.dart';
 import 'settings/widgets/theme_color_selector.dart';
 import './settings/server_management_page.dart';
@@ -127,7 +126,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     title: Text(l10n.themeColor),
                     trailing: IconButton(
-                      onPressed: () => _showThemeColorPicker(context, themeProvider),
+                      onPressed: () =>
+                          _showThemeColorPicker(context, themeProvider),
                       icon: Icon(
                         Icons.palette,
                         color: themeProvider.themeColor,
@@ -164,7 +164,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showThemeColorPicker(BuildContext context, ThemeProvider themeProvider) {
+  void _showThemeColorPicker(
+      BuildContext context, ThemeProvider themeProvider) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
