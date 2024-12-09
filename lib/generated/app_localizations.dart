@@ -1721,6 +1721,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shop'**
   String get shop;
+
+  /// No description provided for @noFund.
+  ///
+  /// In en, this message translates to:
+  /// **'No Account'**
+  String get noFund;
+
+  /// No description provided for @noShop.
+  ///
+  /// In en, this message translates to:
+  /// **'No Shop'**
+  String get noShop;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

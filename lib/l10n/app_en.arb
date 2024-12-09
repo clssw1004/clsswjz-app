@@ -291,5 +291,7 @@
   },
   "pin": "Pin",
   "unpin": "Unpin",
-  "shop": "Shop"
+  "shop": "Shop",
+  "noFund": "No Account",
+  "noShop": "No Shop"
 }

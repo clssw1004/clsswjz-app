@@ -710,7 +710,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noAvailableShops => '暂无可用商家';
 
   @override
-  String get searchShopHint => '搜索或输入新��家';
+  String get searchShopHint => '搜索或输入新商家';
 
   @override
   String addShopButton(Object name) {
@@ -736,7 +736,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics => '统计';
 
   @override
-  String get statisticsTimeRange => '时间范围';
+  String get statisticsTimeRange => '时间���围';
 
   @override
   String get statisticsWeek => '本周';
@@ -838,7 +838,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverNameRequired => '请输入服务器名称';
 
   @override
-  String get serverType => '服务器类型';
+  String get serverType => '服��器类型';
 
   @override
   String get serverUrlRequired => '请输入服务器地址';
@@ -865,6 +865,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get shop => '商家';
+
+  @override
+  String get noFund => '无账户';
+
+  @override
+  String get noShop => '无商家';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

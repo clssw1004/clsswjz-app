@@ -224,6 +224,8 @@
     "serverManagement",
     "pin",
     "unpin",
-    "shop"
+    "shop",
+    "noFund",
+    "noShop"
   ]
 }

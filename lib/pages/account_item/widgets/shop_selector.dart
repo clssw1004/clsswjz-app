@@ -3,8 +3,11 @@ import '../../../models/models.dart';
 import '../providers/account_item_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../l10n/l10n.dart';
+import '../../../generated/app_localizations.dart';
 
-class ShopSelector extends StatefulWidget {
+class ShopSelector extends StatelessWidget {
+  static const String NO_SHOP = 'NO_SHOP';
+
   final String? selectedShop;
   final String accountBookId;
   final ValueChanged<String?> onChanged;
@@ -20,63 +23,37 @@ class ShopSelector extends StatefulWidget {
     this.selectedShopName,
   }) : super(key: key);
 
-  @override
-  State<ShopSelector> createState() => _ShopSelectorState();
-}
-
-class _ShopSelectorState extends State<ShopSelector> {
-  Shop? _selectedShop;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeShop();
-  }
-
-  @override
-  void didUpdateWidget(ShopSelector oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedShop != widget.selectedShop) {
-      _initializeShop();
+  String _getDisplayName(BuildContext context, String? shopId) {
+    if (shopId == null || shopId == NO_SHOP) {
+      return L10n.of(context).noShop;
     }
-  }
-
-  Future<void> _initializeShop() async {
-    if (!mounted) return;
-    final provider = Provider.of<AccountItemProvider>(context, listen: false);
-
-    if (widget.selectedShop != null) {
-      try {
-        _selectedShop = provider.shops.firstWhere(
-          (shop) => shop.name == widget.selectedShop,
-          orElse: () => throw '未找到商家',
-        );
-        print('Found shop: ${_selectedShop?.name}');
-        setState(() {});
-      } catch (e) {
-        print('Error finding shop: $e');
-        // 可以选择是否显示错误信息
-        // MessageHelper.showError(context, message: e.toString());
-      }
-    }
+    return selectedShopName ?? shopId;
   }
 
   void _showShopDialog(BuildContext context) {
     final provider = Provider.of<AccountItemProvider>(context, listen: false);
-    showDialog<Shop>(
+    showDialog(
       context: context,
       builder: (context) => _ShopDialog(
-        shops: provider.shops,
-        selectedShop: widget.selectedShop,
-        accountBookId: widget.accountBookId,
+        shops: [
+          Shop(
+            id: NO_SHOP,
+            name: L10n.of(context).noShop,
+            accountBookId: accountBookId,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+          ...provider.shops,
+        ],
+        selectedShop: selectedShop ?? NO_SHOP,
+        accountBookId: accountBookId,
         onShopsUpdated: (shops) {
           // 暂时不处理商家更新
         },
       ),
     ).then((shop) {
       if (shop != null) {
-        widget.onChanged(shop.name);
-        setState(() => _selectedShop = shop);
+        onChanged(shop == NO_SHOP ? null : shop);
       }
     });
   }
@@ -110,16 +87,15 @@ class _ShopSelectorState extends State<ShopSelector> {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
-                widget.onTap?.call();
+                onTap?.call();
                 _showShopDialog(context);
               },
               child: Text(
-                _selectedShop?.name ?? widget.selectedShopName ?? l10n.shopHint,
+                _getDisplayName(context, selectedShop),
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color:
-                      (_selectedShop != null || widget.selectedShopName != null)
-                          ? colorScheme.onSurface
-                          : colorScheme.onSurfaceVariant,
+                  color: selectedShop != null && selectedShop != NO_SHOP
+                      ? colorScheme.onSurface
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -203,60 +179,26 @@ class _ShopDialogState extends State<_ShopDialog> {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 24),
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: l10n.shopLabel,
-                hintText: l10n.shopHint,
-                hintStyle: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: colorScheme.outline,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: colorScheme.outline,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
-              onChanged: (value) => setState(() => _searchText = value),
-            ),
             SizedBox(height: 16),
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(context).size.height * 0.4,
               ),
-              child: _buildShopList(),
+              child: _buildShopList(context),
             ),
-            _buildCreateButton(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildShopList() {
+  Widget _buildShopList(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
+    final shops = _filteredShops;
 
-    if (_filteredShops.isEmpty) {
+    if (shops.isEmpty) {
       return Center(
         child: Text(
           l10n.noAvailableShops,
@@ -268,11 +210,12 @@ class _ShopDialogState extends State<_ShopDialog> {
     }
 
     return ListView.builder(
-      itemCount: _filteredShops.length,
+      itemCount: shops.length,
       shrinkWrap: true,
       itemBuilder: (context, index) {
-        final shop = _filteredShops[index];
-        final isSelected = shop.name == widget.selectedShop;
+        final shop = shops[index];
+        final isSelected = shop.id == widget.selectedShop;
+        final isNoShop = shop.id == ShopSelector.NO_SHOP;
 
         return ListTile(
           contentPadding: EdgeInsets.symmetric(horizontal: 8),
@@ -289,42 +232,9 @@ class _ShopDialogState extends State<_ShopDialog> {
             color: isSelected ? colorScheme.primary : null,
             size: 20,
           ),
-          onTap: () => Navigator.pop(context, shop),
+          onTap: () => Navigator.pop(context, shop.id),
         );
       },
     );
-  }
-
-  Widget _buildCreateButton() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final l10n = L10n.of(context);
-
-    if (_searchText.isNotEmpty &&
-        !_filteredShops.any((s) => s.name == _searchText)) {
-      return Padding(
-        padding: EdgeInsets.only(top: 16),
-        child: ElevatedButton.icon(
-          onPressed: () => Navigator.pop(
-            context,
-            Shop(
-              id: '',
-              name: _searchText,
-              accountBookId: widget.accountBookId,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            ),
-          ),
-          icon: Icon(Icons.add, size: 18),
-          label: Text(l10n.addShopButton(_searchText)),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
-            padding: EdgeInsets.symmetric(vertical: 12),
-          ),
-        ),
-      );
-    }
-    return SizedBox.shrink();
   }
 }

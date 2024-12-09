@@ -85,34 +85,41 @@ class _AccountItemFormState extends State<AccountItemForm> {
           _selectedCategory = widget.initialData!['category'];
 
           if (widget.initialData!['fundId'] != null) {
-            final fund = _provider.funds.firstWhere(
-              (f) => f.id == widget.initialData!['fundId'],
-              orElse: () => AccountBookFund(
-                id: '',
-                name: '未知账户',
-                fundType: 'OTHER',
-                fundRemark: '',
-                fundBalance: 0,
-                fundIn: true,
-                fundOut: true,
-                isDefault: false,
-                accountBookName: '',
-              ),
-            );
+            if (widget.initialData!['fundId'] == FundSelector.NO_FUND) {
+              _selectedFund = FundSelector.getNoFundOption(l10n);
+            } else {
+              final fund = _provider.funds.firstWhere(
+                (f) => f.id == widget.initialData!['fundId'],
+                orElse: () => AccountBookFund(
+                  id: FundSelector.NO_FUND,
+                  name: l10n.noFund,
+                  fundType: 'NONE',
+                  fundRemark: '',
+                  fundBalance: 0,
+                  fundIn: true,
+                  fundOut: true,
+                  isDefault: false,
+                  accountBookName: '',
+                ),
+              );
 
-            _selectedFund = {
-              'id': fund.id,
-              'name': fund.name,
-              'fundType': fund.fundType,
-              'fundRemark': fund.fundRemark,
-              'fundBalance': fund.fundBalance,
-              'isDefault': fund.isDefault,
-            };
+              _selectedFund = {
+                'id': fund.id,
+                'name': fund.name,
+                'fundType': fund.fundType,
+                'fundRemark': fund.fundRemark,
+                'fundBalance': fund.fundBalance,
+                'isDefault': fund.isDefault,
+              };
+            }
           }
 
           if (widget.initialData!['shop'] != null) {
             _selectedShop = widget.initialData!['shop'];
             _selectedShopName = widget.initialData!['shop'];
+          } else {
+            _selectedShop = ShopSelector.NO_SHOP;
+            _selectedShopName = l10n.noShop;
           }
 
           _descriptionController.text =
@@ -123,6 +130,11 @@ class _AccountItemFormState extends State<AccountItemForm> {
             _selectedDate = dateTime;
             _selectedTime = TimeOfDay.fromDateTime(dateTime);
           }
+        });
+      } else {
+        setState(() {
+          _selectedShop = ShopSelector.NO_SHOP;
+          _selectedShopName = l10n.noShop;
         });
       }
     });
@@ -379,10 +391,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
         MessageHelper.showError(context, message: l10n.pleaseSelectCategory);
         return;
       }
-      if (data['fundId'] == null) {
-        MessageHelper.showError(context, message: l10n.pleaseSelectAccount);
-        return;
-      }
       if (data['accountBookId'] == null) {
         MessageHelper.showError(context, message: l10n.pleaseSelectBook);
         return;
@@ -391,6 +399,10 @@ class _AccountItemFormState extends State<AccountItemForm> {
       FocusScope.of(context).unfocus();
 
       final type = _transactionType;
+      final fundId = _selectedFund?['id'] ?? FundSelector.NO_FUND;
+      final fundName = _selectedFund?['id'] == FundSelector.NO_FUND
+          ? null
+          : _selectedFund?['name'];
 
       final accountItem = AccountItem(
         id: data['id'] ?? '',
@@ -400,8 +412,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
         category: data['category'],
         description: data['description'],
         shop: data['shop'],
-        fundId: _selectedFund?['id'],
-        fundName: _selectedFund?['name'],
+        fundId: fundId,
+        fundName: fundName,
         accountDate: DateTime.parse(data['accountDate']),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),

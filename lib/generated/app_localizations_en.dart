@@ -865,4 +865,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shop => 'Shop';
+
+  @override
+  String get noFund => 'No Account';
+
+  @override
+  String get noShop => 'No Shop';
 }
