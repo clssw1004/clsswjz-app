@@ -66,6 +66,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
     } else {
       _transactionType = TYPE_EXPENSE;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _selectedFund ??= FundSelector.getNoFundOption(L10n.of(context));
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
@@ -260,6 +267,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                             SizedBox(height: 8),
                                             ShopSelector(
                                               selectedShop: _selectedShop,
+                                              selectedShopName:
+                                                  _selectedShopName,
                                               accountBookId:
                                                   _selectedBook?['id'] ?? '',
                                               onTap: () {
@@ -267,6 +276,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                               },
                                               onChanged: (shop) {
                                                 setState(() {
+                                                  _selectedShop = shop ??
+                                                      ShopSelector.NO_SHOP;
                                                   _selectedShopName = shop;
                                                 });
                                               },
@@ -319,7 +330,10 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                       'fundId': _selectedFund?['id'],
                                       'accountBookId': _selectedBook?['id'],
                                       if (_recordId != null) 'id': _recordId,
-                                      'shop': _selectedShopName,
+                                      'shop':
+                                          _selectedShop == ShopSelector.NO_SHOP
+                                              ? ShopSelector.NO_SHOP
+                                              : _selectedShopName,
                                     });
                                   } else {
                                     print('Form validation failed');
@@ -450,7 +464,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
           selectedFund: _selectedFund,
           accountBookId: _selectedBook!['id'],
           onChanged: (fund) {
-            setState(() => _selectedFund = fund);
+            setState(() {
+              _selectedFund = fund;
+            });
           },
           onTap: () {
             _amountFocusNode.unfocus();

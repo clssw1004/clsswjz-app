@@ -51,9 +51,23 @@ class ShopSelector extends StatelessWidget {
           // 暂时不处理商家更新
         },
       ),
-    ).then((shop) {
-      if (shop != null) {
-        onChanged(shop == NO_SHOP ? null : shop);
+    ).then((shopId) {
+      if (shopId != null) {
+        if (shopId == NO_SHOP) {
+          onChanged(null);
+        } else {
+          final shop = provider.shops.firstWhere(
+            (s) => s.id == shopId,
+            orElse: () => Shop(
+              id: shopId,
+              name: shopId,
+              accountBookId: accountBookId,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          );
+          onChanged(shop.name);
+        }
       }
     });
   }
@@ -63,6 +77,9 @@ class ShopSelector extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
+
+    final displayName = _getDisplayName(context, selectedShop);
+    final isNoShop = selectedShop == null || selectedShop == NO_SHOP;
 
     return Container(
       height: 48,
@@ -91,11 +108,12 @@ class ShopSelector extends StatelessWidget {
                 _showShopDialog(context);
               },
               child: Text(
-                _getDisplayName(context, selectedShop),
+                displayName,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: selectedShop != null && selectedShop != NO_SHOP
-                      ? colorScheme.onSurface
-                      : colorScheme.onSurfaceVariant,
+                  color: isNoShop
+                      ? colorScheme.onSurfaceVariant
+                      : colorScheme.onSurface,
+                  fontWeight: isNoShop ? FontWeight.normal : FontWeight.w400,
                 ),
               ),
             ),

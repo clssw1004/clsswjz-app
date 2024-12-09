@@ -22,29 +22,16 @@ class FundSelector extends StatelessWidget {
     this.isRequired = false,
   }) : super(key: key);
 
-  void _showFundDialog(BuildContext context) {
-    final provider = Provider.of<AccountItemProvider>(context, listen: false);
-    showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (context) => _FundDialog(
-        selectedFundId: selectedFund?['id'],
-        provider: provider,
-      ),
-    ).then((fund) {
-      if (fund != null) {
-        onChanged(fund);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
+    final currentFund = selectedFund ?? getNoFundOption(l10n);
+
     return FormField<Map<String, dynamic>>(
-      initialValue: selectedFund ?? FundSelector.getNoFundOption(l10n),
+      initialValue: currentFund,
       validator: (value) {
         if (isRequired && value == null) {
           return l10n.pleaseSelectAccount;
@@ -52,6 +39,10 @@ class FundSelector extends StatelessWidget {
         return null;
       },
       builder: (FormFieldState<Map<String, dynamic>> field) {
+        if (field.value != selectedFund) {
+          Future.microtask(() => field.didChange(currentFund));
+        }
+
         return Container(
           height: 48,
           padding: EdgeInsets.symmetric(vertical: 12),
@@ -76,7 +67,7 @@ class FundSelector extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
                     onTap?.call();
-                    _showFundDialog(context);
+                    _showFundDialog(context, field);
                   },
                   child: Text(
                     field.value?['name'] ?? l10n.selectFundHint,
@@ -90,7 +81,7 @@ class FundSelector extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.chevron_right, size: 18),
-                onPressed: () => _showFundDialog(context),
+                onPressed: () => _showFundDialog(context, field),
                 color: colorScheme.onSurfaceVariant,
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
@@ -104,6 +95,23 @@ class FundSelector extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _showFundDialog(
+      BuildContext context, FormFieldState<Map<String, dynamic>> field) {
+    final provider = Provider.of<AccountItemProvider>(context, listen: false);
+    showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _FundDialog(
+        selectedFundId: field.value?['id'],
+        provider: provider,
+      ),
+    ).then((fund) {
+      if (fund != null) {
+        field.didChange(fund);
+        onChanged(fund);
+      }
+    });
   }
 
   static Map<String, dynamic> getNoFundOption(AppLocalizations l10n) {
