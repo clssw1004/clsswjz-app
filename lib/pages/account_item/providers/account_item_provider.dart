@@ -160,4 +160,9 @@ class AccountItemProvider extends ChangeNotifier {
     _selectedFund = fund;
     notifyListeners();
   }
+
+  // 添加 getter 获取已筛选的分类
+  List<Category> get filteredCategories => categories
+      .where((c) => c.categoryType == _transactionType)
+      .toList(growable: false);
 }

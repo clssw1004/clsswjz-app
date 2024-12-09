@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/account_item_provider.dart';
 import './category_dialog.dart';
 import '../../../l10n/l10n.dart';
+import '../../../models/category.dart';
 
 class CategorySelector extends StatelessWidget {
   final String? selectedCategory;
@@ -53,6 +54,14 @@ class CategorySelector extends StatelessWidget {
               Expanded(
                 child: Consumer<AccountItemProvider>(
                   builder: (context, provider, _) {
+                    final isValidCategory = selectedCategory == null ||
+                        provider.filteredCategories
+                            .any((c) => c.name == selectedCategory);
+
+                    if (!isValidCategory && selectedCategory != null) {
+                      Future.microtask(() => onChanged(''));
+                    }
+
                     return GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () => _showCategoryDialog(context, provider),
@@ -93,7 +102,7 @@ class CategorySelector extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => CategoryDialog(
-        categories: provider.categories.map((c) => c.name).toList(),
+        categories: provider.filteredCategories.map((c) => c.name).toList(),
         selectedCategory: selectedCategory,
         onSelected: (category) {
           if (!provider.categories.any((c) => c.name == category)) {
