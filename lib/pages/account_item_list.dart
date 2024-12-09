@@ -30,7 +30,8 @@ class AccountItemList extends StatefulWidget {
   State<AccountItemList> createState() => _AccountItemListState();
 }
 
-class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAliveClientMixin {
+class _AccountItemListState extends State<AccountItemList>
+    with AutomaticKeepAliveClientMixin {
   static const int _pageSize = 20; // 每页加载的数据量
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
@@ -93,7 +94,8 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
       _hasMoreData = false;
     } else {
       _displayedItems.addAll(nextItems);
-      _updateGroupedItems(); // 更新分组
+      _updateGroupedItems();
+      _hasMoreData = _displayedItems.length < _accountItems.length;
     }
 
     setState(() => _isLoadingMore = false);
@@ -101,6 +103,7 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
 
   Future<void> _initializeAccountBooks() async {
     if (!mounted) return;
+
     try {
       // 先获取保存的账本ID
       final savedBookId = UserService.getCurrentAccountBookId();
@@ -117,8 +120,13 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
         (book) => book['id'] == savedBookId,
         orElse: () => _getFirstOwnedBook(booksJson) ?? booksJson.first,
       );
-          await StorageService.setString(StorageKeys.currentBookId, defaultBook['id']);
-      await StorageService.setString(StorageKeys.currentBookName, defaultBook['name']);
+
+      await StorageService.setString(
+          StorageKeys.currentBookId, defaultBook['id']);
+      await StorageService.setString(
+          StorageKeys.currentBookName, defaultBook['name']);
+
+      if (!mounted) return;
       setState(() {
         _accountBooks = booksJson;
         _selectedBook = defaultBook;
@@ -130,14 +138,14 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
         await _loadCategories();
         await _loadShops();
         await _loadAccountItems();
+      } else {
+        setState(() => _isLoading = false);
       }
     } catch (e) {
+      print('初始化账本失败: $e');
       if (!mounted) return;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          MessageHelper.showError(context, message: e.toString());
-        }
-      });
+      setState(() => _isLoading = false);
+      MessageHelper.showError(context, message: e.toString());
     }
   }
 
@@ -296,6 +304,7 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
 
   Future<void> _loadAccountItems() async {
     if (!mounted) return;
+
     setState(() {
       _isLoading = true;
       _displayedItems = [];
@@ -304,7 +313,6 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     });
 
     try {
-      // 直接加载新数据，不使用缓存
       final response = await ApiService.getAccountItems(
         _selectedBook!['id'],
         categories: _selectedCategories,
@@ -315,21 +323,33 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
       );
 
       if (!mounted) return;
+
       setState(() {
         _accountItems = response.items;
         _displayedItems = response.items.take(_pageSize).toList();
         _updateGroupedItems();
         _summary = response.summary;
+        _hasMoreData = _accountItems.length > _pageSize;
         _isLoading = false;
       });
     } catch (e) {
+      print('加载账目数据失败: $e');
       if (!mounted) return;
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _accountItems = [];
+        _displayedItems = [];
+        _groupedItems.clear();
+        _summary = null;
+        _hasMoreData = false;
+      });
       MessageHelper.showError(context, message: e.toString());
     }
   }
 
   void _addNewRecord() async {
+    if (_selectedBook == null) return;
+
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(
@@ -342,10 +362,8 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     );
 
     if (result == true) {
-      // 清除缓存并立即重新加载数据
       AccountItemCache.clearCache();
       await _loadAccountItems();
-      // 重置列表位置
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(0);
       }
@@ -369,7 +387,7 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
       // 清除缓存并立即重新加载数据
       AccountItemCache.clearCache();
       await _loadAccountItems();
-      // 重置列表位置到顶部
+      // 重置列表位置到顶���
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(0);
       }
@@ -493,7 +511,6 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
     );
   }
 
-
   void _editAccountItem(AccountItem item) async {
     final result = await Navigator.push(
       context,
@@ -531,7 +548,7 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
           }
 
           final itemIndex = _getItemIndexForPosition(index);
-          if (itemIndex >= _displayedItems.length) {
+          if (_hasMoreData && itemIndex == _displayedItems.length) {
             return _buildLoadingIndicator();
           }
 
@@ -548,7 +565,7 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
             _getDateHeaders().length +
             (_hasMoreData ? 1 : 0),
       ),
-      cacheExtent: 1000, // 增加缓存范围
+      cacheExtent: 1000,
     );
   }
 
@@ -565,7 +582,8 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
   }
 
   Future<void> _loadFilterState() async {
-    final isExpanded = StorageService.getBool(StorageKeys.filterPanelPinned, defaultValue: false);
+    final isExpanded = StorageService.getBool(StorageKeys.filterPanelPinned,
+        defaultValue: false);
     if (mounted) {
       setState(() => _isFilterExpanded = isExpanded);
     }
@@ -593,10 +611,12 @@ class _AccountItemListState extends State<AccountItemList> with AutomaticKeepAli
       final shops = await ApiService.getShops(_selectedBook!['id']);
       if (!mounted) return;
       setState(() {
-        _shops = shops.map((s) => ShopOption(
-          code: s.shopCode ?? '',
-          name: s.name,
-        )).toList();
+        _shops = shops
+            .map((s) => ShopOption(
+                  code: s.shopCode ?? '',
+                  name: s.name,
+                ))
+            .toList();
       });
     } catch (e) {
       if (!mounted) return;

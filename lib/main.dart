@@ -24,6 +24,7 @@ import 'services/server_config_service.dart';
 import 'providers/server_config_provider.dart';
 import 'pages/settings/widgets/server_url_dialog.dart';
 import 'services/api_config_manager.dart';
+import 'pages/account_item/providers/account_item_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,13 +34,13 @@ Future<void> main() async {
 
   // 创建数据源
   final dataSource = await DataSourceFactory.create(DataSourceType.http);
-  
+
   // 初始化 API 服务
   ApiService.init(dataSource);
-  
+
   // 初始化 API 配置
   await ApiConfigManager.initialize();
-  
+
   // 初始化其他服务
   AuthService.init(dataSource);
   await UserService.init();
@@ -74,6 +75,9 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (_) => AccountItemProvider(),
+        ),
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: localeProvider),
         Provider<DataSource>.value(value: dataSource),
@@ -102,11 +106,11 @@ Future<void> main() async {
                         ),
                       );
                     }
-                    
+
                     if (snapshot.data == true) {
                       return HomePage();
                     }
-                    
+
                     return LoginPage();
                   },
                 );

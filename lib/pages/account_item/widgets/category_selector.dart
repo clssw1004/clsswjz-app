@@ -64,7 +64,7 @@ class CategorySelector extends StatelessWidget {
 
                     return GestureDetector(
                       behavior: HitTestBehavior.opaque,
-                      onTap: () => _showCategoryDialog(context, provider),
+                      onTap: () => _showCategoryDialog(context),
                       child: Text(
                         selectedCategory ?? l10n.categoryHint,
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -98,7 +98,8 @@ class CategorySelector extends StatelessWidget {
     );
   }
 
-  void _showCategoryDialog(BuildContext context, AccountItemProvider provider) {
+  void _showCategoryDialog(BuildContext context) {
+    final provider = Provider.of<AccountItemProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (context) => CategoryDialog(

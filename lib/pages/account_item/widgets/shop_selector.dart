@@ -69,7 +69,9 @@ class _ShopSelectorState extends State<ShopSelector> {
         shops: provider.shops,
         selectedShop: widget.selectedShop,
         accountBookId: widget.accountBookId,
-        onShopsUpdated: provider.updateShops,
+        onShopsUpdated: (shops) {
+          // 暂时不处理商家更新
+        },
       ),
     ).then((shop) {
       if (shop != null) {

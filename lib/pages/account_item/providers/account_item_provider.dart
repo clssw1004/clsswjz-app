@@ -11,14 +11,10 @@ class AccountItemProvider extends ChangeNotifier {
   bool isLoading = false;
 
   String get transactionType => _transactionType;
+
   List<Map<String, dynamic>> get fundList => funds
       .where((fund) {
-        // 根据交易类型过滤
-        if (transactionType == 'EXPENSE') {
-          return fund.fundOut;
-        } else {
-          return fund.fundIn;
-        }
+        return transactionType == 'EXPENSE' ? fund.fundOut : fund.fundIn;
       })
       .map((f) => {
             'id': f.id,
@@ -29,15 +25,12 @@ class AccountItemProvider extends ChangeNotifier {
             'isDefault': f.isDefault,
           })
       .toList();
-  List<Map<String, dynamic>> get displayCategories =>
-      categories.take(11).map((c) => {'name': c.name}).toList();
-  List<Map<String, dynamic>> get shopList => shops
-      .map((s) => {
-            'id': s.id,
-            'name': s.name,
-            'shopCode': s.shopCode,
-          })
-      .toList();
+
+  // 添加 getter 获取已筛选的分类
+  List<Category> get filteredCategories => categories
+      .where(
+          (c) => c.categoryType.isEmpty || c.categoryType == _transactionType)
+      .toList(growable: false);
 
   AccountItemProvider({this.selectedBook}) {
     if (selectedBook != null) {
@@ -47,30 +40,37 @@ class AccountItemProvider extends ChangeNotifier {
 
   Future<void> loadData() async {
     if (selectedBook == null) return;
-    isLoading = true;
-    notifyListeners();
 
     try {
+      isLoading = true;
+      notifyListeners();
+
       final bookId = selectedBook!['id'];
-      final futures = await Future.wait([
+      final results = await Future.wait([
         ApiService.getCategories(bookId),
         ApiService.getBookFunds(bookId),
         ApiService.getShops(bookId),
       ]);
 
-      categories = futures[0] as List<Category>;
-      funds = futures[1] as List<AccountBookFund>;
-      shops = futures[2] as List<Shop>;
+      categories = results[0] as List<Category>;
+      funds = results[1] as List<AccountBookFund>;
+      shops = results[2] as List<Shop>;
 
       // 如果没有选择账户，设置默认账户
-      if (_selectedFund == null) {
-        final defaultFund = getDefaultFund();
-        if (defaultFund != null) {
-          _selectedFund = defaultFund;
-        }
+      if (_selectedFund == null && funds.isNotEmpty) {
+        final defaultFund = funds.firstWhere(
+          (fund) => fund.isDefault,
+          orElse: () => funds.first,
+        );
+        _selectedFund = {
+          'id': defaultFund.id,
+          'name': defaultFund.name,
+          'fundType': defaultFund.fundType,
+          'fundRemark': defaultFund.fundRemark,
+          'fundBalance': defaultFund.fundBalance,
+          'isDefault': defaultFund.isDefault,
+        };
       }
-
-      notifyListeners();
     } catch (e) {
       print('加载数据失败: $e');
     } finally {
@@ -80,11 +80,9 @@ class AccountItemProvider extends ChangeNotifier {
   }
 
   Future<void> setSelectedBook(Map<String, dynamic>? book) async {
+    if (book == null || book['id'] == selectedBook?['id']) return;
     selectedBook = book;
-    if (book != null) {
-      await loadFundList();
-    }
-    notifyListeners();
+    await loadData();
   }
 
   void setTransactionType(String type) {
@@ -101,6 +99,7 @@ class AccountItemProvider extends ChangeNotifier {
           id: '',
           name: category,
           accountBookId: selectedBook!['id'],
+          categoryType: _transactionType,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         )
@@ -109,60 +108,12 @@ class AccountItemProvider extends ChangeNotifier {
     }
   }
 
-  void updateShops(List<Shop> newShops) {
-    shops = newShops;
-    notifyListeners();
-  }
-
-  // 获取默认资金账户
-  Map<String, dynamic>? getDefaultFund() {
-    if (selectedBook == null) return null;
-
-    final defaultFund = funds.firstWhere(
-      (fund) => fund.isDefault,
-      orElse: () => funds.firstWhere(
-        (fund) => transactionType == 'EXPENSE' ? fund.fundOut : fund.fundIn,
-        orElse: () => funds.first,
-      ),
-    );
-
-    return {
-      'id': defaultFund.id,
-      'name': defaultFund.name,
-      'fundType': defaultFund.fundType,
-      'fundRemark': defaultFund.fundRemark,
-      'fundBalance': defaultFund.fundBalance,
-      'isDefault': defaultFund.isDefault,
-    };
-  }
-
-  // 加载资金账户列表
-  Future<void> loadFundList() async {
-    if (selectedBook == null) return;
-
-    try {
-      final bookFunds = await ApiService.getBookFunds(selectedBook!['id']);
-      funds = bookFunds;
-      notifyListeners();
-    } catch (e) {
-      print('加载资金账户失败: $e');
-    }
-  }
-
-  // 添加账目数据相关字段和方法
-  List<AccountItem> _accountItems = [];
-  List<AccountItem> get accountItems => _accountItems;
-
   // 添加选中账户相关字段和方法
   Map<String, dynamic>? _selectedFund;
   Map<String, dynamic>? get selectedFund => _selectedFund;
+
   void setSelectedFund(Map<String, dynamic>? fund) {
     _selectedFund = fund;
     notifyListeners();
   }
-
-  // 添加 getter 获取已筛选的分类
-  List<Category> get filteredCategories => categories
-      .where((c) => c.categoryType == _transactionType)
-      .toList(growable: false);
 }

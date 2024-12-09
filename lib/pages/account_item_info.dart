@@ -52,7 +52,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
   String? _recordId;
   String? _selectedShop;
   String? _selectedShopName;
-  bool _isSaving = false;
 
   @override
   void initState() {
@@ -61,7 +60,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
     _selectedBook = widget.initialBook;
 
     if (widget.initialData != null) {
-      _transactionType = widget.initialData!['type'] == TYPE_EXPENSE ? TYPE_EXPENSE : TYPE_INCOME;
+      _transactionType = widget.initialData!['type'] == TYPE_EXPENSE
+          ? TYPE_EXPENSE
+          : TYPE_INCOME;
     } else {
       _transactionType = TYPE_EXPENSE;
     }
@@ -70,30 +71,35 @@ class _AccountItemFormState extends State<AccountItemForm> {
       if (!mounted) return;
       final l10n = L10n.of(context);
 
-      await _provider.setSelectedBook(widget.initialBook);
-      if (widget.initialBook != null) {
-        setState(() => _selectedBook = widget.initialBook);
-        await _loadCategories();
-        await _provider.loadData();
+      await _provider.loadData();
 
-        if (widget.initialData != null &&
-            widget.initialData!['fundId'] != null) {
-          final fund = _provider.funds.firstWhere(
-            (f) => f.id == widget.initialData!['fundId'],
-            orElse: () => AccountBookFund(
-              id: '',
-              name: '未知账户',
-              fundType: 'OTHER',
-              fundRemark: '',
-              fundBalance: 0,
-              fundIn: true,
-              fundOut: true,
-              isDefault: false,
-              accountBookName: '',
-            ),
-          );
+      if (widget.initialData != null) {
+        setState(() {
+          _recordId = widget.initialData!['id'];
+          _transactionType = widget.initialData!['type'] == TYPE_EXPENSE
+              ? TYPE_EXPENSE
+              : TYPE_INCOME;
+          _provider
+              .setTransactionType(_getLocalizedType(l10n, _transactionType));
+          _amountController.text = widget.initialData!['amount'].toString();
+          _selectedCategory = widget.initialData!['category'];
 
-          setState(() {
+          if (widget.initialData!['fundId'] != null) {
+            final fund = _provider.funds.firstWhere(
+              (f) => f.id == widget.initialData!['fundId'],
+              orElse: () => AccountBookFund(
+                id: '',
+                name: '未知账户',
+                fundType: 'OTHER',
+                fundRemark: '',
+                fundBalance: 0,
+                fundIn: true,
+                fundOut: true,
+                isDefault: false,
+                accountBookName: '',
+              ),
+            );
+
             _selectedFund = {
               'id': fund.id,
               'name': fund.name,
@@ -102,24 +108,15 @@ class _AccountItemFormState extends State<AccountItemForm> {
               'fundBalance': fund.fundBalance,
               'isDefault': fund.isDefault,
             };
-          });
-        }
-      }
-
-      if (widget.initialData != null) {
-        setState(() {
-          _recordId = widget.initialData!['id'];
-          _transactionType = widget.initialData!['type'] == TYPE_EXPENSE ? TYPE_EXPENSE : TYPE_INCOME;
-          _provider.setTransactionType(_getLocalizedType(l10n, _transactionType));
-          _amountController.text = widget.initialData!['amount'].toString();
-          _selectedCategory = widget.initialData!['category'];
+          }
 
           if (widget.initialData!['shop'] != null) {
             _selectedShop = widget.initialData!['shop'];
             _selectedShopName = widget.initialData!['shop'];
           }
 
-          _descriptionController.text = widget.initialData!['description'] ?? '';
+          _descriptionController.text =
+              widget.initialData!['description'] ?? '';
 
           if (widget.initialData!['accountDate'] != null) {
             final dateTime = DateTime.parse(widget.initialData!['accountDate']);
@@ -158,161 +155,189 @@ class _AccountItemFormState extends State<AccountItemForm> {
       value: _provider,
       child: Builder(
         builder: (context) {
-          return Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBarFactory.buildAppBar(
-              context: context,
-              title: AppBarFactory.buildTitle(
-                context,
-                _recordId == null ? l10n.newRecordTitle : l10n.editRecordTitle,
-              ),
-            ),
-            body: SafeArea(
-              child: Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: colorScheme.outlineVariant.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                    child: BookHeader(book: _selectedBook),
+          return Consumer<AccountItemProvider>(
+            builder: (context, provider, child) {
+              return Scaffold(
+                resizeToAvoidBottomInset: false,
+                appBar: AppBarFactory.buildAppBar(
+                  context: context,
+                  title: AppBarFactory.buildTitle(
+                    context,
+                    _recordId == null
+                        ? l10n.newRecordTitle
+                        : l10n.editRecordTitle,
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Form(
-                        key: _formKey,
+                ),
+                body: provider.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : SafeArea(
                         child: Column(
                           children: [
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
-                              child: Column(
-                                children: [
-                                  TypeSelector(
-                                    value: _getLocalizedType(l10n, _transactionType),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _transactionType = _getTypeValue(value, l10n);
-                                      });
-                                      _provider.setTransactionType(value);
-                                    },
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: colorScheme.outlineVariant
+                                        .withOpacity(0.5),
                                   ),
-                                  SizedBox(height: 12),
-                                  AmountInput(
-                                    initialValue: widget.initialData != null
-                                        ? double.parse(widget
-                                            .initialData!['amount']
-                                            .toString())
-                                        : null,
-                                    onChanged: (value) => _amountController
-                                        .text = value.toString(),
-                                    type: _getLocalizedType(l10n, _transactionType),
-                                    focusNode: _amountFocusNode,
-                                    controller: _amountController,
+                                ),
+                              ),
+                              child: BookHeader(book: _selectedBook),
+                            ),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(16, 12, 16, 16),
+                                        child: Column(
+                                          children: [
+                                            TypeSelector(
+                                              value: _getLocalizedType(
+                                                  l10n, _transactionType),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _transactionType =
+                                                      _getTypeValue(
+                                                          value, l10n);
+                                                });
+                                                _provider
+                                                    .setTransactionType(value);
+                                              },
+                                            ),
+                                            SizedBox(height: 12),
+                                            AmountInput(
+                                              initialValue: widget
+                                                          .initialData !=
+                                                      null
+                                                  ? double.parse(widget
+                                                      .initialData!['amount']
+                                                      .toString())
+                                                  : null,
+                                              onChanged: (value) =>
+                                                  _amountController.text =
+                                                      value.toString(),
+                                              type: _getLocalizedType(
+                                                  l10n, _transactionType),
+                                              focusNode: _amountFocusNode,
+                                              controller: _amountController,
+                                            ),
+                                            SizedBox(height: 12),
+                                            CategorySelector(
+                                              selectedCategory:
+                                                  _selectedCategory,
+                                              onChanged: (category) => setState(
+                                                  () => _selectedCategory =
+                                                      category),
+                                              isRequired: true,
+                                            ),
+                                            SizedBox(height: 12),
+                                            DateTimeSelector(
+                                              selectedDate: _selectedDate,
+                                              selectedTime: _selectedTime,
+                                              onDateChanged: (date) => setState(
+                                                  () => _selectedDate = date),
+                                              onTimeChanged: (time) => setState(
+                                                  () => _selectedTime = time),
+                                            ),
+                                            SizedBox(height: 8),
+                                            ShopSelector(
+                                              selectedShop: _selectedShop,
+                                              accountBookId:
+                                                  _selectedBook?['id'] ?? '',
+                                              onTap: () {
+                                                _amountFocusNode.unfocus();
+                                              },
+                                              onChanged: (shop) {
+                                                setState(() {
+                                                  _selectedShopName = shop;
+                                                });
+                                              },
+                                            ),
+                                            SizedBox(height: 8),
+                                            _buildFundSelector(),
+                                            SizedBox(height: 8),
+                                            DescriptionInput(
+                                              controller:
+                                                  _descriptionController,
+                                            ),
+                                            SizedBox(height: 16),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(height: 12),
-                                  CategorySelector(
-                                    selectedCategory: _selectedCategory,
-                                    onChanged: (category) => setState(
-                                        () => _selectedCategory = category),
-                                    isRequired: true,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: colorScheme.surface,
+                                border: Border(
+                                  top: BorderSide(
+                                    color: colorScheme.outlineVariant
+                                        .withOpacity(0.1),
                                   ),
-                                  SizedBox(height: 12),
-                                  DateTimeSelector(
-                                    selectedDate: _selectedDate,
-                                    selectedTime: _selectedTime,
-                                    onDateChanged: (date) =>
-                                        setState(() => _selectedDate = date),
-                                    onTimeChanged: (time) =>
-                                        setState(() => _selectedTime = time),
+                                ),
+                              ),
+                              child: FilledButton(
+                                onPressed: () {
+                                  print(
+                                      'Form validation: ${_formKey.currentState?.validate()}');
+
+                                  if (_formKey.currentState?.validate() ??
+                                      false) {
+                                    final amount = double.tryParse(
+                                            _amountController.text) ??
+                                        0.0;
+                                    _saveTransaction({
+                                      'amount': amount,
+                                      'description':
+                                          _descriptionController.text.trim(),
+                                      'type': _transactionType,
+                                      'category': _selectedCategory,
+                                      'accountDate': _formattedDateTime,
+                                      'fundId': _selectedFund?['id'],
+                                      'accountBookId': _selectedBook?['id'],
+                                      if (_recordId != null) 'id': _recordId,
+                                      'shop': _selectedShopName,
+                                    });
+                                  } else {
+                                    print('Form validation failed');
+                                    print('Amount: ${_amountController.text}');
+                                    print('Category: $_selectedCategory');
+                                    print('Fund: $_selectedFund');
+                                    print('Book: $_selectedBook');
+                                  }
+                                },
+                                style: FilledButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                  SizedBox(height: 8),
-                                  ShopSelector(
-                                    selectedShop: _selectedShop,
-                                    accountBookId: _selectedBook?['id'] ?? '',
-                                    onTap: () {
-                                      _amountFocusNode.unfocus();
-                                    },
-                                    onChanged: (shop) {
-                                      setState(() {
-                                        _selectedShopName = shop;
-                                      });
-                                    },
-                                  ),
-                                  SizedBox(height: 8),
-                                  _buildFundSelector(),
-                                  SizedBox(height: 8),
-                                  DescriptionInput(
-                                    controller: _descriptionController,
-                                  ),
-                                  SizedBox(height: 16),
-                                ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.save_outlined, size: 18),
+                                    SizedBox(width: 8),
+                                    Text(l10n.saveRecord),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      border: Border(
-                        top: BorderSide(
-                          color: colorScheme.outlineVariant.withOpacity(0.1),
-                        ),
-                      ),
-                    ),
-                    child: FilledButton(
-                      onPressed: () {
-                        print(
-                            'Form validation: ${_formKey.currentState?.validate()}');
-
-                        if (_formKey.currentState?.validate() ?? false) {
-                          final amount =
-                              double.tryParse(_amountController.text) ?? 0.0;
-                          _saveTransaction({
-                            'amount': amount,
-                            'description': _descriptionController.text.trim(),
-                            'type': _transactionType,
-                            'category': _selectedCategory,
-                            'accountDate': _formattedDateTime,
-                            'fundId': _selectedFund?['id'],
-                            'accountBookId': _selectedBook?['id'],
-                            if (_recordId != null) 'id': _recordId,
-                            'shop': _selectedShopName,
-                          });
-                        } else {
-                          print('Form validation failed');
-                          print('Amount: ${_amountController.text}');
-                          print('Category: $_selectedCategory');
-                          print('Fund: $_selectedFund');
-                          print('Book: $_selectedBook');
-                        }
-                      },
-                      style: FilledButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.save_outlined, size: 18),
-                          SizedBox(width: 8),
-                          Text(l10n.saveRecord),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+              );
+            },
           );
         },
       ),
@@ -342,9 +367,10 @@ class _AccountItemFormState extends State<AccountItemForm> {
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
     final l10n = L10n.of(context);
     if (!mounted) return;
-    setState(() => _isSaving = true);
 
     try {
+      _provider.isLoading = true;
+
       if (data['amount'] == 0.0) {
         MessageHelper.showError(context, message: l10n.pleaseInputAmount);
         return;
@@ -396,7 +422,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
       MessageHelper.showError(context, message: e.toString());
     } finally {
       if (mounted) {
-        setState(() => _isSaving = false);
+        _provider.isLoading = false;
       }
     }
   }
@@ -406,6 +432,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
   Widget _buildFundSelector() {
     return Consumer<AccountItemProvider>(
       builder: (context, provider, _) {
+        if (_selectedBook == null) return SizedBox.shrink();
+
         return FundSelector(
           selectedFund: _selectedFund,
           accountBookId: _selectedBook!['id'],
