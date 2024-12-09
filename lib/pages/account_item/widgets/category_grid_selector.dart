@@ -6,10 +6,11 @@ import '../../../l10n/l10n.dart';
 import '../../../models/category.dart';
 
 class CategoryGridSelector extends StatelessWidget {
-  static const int _maxDisplayCount = 8;
+  static const int _maxDisplayCount = 9;
   static const int _firstRowCount = 3;
   static const int _secondRowCount = 3;
-  static const int _thirdRowCount = 2;
+  static const int _thirdRowCount = 3;
+  static const double _horizontalSpacing = 8.0;
 
   final String? selectedCategory;
   final ValueChanged<String> onChanged;
@@ -103,7 +104,7 @@ class CategoryGridSelector extends StatelessWidget {
                               updatedAt: DateTime.now(),
                             ),
                         ],
-                        _thirdRowCount + (showMoreButton ? 1 : 0),
+                        _thirdRowCount,
                       ),
                     ],
                   );
@@ -131,14 +132,31 @@ class CategoryGridSelector extends StatelessWidget {
     List<Category> categories,
     int maxCount,
   ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(maxCount, (index) {
-        if (index < categories.length) {
-          return _buildCategoryItem(context, categories[index]);
-        }
-        return SizedBox(width: 100); // 占位
-      }),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(maxCount, (index) {
+          if (index < categories.length) {
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: index < maxCount - 1 ? _horizontalSpacing : 0,
+                ),
+                child: _buildCategoryItem(context, categories[index]),
+              ),
+            );
+          }
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: index < maxCount - 1 ? _horizontalSpacing : 0,
+              ),
+              child: SizedBox(),
+            ),
+          );
+        }),
+      ),
     );
   }
 
@@ -157,20 +175,20 @@ class CategoryGridSelector extends StatelessWidget {
         }
       },
       child: Container(
-        width: 100,
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        height: 36,
+        padding: EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primary.withOpacity(0.1)
-              : colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color:
                 isSelected ? colorScheme.primary : colorScheme.outlineVariant,
+            width: isSelected ? 1.5 : 1,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             if (!isMoreButton)
               Icon(
@@ -181,11 +199,17 @@ class CategoryGridSelector extends StatelessWidget {
                     : colorScheme.onSurfaceVariant,
               ),
             if (!isMoreButton) SizedBox(width: 4),
-            Text(
-              category.name,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: isSelected ? colorScheme.primary : colorScheme.onSurface,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            Flexible(
+              child: Text(
+                category.name,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color:
+                      isSelected ? colorScheme.primary : colorScheme.onSurface,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
             ),
           ],
@@ -199,7 +223,7 @@ class CategoryGridSelector extends StatelessWidget {
       return allCategories.take(_maxDisplayCount - 1).toList();
     }
 
-    // 如果选中的分类不在前7个中，则替换最后一个
+    // 如果选中的分类不在前8个中，则替换最后一个
     final selectedCategoryObj = allCategories.firstWhere(
       (c) => c.name == selectedCategory,
       orElse: () => allCategories.first,

@@ -16,7 +16,6 @@ import 'settings/widgets/create_account_book_item.dart';
 import 'settings/widgets/theme_color_selector.dart';
 import './settings/server_management_page.dart';
 import '../data/data_source_factory.dart';
-import '../data/data_source.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);

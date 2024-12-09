@@ -50,22 +50,20 @@ class CategoryDialog extends StatelessWidget {
                     final isSelected = category == selectedCategory;
                     return InkWell(
                       onTap: () => onSelected(category),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(8),
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? colorScheme.primary.withOpacity(0.1)
-                              : colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isSelected
                                 ? colorScheme.primary
                                 : colorScheme.outlineVariant,
-                            width: 1,
+                            width: isSelected ? 1.5 : 1,
                           ),
                         ),
                         child: Row(
@@ -112,7 +110,7 @@ class CategoryDialog extends StatelessWidget {
                       vertical: 8,
                     ),
                   ),
-                  child: Text('取消'),
+                  child: Text(l10n.cancelButton),
                 ),
               ],
             ),

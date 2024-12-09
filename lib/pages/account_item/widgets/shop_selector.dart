@@ -3,7 +3,6 @@ import '../../../models/models.dart';
 import '../providers/account_item_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../l10n/l10n.dart';
-import '../../../generated/app_localizations.dart';
 
 class ShopSelector extends StatelessWidget {
   static const String NO_SHOP = 'NO_SHOP';

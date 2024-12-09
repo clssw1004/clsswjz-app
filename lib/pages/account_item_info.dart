@@ -7,7 +7,6 @@ import '../models/models.dart';
 import '../utils/message_helper.dart';
 import './account_item/widgets/type_selector.dart';
 import './account_item/widgets/amount_input.dart';
-import './account_item/widgets/category_selector.dart';
 import './account_item/widgets/datetime_selector.dart';
 import './account_item/widgets/fund_selector.dart';
 import './account_item/widgets/description_input.dart';
