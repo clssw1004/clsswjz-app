@@ -387,7 +387,7 @@ class _AccountItemListState extends State<AccountItemList>
       // 清除缓存并立即重新加载数据
       AccountItemCache.clearCache();
       await _loadAccountItems();
-      // 重置列表位置到顶���
+      // 重置列表位置到顶
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(0);
       }
@@ -479,14 +479,65 @@ class _AccountItemListState extends State<AccountItemList>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // 计算当天的收支统计
+    final itemsInDay = _groupedItems[date] ?? [];
+    final dailyExpense = itemsInDay
+        .where((item) => item.type == 'EXPENSE')
+        .fold(0.0, (sum, item) => sum + item.amount);
+    final dailyIncome = itemsInDay
+        .where((item) => item.type == 'INCOME')
+        .fold(0.0, (sum, item) => sum + item.amount);
+
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(
-        _formatDateHeader(date),
-        style: theme.textTheme.titleSmall?.copyWith(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.w500,
-        ),
+      child: Row(
+        children: [
+          Text(
+            _formatDateHeader(date),
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Spacer(),
+          if (dailyExpense > 0)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.arrow_downward,
+                  size: 14,
+                  color: colorScheme.error,
+                ),
+                SizedBox(width: 2),
+                Text(
+                  dailyExpense.toStringAsFixed(2),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.error,
+                  ),
+                ),
+              ],
+            ),
+          if (dailyExpense > 0 && dailyIncome > 0) SizedBox(width: 12),
+          if (dailyIncome > 0)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.arrow_upward,
+                  size: 14,
+                  color: Colors.green,
+                ),
+                SizedBox(width: 2),
+                Text(
+                  dailyIncome.toStringAsFixed(2),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+        ],
       ),
     );
   }

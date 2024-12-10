@@ -736,7 +736,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics => '统计';
 
   @override
-  String get statisticsTimeRange => '时间���围';
+  String get statisticsTimeRange => '时间范围';
 
   @override
   String get statisticsWeek => '本周';
@@ -838,7 +838,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverNameRequired => '请输入服务器名称';
 
   @override
-  String get serverType => '服��器类型';
+  String get serverType => '服务器类型';
 
   @override
   String get serverUrlRequired => '请输入服务器地址';
