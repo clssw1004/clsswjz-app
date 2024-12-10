@@ -28,45 +28,58 @@ class FundTextField extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return TextField(
-      controller: controller,
-      style: style ?? theme.textTheme.bodyMedium,
-      keyboardType: keyboardType,
-      textAlign: textAlign,
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: AppColors.white,
-        border: UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: colorScheme.outline.withOpacity(0.5),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: colorScheme.outline.withOpacity(0.5),
+        SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          style: style ??
+              theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
+              ),
+          keyboardType: keyboardType,
+          textAlign: textAlign,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: theme.brightness == Brightness.light
+                ? AppColors.white
+                : colorScheme.surfaceVariant,
+            border: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.outline.withOpacity(0.5),
+              ),
+            ),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.outline.withOpacity(0.5),
+              ),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.primary,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 0,
+              vertical: AppDimens.paddingSmall,
+            ),
+            isDense: true,
+            prefixText: prefixText,
+            prefixStyle: prefixStyle,
+            hintStyle: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            ),
           ),
+          onChanged: onChanged,
         ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-          ),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 0,
-          vertical: AppDimens.paddingSmall,
-        ),
-        isDense: true,
-        prefixText: prefixText,
-        prefixStyle: prefixStyle,
-        labelStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-        floatingLabelStyle: theme.textTheme.bodySmall?.copyWith(
-          color: colorScheme.primary,
-        ),
-      ),
-      onChanged: onChanged,
+      ],
     );
   }
 }

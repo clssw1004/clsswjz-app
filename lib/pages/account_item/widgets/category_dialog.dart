@@ -23,7 +23,8 @@ class CategoryDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(28),
       ),
-      surfaceTintColor: colorScheme.surface,
+      backgroundColor: colorScheme.surface,
+      surfaceTintColor: colorScheme.surfaceTint,
       child: Padding(
         padding: EdgeInsets.all(24),
         child: Column(
@@ -57,7 +58,9 @@ class CategoryDialog extends StatelessWidget {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: theme.brightness == Brightness.light
+                              ? Colors.white
+                              : colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isSelected

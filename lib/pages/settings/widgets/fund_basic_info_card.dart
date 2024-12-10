@@ -40,6 +40,9 @@ class FundBasicInfoCard extends StatelessWidget {
           color: colorScheme.outlineVariant.withOpacity(0.5),
         ),
       ),
+      color: theme.brightness == Brightness.light
+          ? Colors.white
+          : colorScheme.surface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -67,20 +70,19 @@ class FundBasicInfoCard extends StatelessWidget {
                 FundTextField(
                   controller: nameController,
                   label: l10n.accountName,
-                  style: theme.textTheme.titleMedium,
                 ),
-                SizedBox(height: AppDimens.padding),
+                SizedBox(height: 24),
                 FundTextField(
                   controller: remarkController,
                   label: l10n.accountRemark,
                 ),
-                SizedBox(height: AppDimens.padding),
+                SizedBox(height: 24),
                 FundTypeSelector(
                   value: selectedType,
                   onChanged: onTypeChanged,
                 ),
                 if (showBalance) ...[
-                  SizedBox(height: AppDimens.padding),
+                  SizedBox(height: 24),
                   FundBalanceInput(
                     controller: balanceController,
                     onChanged: onBalanceChanged,

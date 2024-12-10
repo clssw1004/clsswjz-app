@@ -178,7 +178,9 @@ class CategoryGridSelector extends StatelessWidget {
         height: 36,
         padding: EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.brightness == Brightness.light
+              ? Colors.white
+              : colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color:

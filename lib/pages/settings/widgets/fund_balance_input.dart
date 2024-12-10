@@ -18,57 +18,54 @@ class FundBalanceInput extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.currentBalance,
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: colorScheme.primary,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
-        Spacer(),
-        SizedBox(
-          width: 120,
-          child: TextField(
-            controller: controller,
-            textAlign: TextAlign.right,
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: AppColors.white,
-              border: UnderlineInputBorder(),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.outline.withOpacity(0.5),
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.primary,
-                ),
-              ),
-              prefixText: '¥',
-              prefixStyle: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-              hintText: '0.00',
-              hintStyle: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.5),
-                fontWeight: FontWeight.bold,
-              ),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 0,
-                vertical: AppDimens.paddingSmall,
-              ),
-            ),
-            onChanged: onChanged,
+        SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          textAlign: TextAlign.right,
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface,
           ),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: theme.brightness == Brightness.light
+                ? AppColors.white
+                : colorScheme.surfaceVariant,
+            border: UnderlineInputBorder(),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.outline.withOpacity(0.5),
+              ),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.primary,
+              ),
+            ),
+            prefixText: '¥',
+            prefixStyle: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+            hintText: '0.00',
+            hintStyle: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            ),
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 0,
+              vertical: AppDimens.paddingSmall,
+            ),
+          ),
+          onChanged: onChanged,
         ),
       ],
     );
