@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../../models/server_config.dart';
 import '../../../providers/server_config_provider.dart';
 import '../../../l10n/l10n.dart';
-import '../../../constants/server_constants.dart';
 
 class AddServerDialog extends StatefulWidget {
   final ServerConfig? initialValue;

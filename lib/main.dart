@@ -54,7 +54,7 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
   Future<bool> _checkInitialState() async {
     // 检查是否有服务器配置
     final serverUrl = StorageService.getString(StorageKeys.serverUrl);
-    if (serverUrl == null || serverUrl.isEmpty) {
+    if (serverUrl.isEmpty) {
       return false;
     }
 

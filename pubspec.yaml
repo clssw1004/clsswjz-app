@@ -41,22 +41,4 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/images/logo.png
-
-flutter_launcher_icons:
-  image_path: "assets/images/logo.png"
-  android: true
-  ios: true
-  web:
-    generate: true
-    background_color: "#ffffff"
-    theme_color: "#ffffff"
-  windows:
-    generate: true
-    icon_size: 256 # 可选，默认 48
-  linux:
-    generate: true
-  remove_alpha_ios: true
-  min_sdk_android: 21
-  adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: "assets/images/logo.png"
+    - assets/images/app_logo.png
