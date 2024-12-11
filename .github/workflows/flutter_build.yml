@@ -24,7 +24,7 @@ jobs:
             artifact-name: linux-release
           - platform: android
             os: ubuntu-latest
-            build-command: flutter build apk --release
+            build-command: flutter build apk --release --no-tree-shake-icons
             artifact-path: build/app/outputs/flutter-apk/app-release.apk
             artifact-name: android-release.apk
     
