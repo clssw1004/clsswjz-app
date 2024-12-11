@@ -585,7 +585,7 @@ abstract class AppLocalizations {
   /// No description provided for @noAccountItems.
   ///
   /// In en, this message translates to:
-  /// **'No account records'**
+  /// **'No transactions yet'**
   String get noAccountItems;
 
   /// No description provided for @newRecord.
@@ -610,7 +610,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{month}/{day}'**
-  String monthDayFormat(Object day, Object month);
+  String monthDayFormat(String month, String day);
 
   /// No description provided for @filterConditions.
   ///
@@ -1739,6 +1739,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More'**
   String get more;
+
+  /// No description provided for @confirmDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this record?'**
+  String get confirmDeleteMessage;
+
+  /// No description provided for @deleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete successful'**
+  String get deleteSuccess;
+
+  /// No description provided for @pleaseSelectItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one item'**
+  String get pleaseSelectItems;
+
+  /// No description provided for @confirmBatchDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {count} items?'**
+  String confirmBatchDeleteMessage(int count);
+
+  /// No description provided for @batchDeleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully deleted {count} items'**
+  String batchDeleteSuccess(int count);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

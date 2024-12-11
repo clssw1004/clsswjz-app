@@ -355,7 +355,9 @@ class _MemberListState extends State<MemberList> {
       // 添加新成员
       final newMember = Member(
         userId: userId,
-        nickname: userInfo['nickname'] as String? ?? userInfo['username'] as String? ?? l10n.unknownMember,
+        nickname: userInfo['nickname'] as String? ??
+            userInfo['username'] as String? ??
+            l10n.unknownMember,
         canViewBook: true,
         canEditBook: false,
         canDeleteBook: false,

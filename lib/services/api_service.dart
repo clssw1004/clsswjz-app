@@ -2,6 +2,23 @@ import '../data/data_source.dart';
 import '../models/models.dart';
 import '../models/server_status.dart';
 
+class BatchDeleteResult {
+  final int successCount;
+  final List<String>? errors;
+
+  BatchDeleteResult({
+    required this.successCount,
+    this.errors,
+  });
+
+  factory BatchDeleteResult.fromJson(Map<String, dynamic> json) {
+    return BatchDeleteResult(
+      successCount: json['successCount'] as int,
+      errors: (json['errors'] as List<dynamic>?)?.cast<String>(),
+    );
+  }
+}
+
 class ApiService {
   static DataSource? _dataSource;
 
@@ -110,7 +127,8 @@ class ApiService {
     return dataSource.getUserInfo();
   }
 
-  static Future<Map<String, dynamic>> updateUserInfo(Map<String, dynamic> data) {
+  static Future<Map<String, dynamic>> updateUserInfo(
+      Map<String, dynamic> data) {
     return dataSource.updateUserInfo(data);
   }
 
@@ -144,5 +162,11 @@ class ApiService {
 
   static Future<Map<String, dynamic>?> getUserByInviteCode(String inviteCode) {
     return dataSource.getUserByInviteCode(inviteCode);
+  }
+
+  static Future<BatchDeleteResult> batchDeleteAccountItems(
+    List<String> itemIds,
+  ) async {
+    return dataSource.batchDeleteAccountItems(itemIds);
   }
 }

@@ -256,7 +256,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get filter => '筛选';
 
   @override
-  String get noAccountItems => '暂无账目记录';
+  String get noAccountItems => '暂无交易记录';
 
   @override
   String get newRecord => '新增记录';
@@ -268,7 +268,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get yesterday => '昨天';
 
   @override
-  String monthDayFormat(Object day, Object month) {
+  String monthDayFormat(String month, String day) {
     return '$month月$day日';
   }
 
@@ -382,7 +382,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String lastUpdated(Object time) {
-    return '最近更新：$time';
+    return '最��更新：$time';
   }
 
   @override
@@ -494,7 +494,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get memberAlreadyExists => '该用户已经是成员';
 
   @override
-  String get addMemberSuccess => '成员添加成功';
+  String get addMemberSuccess => '成员��加成功';
 
   @override
   String addMemberFailed(Object error) {
@@ -603,7 +603,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseSelectAccount => '请选择账户';
 
   @override
-  String get pleaseSelectBook => '请选择账本';
+  String get pleaseSelectBook => '请选择��本';
 
   @override
   String get saveRecord => '保存';
@@ -874,6 +874,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get more => '更多';
+
+  @override
+  String get confirmDeleteMessage => '确定要删除这条记录吗？';
+
+  @override
+  String get deleteSuccess => '删除成功';
+
+  @override
+  String get pleaseSelectItems => '请至少选择一条记录';
+
+  @override
+  String confirmBatchDeleteMessage(int count) {
+    return '确定要删除选中的 $count 条记录吗？';
+  }
+
+  @override
+  String batchDeleteSuccess(int count) {
+    return '成功删除 $count 条记录';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -980,6 +999,20 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get serverUrl => '服務器地址';
+
+  @override
+  String get noAccountItems => '暫無交易記錄';
+
+  @override
+  String get today => '今天';
+
+  @override
+  String get yesterday => '昨天';
+
+  @override
+  String monthDayFormat(String month, String day) {
+    return '$month月$day日';
+  }
 
   @override
   String get save => '保存';
@@ -1280,4 +1313,23 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get more => '更多';
+
+  @override
+  String get confirmDeleteMessage => '確定要刪除這條記錄嗎？';
+
+  @override
+  String get deleteSuccess => '刪除成功';
+
+  @override
+  String get pleaseSelectItems => '請至少選擇一條記錄';
+
+  @override
+  String confirmBatchDeleteMessage(int count) {
+    return '確定要刪除選中的 $count 條記錄嗎？';
+  }
+
+  @override
+  String batchDeleteSuccess(int count) {
+    return '成功刪除 $count 條記錄';
+  }
 }

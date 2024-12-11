@@ -81,11 +81,21 @@
   "wechat": "WeChat Pay",
   "other": "Other",
   "filter": "Filter",
-  "noAccountItems": "No account records",
+  "noAccountItems": "No transactions yet",
   "newRecord": "New Record",
   "today": "Today",
   "yesterday": "Yesterday",
   "monthDayFormat": "{month}/{day}",
+  "@monthDayFormat": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
   "filterConditions": "Filter Conditions",
   "clearFilter": "Clear Filter",
   "type": "Type",
@@ -294,5 +304,24 @@
   "shop": "Shop",
   "noFund": "No Account",
   "noShop": "No Shop",
-  "more": "More"
+  "more": "More",
+  "confirmDeleteMessage": "Are you sure you want to delete this record?",
+  "deleteSuccess": "Delete successful",
+  "pleaseSelectItems": "Please select at least one item",
+  "confirmBatchDeleteMessage": "Are you sure you want to delete {count} items?",
+  "batchDeleteSuccess": "Successfully deleted {count} items",
+  "@confirmBatchDeleteMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@batchDeleteSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

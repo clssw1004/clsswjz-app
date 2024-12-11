@@ -1,4 +1,5 @@
 import '../../models/server_status.dart';
+import '../../services/api_service.dart';
 import '../data_source.dart';
 import '../../models/models.dart';
 import 'database_helper.dart';
@@ -498,7 +499,7 @@ class SqliteDataSource implements DataSource {
         where: 'username = ? AND password = ?',
         whereArgs: [username, password],
       );
-      
+
       return result.isNotEmpty ? {'valid': true} : null;
     }
 
@@ -534,5 +535,35 @@ class SqliteDataSource implements DataSource {
   Future<void> setBaseUrl(String url) async {
     // SQLite 数据源不需要设置 URL
     return;
+  }
+
+  @override
+  Future<BatchDeleteResult> batchDeleteAccountItems(
+      List<String> itemIds) async {
+    final db = await _dbHelper.database;
+    int successCount = 0;
+    List<String> errors = [];
+
+    for (final id in itemIds) {
+      try {
+        final count = await db.delete(
+          'account_items',
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+        if (count > 0) {
+          successCount++;
+        } else {
+          errors.add('账目不存在: $id');
+        }
+      } catch (e) {
+        errors.add('删除失败: $id - ${e.toString()}');
+      }
+    }
+
+    return BatchDeleteResult(
+      successCount: successCount,
+      errors: errors.isEmpty ? null : errors,
+    );
   }
 }

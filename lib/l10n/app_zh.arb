@@ -85,11 +85,21 @@
   "wechat": "微信支付",
   "other": "其他",
   "filter": "筛选",
-  "noAccountItems": "暂无账目记录",
+  "noAccountItems": "暂无交易记录",
   "newRecord": "新增记录",
   "today": "今天",
   "yesterday": "昨天",
   "monthDayFormat": "{month}月{day}日",
+  "@monthDayFormat": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
   "filterConditions": "筛选条件",
   "clearFilter": "清空筛选",
   "type": "类型",
@@ -122,7 +132,7 @@
   "editFundTitle": "编辑账户",
   "newFundTitle": "新建账户",
   "linkedBooks": "关联账本",
-  "lastUpdated": "最近更新：{time}",
+  "lastUpdated": "最��更新：{time}",
   "unknown": "未知",
   "basicInfo": "基本信息",
   "accountName": "账户名称",
@@ -157,7 +167,7 @@
   "inviteCodeHint": "请输入邀请码",
   "add": "添加",
   "memberAlreadyExists": "该用户已经是成员",
-  "addMemberSuccess": "成员添加成功",
+  "addMemberSuccess": "成员��加成功",
   "addMemberFailed": "添加成员失败：{error}",
   "permViewBook": "查看账本",
   "permEditBook": "编辑账本",
@@ -189,7 +199,7 @@
   "pleaseInputAmount": "请输入金额",
   "pleaseSelectCategory": "请选择分类",
   "pleaseSelectAccount": "请选择账户",
-  "pleaseSelectBook": "请选择账本",
+  "pleaseSelectBook": "请选择��本",
   "saveRecord": "保存",
   "saveRecordSuccess": "保存成功",
   "amountLabel": "金额",
@@ -272,5 +282,24 @@
   "shop": "商家",
   "noFund": "无账户",
   "noShop": "无商家",
-  "more": "更多"
+  "more": "更多",
+  "confirmDeleteMessage": "确定要删除这条记录吗？",
+  "deleteSuccess": "删除成功",
+  "pleaseSelectItems": "请至少选择一条记录",
+  "confirmBatchDeleteMessage": "确定要删除选中的 {count} 条记录吗？",
+  "batchDeleteSuccess": "成功删除 {count} 条记录",
+  "@confirmBatchDeleteMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@batchDeleteSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -17,6 +17,7 @@ import '../services/account_item_cache.dart';
 import '../constants/storage_keys.dart';
 import '../services/storage_service.dart';
 import '../models/shop.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class AccountItemList extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onBookSelected;
@@ -54,6 +55,9 @@ class _AccountItemListState extends State<AccountItemList>
   Map<String, List<AccountItem>> _groupedItems = {}; // 添加分组缓存
   List<String> _selectedShopCodes = [];
   List<ShopOption> _shops = [];
+  bool _isBatchMode = false;
+  final Set<String> _selectedItems = {};
+  final Set<String> _selectedDates = {};
 
   @override
   void initState() {
@@ -289,14 +293,62 @@ class _AccountItemListState extends State<AccountItemList>
           ],
         ),
       ),
-      floatingActionButton: _accountBooks.isNotEmpty && !_isLoading
-          ? FloatingActionButton(
+      floatingActionButton: _isBatchMode
+          ? null
+          : FloatingActionButton(
               onPressed: _addNewRecord,
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
               elevation: 2,
               tooltip: l10n.newRecord,
               child: Icon(Icons.add),
+            ),
+      bottomNavigationBar: _isBatchMode
+          ? SafeArea(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.shadow.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    TextButton(
+                      onPressed: null, // 暂时禁用
+                      child: Text(
+                        l10n.edit,
+                        style: TextStyle(
+                          color: colorScheme.primary.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _batchDelete,
+                      child: Text(
+                        l10n.delete,
+                        style: TextStyle(
+                          color: colorScheme.error,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _exitBatchMode,
+                      child: Text(
+                        l10n.cancel,
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             )
           : null,
     );
@@ -487,11 +539,24 @@ class _AccountItemListState extends State<AccountItemList>
     final dailyIncome = itemsInDay
         .where((item) => item.type == 'INCOME')
         .fold(0.0, (sum, item) => sum + item.amount);
-
+    final paddingNum = _isBatchMode ? 8.0 : 16.0;
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: EdgeInsets.fromLTRB(paddingNum, paddingNum, paddingNum, 8),
       child: Row(
         children: [
+          if (_isBatchMode)
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: Checkbox(
+                value: _selectedDates.contains(date),
+                onChanged: (checked) => _toggleDateSelection(date, checked),
+                shape: CircleBorder(),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+          if (_isBatchMode) SizedBox(width: 12),
           Text(
             _formatDateHeader(date),
             style: theme.textTheme.titleSmall?.copyWith(
@@ -579,6 +644,8 @@ class _AccountItemListState extends State<AccountItemList>
   }
 
   Widget _buildList() {
+    final theme = Theme.of(context);
+
     return ListView.custom(
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(
@@ -605,11 +672,35 @@ class _AccountItemListState extends State<AccountItemList>
 
           final item = _displayedItems[itemIndex];
           return RepaintBoundary(
-            child: AccountItemTile(
-              key: ValueKey(item.id),
-              item: item,
-              onTap: () => _editAccountItem(item),
-            ),
+            child: _isBatchMode
+                ? AccountItemTile(
+                    key: ValueKey(item.id),
+                    item: item,
+                    showCheckbox: true,
+                    isChecked: _selectedItems.contains(item.id),
+                    onCheckChanged: (checked) =>
+                        _toggleItemSelection(item.id, checked),
+                  )
+                : Slidable(
+                    key: ValueKey(item.id),
+                    endActionPane: ActionPane(
+                      motion: const ScrollMotion(),
+                      extentRatio: 0.2,
+                      children: [
+                        SlidableAction(
+                          onPressed: (context) => _confirmDelete(item),
+                          foregroundColor: theme.colorScheme.error,
+                          icon: Icons.delete_outline,
+                        ),
+                      ],
+                    ),
+                    child: AccountItemTile(
+                      key: ValueKey(item.id),
+                      item: item,
+                      onTap: () => _editAccountItem(item),
+                      onLongPress: () => _enterBatchMode(item.id),
+                    ),
+                  ),
           );
         },
         childCount: _displayedItems.length +
@@ -676,6 +767,168 @@ class _AccountItemListState extends State<AccountItemList>
           MessageHelper.showError(context, message: e.toString());
         }
       });
+    }
+  }
+
+  Future<void> _confirmDelete(AccountItem item) async {
+    final l10n = L10n.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.delete),
+        content: Text(l10n.confirmDeleteMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await ApiService.deleteAccountItem(item.id);
+        AccountItemCache.clearCache();
+        await _loadAccountItems();
+        if (mounted) {
+          MessageHelper.showSuccess(
+            context,
+            message: l10n.deleteSuccess,
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          MessageHelper.showError(context, message: e.toString());
+        }
+      }
+    }
+  }
+
+  void _enterBatchMode(String initialItemId) {
+    setState(() {
+      _isBatchMode = true;
+      _selectedItems.add(initialItemId);
+    });
+  }
+
+  void _exitBatchMode() {
+    setState(() {
+      _isBatchMode = false;
+      _selectedItems.clear();
+      _selectedDates.clear();
+    });
+  }
+
+  void _toggleDateSelection(String date, bool? checked) {
+    if (checked == null) return;
+
+    setState(() {
+      final itemsInDate = _groupedItems[date] ?? [];
+      if (checked) {
+        _selectedDates.add(date);
+        _selectedItems.addAll(itemsInDate.map((item) => item.id));
+      } else {
+        _selectedDates.remove(date);
+        _selectedItems.removeAll(itemsInDate.map((item) => item.id));
+      }
+    });
+  }
+
+  void _toggleItemSelection(String itemId, bool? checked) {
+    if (checked == null) return;
+
+    setState(() {
+      if (checked) {
+        _selectedItems.add(itemId);
+      } else {
+        _selectedItems.remove(itemId);
+      }
+
+      // 更新日期选择状态
+      _updateDateSelectionState();
+    });
+  }
+
+  void _updateDateSelectionState() {
+    _selectedDates.clear();
+    for (final date in _groupedItems.keys) {
+      final itemsInDate = _groupedItems[date] ?? [];
+      if (itemsInDate.every((item) => _selectedItems.contains(item.id))) {
+        _selectedDates.add(date);
+      }
+    }
+  }
+
+  Future<void> _batchDelete() async {
+    final l10n = L10n.of(context);
+
+    if (_selectedItems.isEmpty) {
+      MessageHelper.showError(
+        context,
+        message: l10n.pleaseSelectItems,
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.delete),
+        content: Text(l10n.confirmBatchDeleteMessage(_selectedItems.length)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final result = await ApiService.batchDeleteAccountItems(
+          _selectedItems.toList(),
+        );
+
+        if (result.errors?.isNotEmpty == true) {
+          if (mounted) {
+            MessageHelper.showError(
+              context,
+              message: result.errors!.join('\n'),
+            );
+          }
+        } else {
+          if (mounted) {
+            MessageHelper.showSuccess(
+              context,
+              message: l10n.batchDeleteSuccess(result.successCount),
+            );
+          }
+        }
+
+        AccountItemCache.clearCache();
+        await _loadAccountItems();
+        _exitBatchMode();
+      } catch (e) {
+        if (mounted) {
+          MessageHelper.showError(context, message: e.toString());
+        }
+      }
     }
   }
 }

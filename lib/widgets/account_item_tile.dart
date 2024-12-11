@@ -5,11 +5,19 @@ import '../l10n/l10n.dart';
 class AccountItemTile extends StatelessWidget {
   final AccountItem item;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final bool showCheckbox;
+  final bool? isChecked;
+  final ValueChanged<bool?>? onCheckChanged;
 
   const AccountItemTile({
     Key? key,
     required this.item,
     this.onTap,
+    this.onLongPress,
+    this.showCheckbox = false,
+    this.isChecked,
+    this.onCheckChanged,
   }) : super(key: key);
 
   @override
@@ -33,12 +41,30 @@ class AccountItemTile extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(
+            horizontal: showCheckbox ? 8 : 16,
+            vertical: 12,
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              if (showCheckbox) ...[
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: Checkbox(
+                    value: isChecked,
+                    onChanged: onCheckChanged,
+                    shape: CircleBorder(),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+                SizedBox(width: 8),
+              ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,11 +84,14 @@ class AccountItemTile extends StatelessWidget {
                       child: Row(
                         children: [
                           if (hasShop)
-                            Text(
-                              item.shop!,
-                              style: TextStyle(
-                                color: colorScheme.primary,
-                                fontWeight: FontWeight.w500,
+                            Flexible(
+                              child: Text(
+                                item.shop!,
+                                style: TextStyle(
+                                  color: colorScheme.primary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             )
                           else
@@ -85,11 +114,14 @@ class AccountItemTile extends StatelessWidget {
                           ),
                           SizedBox(width: 8),
                           if (hasFund)
-                            Text(
-                              item.fundName ?? '',
-                              style: TextStyle(
-                                color: colorScheme.primary,
-                                fontWeight: FontWeight.w500,
+                            Flexible(
+                              child: Text(
+                                item.fundName ?? '',
+                                style: TextStyle(
+                                  color: colorScheme.primary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             )
                           else

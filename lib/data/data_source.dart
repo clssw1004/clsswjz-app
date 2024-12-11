@@ -1,5 +1,6 @@
 import '../models/models.dart';
 import '../models/server_status.dart';
+import '../services/api_service.dart';
 import 'http/http_method.dart';
 
 class ServerMemory {
@@ -99,4 +100,10 @@ abstract class DataSource {
 
   // 添加基础 URL 设置方法
   Future<void> setBaseUrl(String url);
+
+  /// 批量删除账目
+  ///
+  /// [itemIds] 要删除的账目ID列表
+  /// 返回 BatchDeleteResult，包含成功删除的记录数和错误信息
+  Future<BatchDeleteResult> batchDeleteAccountItems(List<String> itemIds);
 }

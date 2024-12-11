@@ -256,7 +256,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filter => 'Filter';
 
   @override
-  String get noAccountItems => 'No account records';
+  String get noAccountItems => 'No transactions yet';
 
   @override
   String get newRecord => 'New Record';
@@ -268,7 +268,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yesterday => 'Yesterday';
 
   @override
-  String monthDayFormat(Object day, Object month) {
+  String monthDayFormat(String month, String day) {
     return '$month/$day';
   }
 
@@ -874,4 +874,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get more => 'More';
+
+  @override
+  String get confirmDeleteMessage => 'Are you sure you want to delete this record?';
+
+  @override
+  String get deleteSuccess => 'Delete successful';
+
+  @override
+  String get pleaseSelectItems => 'Please select at least one item';
+
+  @override
+  String confirmBatchDeleteMessage(int count) {
+    return 'Are you sure you want to delete $count items?';
+  }
+
+  @override
+  String batchDeleteSuccess(int count) {
+    return 'Successfully deleted $count items';
+  }
 }

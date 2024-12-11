@@ -1,4 +1,5 @@
 import '../../models/server_status.dart';
+import '../../services/api_service.dart';
 import '../../services/storage_service.dart';
 import 'http_method.dart';
 import 'package:dio/dio.dart';
@@ -98,10 +99,10 @@ class HttpDataSource implements DataSource {
     List<String>? shopCodes,
   }) async {
     try {
-      final formattedStartDate = startDate != null 
+      final formattedStartDate = startDate != null
           ? DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(startDate)
           : null;
-      final formattedEndDate = endDate != null 
+      final formattedEndDate = endDate != null
           ? DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(endDate)
           : null;
 
@@ -483,6 +484,21 @@ class HttpDataSource implements DataSource {
   Future<void> setBaseUrl(String url) async {
     await StorageService.setString(StorageKeys.serverUrl, url);
     _httpClient.setBaseUrl(url);
+  }
+
+  @override
+  Future<BatchDeleteResult> batchDeleteAccountItems(
+      List<String> itemIds) async {
+    try {
+      final response = await _httpClient.request<Map<String, dynamic>>(
+        path: '${ApiEndpoints.accountItems}/batch/delete',
+        method: HttpMethod.post,
+        data: itemIds,
+      );
+      return BatchDeleteResult.fromJson(response);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
   }
 
   // 继续实现其他方法...

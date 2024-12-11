@@ -174,5 +174,38 @@
       }
     }
   },
-  "more": "更多"
+  "more": "更多",
+  "confirmDeleteMessage": "確定要刪除這條記錄嗎？",
+  "deleteSuccess": "刪除成功",
+  "today": "今天",
+  "yesterday": "昨天",
+  "monthDayFormat": "{month}月{day}日",
+  "@monthDayFormat": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "noAccountItems": "暫無交易記錄",
+  "pleaseSelectItems": "請至少選擇一條記錄",
+  "confirmBatchDeleteMessage": "確定要刪除選中的 {count} 條記錄嗎？",
+  "batchDeleteSuccess": "成功刪除 {count} 條記錄",
+  "@confirmBatchDeleteMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@batchDeleteSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
