@@ -1,4 +1,4 @@
-package com.example.clsswjz_app
+package com.clssw.jzapp
 
 import io.flutter.embedding.android.FlutterActivity
 
