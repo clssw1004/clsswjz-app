@@ -96,4 +96,4 @@ class ChartTypeSelector extends StatelessWidget {
       },
     );
   }
-} 
+}

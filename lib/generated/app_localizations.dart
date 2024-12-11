@@ -1503,19 +1503,19 @@ abstract class AppLocalizations {
   /// No description provided for @statisticsWeek.
   ///
   /// In en, this message translates to:
-  /// **'This Week'**
+  /// **'Week'**
   String get statisticsWeek;
 
   /// No description provided for @statisticsMonth.
   ///
   /// In en, this message translates to:
-  /// **'This Month'**
+  /// **'Month'**
   String get statisticsMonth;
 
   /// No description provided for @statisticsYear.
   ///
   /// In en, this message translates to:
-  /// **'This Year'**
+  /// **'Year'**
   String get statisticsYear;
 
   /// No description provided for @statisticsCustom.

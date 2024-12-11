@@ -371,7 +371,7 @@ class HttpDataSource implements DataSource {
     String? nickname,
   }) async {
     await _httpClient.request<void>(
-      path: '${ApiEndpoints.auth}/register',
+      path: '${ApiEndpoints.users}/register',
       method: HttpMethod.post,
       data: {
         'username': username,

@@ -739,13 +739,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statisticsTimeRange => 'Time Range';
 
   @override
-  String get statisticsWeek => 'This Week';
+  String get statisticsWeek => 'Week';
 
   @override
-  String get statisticsMonth => 'This Month';
+  String get statisticsMonth => 'Month';
 
   @override
-  String get statisticsYear => 'This Year';
+  String get statisticsYear => 'Year';
 
   @override
   String get statisticsCustom => 'Custom';

@@ -30,18 +30,22 @@ class TimeRangeSelector extends StatelessWidget {
                     ButtonSegment<TimeRange>(
                       value: TimeRange.week,
                       label: Text(l10n.statisticsWeek),
+                      icon: const SizedBox.shrink(),
                     ),
                     ButtonSegment<TimeRange>(
                       value: TimeRange.month,
                       label: Text(l10n.statisticsMonth),
+                      icon: const SizedBox.shrink(),
                     ),
                     ButtonSegment<TimeRange>(
                       value: TimeRange.year,
                       label: Text(l10n.statisticsYear),
+                      icon: const SizedBox.shrink(),
                     ),
                     ButtonSegment<TimeRange>(
                       value: TimeRange.custom,
                       label: Text(l10n.statisticsCustom),
+                      icon: const SizedBox.shrink(),
                     ),
                   ],
                   selected: {provider.timeRange},
@@ -54,6 +58,11 @@ class TimeRangeSelector extends StatelessWidget {
                       provider.setTimeRange(range);
                     }
                   },
+                  style: ButtonStyle(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  showSelectedIcon: false,
                 );
               },
             ),
@@ -68,12 +77,12 @@ class TimeRangeSelector extends StatelessWidget {
     StatisticsProvider provider,
   ) async {
     final now = DateTime.now();
-    final lastDate = DateTime(now.year, now.month, now.day);  // 设置为今天的开始时间
-    
+    final lastDate = DateTime(now.year, now.month, now.day); // 设置为今天的开始时间
+
     // 确保初始日期范围不超过今天
     final initialStart = provider.startDate ?? now;
     final initialEnd = provider.endDate ?? now;
-    
+
     final initialDateRange = DateTimeRange(
       start: initialStart.isAfter(lastDate) ? lastDate : initialStart,
       end: initialEnd.isAfter(lastDate) ? lastDate : initialEnd,
@@ -82,7 +91,7 @@ class TimeRangeSelector extends StatelessWidget {
     final picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2000),
-      lastDate: lastDate,  // 使用今天作为最后日期
+      lastDate: lastDate, // 使用今天作为最后日期
       initialDateRange: initialDateRange,
       builder: (context, child) {
         return Theme(
@@ -110,9 +119,9 @@ class TimeRangeSelector extends StatelessWidget {
         picked.end.year,
         picked.end.month,
         picked.end.day,
-        23, 59, 59,  // 设置为当天的最后一秒
+        23, 59, 59, // 设置为当天的最后一秒
       );
-      
+
       provider.setCustomRange(start, end);
     }
   }

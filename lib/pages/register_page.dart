@@ -154,15 +154,6 @@ class RegisterPageState extends State<RegisterPage> {
                           BorderRadius.circular(AppDimens.inputRadius),
                     ),
                   ),
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
-                        return '请输入有效的邮箱地址';
-                      }
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: AppDimens.spacing16),
                 TextFormField(
@@ -175,14 +166,6 @@ class RegisterPageState extends State<RegisterPage> {
                           BorderRadius.circular(AppDimens.inputRadius),
                     ),
                   ),
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      if (!RegExp(r'^\d{11}$').hasMatch(value)) {
-                        return '请输入有效的手机号';
-                      }
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: AppDimens.spacing24),
                 Padding(
