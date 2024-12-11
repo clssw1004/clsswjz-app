@@ -59,11 +59,24 @@ jobs:
       - name: Build ${{ matrix.platform }}
         run: ${{ matrix.build-command }}
 
+      - name: Create ZIP (Windows)
+        if: matrix.platform == 'windows'
+        run: |
+          cd build/windows/x64/runner/Release
+          7z a ../../../../windows-release.zip *
+
+      - name: Create ZIP (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          cd build/linux/x64/release/bundle
+          zip -r ../../../../linux-release.zip *
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
-          path: ${{ matrix.artifact-path }}
+          path: |
+            ${{ matrix.platform == 'android' && matrix.artifact-path || format('{0}-release.zip', matrix.platform) }}
 
   release:
     needs: build
@@ -80,8 +93,8 @@ jobs:
         with:
           files: |
             artifacts/android-release.apk/app-release.apk
-            artifacts/windows-release/**
-            artifacts/linux-release/**
+            artifacts/windows-release/windows-release.zip
+            artifacts/linux-release/linux-release.zip
           draft: false
           prerelease: false
           name: Release ${{ github.ref_name }}
