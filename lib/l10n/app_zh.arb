@@ -104,7 +104,7 @@
   "clearFilter": "清空筛选",
   "type": "类型",
   "expense": "支出",
-  "income": "收入",
+  "income": "���入",
   "category": "分类",
   "selectedCount": "已选 {count} 项",
   "amount": "金额",
@@ -132,7 +132,7 @@
   "editFundTitle": "编辑账户",
   "newFundTitle": "新建账户",
   "linkedBooks": "关联账本",
-  "lastUpdated": "最��更新：{time}",
+  "lastUpdated": "最新更新：{time}",
   "unknown": "未知",
   "basicInfo": "基本信息",
   "accountName": "账户名称",
@@ -167,7 +167,7 @@
   "inviteCodeHint": "请输入邀请码",
   "add": "添加",
   "memberAlreadyExists": "该用户已经是成员",
-  "addMemberSuccess": "成员��加成功",
+  "addMemberSuccess": "成员添加成功",
   "addMemberFailed": "添加成员失败：{error}",
   "permViewBook": "查看账本",
   "permEditBook": "编辑账本",
@@ -199,7 +199,7 @@
   "pleaseInputAmount": "请输入金额",
   "pleaseSelectCategory": "请选择分类",
   "pleaseSelectAccount": "请选择账户",
-  "pleaseSelectBook": "请选择��本",
+  "pleaseSelectBook": "请选择账本",
   "saveRecord": "保存",
   "saveRecordSuccess": "保存成功",
   "amountLabel": "金额",
@@ -301,5 +301,10 @@
         "type": "int"
       }
     }
-  }
+  },
+  "checkingServerStatus": "正在检测服务器状态...",
+  "serverCheckFailed": "服务器检测失败",
+  "serverCheckFailedMessage": "无法连接到服务器，请检查网络连接后重试。",
+  "backToLogin": "返回登录",
+  "retry": "重试"
 }

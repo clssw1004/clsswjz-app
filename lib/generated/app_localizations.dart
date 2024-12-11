@@ -1769,6 +1769,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Successfully deleted {count} items'**
   String batchDeleteSuccess(int count);
+
+  /// No description provided for @checkingServerStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking server status...'**
+  String get checkingServerStatus;
+
+  /// No description provided for @serverCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Check Failed'**
+  String get serverCheckFailed;
+
+  /// No description provided for @serverCheckFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to connect to server. Please check your network connection and try again.'**
+  String get serverCheckFailedMessage;
+
+  /// No description provided for @backToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Login'**
+  String get backToLogin;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

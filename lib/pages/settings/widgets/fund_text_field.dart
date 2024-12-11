@@ -50,7 +50,7 @@ class FundTextField extends StatelessWidget {
             filled: true,
             fillColor: theme.brightness == Brightness.light
                 ? AppColors.white
-                : colorScheme.surfaceVariant,
+                : colorScheme.surfaceContainerHighest,
             border: UnderlineInputBorder(
               borderSide: BorderSide(
                 color: colorScheme.outline.withOpacity(0.5),

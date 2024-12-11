@@ -893,4 +893,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String batchDeleteSuccess(int count) {
     return 'Successfully deleted $count items';
   }
+
+  @override
+  String get checkingServerStatus => 'Checking server status...';
+
+  @override
+  String get serverCheckFailed => 'Server Check Failed';
+
+  @override
+  String get serverCheckFailedMessage => 'Failed to connect to server. Please check your network connection and try again.';
+
+  @override
+  String get backToLogin => 'Back to Login';
+
+  @override
+  String get retry => 'Retry';
 }

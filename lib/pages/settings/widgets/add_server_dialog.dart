@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../models/server_config.dart';
 import '../../../providers/server_config_provider.dart';
 import '../../../l10n/l10n.dart';
+import '../../../constants/server_constants.dart';
 
 class AddServerDialog extends StatefulWidget {
   final ServerConfig? initialValue;
@@ -107,8 +108,9 @@ class _AddServerDialogState extends State<AddServerDialog> {
                   prefixIcon: const Icon(Icons.storage_outlined),
                 ),
                 items: ServerType.values.map((type) {
-                  final isEnabled = !_isCloudOrLocalExists ||
-                      widget.initialValue?.type == type;
+                  final isEnabled = (type != ServerType.localStorage) &&
+                      (!_isCloudOrLocalExists ||
+                          widget.initialValue?.type == type);
                   return DropdownMenuItem(
                     value: type,
                     enabled: isEnabled,
@@ -173,7 +175,9 @@ class _AddServerDialogState extends State<AddServerDialog> {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: _nameController.text,
       type: _type,
-      serverUrl: _type == ServerType.selfHosted ? _urlController.text : null,
+      serverUrl: _type == ServerType.clsswjzCloud
+          ? ServerConstants.clsswjzCloudUrl
+          : _urlController.text,
     );
 
     context.read<ServerConfigProvider>().addConfig(config);

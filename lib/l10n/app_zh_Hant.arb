@@ -207,5 +207,10 @@
         "type": "int"
       }
     }
-  }
+  },
+  "checkingServerStatus": "正在檢測伺服器狀態...",
+  "serverCheckFailed": "伺服器檢測失敗",
+  "serverCheckFailedMessage": "無法連接到伺服器，請檢查網絡連接後重試。",
+  "backToLogin": "返回登錄",
+  "retry": "重試"
 }

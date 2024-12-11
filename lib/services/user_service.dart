@@ -11,8 +11,6 @@ class UserService {
   static Future<void> init() async {
     if (_initialized) return;
     _initialized = true;
-
-    await initializeSession();
     _currentAccountBookId = StorageService.getString(StorageKeys.currentBookId);
   }
 

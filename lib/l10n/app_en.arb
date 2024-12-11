@@ -323,5 +323,10 @@
         "type": "int"
       }
     }
-  }
+  },
+  "checkingServerStatus": "Checking server status...",
+  "serverCheckFailed": "Server Check Failed",
+  "serverCheckFailedMessage": "Failed to connect to server. Please check your network connection and try again.",
+  "backToLogin": "Back to Login",
+  "retry": "Retry"
 }

@@ -38,7 +38,7 @@ class FundTypeSelector extends StatelessWidget {
             filled: true,
             fillColor: theme.brightness == Brightness.light
                 ? AppColors.white
-                : colorScheme.surfaceVariant,
+                : colorScheme.surfaceContainerHighest,
             border: UnderlineInputBorder(),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(

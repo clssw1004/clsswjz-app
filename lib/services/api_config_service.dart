@@ -17,7 +17,7 @@ class ApiConfigService {
         }
         break;
       case ServerType.clsswjzCloud:
-        ApiService.setBaseUrl('https://api.clsswjz.com');
+        ApiService.setBaseUrl(config.serverUrl!);
         break;
       case ServerType.localStorage:
         // 本地存储模式不需要设置baseUrl

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'data/data_source_factory.dart';
+import 'l10n/app_localizations.dart';
 import "pages/login_page.dart";
 import 'pages/home_page.dart';
 import 'pages/register_page.dart';
@@ -26,6 +28,135 @@ import 'pages/settings/widgets/server_url_dialog.dart';
 import 'services/api_config_manager.dart';
 import 'pages/account_item/providers/account_item_provider.dart';
 
+class ServerCheckScreen extends StatefulWidget {
+  final ThemeProvider themeProvider;
+
+  const ServerCheckScreen({
+    Key? key,
+    required this.themeProvider,
+  }) : super(key: key);
+
+  @override
+  State<ServerCheckScreen> createState() => _ServerCheckScreenState();
+}
+
+class _ServerCheckScreenState extends State<ServerCheckScreen> {
+  late Future<bool> _checkFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFuture = _checkServerAndSession();
+  }
+
+  Future<bool> _checkServerAndSession() async {
+    try {
+      // 设置较短的超时时间
+      await Future.any([
+        ApiService.checkServerStatus(),
+        Future.delayed(const Duration(seconds: 3), () {
+          throw TimeoutException('Server check timeout');
+        }),
+      ]);
+
+      // 服务器正常后，再初始化会话
+      await UserService.initializeSession();
+
+      // 最后检查会话是否有效
+      return await UserService.hasValidSession();
+    } catch (e) {
+      print('Server status check failed: $e');
+      return false;
+    }
+  }
+
+  Future<void> _handleCheckFailure() async {
+    final shouldRetry = await _showServerCheckFailedDialog();
+    if (shouldRetry) {
+      setState(() {
+        _checkFuture = _checkServerAndSession();
+      });
+    } else {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => LoginPage()),
+        );
+      }
+    }
+  }
+
+  Future<bool> _showServerCheckFailedDialog() async {
+    final l10n = L10n.of(context);
+    final theme = Theme.of(context);
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.serverCheckFailed),
+        content: Text(l10n.serverCheckFailedMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.backToLogin),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.retry),
+          ),
+        ],
+      ),
+    );
+
+    return result ?? false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _checkFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingScreen(context);
+        }
+
+        if (snapshot.data != true) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _handleCheckFailure();
+          });
+          return _buildLoadingScreen(context);
+        }
+
+        return HomePage();
+      },
+    );
+  }
+
+  Widget _buildLoadingScreen(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              color: widget.themeProvider.themeColor,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              L10n.of(context).checkingServerStatus,
+              style: TextStyle(
+                color: widget.themeProvider.themeColor,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -41,10 +172,9 @@ Future<void> main() async {
   // 初始化 API 配置
   await ApiConfigManager.initialize();
 
-  // 初始化其他服务
+  // 初始化认证服务（但不检查会话）
   AuthService.init(dataSource);
   await UserService.init();
-  await UserService.initializeSession();
 
   final prefs = await SharedPreferences.getInstance();
   final serverConfigService = ServerConfigService(prefs);
@@ -93,28 +223,9 @@ Future<void> main() async {
             themeMode: themeProvider.themeMode,
             title: '记账本',
             home: Builder(
-              builder: (context) {
-                return FutureBuilder<bool>(
-                  future: UserService.hasValidSession(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Scaffold(
-                        body: Center(
-                          child: CircularProgressIndicator(
-                            color: themeProvider.themeColor,
-                          ),
-                        ),
-                      );
-                    }
-
-                    if (snapshot.data == true) {
-                      return HomePage();
-                    }
-
-                    return LoginPage();
-                  },
-                );
-              },
+              builder: (context) => ServerCheckScreen(
+                themeProvider: themeProvider,
+              ),
             ),
             routes: {
               '/register': (context) => RegisterPage(),

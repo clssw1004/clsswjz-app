@@ -285,7 +285,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get expense => '支出';
 
   @override
-  String get income => '收入';
+  String get income => '���入';
 
   @override
   String get category => '分类';
@@ -382,7 +382,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String lastUpdated(Object time) {
-    return '最��更新：$time';
+    return '最新更新：$time';
   }
 
   @override
@@ -494,7 +494,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get memberAlreadyExists => '该用户已经是成员';
 
   @override
-  String get addMemberSuccess => '成员��加成功';
+  String get addMemberSuccess => '成员添加成功';
 
   @override
   String addMemberFailed(Object error) {
@@ -603,7 +603,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseSelectAccount => '请选择账户';
 
   @override
-  String get pleaseSelectBook => '请选择��本';
+  String get pleaseSelectBook => '请选择账本';
 
   @override
   String get saveRecord => '保存';
@@ -893,6 +893,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String batchDeleteSuccess(int count) {
     return '成功删除 $count 条记录';
   }
+
+  @override
+  String get checkingServerStatus => '正在检测服务器状态...';
+
+  @override
+  String get serverCheckFailed => '服务器检测失败';
+
+  @override
+  String get serverCheckFailedMessage => '无法连接到服务器，请检查网络连接后重试。';
+
+  @override
+  String get backToLogin => '返回登录';
+
+  @override
+  String get retry => '重试';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1332,4 +1347,19 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String batchDeleteSuccess(int count) {
     return '成功刪除 $count 條記錄';
   }
+
+  @override
+  String get checkingServerStatus => '正在檢測伺服器狀態...';
+
+  @override
+  String get serverCheckFailed => '伺服器檢測失敗';
+
+  @override
+  String get serverCheckFailedMessage => '無法連接到伺服器，請檢查網絡連接後重試。';
+
+  @override
+  String get backToLogin => '返回登錄';
+
+  @override
+  String get retry => '重試';
 }
