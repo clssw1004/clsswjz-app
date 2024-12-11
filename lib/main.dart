@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'constants/storage_keys.dart';
 import 'data/data_source_factory.dart';
 import 'l10n/app_localizations.dart';
 import "pages/login_page.dart";
@@ -46,10 +47,22 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
   @override
   void initState() {
     super.initState();
-    _checkFuture = _checkServerAndSession();
+    _checkFuture = _checkInitialState();
   }
 
-  Future<bool> _checkServerAndSession() async {
+  // 检查初始状态
+  Future<bool> _checkInitialState() async {
+    // 检查是否有服务器配置
+    final serverUrl = StorageService.getString(StorageKeys.serverUrl);
+    if (serverUrl == null || serverUrl.isEmpty) {
+      return false;
+    }
+
+    return _checkServerStatus();
+  }
+
+  // 只检查服务器状态
+  Future<bool> _checkServerStatus() async {
     try {
       // 设置较短的超时时间
       await Future.any([
@@ -58,12 +71,7 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
           throw TimeoutException('Server check timeout');
         }),
       ]);
-
-      // 服务器正常后，再初始化会话
-      await UserService.initializeSession();
-
-      // 最后检查会话是否有效
-      return await UserService.hasValidSession();
+      return true;
     } catch (e) {
       print('Server status check failed: $e');
       return false;
@@ -74,7 +82,7 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
     final shouldRetry = await _showServerCheckFailedDialog();
     if (shouldRetry) {
       setState(() {
-        _checkFuture = _checkServerAndSession();
+        _checkFuture = _checkServerStatus();
       });
     } else {
       if (mounted) {
@@ -121,14 +129,37 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
           return _buildLoadingScreen(context);
         }
 
+        // 如果没有服务器配置或服务器检查失败
         if (snapshot.data != true) {
+          // 如果没有服务器配置，直接跳转登录页
+          if (StorageService.getString(StorageKeys.serverUrl).isEmpty) {
+            return LoginPage();
+          }
+
+          // 否则显示服务器检查失败对话框
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _handleCheckFailure();
           });
           return _buildLoadingScreen(context);
         }
 
-        return HomePage();
+        // 服务器正常，检查会话状态
+        return FutureBuilder<bool>(
+          future: UserService.hasValidSession(),
+          builder: (context, sessionSnapshot) {
+            if (sessionSnapshot.connectionState == ConnectionState.waiting) {
+              return _buildLoadingScreen(context);
+            }
+
+            // 如果会话无效，直接跳转到登录页
+            if (sessionSnapshot.data != true) {
+              return LoginPage();
+            }
+
+            // 服务器正常且会话有效，进入主页
+            return HomePage();
+          },
+        );
       },
     );
   }
@@ -139,16 +170,35 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
-              color: widget.themeProvider.themeColor,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              L10n.of(context).checkingServerStatus,
-              style: TextStyle(
-                color: widget.themeProvider.themeColor,
-                fontSize: 16,
+            // Logo
+            Padding(
+              padding: const EdgeInsets.only(bottom: 48),
+              child: Column(
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 120,
+                    height: 120,
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
+            ),
+            // 加载指示器和状态文本
+            Column(
+              children: [
+                CircularProgressIndicator(
+                  color: widget.themeProvider.themeColor,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  L10n.of(context).checkingServerStatus,
+                  style: TextStyle(
+                    color: widget.themeProvider.themeColor,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

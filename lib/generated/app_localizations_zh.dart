@@ -849,7 +849,7 @@ class AppLocalizationsZh extends AppLocalizations {
       type,
       {
         'selfHosted': '自托管服务器',
-        'clsswjzCloud': 'Clsswjz云',
+        'clsswjzCloud': 'Clssw云',
         'localStorage': '本地存储',
         'other': '未知',
       },
@@ -1303,7 +1303,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
       type,
       {
         'selfHosted': '自托管服務器',
-        'clsswjzCloud': 'Clsswjz雲',
+        'clsswjzCloud': 'Clssw雲',
         'localStorage': '本地存儲',
         'other': '未知',
       },

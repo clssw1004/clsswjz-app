@@ -1,3 +1,4 @@
+import '../constants/server_constants.dart';
 import '../models/server_config.dart';
 import 'api_service.dart';
 
@@ -17,7 +18,7 @@ class ApiConfigService {
         }
         break;
       case ServerType.clsswjzCloud:
-        ApiService.setBaseUrl(config.serverUrl!);
+        ApiService.setBaseUrl(ServerConstants.clsswjzCloudUrl);
         break;
       case ServerType.localStorage:
         // 本地存储模式不需要设置baseUrl

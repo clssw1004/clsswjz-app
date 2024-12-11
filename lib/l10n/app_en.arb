@@ -291,7 +291,7 @@
   "serverNameRequired": "Server name is required",
   "serverType": "Server Type",
   "serverUrlRequired": "Server URL is required",
-  "serverTypeLabel": "{type, select, selfHosted{Self-hosted} clsswjzCloud{Clsswjz Cloud} localStorage{Local Storage} other{Unknown}}",
+  "serverTypeLabel": "{type, select, selfHosted{Self-hosted} clsswjzCloud{Clssw Cloud} localStorage{Local Storage} other{Unknown}}",
   "@serverTypeLabel": {
     "placeholders": {
       "type": {

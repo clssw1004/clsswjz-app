@@ -849,7 +849,7 @@ class AppLocalizationsEn extends AppLocalizations {
       type,
       {
         'selfHosted': 'Self-hosted',
-        'clsswjzCloud': 'Clsswjz Cloud',
+        'clsswjzCloud': 'Clssw Cloud',
         'localStorage': 'Local Storage',
         'other': 'Unknown',
       },

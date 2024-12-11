@@ -1701,7 +1701,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverTypeLabel.
   ///
   /// In en, this message translates to:
-  /// **'{type, select, selfHosted{Self-hosted} clsswjzCloud{Clsswjz Cloud} localStorage{Local Storage} other{Unknown}}'**
+  /// **'{type, select, selfHosted{Self-hosted} clsswjzCloud{Clssw Cloud} localStorage{Local Storage} other{Unknown}}'**
   String serverTypeLabel(String type);
 
   /// No description provided for @pin.

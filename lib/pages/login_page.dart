@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                   value: config.id,
                   child: Text(
                     config.name,
-                    style: theme.textTheme.bodyMedium,
+                    style: theme.textTheme.titleMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

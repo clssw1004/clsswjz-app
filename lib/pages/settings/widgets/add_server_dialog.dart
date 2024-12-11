@@ -83,23 +83,6 @@ class _AddServerDialogState extends State<AddServerDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 服务器名称
-              TextFormField(
-                controller: _nameController,
-                decoration: inputDecoration.copyWith(
-                  labelText: l10n.serverName,
-                  hintText: l10n.serverNameHint,
-                  prefixIcon: const Icon(Icons.dns_outlined),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return l10n.serverNameRequired;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
               // 服务器类型
               DropdownButtonFormField<ServerType>(
                 value: _type,
@@ -130,9 +113,24 @@ class _AddServerDialogState extends State<AddServerDialog> {
                   }
                 },
               ),
-
+              const SizedBox(height: 16),
               // 服务器地址（仅自托管服务器显示）
               if (_type == ServerType.selfHosted) ...[
+                // 服务器名称
+                TextFormField(
+                  controller: _nameController,
+                  decoration: inputDecoration.copyWith(
+                    labelText: l10n.serverName,
+                    hintText: l10n.serverNameHint,
+                    prefixIcon: const Icon(Icons.dns_outlined),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.serverNameRequired;
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _urlController,
@@ -173,11 +171,11 @@ class _AddServerDialogState extends State<AddServerDialog> {
 
     final config = ServerConfig(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: _nameController.text,
+      name: _type == ServerType.selfHosted
+          ? _nameController.text
+          : _type.getLabel(context),
       type: _type,
-      serverUrl: _type == ServerType.clsswjzCloud
-          ? ServerConstants.clsswjzCloudUrl
-          : _urlController.text,
+      serverUrl: _type == ServerType.selfHosted ? _urlController.text : null,
     );
 
     context.read<ServerConfigProvider>().addConfig(config);

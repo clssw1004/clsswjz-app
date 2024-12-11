@@ -44,7 +44,7 @@
   "serverNameRequired": "請輸入服務器名稱",
   "serverType": "服務器類型",
   "serverUrlRequired": "請輸入服務器地址",
-  "serverTypeLabel": "{type, select, selfHosted{自托管服務器} clsswjzCloud{Clsswjz雲} localStorage{本地存儲} other{未知}}",
+  "serverTypeLabel": "{type, select, selfHosted{自托管服務器} clsswjzCloud{Clssw雲} localStorage{本地存儲} other{未知}}",
   "@serverTypeLabel": {
     "placeholders": {
       "type": {
