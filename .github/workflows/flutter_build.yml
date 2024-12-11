@@ -3,7 +3,7 @@ name: Build and Release Flutter App
 on:
   push:
     tags:
-      - "v*" # 每次推送以 v 开头的 tag 时触发
+      - "v*"
 
 jobs:
   build:
@@ -63,20 +63,20 @@ jobs:
         if: matrix.platform == 'windows'
         run: |
           cd build/windows/x64/runner/Release
-          7z a ../../../../windows-release.zip *
+          7z a ../../../../../windows-release.zip *
 
       - name: Create ZIP (Linux)
         if: matrix.platform == 'linux'
         run: |
           cd build/linux/x64/release/bundle
-          zip -r ../../../../linux-release.zip *
+          zip -r ../../../../../linux-release.zip *
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
           path: |
-            ${{ matrix.platform == 'android' && matrix.artifact-path || format('{0}-release.zip', matrix.platform) }}
+            ${{ matrix.platform == 'android' && 'build/app/outputs/flutter-apk/app-release.apk' || format('{0}-release.zip', matrix.platform) }}
 
   release:
     needs: build
@@ -86,6 +86,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: artifacts
+
+      - name: List artifacts
+        run: ls -R artifacts/
 
       - name: Create Release
         id: create_release
