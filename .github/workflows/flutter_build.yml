@@ -16,17 +16,20 @@ jobs:
             os: windows-latest
             build-command: flutter build windows --release
             artifact-path: build/windows/x64/runner/Release
-            artifact-name: windows-release
+            artifact-name: clsswjz-windows-x64
+            ext: .zip
           - platform: linux
             os: ubuntu-latest
             build-command: flutter build linux --release
             artifact-path: build/linux/x64/release/bundle
-            artifact-name: linux-release
+            artifact-name: clsswjz-linux-x64
+            ext: .zip
           - platform: android
             os: ubuntu-latest
             build-command: flutter build apk --release --no-tree-shake-icons
             artifact-path: build/app/outputs/flutter-apk/app-release.apk
-            artifact-name: android-release.apk
+            artifact-name: clsswjz-android-arm64
+            ext: .apk
     
     runs-on: ${{ matrix.os }}
     
@@ -63,20 +66,24 @@ jobs:
         if: matrix.platform == 'windows'
         run: |
           cd build/windows/x64/runner/Release
-          7z a ../../../../../windows-release.zip *
+          7z a ../../../../../${{ matrix.artifact-name }}${{ matrix.ext }} *
 
       - name: Create ZIP (Linux)
         if: matrix.platform == 'linux'
         run: |
           cd build/linux/x64/release/bundle
-          zip -r ../../../../../linux-release.zip *
+          zip -r ../../../../../${{ matrix.artifact-name }}${{ matrix.ext }} *
+
+      - name: Rename Android APK
+        if: matrix.platform == 'android'
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk ${{ matrix.artifact-name }}${{ matrix.ext }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
-          path: |
-            ${{ matrix.platform == 'android' && 'build/app/outputs/flutter-apk/app-release.apk' || format('{0}-release.zip', matrix.platform) }}
+          path: ${{ matrix.artifact-name }}${{ matrix.ext }}
 
   release:
     needs: build
@@ -95,9 +102,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/android-release.apk/app-release.apk
-            artifacts/windows-release/windows-release.zip
-            artifacts/linux-release/linux-release.zip
+            artifacts/clsswjz-android-arm64/clsswjz-android-arm64.apk
+            artifacts/clsswjz-windows-x64/clsswjz-windows-x64.zip
+            artifacts/clsswjz-linux-x64/clsswjz-linux-x64.zip
           draft: false
           prerelease: false
           name: Release ${{ github.ref_name }}
@@ -105,8 +112,8 @@ jobs:
             Release ${{ github.ref_name }}
             
             Automated release for:
-            - Windows (x64)
-            - Linux (x64)
-            - Android (APK)
+            - Windows (x64): clsswjz-windows-x64.zip
+            - Linux (x64): clsswjz-linux-x64.zip
+            - Android (arm64): clsswjz-android-arm64.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
