@@ -221,14 +221,24 @@ class CategoryGridSelector extends StatelessWidget {
   }
 
   List<Category> _getDisplayCategories(List<Category> allCategories) {
-    if (selectedCategory == null) {
+    if (selectedCategory == null || allCategories.isEmpty) {
       return allCategories.take(_maxDisplayCount - 1).toList();
     }
 
     // 如果选中的分类不在前8个中，则替换最后一个
     final selectedCategoryObj = allCategories.firstWhere(
       (c) => c.name == selectedCategory,
-      orElse: () => allCategories.first,
+      orElse: () {
+        // 如果找不到选中的分类，创建一个新的分类对象
+        return Category(
+          id: '',
+          name: selectedCategory!,
+          accountBookId: '',
+          categoryType: '',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+      },
     );
 
     final displayCategories = allCategories.take(_maxDisplayCount - 1).toList();

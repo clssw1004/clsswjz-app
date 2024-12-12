@@ -426,10 +426,11 @@ class HttpDataSource implements DataSource {
 
   // 错误处理
   Exception _handleDioError(DioException e) {
+    final path = e.requestOptions.path;
     if (e.response?.data != null && e.response?.data is Map) {
-      return Exception(e.response?.data['message'] ?? e.message);
+      return Exception('$path: ${e.response?.data['message'] ?? e.message}');
     }
-    return Exception(e.message);
+    return Exception('$path: ${e.message}');
   }
 
   @override

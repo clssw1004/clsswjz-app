@@ -109,7 +109,7 @@ class AccountItem {
         id: json['id'],
         accountBookId: json['accountBookId'],
         type: json['type'],
-        amount: json['amount'].toDouble(),
+        amount: (json['amount'] as num).toDouble(),
         category: json['category'],
         description: json['description'],
         shop: json['shop'],
