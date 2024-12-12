@@ -285,7 +285,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get expense => '支出';
 
   @override
-  String get income => '���入';
+  String get income => '收入';
 
   @override
   String get category => '分类';
@@ -826,7 +826,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rememberLogin => '记住登录信息';
 
   @override
-  String get selectServer => '选择服服务器';
+  String get selectServer => '选择服务器';
 
   @override
   String get serverName => '服务器名称';

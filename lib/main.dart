@@ -146,7 +146,7 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
         return FutureBuilder<bool>(
           future: StorageService.getString(StorageKeys.token).isEmpty
               ? Future.value(false) // 如果没有 token，直接返回 false
-              : UserService.hasValidSession(), // 有 token 才去验证会话
+              : UserService.initializeSession(), // 有 token 才去验证会话
           builder: (context, sessionSnapshot) {
             if (sessionSnapshot.connectionState == ConnectionState.waiting) {
               return _buildLoadingScreen(context);

@@ -14,11 +14,12 @@ class UserService {
     _currentAccountBookId = StorageService.getString(StorageKeys.currentBookId);
   }
 
-  static Future<void> initializeSession() async {
+  static Future<bool> initializeSession() async {
     final hasSession = await hasValidSession();
     if (hasSession) {
       _userInfo = await ApiService.getUserInfo();
     }
+    return hasSession;
   }
 
   static Future<bool> hasValidSession() async {
@@ -35,7 +36,10 @@ class UserService {
   static Map<String, dynamic>? getUserInfo() => _userInfo;
 
   static Future<void> updateUserInfo(Map<String, dynamic> info) async {
-    _userInfo = info;
+    _userInfo = {
+      ...?_userInfo,
+      ...info,
+    };
   }
 
   static Future<void> logout() async {

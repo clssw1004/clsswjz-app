@@ -47,6 +47,13 @@ class AccountBook {
         'createdAt': createdAt?.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
       };
+
+  Map<String, dynamic> toJsonCreate() => {
+        'name': name,
+        'description': description,
+        'currencySymbol': currencySymbol,
+        'icon': icon,
+      };
   Map<String, dynamic> toJsonRequest() => {
         'id': id,
         'name': name,

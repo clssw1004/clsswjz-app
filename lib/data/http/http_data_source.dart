@@ -54,7 +54,7 @@ class HttpDataSource implements DataSource {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: ApiEndpoints.accountBooks,
         method: HttpMethod.post,
-        data: book.toJson(),
+        data: book.toJsonCreate(),
       );
       return AccountBook.fromJson(response);
     } on DioException catch (e) {
