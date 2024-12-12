@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../generated/app_localizations.dart';
 import '../../models/category.dart';
 import 'providers/category_management_provider.dart';
+import '../../widgets/app_bar_factory.dart';
 
 class CategoryManagementPage extends StatefulWidget {
   final String bookId;
@@ -26,10 +27,12 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.categoryTitle),
+      appBar: AppBarFactory.buildAppBar(
+        context: context,
+        title: AppBarFactory.buildTitle(context, l10n.categoryManagement),
       ),
       body: Column(
         children: [

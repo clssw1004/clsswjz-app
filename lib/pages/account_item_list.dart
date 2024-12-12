@@ -622,8 +622,8 @@ class _AccountItemListState extends State<AccountItemList>
 
     final dateTime = DateTime.parse(date);
     return l10n.monthDayFormat(
-      dateTime.day.toString(),
       dateTime.month.toString(),
+      dateTime.day.toString(),
     );
   }
 

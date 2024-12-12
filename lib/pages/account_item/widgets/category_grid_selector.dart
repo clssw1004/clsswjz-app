@@ -244,15 +244,25 @@ class CategoryGridSelector extends StatelessWidget {
   }
 
   void _showCategoryDialog(BuildContext context) {
-    final provider = Provider.of<AccountItemProvider>(context, listen: false);
+    if (!context.mounted) return;
+
+    final provider = context.read<AccountItemProvider>();
+    final categories = provider.filteredCategories.map((c) => c.name).toList();
+
     showDialog(
       context: context,
-      builder: (context) => CategoryDialog(
-        categories: provider.filteredCategories.map((c) => c.name).toList(),
+      builder: (dialogContext) => CategoryDialog(
+        categories: categories,
         selectedCategory: selectedCategory,
         onSelected: (category) {
-          onChanged(category);
-          Navigator.pop(context);
+          if (context.mounted) {
+            onChanged(category);
+          }
+        },
+        onCategoryAdded: (newCategory) {
+          if (context.mounted) {
+            provider.addCategory(newCategory);
+          }
         },
       ),
     );

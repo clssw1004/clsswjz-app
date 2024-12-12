@@ -9,6 +9,7 @@ class AccountItemProvider extends ChangeNotifier {
   List<Shop> shops = [];
   String _transactionType = 'EXPENSE';
   bool isLoading = false;
+  bool _disposed = false;
 
   String get transactionType => _transactionType;
 
@@ -115,5 +116,35 @@ class AccountItemProvider extends ChangeNotifier {
   void setSelectedFund(Map<String, dynamic>? fund) {
     _selectedFund = fund;
     notifyListeners();
+  }
+
+  void addCategory(String newCategory) {
+    if (_disposed) return;
+    try {
+      final category = Category(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: newCategory,
+        accountBookId: selectedBook?['id'],
+        categoryType: _transactionType,
+      );
+
+      categories.add(category);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('添加分类失败: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) {
+      super.notifyListeners();
+    }
   }
 }
