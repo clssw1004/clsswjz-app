@@ -1799,6 +1799,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get retry;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @projectInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Information'**
+  String get projectInfo;
+
+  /// No description provided for @sourceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Source Code'**
+  String get sourceCode;
+
+  /// No description provided for @latestRelease.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest Release'**
+  String get latestRelease;
+
+  /// No description provided for @downloadLatestVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Download latest version'**
+  String get downloadLatestVersion;
+
+  /// No description provided for @technicalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Information'**
+  String get technicalInfo;
+
+  /// No description provided for @flutterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cross-platform UI framework by Google'**
+  String get flutterDescription;
+
+  /// No description provided for @materialDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Modern design system for Flutter'**
+  String get materialDescription;
+
+  /// No description provided for @providerDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'State management solution for Flutter'**
+  String get providerDescription;
+
+  /// No description provided for @license.
+  ///
+  /// In en, this message translates to:
+  /// **'License'**
+  String get license;
+
+  /// No description provided for @mitLicenseDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Open source under MIT License'**
+  String get mitLicenseDescription;
+
+  /// No description provided for @support.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get support;
+
+  /// No description provided for @technicalSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Support'**
+  String get technicalSupport;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

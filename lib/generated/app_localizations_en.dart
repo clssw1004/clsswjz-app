@@ -908,4 +908,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retry => 'Retry';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get projectInfo => 'Project Information';
+
+  @override
+  String get sourceCode => 'Source Code';
+
+  @override
+  String get latestRelease => 'Latest Release';
+
+  @override
+  String get downloadLatestVersion => 'Download latest version';
+
+  @override
+  String get technicalInfo => 'Technical Information';
+
+  @override
+  String get flutterDescription => 'Cross-platform UI framework by Google';
+
+  @override
+  String get materialDescription => 'Modern design system for Flutter';
+
+  @override
+  String get providerDescription => 'State management solution for Flutter';
+
+  @override
+  String get license => 'License';
+
+  @override
+  String get mitLicenseDescription => 'Open source under MIT License';
+
+  @override
+  String get support => 'Support';
+
+  @override
+  String get technicalSupport => 'Technical Support';
 }

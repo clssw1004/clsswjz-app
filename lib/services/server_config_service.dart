@@ -8,7 +8,7 @@ class ServerConfigService {
   static const String _selectedConfigKey = StorageKeys.selectedServerId;
 
   Future<List<ServerConfig>> getConfigs() async {
-    final String? jsonStr = StorageService.getString(_configsKey);
+    final String jsonStr = StorageService.getString(_configsKey);
     if (jsonStr!.isEmpty) return [];
 
     final List<dynamic> jsonList = json.decode(jsonStr);

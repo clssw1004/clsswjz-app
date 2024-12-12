@@ -826,7 +826,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rememberLogin => '记住登录信息';
 
   @override
-  String get selectServer => '选择服务器';
+  String get selectServer => '选择服服务器';
 
   @override
   String get serverName => '服务器名称';
@@ -908,6 +908,48 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get retry => '重试';
+
+  @override
+  String get about => '关于';
+
+  @override
+  String get version => '版本';
+
+  @override
+  String get projectInfo => '项目信息';
+
+  @override
+  String get sourceCode => '源代码';
+
+  @override
+  String get latestRelease => '最新版本';
+
+  @override
+  String get downloadLatestVersion => '下载最新版本';
+
+  @override
+  String get technicalInfo => '技术信息';
+
+  @override
+  String get flutterDescription => 'Google 开源的跨平台 UI 框架';
+
+  @override
+  String get materialDescription => 'Flutter 的现代设计系统';
+
+  @override
+  String get providerDescription => 'Flutter 的状态管理解决方案';
+
+  @override
+  String get license => '开源协议';
+
+  @override
+  String get mitLicenseDescription => '基于 MIT 协议开源';
+
+  @override
+  String get support => '支持';
+
+  @override
+  String get technicalSupport => '技术支持';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1362,4 +1404,46 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get retry => '重試';
+
+  @override
+  String get about => '關於';
+
+  @override
+  String get version => '版本';
+
+  @override
+  String get projectInfo => '項目信息';
+
+  @override
+  String get sourceCode => '源代碼';
+
+  @override
+  String get latestRelease => '最新版本';
+
+  @override
+  String get downloadLatestVersion => '下載最新版本';
+
+  @override
+  String get technicalInfo => '技術信息';
+
+  @override
+  String get flutterDescription => 'Google 開源的跨平台 UI 框架';
+
+  @override
+  String get materialDescription => 'Flutter 的現代設計系統';
+
+  @override
+  String get providerDescription => 'Flutter 的狀態管理解決方案';
+
+  @override
+  String get license => '開源協議';
+
+  @override
+  String get mitLicenseDescription => '基於 MIT 協議開源';
+
+  @override
+  String get support => '支持';
+
+  @override
+  String get technicalSupport => '技術支持';
 }

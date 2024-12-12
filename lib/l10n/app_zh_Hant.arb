@@ -212,5 +212,19 @@
   "serverCheckFailed": "伺服器檢測失敗",
   "serverCheckFailedMessage": "無法連接到伺服器，請檢查網絡連接後重試。",
   "backToLogin": "返回登錄",
-  "retry": "重試"
+  "retry": "重試",
+  "about": "關於",
+  "version": "版本",
+  "projectInfo": "項目信息",
+  "sourceCode": "源代碼",
+  "latestRelease": "最新版本",
+  "downloadLatestVersion": "下載最新版本",
+  "technicalInfo": "技術信息",
+  "flutterDescription": "Google 開源的跨平台 UI 框架",
+  "materialDescription": "Flutter 的現代設計系統",
+  "providerDescription": "Flutter 的狀態管理解決方案",
+  "license": "開源協議",
+  "mitLicenseDescription": "基於 MIT 協議開源",
+  "support": "支持",
+  "technicalSupport": "技術支持"
 }

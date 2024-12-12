@@ -328,5 +328,19 @@
   "serverCheckFailed": "Server Check Failed",
   "serverCheckFailedMessage": "Failed to connect to server. Please check your network connection and try again.",
   "backToLogin": "Back to Login",
-  "retry": "Retry"
+  "retry": "Retry",
+  "about": "About",
+  "version": "Version",
+  "projectInfo": "Project Information",
+  "sourceCode": "Source Code",
+  "latestRelease": "Latest Release",
+  "downloadLatestVersion": "Download latest version",
+  "technicalInfo": "Technical Information",
+  "flutterDescription": "Cross-platform UI framework by Google",
+  "materialDescription": "Modern design system for Flutter",
+  "providerDescription": "State management solution for Flutter",
+  "license": "License",
+  "mitLicenseDescription": "Open source under MIT License",
+  "support": "Support",
+  "technicalSupport": "Technical Support"
 }

@@ -16,6 +16,7 @@ import 'settings/widgets/create_account_book_item.dart';
 import 'settings/widgets/theme_color_selector.dart';
 import './settings/server_management_page.dart';
 import '../data/data_source_factory.dart';
+import './settings/about_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -185,6 +186,17 @@ class _SettingsPageState extends State<SettingsPage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ServerManagementPage(),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.info_outline),
+                    title: Text(l10n.about),
+                    trailing: Icon(Icons.chevron_right),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AboutPage(),
                       ),
                     ),
                   ),
