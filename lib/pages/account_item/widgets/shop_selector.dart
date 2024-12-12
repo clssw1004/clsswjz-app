@@ -33,7 +33,7 @@ class ShopSelector extends StatelessWidget {
     final provider = Provider.of<AccountItemProvider>(context, listen: false);
     showDialog(
       context: context,
-      builder: (context) => _ShopDialog(
+      builder: (context) => ShopDialog(
         shops: [
           Shop(
             id: NO_SHOP,
@@ -46,29 +46,14 @@ class ShopSelector extends StatelessWidget {
         ],
         selectedShop: selectedShop ?? NO_SHOP,
         accountBookId: accountBookId,
-        onShopsUpdated: (shops) {
+        onSelected: (shopId) {
+          onChanged(shopId);
+        },
+        onShopAdded: (shopName) {
           // 暂时不处理商家更新
         },
       ),
-    ).then((shopId) {
-      if (shopId != null) {
-        if (shopId == NO_SHOP) {
-          onChanged(null);
-        } else {
-          final shop = provider.shops.firstWhere(
-            (s) => s.id == shopId,
-            orElse: () => Shop(
-              id: shopId,
-              name: shopId,
-              accountBookId: accountBookId,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            ),
-          );
-          onChanged(shop.name);
-        }
-      }
-    });
+    );
   }
 
   @override
@@ -134,27 +119,36 @@ class ShopSelector extends StatelessWidget {
   }
 }
 
-class _ShopDialog extends StatefulWidget {
+class ShopDialog extends StatefulWidget {
   final List<Shop> shops;
   final String? selectedShop;
   final String accountBookId;
-  final ValueChanged<List<Shop>> onShopsUpdated;
+  final ValueChanged<String> onSelected;
+  final ValueChanged<String>? onShopAdded;
 
-  const _ShopDialog({
+  const ShopDialog({
     Key? key,
     required this.shops,
     this.selectedShop,
     required this.accountBookId,
-    required this.onShopsUpdated,
+    required this.onSelected,
+    this.onShopAdded,
   }) : super(key: key);
 
   @override
-  State<_ShopDialog> createState() => _ShopDialogState();
+  State<ShopDialog> createState() => _ShopDialogState();
 }
 
-class _ShopDialogState extends State<_ShopDialog> {
-  final _searchController = TextEditingController();
-  String _searchText = '';
+class _ShopDialogState extends State<ShopDialog> {
+  final TextEditingController _searchController = TextEditingController();
+  List<Shop> _filteredShops = [];
+  bool _showAddButton = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredShops = List.from(widget.shops);
+  }
 
   @override
   void dispose() {
@@ -162,14 +156,42 @@ class _ShopDialogState extends State<_ShopDialog> {
     super.dispose();
   }
 
-  List<Shop> get _filteredShops {
-    if (_searchText.isEmpty) return widget.shops;
-    return widget.shops
-        .where((shop) => shop.name
-            .toString()
-            .toLowerCase()
-            .contains(_searchText.toLowerCase()))
-        .toList();
+  void _filterShops(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredShops = List.from(widget.shops);
+        _showAddButton = false;
+      } else {
+        _filteredShops = widget.shops
+            .where(
+                (shop) => shop.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+        _showAddButton = _filteredShops.isEmpty;
+      }
+    });
+  }
+
+  void _addNewShop(String name) {
+    final newShop = Shop(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+      shopCode: name,
+      accountBookId: widget.accountBookId,
+      createdBy: '',
+      updatedBy: '',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    setState(() {
+      widget.shops.add(newShop);
+      _filteredShops = List.from(widget.shops);
+      _searchController.clear();
+      _showAddButton = false;
+    });
+    widget.onShopAdded?.call(name);
+    widget.onSelected(name);
+    Navigator.pop(context);
   }
 
   @override
@@ -180,78 +202,119 @@ class _ShopDialogState extends State<_ShopDialog> {
 
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(12),
       ),
-      surfaceTintColor: colorScheme.surface,
-      child: Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              l10n.selectShopTitle,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  l10n.selectShopTitle,
+                  style: theme.textTheme.titleLarge,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 16),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.4,
+              SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: l10n.searchShopHint,
+                    prefixIcon: Icon(Icons.search),
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_searchController.text.isNotEmpty)
+                          IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              _filterShops('');
+                            },
+                          ),
+                        if (_showAddButton)
+                          IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: () {
+                              if (_searchController.text.isNotEmpty) {
+                                _addNewShop(_searchController.text);
+                              }
+                            },
+                          ),
+                      ],
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: colorScheme.outline.withOpacity(0.5),
+                      ),
+                    ),
+                  ),
+                  onChanged: _filterShops,
+                ),
               ),
-              child: _buildShopList(context),
-            ),
-          ],
+              SizedBox(height: 16),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.4,
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _filteredShops.length,
+                  itemBuilder: (context, index) {
+                    final shop = _filteredShops[index];
+                    final isSelected = shop.name == widget.selectedShop;
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 24),
+                      title: Text(
+                        shop.name,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: isSelected ? colorScheme.primary : null,
+                        ),
+                      ),
+                      leading: Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        color: isSelected ? colorScheme.primary : null,
+                        size: 20,
+                      ),
+                      onTap: () {
+                        widget.onSelected(shop.name);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                      ),
+                      child: Text(l10n.cancelButton),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _buildShopList(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final l10n = L10n.of(context);
-    final shops = _filteredShops;
-
-    if (shops.isEmpty) {
-      return Center(
-        child: Text(
-          l10n.noAvailableShops,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: shops.length,
-      shrinkWrap: true,
-      itemBuilder: (context, index) {
-        final shop = shops[index];
-        final isSelected = shop.id == widget.selectedShop;
-        final isNoShop = shop.id == ShopSelector.NO_SHOP;
-
-        return ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-          title: Text(
-            shop.name,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: isSelected ? colorScheme.primary : colorScheme.onSurface,
-            ),
-          ),
-          leading: Icon(
-            isSelected
-                ? Icons.radio_button_checked
-                : Icons.radio_button_unchecked,
-            color: isSelected ? colorScheme.primary : null,
-            size: 20,
-          ),
-          onTap: () => Navigator.pop(context, shop.id),
-        );
-      },
     );
   }
 }
