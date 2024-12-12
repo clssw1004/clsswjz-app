@@ -67,7 +67,7 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
       // 设置较短的超时时间
       await Future.any([
         ApiService.checkServerStatus(),
-        Future.delayed(const Duration(seconds: 3), () {
+        Future.delayed(const Duration(seconds: 5), () {
           throw TimeoutException('Server check timeout');
         }),
       ]);
@@ -128,7 +128,6 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return _buildLoadingScreen(context);
         }
-
         // 如果没有服务器配置或服务器检查失败
         if (snapshot.data != true) {
           // 如果没有服务器配置，直接跳转登录页
@@ -145,7 +144,9 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
 
         // 服务器正常，检查会话状态
         return FutureBuilder<bool>(
-          future: UserService.hasValidSession(),
+          future: StorageService.getString(StorageKeys.token).isEmpty
+              ? Future.value(false) // 如果没有 token，直接返回 false
+              : UserService.hasValidSession(), // 有 token 才去验证会话
           builder: (context, sessionSnapshot) {
             if (sessionSnapshot.connectionState == ConnectionState.waiting) {
               return _buildLoadingScreen(context);
@@ -176,7 +177,7 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
               child: Column(
                 children: [
                   Image.asset(
-                    'assets/images/logo.png',
+                    'assets/images/app_logo.png',
                     width: 120,
                     height: 120,
                   ),
@@ -227,7 +228,7 @@ Future<void> main() async {
   await UserService.init();
 
   final prefs = await SharedPreferences.getInstance();
-  final serverConfigService = ServerConfigService(prefs);
+  final serverConfigService = ServerConfigService();
 
   // 初始化主题
   final themeProvider = ThemeProvider();

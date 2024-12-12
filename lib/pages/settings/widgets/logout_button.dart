@@ -61,13 +61,12 @@ class LogoutButton extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () {
-              UserService.logout();
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/login',
-                (route) => false,
-              );
+            onPressed: () async {
+              Navigator.pop(context);
+              await UserService.logout();
+              if (context.mounted) {
+                Navigator.of(context).pushReplacementNamed('/login');
+              }
             },
             child: Text(
               l10n.confirm,

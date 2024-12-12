@@ -4,19 +4,19 @@ class StorageKeys {
   // 主题相关
   static const String themeMode = 'theme_mode';
   static const String themeColor = 'theme_color';
-  
+
   // 语言相关
   static const String locale = 'locale';
   static const String timezone = 'timezone';
-  
+
   // 服务器相关
   static const String serverUrl = 'server_url';
-  
+
   // 用户相关
   static const String token = 'token';
   static const String userId = 'userId';
   static const String username = 'username';
-  
+
   // 账本相关
   static const String defaultBookId = 'default_book_id';
   static const String lastUsedBookId = 'last_used_book_id';
@@ -34,6 +34,10 @@ class StorageKeys {
   // 筛选面板相关
   static const String filterPanelPinned = 'filter_panel_pinned';
 
+  // 服务器配置相关
+  static const String serverConfigs = 'server_configs';
+  static const String selectedServerId = 'selected_server_id';
+
   // 禁止实例化
   StorageKeys._();
-} 
+}

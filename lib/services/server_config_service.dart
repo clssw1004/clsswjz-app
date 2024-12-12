@@ -1,16 +1,15 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/server_config.dart';
+import '../constants/storage_keys.dart';
+import './storage_service.dart';
 
 class ServerConfigService {
-  static const String _storageKey = 'server_configs';
-  final SharedPreferences _prefs;
-
-  ServerConfigService(this._prefs);
+  static const String _configsKey = StorageKeys.serverConfigs;
+  static const String _selectedConfigKey = StorageKeys.selectedServerId;
 
   Future<List<ServerConfig>> getConfigs() async {
-    final String? jsonStr = _prefs.getString(_storageKey);
-    if (jsonStr == null) return [];
+    final String? jsonStr = StorageService.getString(_configsKey);
+    if (jsonStr!.isEmpty) return [];
 
     final List<dynamic> jsonList = json.decode(jsonStr);
     return jsonList
@@ -20,7 +19,7 @@ class ServerConfigService {
 
   Future<void> saveConfigs(List<ServerConfig> configs) async {
     final jsonList = configs.map((config) => config.toJson()).toList();
-    await _prefs.setString(_storageKey, json.encode(jsonList));
+    await StorageService.setString(_configsKey, json.encode(jsonList));
   }
 
   Future<void> addConfig(ServerConfig config) async {
@@ -45,17 +44,19 @@ class ServerConfigService {
   }
 
   Future<ServerConfig?> getSelectedConfig() async {
-    final String? selectedId = _prefs.getString('selected_server_id');
-    if (selectedId == null) return null;
+    final String selectedId = StorageService.getString(_selectedConfigKey);
+    if (selectedId.isEmpty) return null;
 
     final configs = await getConfigs();
-    return configs.firstWhere(
-      (config) => config.id == selectedId,
-      orElse: () => configs.first,
-    );
+    return configs.isEmpty
+        ? null
+        : configs.firstWhere(
+            (config) => config.id == selectedId,
+            orElse: () => configs.first,
+          );
   }
 
   Future<void> setSelectedConfig(String id) async {
-    await _prefs.setString('selected_server_id', id);
+    await StorageService.setString(_selectedConfigKey, id);
   }
-} 
+}

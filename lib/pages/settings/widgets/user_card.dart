@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../utils/api_error_handler.dart';
 import '../../../services/api_service.dart';
+import '../../user/user_info_page.dart';
 
 class UserCard extends StatefulWidget {
   const UserCard({Key? key}) : super(key: key);
@@ -16,34 +17,27 @@ class _UserCardState extends State<UserCard> {
   @override
   void initState() {
     super.initState();
-    _loadUserInfo();
+    _refreshUserInfo();
   }
 
-  Future<void> _loadUserInfo() async {
+  Future<void> _refreshUserInfo() async {
+    if (!mounted) return;
+
+    setState(() => _isLoading = true);
     try {
-      final userInfo = await ApiErrorHandler.wrapRequest(
-        context,
-        () => ApiService.getUserInfo(),
-      );
-
-      if (mounted) {
-        setState(() {
-          _userInfo = userInfo;
-          _isLoading = false;
-        });
-      }
+      final userInfo = await ApiService.getUserInfo();
+      if (!mounted) return;
+      setState(() {
+        _userInfo = userInfo;
+        _isLoading = false;
+      });
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _userInfo = null;
-          _isLoading = false;
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        _userInfo = null;
+        _isLoading = false;
+      });
     }
-  }
-
-  void _refreshUserInfo() {
-    _loadUserInfo();
   }
 
   @override
@@ -85,8 +79,13 @@ class _UserCardState extends State<UserCard> {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
-            Navigator.pushNamed(context, '/user-info').then((_) {
-              _refreshUserInfo();
+            final route = MaterialPageRoute(
+              builder: (_) => UserInfoPage(),
+            );
+            Navigator.push(context, route).then((value) {
+              if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+                _refreshUserInfo();
+              }
             });
           },
           child: Container(
