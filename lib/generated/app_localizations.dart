@@ -99,7 +99,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'Account Book'**
+  /// **'CLSSW Account'**
   String get appName;
 
   /// No description provided for @settings.
