@@ -88,9 +88,6 @@ jobs:
         run: |
           mv build/app/outputs/flutter-apk/app-release.apk ${{ matrix.artifact-name }}${{ matrix.ext }}
 
-      - name: Build Android APK
-        run: flutter build apk --release
-
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
