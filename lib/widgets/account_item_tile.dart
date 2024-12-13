@@ -31,8 +31,7 @@ class AccountItemTile extends StatelessWidget {
     final hasShop = item.shop != null && item.shop != 'NO_SHOP';
     final hasFund = item.fundId != null && item.fundId != 'NO_FUND';
 
-    final timeStr =
-        DateFormat('HH:mm').format(item.createdAt ?? DateTime.now());
+    final timeStr = DateFormat('HH:mm').format(item.accountDate);
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4),
@@ -52,131 +51,101 @@ class AccountItemTile extends StatelessWidget {
             horizontal: showCheckbox ? 8 : 16,
             vertical: 12,
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              if (showCheckbox) ...[
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: Checkbox(
-                    value: isChecked,
-                    onChanged: onCheckChanged,
-                    shape: CircleBorder(),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ),
-                SizedBox(width: 8),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (showCheckbox) ...[
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Checkbox(
+                        value: isChecked,
+                        onChanged: onCheckChanged,
+                        shape: CircleBorder(),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                  ],
+                  Expanded(
+                    child: Text(
                       item.category,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurface,
                       ),
                     ),
-                    SizedBox(height: 4),
+                  ),
+                  SizedBox(width: 16),
+                  Text(
+                    '${isExpense ? '-' : '+'}${l10n.currencySymbol}${item.amount.toStringAsFixed(2)}',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color:
+                          isExpense ? colorScheme.error : colorScheme.tertiary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              if (hasShop || hasFund) ...[
+                SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     DefaultTextStyle(
                       style: theme.textTheme.bodySmall!.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                       child: Row(
                         children: [
-                          if (hasShop)
-                            Flexible(
-                              child: Text(
-                                item.shop!,
-                                style: TextStyle(
-                                  color: colorScheme.primary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            )
-                          else
-                            Text(
-                              l10n.noShop,
-                              style: TextStyle(
-                                color: colorScheme.onSurfaceVariant,
-                                fontSize: 13,
-                              ),
+                          if (hasShop) ...[
+                            Icon(
+                              Icons.store_outlined,
+                              size: 14,
+                              color: colorScheme.onSurfaceVariant,
                             ),
-                          SizedBox(width: 8),
-                          Container(
-                            width: 3,
-                            height: 3,
-                            decoration: BoxDecoration(
-                              color:
-                                  colorScheme.onSurfaceVariant.withOpacity(0.5),
-                              shape: BoxShape.circle,
+                            SizedBox(width: 4),
+                            Text(item.shop!),
+                          ],
+                          if (hasShop && hasFund) ...[
+                            Text(' · '),
+                          ],
+                          if (hasFund) ...[
+                            Icon(
+                              Icons.account_balance_wallet_outlined,
+                              size: 14,
+                              color: colorScheme.onSurfaceVariant,
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          if (hasFund)
-                            Flexible(
-                              child: Text(
-                                item.fundName ?? '',
-                                style: TextStyle(
-                                  color: colorScheme.primary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            )
-                          else
-                            Text(
-                              l10n.noFund,
-                              style: TextStyle(
-                                color: colorScheme.onSurfaceVariant,
-                                fontSize: 13,
-                              ),
-                            ),
-                          if (item.description?.isNotEmpty == true) ...[
-                            SizedBox(width: 8),
-                            Container(
-                              width: 3,
-                              height: 3,
-                              decoration: BoxDecoration(
-                                color: colorScheme.onSurfaceVariant
-                                    .withOpacity(0.5),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                item.description!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                            SizedBox(width: 4),
+                            Text(item.fundName!),
                           ],
                         ],
                       ),
                     ),
+                    Text(
+                      timeStr,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              SizedBox(width: 16),
-              Text(
-                '${isExpense ? '-' : '+'}${l10n.currencySymbol}${item.amount.toStringAsFixed(2)}',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: isExpense ? colorScheme.error : colorScheme.tertiary,
-                  fontWeight: FontWeight.w600,
+              ] else ...[
+                SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    timeStr,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(width: 8),
-              Text(
-                timeStr,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
+              ],
             ],
           ),
         ),
