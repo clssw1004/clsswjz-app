@@ -284,27 +284,27 @@ class _AccountItemListState extends State<AccountItemList>
               categories: _categories,
               onTypeChanged: (type) {
                 setState(() => _selectedType = type);
-                _loadAccountItems();
+                _loadAccountItems(isRefresh: true);
               },
               onCategoriesChanged: (categories) {
                 setState(() => _selectedCategories = categories);
-                _loadAccountItems();
+                _loadAccountItems(isRefresh: true);
               },
               onMinAmountChanged: (amount) {
                 setState(() => _minAmount = amount);
-                _loadAccountItems();
+                _loadAccountItems(isRefresh: true);
               },
               onMaxAmountChanged: (amount) {
                 setState(() => _maxAmount = amount);
-                _loadAccountItems();
+                _loadAccountItems(isRefresh: true);
               },
               onStartDateChanged: (date) {
                 setState(() => _startDate = date);
-                _loadAccountItems();
+                _loadAccountItems(isRefresh: true);
               },
               onEndDateChanged: (date) {
                 setState(() => _endDate = date);
-                _loadAccountItems();
+                _loadAccountItems(isRefresh: true);
               },
               onClearFilter: () {
                 setState(() {
@@ -315,13 +315,13 @@ class _AccountItemListState extends State<AccountItemList>
                   _startDate = null;
                   _endDate = null;
                 });
-                _loadAccountItems();
+                _loadAccountItems(isRefresh: true);
               },
               selectedShopCodes: _selectedShopCodes,
               shops: _shops,
               onShopCodesChanged: (codes) {
                 setState(() => _selectedShopCodes = codes);
-                _loadAccountItems();
+                _loadAccountItems(isRefresh: true);
               },
             ),
             if (_summary != null)
