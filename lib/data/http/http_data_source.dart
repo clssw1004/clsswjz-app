@@ -11,7 +11,6 @@ import '../../models/models.dart';
 import 'api_endpoints.dart';
 import 'http_client.dart';
 import '../../constants/storage_keys.dart';
-import 'package:intl/intl.dart';
 import 'package:http_parser/http_parser.dart';
 
 class HttpDataSource implements DataSource {

@@ -9,7 +9,7 @@ class ServerConfigService {
 
   Future<List<ServerConfig>> getConfigs() async {
     final String jsonStr = StorageService.getString(_configsKey);
-    if (jsonStr!.isEmpty) return [];
+    if (jsonStr.isEmpty) return [];
 
     final List<dynamic> jsonList = json.decode(jsonStr);
     return jsonList
