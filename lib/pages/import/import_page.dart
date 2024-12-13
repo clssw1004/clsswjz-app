@@ -98,11 +98,32 @@ class _ImportPageState extends State<ImportPage> {
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final dropdownDecoration = InputDecoration(
+      contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+      border: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: colorScheme.outline.withOpacity(0.5),
+        ),
+      ),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: colorScheme.outline.withOpacity(0.5),
+        ),
+      ),
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: colorScheme.primary,
+        ),
+      ),
+      filled: false,
+    );
 
     return Scaffold(
       appBar: AppBarFactory.buildAppBar(
         context: context,
-        title: Text(l10n.importData),
+        title: AppBarFactory.buildTitle(context, l10n.importData),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -111,12 +132,11 @@ class _ImportPageState extends State<ImportPage> {
           children: [
             DropdownButtonFormField<String>(
               value: _selectedBookId,
-              decoration: InputDecoration(
+              decoration: dropdownDecoration.copyWith(
                 labelText: l10n.selectBook,
-                border: OutlineInputBorder(),
               ),
               items: _accountBooks
-                  .map<DropdownMenuItem<String>>((book) => DropdownMenuItem(
+                  .map((book) => DropdownMenuItem(
                         value: book['id'] as String,
                         child: Text(book['name'] as String),
                       ))
@@ -128,9 +148,8 @@ class _ImportPageState extends State<ImportPage> {
             SizedBox(height: 16),
             DropdownButtonFormField<DataSourceType>(
               value: _selectedDataSource,
-              decoration: InputDecoration(
+              decoration: dropdownDecoration.copyWith(
                 labelText: l10n.dataSource,
-                border: OutlineInputBorder(),
               ),
               items: DataSourceType.values
                   .map<DropdownMenuItem<DataSourceType>>(
@@ -143,28 +162,47 @@ class _ImportPageState extends State<ImportPage> {
                 setState(() => _selectedDataSource = value);
               },
             ),
-            SizedBox(height: 16),
-            OutlinedButton(
+            SizedBox(height: 24),
+            FilledButton.tonal(
               onPressed: _pickFile,
-              child: Text(_selectedFile?.name ?? l10n.selectFile),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.upload_file),
+                    SizedBox(width: 8),
+                    Text(_selectedFile?.name ?? l10n.selectFile),
+                  ],
+                ),
+              ),
             ),
             if (_selectedFile != null) ...[
               SizedBox(height: 8),
               Text(
                 _selectedFile!.name,
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
             SizedBox(height: 32),
-            ElevatedButton(
+            FilledButton(
               onPressed: _isLoading ? null : _importData,
-              child: _isLoading
-                  ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(l10n.importData),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: _isLoading
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colorScheme.onPrimary,
+                        ),
+                      )
+                    : Text(l10n.importData),
+              ),
             ),
           ],
         ),
