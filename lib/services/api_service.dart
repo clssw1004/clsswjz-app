@@ -1,3 +1,5 @@
+import 'package:clsswjz/models/account_item_request.dart';
+
 import '../data/data_source.dart';
 import '../models/models.dart';
 import '../models/server_status.dart';
@@ -66,21 +68,8 @@ class ApiService {
   }
 
   static Future<AccountItemResponse> getAccountItems(
-    String bookId, {
-    List<String>? categories,
-    String? type,
-    DateTime? startDate,
-    DateTime? endDate,
-    List<String>? shopCodes,
-  }) async {
-    return dataSource.getAccountItems(
-      bookId,
-      categories: categories,
-      type: type,
-      startDate: startDate,
-      endDate: endDate,
-      shopCodes: shopCodes,
-    );
+      AccountItemRequest request) async {
+    return dataSource.getAccountItems(request);
   }
 
   static Future<AccountItem> createAccountItem(AccountItem item) {

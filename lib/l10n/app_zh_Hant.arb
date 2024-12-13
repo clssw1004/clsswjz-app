@@ -226,5 +226,7 @@
   "license": "開源協議",
   "mitLicenseDescription": "基於 MIT 協議開源",
   "support": "支持",
-  "technicalSupport": "技術支持"
+  "technicalSupport": "技術支持",
+  "loadingMore": "加載更多...",
+  "noMoreData": "已經到底了"
 }

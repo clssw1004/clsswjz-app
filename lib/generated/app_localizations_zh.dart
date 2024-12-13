@@ -950,6 +950,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get technicalSupport => '技术支持';
+
+  @override
+  String get loadingMore => '加载更多...';
+
+  @override
+  String get noMoreData => '已经到底了';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1446,4 +1452,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get technicalSupport => '技術支持';
+
+  @override
+  String get loadingMore => '加載更多...';
+
+  @override
+  String get noMoreData => '已經到底了';
 }

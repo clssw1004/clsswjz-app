@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../pages/account_item_info.dart';
-import 'account_item/providers/account_item_provider.dart';
 import 'account_item/widgets/filter_section.dart';
 import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
@@ -13,11 +11,10 @@ import 'account_item/widgets/summary_card.dart';
 import '../models/account_item.dart';
 import '../l10n/l10n.dart';
 import '../widgets/account_item_tile.dart';
-import '../services/account_item_cache.dart';
 import '../constants/storage_keys.dart';
 import '../services/storage_service.dart';
 import '../models/shop.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import '../models/account_item_request.dart';
 
 class AccountItemList extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onBookSelected;
@@ -33,38 +30,38 @@ class AccountItemList extends StatefulWidget {
 
 class _AccountItemListState extends State<AccountItemList>
     with AutomaticKeepAliveClientMixin {
-  static const int _pageSize = 20; // 每页加载的数据量
-  final ScrollController _scrollController = ScrollController();
-  bool _isLoadingMore = false;
+  int _currentPage = 1;
+  static const int _pageSize = 100;
+  static const double _loadMoreThreshold = 0.85;
   bool _hasMoreData = true;
-  List<AccountItem> _displayedItems = []; // 当前显示的数据
-  List<AccountItem> _accountItems = [];
+  bool _isLoading = false;
+  final ScrollController _scrollController = ScrollController();
+  List<AccountItem> _items = [];
   List<Map<String, dynamic>> _accountBooks = [];
   List<String> _categories = [];
   Map<String, dynamic>? _selectedBook;
   String? _selectedType;
   DateTime? _startDate;
   DateTime? _endDate;
-  bool _isLoading = true;
   bool _isFilterExpanded = false;
   List<String> _selectedCategories = [];
   double? _minAmount;
   double? _maxAmount;
   AccountSummary? _summary;
-  late AccountItemProvider _provider;
-  Map<String, List<AccountItem>> _groupedItems = {}; // 添加分组缓存
   List<String> _selectedShopCodes = [];
   List<ShopOption> _shops = [];
   bool _isBatchMode = false;
   final Set<String> _selectedItems = {};
   final Set<String> _selectedDates = {};
+  Map<String, List<AccountItem>> _groupedItems = {};
+  final _listKey = GlobalKey<State>();
 
   @override
   void initState() {
     super.initState();
-    _provider = AccountItemProvider();
     _scrollController.addListener(_onScroll);
     _loadFilterState();
+    _loadAccountItems(isRefresh: true);
   }
 
   @override
@@ -75,34 +72,93 @@ class _AccountItemListState extends State<AccountItemList>
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      _loadMoreItems();
+    if (_scrollController.position.maxScrollExtent > 0) {
+      final threshold =
+          _scrollController.position.maxScrollExtent * _loadMoreThreshold;
+      if (_scrollController.position.pixels >= threshold) {
+        if (!_isLoading && _hasMoreData) {
+          _loadMoreData();
+        }
+      }
     }
   }
 
-  Future<void> _loadMoreItems() async {
-    if (_isLoadingMore || !_hasMoreData) return;
+  Future<void> _loadMoreData() async {
+    if (!_hasMoreData || _isLoading) return;
+    _currentPage++;
+    await _loadAccountItems();
+  }
 
-    setState(() => _isLoadingMore = true);
+  Future<void> _loadAccountItems({bool isRefresh = false}) async {
+    if (_selectedBook == null) return;
+    if (_isLoading && !isRefresh) return;
 
-    final nextItems =
-        _accountItems.skip(_displayedItems.length).take(_pageSize).toList();
-
-    if (nextItems.isEmpty) {
-      _hasMoreData = false;
-    } else {
-      _displayedItems.addAll(nextItems);
-      _updateGroupedItems();
-      _hasMoreData = _displayedItems.length < _accountItems.length;
+    if (isRefresh) {
+      setState(() {
+        _isLoading = true;
+      });
     }
 
-    setState(() => _isLoadingMore = false);
+    try {
+      if (isRefresh) {
+        _currentPage = 1;
+        _hasMoreData = true;
+        _items.clear();
+        _groupedItems.clear();
+        _scrollController.jumpTo(0);
+      }
+
+      final request = AccountItemRequest(
+        accountBookId: _selectedBook!['id'],
+        page: _currentPage,
+        pageSize: _pageSize,
+        categories: _selectedCategories,
+        type: _selectedType,
+        startDate: _startDate,
+        endDate: _endDate,
+        shopCodes: _selectedShopCodes,
+      );
+
+      final response = await ApiService.getAccountItems(request);
+
+      if (!mounted) return;
+
+      setState(() {
+        if (!isRefresh) {
+          _items.addAll(response.items);
+        } else {
+          _items = response.items;
+        }
+        _updateGroupedItems();
+        _summary = response.summary;
+        _hasMoreData = !response.pagination.isLastPage;
+        if (isRefresh) {
+          _isLoading = false;
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      if (isRefresh) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      MessageHelper.showError(context, message: e.toString());
+    }
+  }
+
+  void _updateGroupedItems() {
+    _groupedItems = <String, List<AccountItem>>{};
+    for (var item in _items) {
+      final date = DateFormat('yyyy-MM-dd').format(item.accountDate);
+      _groupedItems.putIfAbsent(date, () => []).add(item);
+    }
   }
 
   Future<void> _initializeAccountBooks() async {
@@ -192,7 +248,6 @@ class _AccountItemListState extends State<AccountItemList>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -277,18 +332,12 @@ class _AccountItemListState extends State<AccountItemList>
                 allBalance: _summary!.allBalance,
               ),
             Expanded(
-              child: _isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(
-                        color: colorScheme.primary,
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: _loadAccountItems,
-                      child: _accountItems.isEmpty
-                          ? _buildEmptyView(colorScheme)
-                          : _buildList(),
-                    ),
+              child: RefreshIndicator(
+                onRefresh: () => _loadAccountItems(isRefresh: true),
+                child: _items.isEmpty && !_isLoading
+                    ? _buildEmptyView(colorScheme)
+                    : _buildList(),
+              ),
             ),
           ],
         ),
@@ -354,375 +403,6 @@ class _AccountItemListState extends State<AccountItemList>
     );
   }
 
-  Future<void> _loadAccountItems() async {
-    if (!mounted) return;
-
-    setState(() {
-      _isLoading = true;
-      _displayedItems = [];
-      _groupedItems.clear();
-      _hasMoreData = true;
-    });
-
-    try {
-      final response = await ApiService.getAccountItems(
-        _selectedBook!['id'],
-        categories: _selectedCategories,
-        type: _selectedType,
-        startDate: _startDate,
-        endDate: _endDate,
-        shopCodes: _selectedShopCodes,
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        _accountItems = response.items;
-        _displayedItems = response.items.take(_pageSize).toList();
-        _updateGroupedItems();
-        _summary = response.summary;
-        _hasMoreData = _accountItems.length > _pageSize;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print('加载账目数据失败: $e');
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _accountItems = [];
-        _displayedItems = [];
-        _groupedItems.clear();
-        _summary = null;
-        _hasMoreData = false;
-      });
-      MessageHelper.showError(context, message: e.toString());
-    }
-  }
-
-  void _addNewRecord() async {
-    if (_selectedBook == null) return;
-
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider(
-          create: (_) => AccountItemProvider(selectedBook: _selectedBook),
-          child: AccountItemForm(
-            initialBook: _selectedBook,
-          ),
-        ),
-      ),
-    );
-
-    if (result == true) {
-      AccountItemCache.clearCache();
-      await _loadAccountItems();
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(0);
-      }
-    }
-  }
-
-  void _editRecord(Map<String, dynamic> record) async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider(
-          create: (_) => AccountItemProvider(selectedBook: _selectedBook),
-          child: AccountItemForm(
-            initialData: record,
-            initialBook: _selectedBook,
-          ),
-        ),
-      ),
-    );
-
-    if (result == true) {
-      // 清除缓存并立即重新加载数据
-      AccountItemCache.clearCache();
-      await _loadAccountItems();
-      // 重置列表位置到顶
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(0);
-      }
-    }
-  }
-
-  Future<void> _loadCategories() async {
-    try {
-      final categories = await ApiService.getCategories(_selectedBook!['id']);
-      if (!mounted) return;
-      setState(() {
-        _categories = categories.map((c) => c.name).toList();
-      });
-    } catch (e) {
-      if (!mounted) return;
-      MessageHelper.showError(context, message: e.toString());
-    }
-  }
-
-  Widget _buildEmptyView(ColorScheme colorScheme) {
-    final l10n = L10n.of(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.receipt_long_outlined,
-            size: 64,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
-          ),
-          SizedBox(height: 16),
-          Text(
-            l10n.noAccountItems,
-            style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 优化分组计算
-  void _updateGroupedItems() {
-    _groupedItems.clear();
-    for (var item in _displayedItems) {
-      final dateStr = DateFormat('yyyy-MM-dd').format(item.accountDate);
-      _groupedItems.putIfAbsent(dateStr, () => []).add(item);
-    }
-  }
-
-  List<String> _getDateHeaders() {
-    return _groupedItems.keys.toList()..sort((a, b) => b.compareTo(a));
-  }
-
-  int _getHeaderIndexForPosition(int position) {
-    final headers = _getDateHeaders();
-    int itemCount = 0;
-    for (int i = 0; i < headers.length; i++) {
-      if (position == itemCount) return i;
-      itemCount += 1 + (_groupedItems[headers[i]]?.length ?? 0);
-      if (position < itemCount) return -1;
-    }
-    return -1;
-  }
-
-  int _getItemIndexForPosition(int position) {
-    final headers = _getDateHeaders();
-    int itemCount = 0;
-    int itemIndex = 0;
-
-    for (String header in headers) {
-      itemCount++; // 头部
-      if (position == itemCount - 1) return -1;
-
-      final itemsInSection = _groupedItems[header]?.length ?? 0;
-      if (position < itemCount + itemsInSection) {
-        return itemIndex + (position - itemCount);
-      }
-
-      itemCount += itemsInSection;
-      itemIndex += itemsInSection;
-    }
-    return itemIndex;
-  }
-
-  Widget _buildDateHeader(BuildContext context, String date) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    // 计算当天的收支统计
-    final itemsInDay = _groupedItems[date] ?? [];
-    final dailyExpense = itemsInDay
-        .where((item) => item.type == 'EXPENSE')
-        .fold(0.0, (sum, item) => sum + item.amount);
-    final dailyIncome = itemsInDay
-        .where((item) => item.type == 'INCOME')
-        .fold(0.0, (sum, item) => sum + item.amount);
-    final paddingNum = _isBatchMode ? 8.0 : 16.0;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(paddingNum, paddingNum, paddingNum, 8),
-      child: Row(
-        children: [
-          if (_isBatchMode)
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: Checkbox(
-                value: _selectedDates.contains(date),
-                onChanged: (checked) => _toggleDateSelection(date, checked),
-                shape: CircleBorder(),
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-              ),
-            ),
-          if (_isBatchMode) SizedBox(width: 12),
-          Text(
-            _formatDateHeader(date),
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: colorScheme.primary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Spacer(),
-          if (dailyExpense > 0)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.arrow_downward,
-                  size: 14,
-                  color: colorScheme.error,
-                ),
-                SizedBox(width: 2),
-                Text(
-                  dailyExpense.toStringAsFixed(2),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.error,
-                  ),
-                ),
-              ],
-            ),
-          if (dailyExpense > 0 && dailyIncome > 0) SizedBox(width: 12),
-          if (dailyIncome > 0)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.arrow_upward,
-                  size: 14,
-                  color: Colors.green,
-                ),
-                SizedBox(width: 2),
-                Text(
-                  dailyIncome.toStringAsFixed(2),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.green,
-                  ),
-                ),
-              ],
-            ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDateHeader(String date) {
-    final l10n = L10n.of(context);
-    final now = DateTime.now();
-    final today = DateFormat('yyyy-MM-dd').format(now);
-    final yesterday =
-        DateFormat('yyyy-MM-dd').format(now.subtract(Duration(days: 1)));
-
-    if (date == today) {
-      return l10n.today;
-    } else if (date == yesterday) {
-      return l10n.yesterday;
-    }
-
-    final dateTime = DateTime.parse(date);
-    return l10n.monthDayFormat(
-      dateTime.month.toString(),
-      dateTime.day.toString(),
-    );
-  }
-
-  void _editAccountItem(AccountItem item) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AccountItemForm(
-          initialData: item.toJson(),
-          initialBook: _selectedBook,
-        ),
-      ),
-    );
-
-    if (result == true) {
-      _loadAccountItems();
-    }
-  }
-
-  Widget _buildList() {
-    final theme = Theme.of(context);
-
-    return ListView.custom(
-      controller: _scrollController,
-      physics: const AlwaysScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
-      ),
-      padding: EdgeInsets.only(
-        bottom: 80,
-        left: MediaQuery.of(context).size.width > 600 ? 32 : 16,
-        right: MediaQuery.of(context).size.width > 600 ? 32 : 16,
-      ),
-      childrenDelegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final dateHeaders = _getDateHeaders();
-          final headerIndex = _getHeaderIndexForPosition(index);
-
-          if (headerIndex != -1) {
-            return _buildDateHeader(context, dateHeaders[headerIndex]);
-          }
-
-          final itemIndex = _getItemIndexForPosition(index);
-          if (_hasMoreData && itemIndex == _displayedItems.length) {
-            return _buildLoadingIndicator();
-          }
-
-          final item = _displayedItems[itemIndex];
-          return RepaintBoundary(
-            child: _isBatchMode
-                ? AccountItemTile(
-                    key: ValueKey(item.id),
-                    item: item,
-                    showCheckbox: true,
-                    isChecked: _selectedItems.contains(item.id),
-                    onCheckChanged: (checked) =>
-                        _toggleItemSelection(item.id, checked),
-                  )
-                : Slidable(
-                    key: ValueKey(item.id),
-                    endActionPane: ActionPane(
-                      motion: const ScrollMotion(),
-                      extentRatio: 0.2,
-                      children: [
-                        SlidableAction(
-                          onPressed: (context) => _confirmDelete(item),
-                          foregroundColor: theme.colorScheme.error,
-                          icon: Icons.delete_outline,
-                        ),
-                      ],
-                    ),
-                    child: AccountItemTile(
-                      key: ValueKey(item.id),
-                      item: item,
-                      onTap: () => _editAccountItem(item),
-                      onLongPress: () => _enterBatchMode(item.id),
-                    ),
-                  ),
-          );
-        },
-        childCount: _displayedItems.length +
-            _getDateHeaders().length +
-            (_hasMoreData ? 1 : 0),
-      ),
-      cacheExtent: 1000,
-    );
-  }
-
-  Widget _buildLoadingIndicator() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      alignment: Alignment.center,
-      child: const SizedBox(
-        width: 24,
-        height: 24,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      ),
-    );
-  }
-
   Future<void> _loadFilterState() async {
     final isExpanded = StorageService.getBool(StorageKeys.filterPanelPinned,
         defaultValue: false);
@@ -770,48 +450,6 @@ class _AccountItemListState extends State<AccountItemList>
     }
   }
 
-  Future<void> _confirmDelete(AccountItem item) async {
-    final l10n = L10n.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.delete),
-        content: Text(l10n.confirmDeleteMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: Text(l10n.delete),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      try {
-        await ApiService.deleteAccountItem(item.id);
-        AccountItemCache.clearCache();
-        await _loadAccountItems();
-        if (mounted) {
-          MessageHelper.showSuccess(
-            context,
-            message: l10n.deleteSuccess,
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          MessageHelper.showError(context, message: e.toString());
-        }
-      }
-    }
-  }
-
   void _enterBatchMode(String initialItemId) {
     setState(() {
       _isBatchMode = true;
@@ -827,32 +465,13 @@ class _AccountItemListState extends State<AccountItemList>
     });
   }
 
-  void _toggleDateSelection(String date, bool? checked) {
-    if (checked == null) return;
-
+  void _toggleItemSelection(String itemId) {
     setState(() {
-      final itemsInDate = _groupedItems[date] ?? [];
-      if (checked) {
-        _selectedDates.add(date);
-        _selectedItems.addAll(itemsInDate.map((item) => item.id));
-      } else {
-        _selectedDates.remove(date);
-        _selectedItems.removeAll(itemsInDate.map((item) => item.id));
-      }
-    });
-  }
-
-  void _toggleItemSelection(String itemId, bool? checked) {
-    if (checked == null) return;
-
-    setState(() {
-      if (checked) {
-        _selectedItems.add(itemId);
-      } else {
+      if (_selectedItems.contains(itemId)) {
         _selectedItems.remove(itemId);
+      } else {
+        _selectedItems.add(itemId);
       }
-
-      // 更新日期选择状态
       _updateDateSelectionState();
     });
   }
@@ -921,7 +540,6 @@ class _AccountItemListState extends State<AccountItemList>
           }
         }
 
-        AccountItemCache.clearCache();
         await _loadAccountItems();
         _exitBatchMode();
       } catch (e) {
@@ -930,5 +548,208 @@ class _AccountItemListState extends State<AccountItemList>
         }
       }
     }
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final categories = await ApiService.getCategories(_selectedBook!['id']);
+      if (!mounted) return;
+      setState(() {
+        _categories = categories.map((c) => c.name).toList();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      MessageHelper.showError(context, message: e.toString());
+    }
+  }
+
+  Widget _buildEmptyView(ColorScheme colorScheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.receipt_long_outlined,
+            size: 64,
+            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+          ),
+          SizedBox(height: 16),
+          Text(
+            L10n.of(context).noAccountItems,
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildList() {
+    final items = _items;
+    if (items.isEmpty) return _buildEmptyView(Theme.of(context).colorScheme);
+
+    return ListView.builder(
+      key: _listKey,
+      controller: _scrollController,
+      itemCount: _groupedItems.length + (_hasMoreData ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index == _groupedItems.length) {
+          return _buildLoadingIndicator();
+        }
+
+        final date = _groupedItems.keys.elementAt(index);
+        final dateItems = _groupedItems[date]!;
+
+        return Column(
+          key: ValueKey(date),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDateHeader(date, dateItems),
+            ...dateItems.map((item) => AccountItemTile(
+                  key: ValueKey(item.id),
+                  item: item,
+                  onTap: () => _editAccountItem(item),
+                  onLongPress: () => _enterBatchMode(item.id),
+                  showCheckbox: _isBatchMode,
+                  isChecked: _selectedItems.contains(item.id),
+                  onCheckChanged: (checked) => _toggleItemSelection(item.id),
+                )),
+          ],
+        );
+      },
+      cacheExtent: 1000.0,
+    );
+  }
+
+  void _addNewRecord() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AccountItemForm(
+          initialBook: _selectedBook,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      _loadAccountItems(isRefresh: true);
+    }
+  }
+
+  void _editAccountItem(AccountItem item) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AccountItemForm(
+          initialData: item.toJson(),
+          initialBook: _selectedBook,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      _loadAccountItems(isRefresh: true);
+    }
+  }
+
+  Widget _buildDateHeader(String date, List<AccountItem> items) {
+    final theme = Theme.of(context);
+    final l10n = L10n.of(context);
+
+    double dailyIncome = 0;
+    double dailyExpense = 0;
+    for (var item in items) {
+      if (item.type == 'INCOME') {
+        dailyIncome += item.amount;
+      } else {
+        dailyExpense += item.amount;
+      }
+    }
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Row(
+        children: [
+          Text(
+            _formatDateHeader(date),
+            style: theme.textTheme.titleSmall,
+          ),
+          Spacer(),
+          if (dailyExpense > 0)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.arrow_downward,
+                  size: 14,
+                  color: theme.colorScheme.error,
+                ),
+                SizedBox(width: 2),
+                Text(
+                  dailyExpense.toStringAsFixed(2),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+              ],
+            ),
+          if (dailyExpense > 0 && dailyIncome > 0) SizedBox(width: 12),
+          if (dailyIncome > 0)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.arrow_upward,
+                  size: 14,
+                  color: Colors.green,
+                ),
+                SizedBox(width: 2),
+                Text(
+                  dailyIncome.toStringAsFixed(2),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDateHeader(String date) {
+    final l10n = L10n.of(context);
+    final now = DateTime.now();
+    final today = DateFormat('yyyy-MM-dd').format(now);
+    final yesterday =
+        DateFormat('yyyy-MM-dd').format(now.subtract(Duration(days: 1)));
+
+    if (date == today) {
+      return l10n.today;
+    } else if (date == yesterday) {
+      return l10n.yesterday;
+    }
+
+    final dateTime = DateTime.parse(date);
+    return l10n.monthDayFormat(
+      dateTime.month.toString(),
+      dateTime.day.toString(),
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      alignment: Alignment.center,
+      child: Text(
+        _hasMoreData
+            ? L10n.of(context).loadingMore
+            : L10n.of(context).noMoreData,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+      ),
+    );
   }
 }

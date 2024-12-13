@@ -1883,6 +1883,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Technical Support'**
   String get technicalSupport;
+
+  /// No description provided for @loadingMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading more...'**
+  String get loadingMore;
+
+  /// No description provided for @noMoreData.
+  ///
+  /// In en, this message translates to:
+  /// **'No more data'**
+  String get noMoreData;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

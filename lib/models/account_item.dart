@@ -3,10 +3,12 @@ import 'package:intl/intl.dart';
 class AccountItemResponse {
   final List<AccountItem> items;
   final AccountSummary summary;
+  final Pagination pagination;
 
   AccountItemResponse({
     required this.items,
     required this.summary,
+    required this.pagination,
   });
 
   factory AccountItemResponse.fromJson(Map<String, dynamic> json) =>
@@ -15,6 +17,30 @@ class AccountItemResponse {
             .map((item) => AccountItem.fromJson(item))
             .toList(),
         summary: AccountSummary.fromJson(json['summary']),
+        pagination: Pagination.fromJson(json['pagination']),
+      );
+}
+
+class Pagination {
+  final bool isLastPage;
+  final int current;
+  final int pageSize;
+  final int total;
+  final int totalPage;
+  Pagination({
+    required this.isLastPage,
+    required this.current,
+    required this.pageSize,
+    required this.total,
+    required this.totalPage,
+  });
+
+  factory Pagination.fromJson(Map<String, dynamic> json) => Pagination(
+        isLastPage: json['isLastPage'],
+        current: json['current'],
+        pageSize: json['pageSize'],
+        total: json['total'],
+        totalPage: json['totalPage'],
       );
 }
 

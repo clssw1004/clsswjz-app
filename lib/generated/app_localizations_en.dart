@@ -950,4 +950,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get technicalSupport => 'Technical Support';
+
+  @override
+  String get loadingMore => 'Loading more...';
+
+  @override
+  String get noMoreData => 'No more data';
 }

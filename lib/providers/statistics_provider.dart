@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/data_source.dart';
+import '../models/account_item_request.dart';
 import '../models/models.dart';
 import 'dart:math' as math;
 import '../models/statistics_metric.dart';
@@ -7,10 +8,11 @@ import '../services/storage_service.dart';
 import '../constants/storage_keys.dart';
 
 enum TimeRange { week, month, year, custom }
+
 enum ChartType {
-  line,    // 折线图
-  bar,     // 柱状图
-  area,    // 面积图
+  line, // 折线图
+  bar, // 柱状图
+  area, // 面积图
   stacked, // 堆叠图
 }
 
@@ -130,11 +132,13 @@ class StatisticsProvider extends ChangeNotifier {
         throw Exception('请先选择账本');
       }
 
-      final response = await _dataSource.getAccountItems(
-        currentBookId,
+      final response = await _dataSource.getAccountItems(AccountItemRequest(
+        accountBookId: currentBookId,
         startDate: _startDate,
         endDate: _endDate,
-      );
+        page: 1,
+        pageSize: 5000,
+      ));
 
       _data = _processData(response);
       _error = null;
@@ -164,22 +168,25 @@ class StatisticsProvider extends ChangeNotifier {
 
     // 据选定的指标处理数据
     final trends = dailyStats.values.map((data) {
-      final incomeItems = response.items.where((item) => 
-        item.type == 'INCOME' && 
-        item.accountDate.toString().split(' ')[0] == data.date
-      ).toList();
+      final incomeItems = response.items
+          .where((item) =>
+              item.type == 'INCOME' &&
+              item.accountDate.toString().split(' ')[0] == data.date)
+          .toList();
 
-      final expenseItems = response.items.where((item) => 
-        item.type == 'EXPENSE' && 
-        item.accountDate.toString().split(' ')[0] == data.date
-      ).toList();
+      final expenseItems = response.items
+          .where((item) =>
+              item.type == 'EXPENSE' &&
+              item.accountDate.toString().split(' ')[0] == data.date)
+          .toList();
 
       return TrendData(
         date: data.date,
         income: calculateMetricValue(incomeItems, _yMetric),
         expense: calculateMetricValue(expenseItems, _yMetric),
       );
-    }).toList()..sort((a, b) => a.date.compareTo(b.date));
+    }).toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
 
     // 处理分类数据
     final expenseMap = <String, double>{};
@@ -197,8 +204,8 @@ class StatisticsProvider extends ChangeNotifier {
           // 生成随机颜色，但保持较高的饱度和亮度
           final hue = random.nextDouble() * 360;
           final saturation = 0.7 + random.nextDouble() * 0.3; // 70-100% 饱和度
-          final lightness = 0.4 + random.nextDouble() * 0.2;  // 40-60% 亮度
-          
+          final lightness = 0.4 + random.nextDouble() * 0.2; // 40-60% 亮度
+
           final hslColor = HSLColor.fromAHSL(1.0, hue, saturation, lightness);
           final color = hslColor.toColor();
           categoryColors[category] = color.value;
@@ -209,10 +216,12 @@ class StatisticsProvider extends ChangeNotifier {
     // 处理收支数据并分配颜色
     for (final item in response.items) {
       if (item.type == 'EXPENSE') {
-        expenseMap[item.category] = (expenseMap[item.category] ?? 0) + item.amount;
+        expenseMap[item.category] =
+            (expenseMap[item.category] ?? 0) + item.amount;
         assignColor(item.category);
       } else {
-        incomeMap[item.category] = (incomeMap[item.category] ?? 0) + item.amount;
+        incomeMap[item.category] =
+            (incomeMap[item.category] ?? 0) + item.amount;
         assignColor(item.category);
       }
     }
@@ -274,7 +283,8 @@ class StatisticsProvider extends ChangeNotifier {
   }
 
   // 根据指标计算值
-  double calculateMetricValue(List<AccountItem> items, StatisticsMetric metric) {
+  double calculateMetricValue(
+      List<AccountItem> items, StatisticsMetric metric) {
     switch (metric.type) {
       case MetricType.amount:
         return items.fold(0.0, (sum, item) => sum + item.amount);

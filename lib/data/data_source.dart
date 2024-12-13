@@ -1,3 +1,4 @@
+import '../models/account_item_request.dart';
 import '../models/models.dart';
 import '../models/server_status.dart';
 import '../services/api_service.dart';
@@ -51,14 +52,7 @@ abstract class DataSource {
   Future<void> deleteAccountBook(String id);
 
   // 账目相关
-  Future<AccountItemResponse> getAccountItems(
-    String bookId, {
-    List<String>? categories,
-    String? type,
-    DateTime? startDate,
-    DateTime? endDate,
-    List<String>? shopCodes,
-  });
+  Future<AccountItemResponse> getAccountItems(AccountItemRequest request);
   Future<AccountItem> createAccountItem(AccountItem item);
   Future<AccountItem> updateAccountItem(String id, AccountItem item);
   Future<void> deleteAccountItem(String id);
@@ -98,7 +92,7 @@ abstract class DataSource {
 
   Future<Map<String, dynamic>?> getUserByInviteCode(String inviteCode);
 
-  // 添加基础 URL 设置方法
+  // 添加基础 URL 设置���法
   Future<void> setBaseUrl(String url);
 
   /// 批量删除账目

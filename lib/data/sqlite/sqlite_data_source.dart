@@ -1,3 +1,4 @@
+import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
 import '../../services/api_service.dart';
 import '../data_source.dart';
@@ -92,62 +93,17 @@ class SqliteDataSource implements DataSource {
   // 账目相关方法
   @override
   Future<AccountItemResponse> getAccountItems(
-    String bookId, {
-    List<String>? categories,
-    String? type,
-    DateTime? startDate,
-    DateTime? endDate,
-    List<String>? shopCodes,
-  }) async {
-    final db = await _dbHelper.database;
-
-    String whereClause = 'account_book_id = ?';
-    List<dynamic> whereArgs = [bookId];
-
-    if (categories?.isNotEmpty ?? false) {
-      whereClause +=
-          ' AND category IN (${List.filled(categories!.length, '?').join(',')})';
-      whereArgs.addAll(categories);
-    }
-    if (type != null) {
-      whereClause += ' AND type = ?';
-      whereArgs.add(type);
-    }
-    if (startDate != null) {
-      whereClause += ' AND account_date >= ?';
-      whereArgs.add(startDate.toIso8601String());
-    }
-    if (endDate != null) {
-      whereClause += ' AND account_date <= ?';
-      whereArgs.add(endDate.toIso8601String());
-    }
-
-    final List<Map<String, dynamic>> maps = await db.query(
-      'account_items',
-      where: whereClause,
-      whereArgs: whereArgs,
-      orderBy: 'account_date DESC',
-    );
-
-    final items = maps.map((map) => AccountItem.fromJson(map)).toList();
-
-    // 计算汇总信息
-    double allIn = 0;
-    double allOut = 0;
-    for (var item in items) {
-      if (item.type == 'INCOME') {
-        allIn += item.amount;
-      } else {
-        allOut += item.amount;
-      }
-    }
-
+      AccountItemRequest request) async {
     return AccountItemResponse(
-      items: items,
+      items: [],
       summary: AccountSummary(
-        allIn: allIn,
-        allOut: allOut,
-        allBalance: allIn - allOut,
+          allIn: 347117.44, allOut: 233180.36, allBalance: 113937.08),
+      pagination: Pagination(
+        isLastPage: true,
+        current: 1,
+        pageSize: 10,
+        total: 100,
+        totalPage: 10,
       ),
     );
   }

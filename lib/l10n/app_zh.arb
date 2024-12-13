@@ -320,5 +320,7 @@
   "license": "开源协议",
   "mitLicenseDescription": "基于 MIT 协议开源",
   "support": "支持",
-  "technicalSupport": "技术支持"
+  "technicalSupport": "技术支持",
+  "loadingMore": "加载更多...",
+  "noMoreData": "已经到底了"
 }

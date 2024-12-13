@@ -1,3 +1,4 @@
+import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
 import '../../services/api_service.dart';
 import '../../services/storage_service.dart';
@@ -91,31 +92,22 @@ class HttpDataSource implements DataSource {
   // 账目相关方法
   @override
   Future<AccountItemResponse> getAccountItems(
-    String bookId, {
-    List<String>? categories,
-    String? type,
-    DateTime? startDate,
-    DateTime? endDate,
-    List<String>? shopCodes,
-  }) async {
+      AccountItemRequest request) async {
     try {
-      final formattedStartDate = startDate != null
-          ? DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(startDate)
-          : null;
-      final formattedEndDate = endDate != null
-          ? DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(endDate)
-          : null;
-
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.accountItems}/list',
         method: HttpMethod.post,
         data: {
-          'accountBookId': bookId,
-          if (categories != null) 'categories': categories,
-          if (type != null) 'type': type,
-          if (formattedStartDate != null) 'startDate': formattedStartDate,
-          if (formattedEndDate != null) 'endDate': formattedEndDate,
-          if (shopCodes != null) 'shopCodes': shopCodes,
+          'accountBookId': request.accountBookId,
+          if (request.categories != null) 'categories': request.categories,
+          if (request.type != null) 'type': request.type,
+          if (request.startDate != null)
+            'startDate': request.startDate!.toIso8601String(),
+          if (request.endDate != null)
+            'endDate': request.endDate!.toIso8601String(),
+          if (request.shopCodes != null) 'shopCodes': request.shopCodes,
+          'page': request.page,
+          'pageSize': request.pageSize,
         },
       );
       return AccountItemResponse.fromJson(response);
