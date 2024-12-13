@@ -1,3 +1,5 @@
+import 'package:file_picker/file_picker.dart';
+
 import '../models/account_item_request.dart';
 import '../models/models.dart';
 import '../models/server_status.dart';
@@ -92,7 +94,7 @@ abstract class DataSource {
 
   Future<Map<String, dynamic>?> getUserByInviteCode(String inviteCode);
 
-  // 添加基础 URL 设置���法
+  // 添加基础 URL 设置法
   Future<void> setBaseUrl(String url);
 
   /// 批量删除账目
@@ -100,4 +102,11 @@ abstract class DataSource {
   /// [itemIds] 要删除的账目ID列表
   /// 返回 BatchDeleteResult，包含成功删除的记录数和错误信息
   Future<BatchDeleteResult> batchDeleteAccountItems(List<String> itemIds);
+
+  /// 导入数据
+  Future<void> importData({
+    required String accountBookId,
+    required String dataSource,
+    required PlatformFile file,
+  });
 }

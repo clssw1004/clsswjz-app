@@ -1,4 +1,5 @@
 import 'package:clsswjz/models/account_item_request.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../data/data_source.dart';
 import '../models/models.dart';
@@ -28,7 +29,7 @@ class ApiService {
     _dataSource = dataSource;
   }
 
-  static DataSource get dataSource {
+  static DataSource get ds {
     if (_dataSource == null) {
       throw Exception('ApiService not initialized');
     }
@@ -36,98 +37,98 @@ class ApiService {
   }
 
   static Future<void> setBaseUrl(String baseUrl) async {
-    await dataSource.setBaseUrl(baseUrl);
+    await ds.setBaseUrl(baseUrl);
   }
 
   static Future<List<AccountBook>> getAccountBooks() {
-    return dataSource.getAccountBooks();
+    return ds.getAccountBooks();
   }
 
   static Future<AccountBook> createAccountBook(AccountBook book) {
-    return dataSource.createAccountBook(book);
+    return ds.createAccountBook(book);
   }
 
   static Future<AccountBook> updateAccountBook(String id, AccountBook book) {
-    return dataSource.updateAccountBook(id, book);
+    return ds.updateAccountBook(id, book);
   }
 
   static Future<void> deleteAccountBook(String id) {
-    return dataSource.deleteAccountBook(id);
+    return ds.deleteAccountBook(id);
   }
 
   static Future<List<Category>> getCategories(String bookId) {
-    return dataSource.getCategories(bookId);
+    return ds.getCategories(bookId);
   }
 
   static Future<Category> createCategory(Category category) {
-    return dataSource.createCategory(category);
+    return ds.createCategory(category);
   }
 
   static Future<Category> updateCategory(String id, Category category) {
-    return dataSource.updateCategory(id, category);
+    return ds.updateCategory(id, category);
   }
 
   static Future<AccountItemResponse> getAccountItems(
       AccountItemRequest request) async {
-    return dataSource.getAccountItems(request);
+    return ds.getAccountItems(request);
   }
 
   static Future<AccountItem> createAccountItem(AccountItem item) {
-    return dataSource.createAccountItem(item);
+    return ds.createAccountItem(item);
   }
 
   static Future<AccountItem> updateAccountItem(String id, AccountItem item) {
-    return dataSource.updateAccountItem(id, item);
+    return ds.updateAccountItem(id, item);
   }
 
   static Future<void> deleteAccountItem(String id) {
-    return dataSource.deleteAccountItem(id);
+    return ds.deleteAccountItem(id);
   }
 
   static Future<List<AccountBookFund>> getBookFunds(String bookId) {
-    return dataSource.getBookFunds(bookId);
+    return ds.getBookFunds(bookId);
   }
 
   static Future<List<UserFund>> getUserFunds() {
-    return dataSource.getUserFunds();
+    return ds.getUserFunds();
   }
 
   static Future<UserFund> createFund(UserFund fund) {
-    return dataSource.createFund(fund);
+    return ds.createFund(fund);
   }
 
   static Future<UserFund> updateFund(String id, UserFund fund) {
-    return dataSource.updateFund(id, fund);
+    return ds.updateFund(id, fund);
   }
 
   static Future<List<Shop>> getShops(String bookId) {
-    return dataSource.getShops(bookId);
+    return ds.getShops(bookId);
   }
 
   static Future<Shop> createShop(Shop shop) {
-    return dataSource.createShop(shop);
+    return ds.createShop(shop);
   }
 
   static Future<Shop> updateShop(String id, Shop shop) {
-    return dataSource.updateShop(id, shop);
+    return ds.updateShop(id, shop);
   }
 
   static Future<Map<String, dynamic>> getUserInfo() {
-    return dataSource.getUserInfo();
+    return ds.getUserInfo();
   }
 
   static Future<Map<String, dynamic>> updateUserInfo(
       Map<String, dynamic> data) {
-    return dataSource.updateUserInfo(data);
+    return ds.updateUserInfo(data);
   }
 
   static Future<String> resetInviteCode() {
-    return dataSource.resetInviteCode();
+    return ds.resetInviteCode();
   }
 
   // 服务器状态相关
   static Future<ServerStatus> checkServerStatus() {
-    return dataSource.serverStatus();
+    return ds.serverStatus();
   }
 
   // 用户认证相关
@@ -137,7 +138,7 @@ class ApiService {
     required String email,
     String? nickname,
   }) {
-    return dataSource.register(
+    return ds.register(
       username: username,
       password: password,
       email: email,
@@ -146,16 +147,28 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>?> validateToken(String token) {
-    return dataSource.validateToken(token);
+    return ds.validateToken(token);
   }
 
   static Future<Map<String, dynamic>?> getUserByInviteCode(String inviteCode) {
-    return dataSource.getUserByInviteCode(inviteCode);
+    return ds.getUserByInviteCode(inviteCode);
   }
 
   static Future<BatchDeleteResult> batchDeleteAccountItems(
     List<String> itemIds,
   ) async {
-    return dataSource.batchDeleteAccountItems(itemIds);
+    return ds.batchDeleteAccountItems(itemIds);
+  }
+
+  static Future<void> importData({
+    required String accountBookId,
+    required String dataSource,
+    required PlatformFile file,
+  }) {
+    return ds.importData(
+      accountBookId: accountBookId,
+      dataSource: dataSource,
+      file: file,
+    );
   }
 }

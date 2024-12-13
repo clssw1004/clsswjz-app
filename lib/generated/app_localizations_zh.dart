@@ -15,7 +15,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings => '设置';
 
   @override
-  String get accountManagement => '账本管理';
+  String get accountManagement => '账本';
 
   @override
   String get themeSettings => '主题设置';
@@ -24,13 +24,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get systemSettings => '系统设置';
 
   @override
-  String get categoryManagement => '分类管理';
+  String get categoryManagement => '分类';
 
   @override
-  String get shopManagement => '商家管理';
+  String get shopManagement => '商家';
 
   @override
-  String get fundManagement => '账户管理';
+  String get fundManagement => '账户';
 
   @override
   String get createAccountBook => '创建账本';
@@ -395,7 +395,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accountName => '账户名称';
 
   @override
-  String get accountRemark => '账户备注';
+  String get accountRemark => '账户备���';
 
   @override
   String get currentBalance => '当前余额';
@@ -956,6 +956,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noMoreData => '已经到底了';
+
+  @override
+  String get importData => '导入数据';
+
+  @override
+  String get dataSource => '数据来源';
+
+  @override
+  String get selectFile => '选择文件';
+
+  @override
+  String get importFieldsRequired => '请填写所有必填字段';
+
+  @override
+  String get importSuccess => '导入成功';
+
+  @override
+  String get selectBook => '选择账本';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1458,4 +1476,22 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get noMoreData => '已經到底了';
+
+  @override
+  String get importData => '導入數據';
+
+  @override
+  String get dataSource => '數據來源';
+
+  @override
+  String get selectFile => '選擇文件';
+
+  @override
+  String get importFieldsRequired => '請填寫所有必填欄位';
+
+  @override
+  String get importSuccess => '導入成功';
+
+  @override
+  String get selectBook => '選擇賬本';
 }

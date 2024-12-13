@@ -1,3 +1,5 @@
+import 'package:file_picker/file_picker.dart';
+
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
 import '../../services/api_service.dart';
@@ -489,6 +491,32 @@ class HttpDataSource implements DataSource {
         data: itemIds,
       );
       return BatchDeleteResult.fromJson(response);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<void> importData({
+    required String accountBookId,
+    required String dataSource,
+    required PlatformFile file,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'accountBookId': accountBookId,
+        'dataSource': dataSource,
+        'file': await MultipartFile.fromFile(
+          file.path!,
+          filename: file.name,
+        ),
+      });
+
+      await _httpClient.request<void>(
+        path: '/api/import',
+        method: HttpMethod.post,
+        data: formData,
+      );
     } on DioException catch (e) {
       throw _handleDioError(e);
     }

@@ -228,5 +228,11 @@
   "support": "支持",
   "technicalSupport": "技術支持",
   "loadingMore": "加載更多...",
-  "noMoreData": "已經到底了"
+  "noMoreData": "已經到底了",
+  "selectBook": "選擇賬本",
+  "importData": "導入數據",
+  "dataSource": "數據來源",
+  "selectFile": "選擇文件",
+  "importFieldsRequired": "請填寫所有必填欄位",
+  "importSuccess": "導入成功"
 }

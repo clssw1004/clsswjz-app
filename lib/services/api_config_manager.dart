@@ -13,16 +13,16 @@ class ApiConfigManager {
   static Future<void> setToken(String token) async {
     _token = token;
     await StorageService.setString('token', token);
-    if (ApiService.dataSource is HttpDataSource) {
-      (ApiService.dataSource as HttpDataSource).setToken(token);
+    if (ApiService.ds is HttpDataSource) {
+      (ApiService.ds as HttpDataSource).setToken(token);
     }
   }
 
   static void clearToken() {
     _token = null;
     StorageService.remove('token');
-    if (ApiService.dataSource is HttpDataSource) {
-      (ApiService.dataSource as HttpDataSource).clearToken();
+    if (ApiService.ds is HttpDataSource) {
+      (ApiService.ds as HttpDataSource).clearToken();
     }
   }
 

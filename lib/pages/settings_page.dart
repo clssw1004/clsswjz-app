@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import './settings/widgets/user_card.dart';
 import './settings/widgets/developer_mode_selector.dart';
 import './settings/widgets/language_selector.dart';
-import './settings/category_management_page.dart';
-import './settings/shop_management_page.dart';
-import './settings/fund_management_page.dart';
+import './settings/widgets/book_management_section.dart';
 import '../widgets/app_bar_factory.dart';
 import '../theme/theme_provider.dart';
 import '../l10n/l10n.dart';
@@ -47,75 +45,8 @@ class _SettingsPageState extends State<SettingsPage> {
               SizedBox(height: 16),
 
               // 账本管理
-              _buildSection(
-                context,
-                title: l10n.accountManagement,
-                children: [
-                  AccountBookManager(),
-                  ListTile(
-                    leading: Icon(Icons.category_outlined),
-                    title: Text(l10n.categoryManagement),
-                    trailing: Icon(Icons.chevron_right),
-                    onTap: () async {
-                      // 从 StorageService 获取当前账本ID
-                      final currentBookId = StorageService.getString(
-                        StorageKeys.currentBookId,
-                      );
-
-                      if (currentBookId.isEmpty) {
-                        // 如果没有当前账本，显示提示
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.noDefaultBook),
-                          ),
-                        );
-                        return;
-                      }
-
-                      // 获取数据源
-                      final dataSource =
-                          await DataSourceFactory.create(DataSourceType.http);
-
-                      if (context.mounted) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChangeNotifierProvider(
-                              create: (_) =>
-                                  CategoryManagementProvider(dataSource),
-                              child: CategoryManagementPage(
-                                bookId: currentBookId,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.store_outlined),
-                    title: Text(l10n.shopManagement),
-                    trailing: Icon(Icons.chevron_right),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ShopManagementPage(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.account_balance_wallet_outlined),
-                    title: Text(l10n.fundManagement),
-                    trailing: Icon(Icons.chevron_right),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FundManagementPage(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              const BookManagementSection(),
+              SizedBox(height: 16),
 
               // 主题设置
               _buildSection(

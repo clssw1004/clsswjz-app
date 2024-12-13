@@ -15,7 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
-  String get accountManagement => 'Account Management';
+  String get accountManagement => 'Account';
 
   @override
   String get themeSettings => 'Theme Settings';
@@ -24,13 +24,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get systemSettings => 'System Settings';
 
   @override
-  String get categoryManagement => 'Category Management';
+  String get categoryManagement => 'Category';
 
   @override
-  String get shopManagement => 'Shop Management';
+  String get shopManagement => 'Shop';
 
   @override
-  String get fundManagement => 'Fund Management';
+  String get fundManagement => 'Fund';
 
   @override
   String get createAccountBook => 'Create Account Book';
@@ -956,4 +956,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noMoreData => 'No more data';
+
+  @override
+  String get importData => 'Import Data';
+
+  @override
+  String get dataSource => 'Data Source';
+
+  @override
+  String get selectFile => 'Select File';
+
+  @override
+  String get importFieldsRequired => 'Please fill in all required fields';
+
+  @override
+  String get importSuccess => 'Import successful';
+
+  @override
+  String get selectBook => 'Select Account Book';
 }

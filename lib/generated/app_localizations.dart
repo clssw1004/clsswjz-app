@@ -111,7 +111,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountManagement.
   ///
   /// In en, this message translates to:
-  /// **'Account Management'**
+  /// **'Account'**
   String get accountManagement;
 
   /// No description provided for @themeSettings.
@@ -129,19 +129,19 @@ abstract class AppLocalizations {
   /// No description provided for @categoryManagement.
   ///
   /// In en, this message translates to:
-  /// **'Category Management'**
+  /// **'Category'**
   String get categoryManagement;
 
   /// No description provided for @shopManagement.
   ///
   /// In en, this message translates to:
-  /// **'Shop Management'**
+  /// **'Shop'**
   String get shopManagement;
 
   /// No description provided for @fundManagement.
   ///
   /// In en, this message translates to:
-  /// **'Fund Management'**
+  /// **'Fund'**
   String get fundManagement;
 
   /// No description provided for @createAccountBook.
@@ -1895,6 +1895,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No more data'**
   String get noMoreData;
+
+  /// No description provided for @importData.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Data'**
+  String get importData;
+
+  /// No description provided for @dataSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Source'**
+  String get dataSource;
+
+  /// No description provided for @selectFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select File'**
+  String get selectFile;
+
+  /// No description provided for @importFieldsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in all required fields'**
+  String get importFieldsRequired;
+
+  /// No description provided for @importSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Import successful'**
+  String get importSuccess;
+
+  /// No description provided for @selectBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Account Book'**
+  String get selectBook;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

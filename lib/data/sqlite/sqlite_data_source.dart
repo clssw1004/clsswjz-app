@@ -522,4 +522,13 @@ class SqliteDataSource implements DataSource {
       errors: errors.isEmpty ? null : errors,
     );
   }
+
+  @override
+  Future<void> importData(
+      {required String accountBookId,
+      required String dataSource,
+      required file}) {
+    // TODO: implement importData
+    throw UnimplementedError();
+  }
 }
