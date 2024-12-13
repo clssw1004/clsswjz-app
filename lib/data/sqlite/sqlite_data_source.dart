@@ -1,5 +1,5 @@
-import 'package:file_picker/src/platform_file.dart';
 
+import 'package:file_picker/file_picker.dart';
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
 import '../../services/api_service.dart';

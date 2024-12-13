@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../models/data_source_type.dart';
+import '../../models/import_source_type.dart';
 import '../../services/api_service.dart';
 import '../../utils/message_helper.dart';
 import '../../l10n/l10n.dart';
@@ -15,7 +15,7 @@ class ImportPage extends StatefulWidget {
 
 class _ImportPageState extends State<ImportPage> {
   String? _selectedBookId;
-  DataSourceType? _selectedDataSource;
+  ImportSourceType? _selectedDataSource;
   PlatformFile? _selectedFile;
   bool _isLoading = false;
   List<Map<String, dynamic>> _accountBooks = [];
@@ -180,13 +180,13 @@ class _ImportPageState extends State<ImportPage> {
               },
             ),
             SizedBox(height: 16),
-            DropdownButtonFormField<DataSourceType>(
+            DropdownButtonFormField<ImportSourceType>(
               value: _selectedDataSource,
               decoration: dropdownDecoration.copyWith(
                 labelText: l10n.dataSource,
               ),
-              items: DataSourceType.values
-                  .map<DropdownMenuItem<DataSourceType>>(
+              items: ImportSourceType.values
+                  .map<DropdownMenuItem<ImportSourceType>>(
                       (type) => DropdownMenuItem(
                             value: type,
                             child: Text(type.label),
