@@ -70,18 +70,52 @@ class _ImportPageState extends State<ImportPage> {
     setState(() => _isLoading = true);
 
     try {
-      await ApiService.importData(
+      final result = await ApiService.importData(
         accountBookId: _selectedBookId!,
         dataSource: _selectedDataSource!.name,
         file: _selectedFile!,
       );
 
       if (mounted) {
-        MessageHelper.showSuccess(
-          context,
-          message: L10n.of(context).importSuccess,
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(L10n.of(context).importSuccess),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  L10n.of(context).importSuccessCount(
+                    result['successCount'].toString(),
+                  ),
+                ),
+                if ((result['errors'] as List).isNotEmpty) ...[
+                  SizedBox(height: 8),
+                  Text(
+                    L10n.of(context).importErrors,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  ...((result['errors'] as List).map((error) => Padding(
+                        padding: EdgeInsets.only(left: 8, top: 4),
+                        child: Text('• $error'),
+                      ))),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context, true);
+                },
+                child: Text(L10n.of(context).confirm),
+              ),
+            ],
+          ),
         );
-        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {

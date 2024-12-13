@@ -1931,6 +1931,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Account Book'**
   String get selectBook;
+
+  /// No description provided for @importSuccessCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully imported {count} records'**
+  String importSuccessCount(String count);
+
+  /// No description provided for @importErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'The following errors occurred during import:'**
+  String get importErrors;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

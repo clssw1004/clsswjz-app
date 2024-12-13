@@ -974,4 +974,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectBook => 'Select Account Book';
+
+  @override
+  String importSuccessCount(String count) {
+    return 'Successfully imported $count records';
+  }
+
+  @override
+  String get importErrors => 'The following errors occurred during import:';
 }

@@ -55,7 +55,7 @@ class HttpClient {
   void setToken(String token) {
     _token = token;
     print('HttpClient setToken: $token');
-    
+
     _dio.options.headers = {
       ..._dio.options.headers,
       'Authorization': 'Bearer $token',
@@ -78,14 +78,18 @@ class HttpClient {
     try {
       print('Request path: $path');
       print('Request data: $data');
+      print('Request options: ${options?.headers}');
+      final contentType =
+          options?.headers?['Content-Type'] ?? 'application/json';
+      print('Request options: $contentType');
       final response = await _dio.request<Map<String, dynamic>>(
         path,
         queryParameters: queryParameters,
         data: data,
-        options: options ?? Options(
+        options: Options(
           method: method.value,
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': contentType,
             if (_token != null) 'Authorization': 'Bearer $_token',
           },
         ),

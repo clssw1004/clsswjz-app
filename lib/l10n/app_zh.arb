@@ -136,7 +136,7 @@
   "unknown": "未知",
   "basicInfo": "基本信息",
   "accountName": "账户名称",
-  "accountRemark": "账户备���",
+  "accountRemark": "账户备注",
   "currentBalance": "当前余额",
   "pleaseInputAccountName": "请输入账户名称",
   "fundIncome": "收入",
@@ -169,7 +169,7 @@
   "memberAlreadyExists": "该用户已经是成员",
   "addMemberSuccess": "成员添加成功",
   "addMemberFailed": "添加成员失败：{error}",
-  "permViewBook": "查看账本",
+  "permViewBook": "查看���本",
   "permEditBook": "编辑账本",
   "permDeleteBook": "删除账本",
   "permViewItem": "查看账目",
@@ -304,7 +304,7 @@
   },
   "checkingServerStatus": "正在检测服务器状态...",
   "serverCheckFailed": "服务器检测失败",
-  "serverCheckFailedMessage": "无法连接到服务器，请检查网络连接后重试。",
+  "serverCheckFailedMessage": "无法连接到服务��，请检查网络连接后重试。",
   "backToLogin": "返回登录",
   "retry": "重试",
   "about": "关于",
@@ -328,5 +328,14 @@
   "selectFile": "选择文件",
   "importFieldsRequired": "请填写所有必填字段",
   "importSuccess": "导入成功",
-  "selectBook": "选择账本"
+  "selectBook": "选择账本",
+  "importSuccessCount": "成功导入 {count} 条记录",
+  "@importSuccessCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "importErrors": "导入过程中出现以下错误："
 }

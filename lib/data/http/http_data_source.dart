@@ -12,6 +12,7 @@ import 'api_endpoints.dart';
 import 'http_client.dart';
 import '../../constants/storage_keys.dart';
 import 'package:intl/intl.dart';
+import 'package:http_parser/http_parser.dart';
 
 class HttpDataSource implements DataSource {
   final HttpClient _httpClient;
@@ -497,26 +498,42 @@ class HttpDataSource implements DataSource {
   }
 
   @override
-  Future<void> importData({
+  Future<Map<String, dynamic>> importData({
     required String accountBookId,
     required String dataSource,
     required PlatformFile file,
   }) async {
     try {
-      final formData = FormData.fromMap({
-        'accountBookId': accountBookId,
-        'dataSource': dataSource,
-        'file': await MultipartFile.fromFile(
-          file.path!,
-          filename: file.name,
+      final formData = FormData();
+      formData.fields.addAll([
+        MapEntry('accountBookId', accountBookId),
+        MapEntry('dataSource', dataSource),
+      ]);
+      formData.files.add(
+        MapEntry(
+          'file',
+          await MultipartFile.fromFile(
+            file.path!,
+            filename: file.name,
+            contentType: MediaType('text', 'csv'),
+          ),
         ),
-      });
+      );
 
-      await _httpClient.request<void>(
+      final response = await _httpClient.request<Map<String, dynamic>>(
         path: '/api/import',
         method: HttpMethod.post,
         data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          responseType: ResponseType.json,
+          sendTimeout: const Duration(minutes: 2),
+          receiveTimeout: const Duration(minutes: 2),
+        ),
       );
+      return response;
     } on DioException catch (e) {
       throw _handleDioError(e);
     }

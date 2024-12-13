@@ -395,7 +395,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accountName => '账户名称';
 
   @override
-  String get accountRemark => '账户备���';
+  String get accountRemark => '账户备注';
 
   @override
   String get currentBalance => '当前余额';
@@ -502,7 +502,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get permViewBook => '查看账本';
+  String get permViewBook => '查看���本';
 
   @override
   String get permEditBook => '编辑账本';
@@ -901,7 +901,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverCheckFailed => '服务器检测失败';
 
   @override
-  String get serverCheckFailedMessage => '无法连接到服务器，请检查网络连接后重试。';
+  String get serverCheckFailedMessage => '无法连接到服务��，请检查网络连接后重试。';
 
   @override
   String get backToLogin => '返回登录';
@@ -974,6 +974,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get selectBook => '选择账本';
+
+  @override
+  String importSuccessCount(String count) {
+    return '成功导入 $count 条记录';
+  }
+
+  @override
+  String get importErrors => '导入过程中出现以下错误：';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

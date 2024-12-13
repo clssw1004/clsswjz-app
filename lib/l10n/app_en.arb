@@ -350,5 +350,14 @@
   "selectFile": "Select File",
   "importFieldsRequired": "Please fill in all required fields",
   "importSuccess": "Import successful",
-  "selectBook": "Select Account Book"
+  "selectBook": "Select Account Book",
+  "importSuccessCount": "Successfully imported {count} records",
+  "@importSuccessCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "importErrors": "The following errors occurred during import:"
 }

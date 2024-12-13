@@ -148,6 +148,8 @@
     "invalidPhoneFormat",
     "confirmLogoutTitle",
     "confirmLogoutMessage",
-    "serverManagement"
+    "serverManagement",
+    "importSuccessCount",
+    "importErrors"
   ]
 }

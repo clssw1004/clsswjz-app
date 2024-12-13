@@ -1,3 +1,5 @@
+import 'package:file_picker/src/platform_file.dart';
+
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
 import '../../services/api_service.dart';
@@ -524,10 +526,10 @@ class SqliteDataSource implements DataSource {
   }
 
   @override
-  Future<void> importData(
+  Future<Map<String, dynamic>> importData(
       {required String accountBookId,
       required String dataSource,
-      required file}) {
+      required PlatformFile file}) {
     // TODO: implement importData
     throw UnimplementedError();
   }

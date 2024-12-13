@@ -104,7 +104,7 @@ abstract class DataSource {
   Future<BatchDeleteResult> batchDeleteAccountItems(List<String> itemIds);
 
   /// 导入数据
-  Future<void> importData({
+  Future<Map<String, dynamic>> importData({
     required String accountBookId,
     required String dataSource,
     required PlatformFile file,
