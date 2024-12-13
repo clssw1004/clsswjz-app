@@ -30,9 +30,9 @@ jobs:
             artifact-path: build/app/outputs/flutter-apk/app-release.apk
             artifact-name: clsswjz-${{ github.ref_name }}-android-arm64
             ext: .apk
-    
+
     runs-on: ${{ matrix.os }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -41,14 +41,14 @@ jobs:
         if: matrix.platform == 'android'
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.5'
-          channel: 'stable'
+          flutter-version: "3.24.5"
+          channel: "stable"
 
       - name: Install Linux dependencies
         if: matrix.platform == 'linux'
@@ -60,6 +60,7 @@ jobs:
         run: flutter pub get
 
       - name: Setup signing config
+        if: matrix.platform == 'android'
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/clsswjz.keystore
           echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
@@ -121,7 +122,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           body: |
             Release ${{ github.ref_name }}
-            
+
             Automated release for:
             - Windows (x64): clsswjz-${{ github.ref_name }}-windows-x64.zip
             - Linux (x64): clsswjz-${{ github.ref_name }}-linux-x64.zip
