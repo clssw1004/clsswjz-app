@@ -59,6 +59,14 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Setup signing config
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/clsswjz.keystore
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=clsswjz.keystore" >> android/key.properties
+
       - name: Build ${{ matrix.platform }}
         run: ${{ matrix.build-command }}
 
@@ -78,6 +86,9 @@ jobs:
         if: matrix.platform == 'android'
         run: |
           mv build/app/outputs/flutter-apk/app-release.apk ${{ matrix.artifact-name }}${{ matrix.ext }}
+
+      - name: Build Android APK
+        run: flutter build apk --release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
