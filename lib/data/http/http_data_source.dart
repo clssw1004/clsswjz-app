@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:file_picker/file_picker.dart';
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
@@ -12,6 +14,9 @@ import 'api_endpoints.dart';
 import 'http_client.dart';
 import '../../constants/storage_keys.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
 class HttpDataSource implements DataSource {
   final HttpClient _httpClient;
@@ -563,5 +568,54 @@ class HttpDataSource implements DataSource {
     }
   }
 
-  // 继续实现其他方法...
+  @override
+  Future<File> downloadAttachment(
+    String id, {
+    void Function(int received, int total)? onProgress,
+  }) async {
+    try {
+      // 创建临时目录用于保存下载文件
+      final tempDir = await getTemporaryDirectory();
+      
+      // 使用 Dio 下载文件
+      final response = await _httpClient.dio.get<List<int>>(
+        '${ApiEndpoints.attachments}/$id',
+        options: Options(
+          responseType: ResponseType.bytes,
+          headers: {
+            'Accept': '*/*',
+          },
+        ),
+        onReceiveProgress: onProgress,
+      );
+
+      if (response.data == null) {
+        throw Exception('Download failed: empty response');
+      }
+
+      // 从响应头获取文件名
+      final disposition = response.headers.value('content-disposition');
+      String fileName = '';
+      if (disposition != null) {
+        final match = RegExp(r'filename="?([^"]+)"?').firstMatch(disposition);
+        if (match != null) {
+          fileName = match.group(1) ?? '';
+        }
+      }
+      
+      // 如果没有文件名,使用附件ID作为文件名
+      if (fileName.isEmpty) {
+        fileName = id;
+      }
+
+      // 创建本地文件
+      final file = File('${tempDir.path}/$fileName');
+      
+      // 直接写入字节数据
+      await file.writeAsBytes(response.data!);
+      return file;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
 }

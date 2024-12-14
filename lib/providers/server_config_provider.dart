@@ -15,6 +15,7 @@ class ServerConfigProvider extends ChangeNotifier {
 
   List<ServerConfig> get configs => List.unmodifiable(_configs);
   ServerConfig? get selectedConfig => _selectedConfig;
+  set selectedConfig(ServerConfig? value) => _selectedConfig = value;
   bool get isLoading => _isLoading;
 
   Future<void> _loadConfigs() async {
@@ -34,8 +35,17 @@ class ServerConfigProvider extends ChangeNotifier {
   }
 
   Future<void> updateConfig(ServerConfig config) async {
-    await _service.updateConfig(config);
-    await _loadConfigs();
+    final index = _configs.indexWhere((c) => c.id == config.id);
+    if (index != -1) {
+      _configs[index] = config;
+      notifyListeners();
+      await _service.saveConfigs(_configs);
+      
+      // 如果更新的是当前选中的配置，也更新selectedConfig
+      if (_selectedConfig?.id == config.id) {
+        _selectedConfig = config;
+      }
+    }
   }
 
   Future<void> deleteConfig(String id) async {

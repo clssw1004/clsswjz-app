@@ -1004,4 +1004,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String fileSelectFailed(String error) {
     return 'Failed to select file: $error';
   }
+
+  @override
+  String get fileOpenFailed => 'Failed to open file';
+
+  @override
+  String downloadProgress(String progress) {
+    return 'Downloading... $progress%';
+  }
+
+  @override
+  String get editServer => 'Edit Server';
+
+  @override
+  String get openInExternalApp => 'Open in external app';
 }

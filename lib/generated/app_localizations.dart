@@ -1979,6 +1979,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to select file: {error}'**
   String fileSelectFailed(String error);
+
+  /// No description provided for @fileOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open file'**
+  String get fileOpenFailed;
+
+  /// No description provided for @downloadProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading... {progress}%'**
+  String downloadProgress(String progress);
+
+  /// No description provided for @editServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Server'**
+  String get editServer;
+
+  /// No description provided for @openInExternalApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in external app'**
+  String get openInExternalApp;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

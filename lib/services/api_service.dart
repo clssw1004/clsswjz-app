@@ -172,4 +172,12 @@ class ApiService {
       file: file,
     );
   }
+
+  /// 下载附件
+  static Future<File> downloadAttachment(
+    String id, {
+    void Function(int received, int total)? onProgress,
+  }) {
+    return ds.downloadAttachment(id, onProgress: onProgress);
+  }
 }

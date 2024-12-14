@@ -131,117 +131,15 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
 
-    Widget buildServerSelector() {
-      final provider = context.watch<ServerConfigProvider>();
-      return Row(
-        children: [
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              value: provider.selectedConfig?.id,
-              decoration: inputDecoration.copyWith(
-                labelText: l10n.selectServer,
-                prefixIcon: Icon(
-                    provider.selectedConfig?.type == ServerType.selfHosted
-                        ? Icons.computer_outlined
-                        : Icons.cloud_outlined,
-                    size: 20),
-                isDense: true,
-                contentPadding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
-              ),
-              dropdownColor: Theme.of(context).colorScheme.surface,
-              menuMaxHeight: 300,
-              icon: const Icon(Icons.arrow_drop_down, size: 24),
-              selectedItemBuilder: (context) {
-                return provider.configs.map((config) { 
-                  return Container(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      config.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  );
-                }).toList();
-              },
-              items: provider.configs.map((config) {
-                return DropdownMenuItem<String>(
-                  value: config.id,
-                  child: Container(
-                    constraints: const BoxConstraints(minHeight: 48),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          config.type == ServerType.selfHosted
-                              ? Icons.computer_outlined
-                              : Icons.cloud_outlined,
-                          size: 20,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                config.name,
-                                style: Theme.of(context).textTheme.titleMedium,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              if (config.serverUrl != null &&
-                                  config.serverUrl!.isNotEmpty) ...[
-                                const SizedBox(height: 2),
-                                Text(
-                                  config.serverUrl ?? "",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: (id) {
-                if (id != null) {
-                  provider.selectConfig(id);
-                }
-              },
-              isExpanded: true,
-            ),
-          ),
-          IconButton(
-            onPressed: () => _showAddServerDialog(context),
-            icon: const Icon(Icons.add, size: 20),
-            tooltip: l10n.addServer,
-            visualDensity: VisualDensity.compact,
-            style: IconButton.styleFrom(
-              padding: const EdgeInsets.all(8),
-              foregroundColor: colorScheme.primary,
-            ),
-          ),
-        ],
-      );
-    }
-
     return Scaffold(
       appBar: AppBarFactory.buildAppBar(
         context: context,
         title: AppBarFactory.buildTitle(context, l10n.appName),
+        leading: IconButton(
+          icon: const Icon(Icons.dns_outlined),
+          tooltip: l10n.serverSettings,
+          onPressed: () => Navigator.pushNamed(context, '/server-settings'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.language_outlined),
@@ -297,10 +195,6 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // 使用新的服务器选择器
-                            buildServerSelector(),
-                            const SizedBox(height: 16),
-
                             // 用户名输入框
                             TextFormField(
                               controller: _usernameController,
@@ -398,16 +292,6 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       context: context,
       builder: (context) => const LanguageSelectorDialog(),
-    );
-  }
-
-  void _showAddServerDialog(BuildContext context) {
-    final provider = context.read<ServerConfigProvider>();
-    showDialog(
-      context: context,
-      builder: (context) => AddServerDialog(
-        existingServers: provider.configs,
-      ),
     );
   }
 }

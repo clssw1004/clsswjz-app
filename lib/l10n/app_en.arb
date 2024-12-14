@@ -379,5 +379,16 @@
         "type": "String"
       }
     }
-  }
+  },
+  "fileOpenFailed": "Failed to open file",
+  "downloadProgress": "Downloading... {progress}%",
+  "@downloadProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "editServer": "Edit Server",
+  "openInExternalApp": "Open in external app"
 }

@@ -110,4 +110,14 @@ abstract class DataSource {
     required String dataSource,
     required PlatformFile file,
   });
+
+  /// 下载附件
+  /// 
+  /// [id] 附件ID
+  /// [onProgress] 下载进度回调，参数为已下载字节数和总字节数
+  /// 返回下载的文件
+  Future<File> downloadAttachment(
+    String id, {
+    void Function(int received, int total)? onProgress,
+  });
 }

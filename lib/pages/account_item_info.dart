@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../generated/app_localizations.dart';
+import '../models/attachment.dart';
 import '../services/account_item_cache.dart';
 import '../services/api_service.dart';
 import '../models/models.dart';
+import '../utils/attachment_utils.dart';
 import '../utils/message_helper.dart';
+import '../widgets/attachment_list.dart';
 import './account_item/widgets/type_selector.dart';
 import './account_item/widgets/amount_input.dart';
 import './account_item/widgets/datetime_selector.dart';
@@ -296,6 +299,17 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                             ),
                                             SizedBox(height: 16),
                                             _buildAttachmentSection(),
+                                            if (widget.initialData != null && widget.initialData!['attachments'] != null) ...[
+                                              const SizedBox(height: 16),
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                                child: AttachmentList(
+                                                  attachments: (widget.initialData!['attachments'] as List)
+                                                      .map((e) => Attachment.fromJson(e as Map<String, dynamic>))
+                                                      .toList(),
+                                                ),
+                                              ),
+                                            ],
                                           ],
                                         ),
                                       ),
@@ -512,7 +526,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          _getFileIcon(file.path),
+                          AttachmentUtils.getFileIcon(file.path),
                           size: 20,
                           color: Theme.of(context).colorScheme.primary,
                         ),
@@ -542,25 +556,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
     );
   }
 
-  IconData _getFileIcon(String path) {
-    final extension = path.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-        return Icons.image_outlined;
-      case 'pdf':
-        return Icons.picture_as_pdf_outlined;
-      case 'doc':
-      case 'docx':
-        return Icons.description_outlined;
-      case 'xls':
-      case 'xlsx':
-        return Icons.table_chart_outlined;
-      default:
-        return Icons.insert_drive_file_outlined;
-    }
-  }
+
 
   Future<void> _pickFiles() async {
     try {

@@ -7,4 +7,5 @@ class ApiEndpoints {
   static const String funds = '/api/account/fund';
   static const String shops = '/api/account/shop';
   static const String health = '/api/health';
+  static const String attachments = '/api/attachments';
 }

@@ -8,6 +8,7 @@ import 'l10n/app_localizations.dart';
 import "pages/login_page.dart";
 import 'pages/home_page.dart';
 import 'pages/register_page.dart';
+import 'pages/settings/server_management_page.dart';
 import 'pages/user/user_info_page.dart';
 import 'theme/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -285,6 +286,8 @@ Future<void> main() async {
               '/account-books': (context) => AccountBookList(),
               '/create-account-book': (context) => CreateAccountBookPage(),
               '/user-info': (context) => UserInfoPage(),
+              '/server-settings': (context) =>  ServerManagementPage(),
+
             },
             localizationsDelegates: const [
               AppLocalizations.delegate,

@@ -137,7 +137,7 @@
   "basicInfo": "基本信息",
   "accountName": "账户名称",
   "accountRemark": "账户备注",
-  "currentBalance": "当前余额",
+  "currentBalance": "当前��额",
   "pleaseInputAccountName": "请输入账户名称",
   "fundIncome": "收入",
   "fundExpense": "支出",
@@ -341,7 +341,7 @@
   "attachments": "附件",
   "addAttachment": "添加附件",
   "selectFiles": "选择文件",
-  "fileUploadFailed": "文���上传失败",
+  "fileUploadFailed": "文件上传失败",
   "maxFileSize": "文件大小不能超过 {size}MB",
   "@maxFileSize": {
     "placeholders": {
@@ -357,5 +357,19 @@
         "type": "String"
       }
     }
-  }
+  },
+  "fileOpenFailed": "打开文件失败",
+  "downloadProgress": "下载中... {progress}%",
+  "@downloadProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "editServer": "编辑服���器",
+  "serverName": "服务器名称",
+  "serverUrl": "服务器地址",
+  "save": "保存",
+  "openInExternalApp": "在外部应用中打开"
 }

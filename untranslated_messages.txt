@@ -156,6 +156,10 @@
     "selectFiles",
     "fileUploadFailed",
     "maxFileSize",
-    "fileSelectFailed"
+    "fileSelectFailed",
+    "fileOpenFailed",
+    "downloadProgress",
+    "editServer",
+    "openInExternalApp"
   ]
 }

@@ -1,4 +1,3 @@
-
 import 'package:file_picker/file_picker.dart';
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
@@ -519,5 +518,13 @@ class SqliteDataSource implements DataSource {
       required PlatformFile file}) {
     // TODO: implement importData
     throw UnimplementedError();
+  }
+
+  @override
+  Future<File> downloadAttachment(
+    String id, {
+    void Function(int received, int total)? onProgress,
+  }) {
+    throw UnimplementedError('SQLite does not support attachment download');
   }
 }

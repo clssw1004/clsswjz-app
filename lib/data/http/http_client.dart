@@ -145,6 +145,8 @@ class HttpClient {
     );
   }
 
+  Dio get dio => _dio;
+
   void setBaseUrl(String baseUrl) {
     _dio.options.baseUrl = baseUrl;
   }

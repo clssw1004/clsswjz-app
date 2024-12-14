@@ -81,7 +81,82 @@ class ServerManagementPage extends StatelessWidget {
   }
 
   void _editServer(BuildContext context, ServerConfig config) {
-    // TODO: 实现编辑功能
+    final l10n = L10n.of(context);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    final nameController = TextEditingController(text: config.name);
+    final urlController = TextEditingController(text: config.serverUrl);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.editServer),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 服务器名称输入框
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: l10n.serverName,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // 仅自托管服务器显示URL输入框
+            if (config.type == ServerType.selfHosted) ...[
+              TextField(
+                controller: urlController,
+                decoration: InputDecoration(
+                  labelText: l10n.serverUrl,
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final provider = context.read<ServerConfigProvider>();
+              final newConfig = config.copyWith(
+                name: nameController.text.trim(),
+                serverUrl: config.type == ServerType.selfHosted 
+                  ? urlController.text.trim() 
+                  : config.serverUrl,
+              );
+              
+              provider.updateConfig(newConfig);
+              Navigator.pop(context);
+            },
+            child: Text(l10n.save),
+          ),
+        ],
+      ),
+    );
   }
 
   void _deleteServer(

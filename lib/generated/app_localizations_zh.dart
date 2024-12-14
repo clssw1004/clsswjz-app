@@ -398,7 +398,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accountRemark => '账户备注';
 
   @override
-  String get currentBalance => '当前余额';
+  String get currentBalance => '当前��额';
 
   @override
   String get pleaseInputAccountName => '请输入账户名称';
@@ -993,7 +993,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get selectFiles => '选择文件';
 
   @override
-  String get fileUploadFailed => '文���上传失败';
+  String get fileUploadFailed => '文件上传失败';
 
   @override
   String maxFileSize(String size) {
@@ -1004,6 +1004,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String fileSelectFailed(String error) {
     return '选择文件失败：$error';
   }
+
+  @override
+  String get fileOpenFailed => '打开文件失败';
+
+  @override
+  String downloadProgress(String progress) {
+    return '下载中... $progress%';
+  }
+
+  @override
+  String get editServer => '编辑服���器';
+
+  @override
+  String get openInExternalApp => '在外部应用中打开';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
