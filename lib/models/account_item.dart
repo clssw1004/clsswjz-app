@@ -71,7 +71,7 @@ class AccountItem {
   final String? description;
   final String? shop;
   final String? fundId;
-  final String? fundName;
+  final String? fund;
   final DateTime accountDate;
   final String? createdBy;
   final String? updatedBy;
@@ -87,7 +87,7 @@ class AccountItem {
     this.description,
     this.shop,
     this.fundId,
-    this.fundName,
+    this.fund,
     required this.accountDate,
     this.createdBy,
     this.updatedBy,
@@ -104,7 +104,7 @@ class AccountItem {
         'description': description,
         'shop': shop,
         'fundId': fundId,
-        'fundName': fundName,
+        'fundName': fund,
         'accountDate': accountDate.toIso8601String(),
       };
 
@@ -140,7 +140,7 @@ class AccountItem {
         description: json['description'],
         shop: json['shop'],
         fundId: json['fundId'],
-        fundName: json['fundName'],
+        fund: json['fund'],
         accountDate: DateTime.parse(json['accountDate']),
         createdBy: json['createdBy'],
         updatedBy: json['updatedBy'],
@@ -173,7 +173,7 @@ class AccountItem {
         description: description ?? this.description,
         shop: shop ?? this.shop,
         fundId: fundId ?? this.fundId,
-        fundName: fundName ?? this.fundName,
+        fund: fundName ?? this.fund,
         accountDate: accountDate ?? this.accountDate,
         createdBy: createdBy,
         updatedBy: updatedBy,

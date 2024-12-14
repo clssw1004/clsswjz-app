@@ -80,6 +80,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
       await _provider.loadData();
 
+      if (!mounted) return;
+
       if (widget.initialData != null) {
         setState(() {
           _recordId = widget.initialData!['id'];
@@ -391,11 +393,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
   }
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
-    final l10n = L10n.of(context);
     if (!mounted) return;
+    
+    final l10n = L10n.of(context);
 
     try {
-      _provider.isLoading = true;
+      if (mounted) {
+        _provider.isLoading = true;
+      }
 
       if (data['amount'] == 0.0) {
         MessageHelper.showError(context, message: l10n.pleaseInputAmount);
@@ -427,7 +432,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
         description: data['description'],
         shop: data['shop'],
         fundId: fundId,
-        fundName: fundName,
+        fund: fundName,
         accountDate: DateTime.parse(data['accountDate']),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -441,11 +446,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
       AccountItemCache.clearCache();
 
-      if (!mounted) return;
-      Navigator.pop(context, true);
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
     } catch (e) {
-      if (!mounted) return;
-      MessageHelper.showError(context, message: e.toString());
+      if (mounted) {
+        MessageHelper.showError(context, message: e.toString());
+      }
     } finally {
       if (mounted) {
         _provider.isLoading = false;

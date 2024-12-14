@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
               menuMaxHeight: 300,
               icon: const Icon(Icons.arrow_drop_down, size: 24),
               selectedItemBuilder: (context) {
-                return provider.configs.map((config) {
+                return provider.configs.map((config) { 
                   return Container(
                     alignment: Alignment.centerLeft,
                     child: Text(

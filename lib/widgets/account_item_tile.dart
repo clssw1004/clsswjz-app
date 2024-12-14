@@ -121,7 +121,7 @@ class AccountItemTile extends StatelessWidget {
                               color: colorScheme.onSurfaceVariant,
                             ),
                             SizedBox(width: 4),
-                            Text(item.fundName!),
+                            Text(item.fund!),
                           ],
                         ],
                       ),
