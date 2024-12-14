@@ -502,7 +502,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get permViewBook => '查看���本';
+  String get permViewBook => '查看账本';
 
   @override
   String get permEditBook => '编辑账本';
@@ -901,7 +901,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverCheckFailed => '服务器检测失败';
 
   @override
-  String get serverCheckFailedMessage => '无法连接到服务��，请检查网络连接后重试。';
+  String get serverCheckFailedMessage => '无法连接到服务器，请检查网络连接后重试。';
 
   @override
   String get backToLogin => '返回登录';

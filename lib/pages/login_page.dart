@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/server_config.dart';
 import '../providers/server_config_provider.dart';
 import '../services/auth_service.dart';
 import '../l10n/l10n.dart';
@@ -139,18 +140,79 @@ class _LoginPageState extends State<LoginPage> {
               value: provider.selectedConfig?.id,
               decoration: inputDecoration.copyWith(
                 labelText: l10n.selectServer,
-                prefixIcon: const Icon(Icons.dns_outlined, size: 20),
+                prefixIcon: Icon(
+                    provider.selectedConfig?.type == ServerType.selfHosted
+                        ? Icons.computer_outlined
+                        : Icons.cloud_outlined,
+                    size: 20),
                 isDense: true,
                 contentPadding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
               ),
+              dropdownColor: Theme.of(context).colorScheme.surface,
+              menuMaxHeight: 300,
+              icon: const Icon(Icons.arrow_drop_down, size: 24),
+              selectedItemBuilder: (context) {
+                return provider.configs.map((config) {
+                  return Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      config.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList();
+              },
               items: provider.configs.map((config) {
-                return DropdownMenuItem(
+                return DropdownMenuItem<String>(
                   value: config.id,
-                  child: Text(
-                    config.name,
-                    style: theme.textTheme.titleMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 48),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          config.type == ServerType.selfHosted
+                              ? Icons.computer_outlined
+                              : Icons.cloud_outlined,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                config.name,
+                                style: Theme.of(context).textTheme.titleMedium,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (config.serverUrl != null &&
+                                  config.serverUrl!.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  config.serverUrl ?? "",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),
@@ -159,6 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                   provider.selectConfig(id);
                 }
               },
+              isExpanded: true,
             ),
           ),
           IconButton(
@@ -201,16 +264,23 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 32),
-                    Text(
-                      l10n.login,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.bold,
+                    // 添加 App Logo
+                    Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorScheme.primaryContainer,
                       ),
-                      textAlign: TextAlign.center,
+                      child: Center(
+                        child: Image.asset(
+                          'assets/images/app_logo.png',
+                          width: 120,
+                          height: 120,
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
                     // 登录表单卡片
                     Card(
