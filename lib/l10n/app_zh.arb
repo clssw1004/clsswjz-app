@@ -337,5 +337,25 @@
       }
     }
   },
-  "importErrors": "导入过程中出现以下错误："
+  "importErrors": "导入过程中出现以下错误：",
+  "attachments": "附件",
+  "addAttachment": "添加附件",
+  "selectFiles": "选择文件",
+  "fileUploadFailed": "文���上传失败",
+  "maxFileSize": "文件大小不能超过 {size}MB",
+  "@maxFileSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "fileSelectFailed": "选择文件失败：{error}",
+  "@fileSelectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

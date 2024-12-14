@@ -982,6 +982,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importErrors => '导入过程中出现以下错误：';
+
+  @override
+  String get attachments => '附件';
+
+  @override
+  String get addAttachment => '添加附件';
+
+  @override
+  String get selectFiles => '选择文件';
+
+  @override
+  String get fileUploadFailed => '文���上传失败';
+
+  @override
+  String maxFileSize(String size) {
+    return '文件大小不能超过 ${size}MB';
+  }
+
+  @override
+  String fileSelectFailed(String error) {
+    return '选择文件失败：$error';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

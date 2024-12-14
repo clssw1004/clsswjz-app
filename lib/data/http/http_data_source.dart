@@ -1,10 +1,10 @@
 import 'package:file_picker/file_picker.dart';
-
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
 import '../../services/api_service.dart';
 import '../../services/storage_service.dart';
 import 'http_method.dart';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import '../data_source.dart';
 import '../../models/models.dart';
@@ -23,8 +23,7 @@ class HttpDataSource implements DataSource {
 
   factory HttpDataSource({String? baseUrl}) {
     final savedUrl = StorageService.getString(StorageKeys.serverUrl);
-    return HttpDataSource._internal(
-        baseUrl: baseUrl ?? savedUrl ?? 'http://192.168.2.199:3000');
+    return HttpDataSource._internal(baseUrl: baseUrl ?? savedUrl);
   }
 
   void setToken(String token) {
@@ -119,13 +118,39 @@ class HttpDataSource implements DataSource {
   }
 
   @override
-  Future<AccountItem> createAccountItem(AccountItem item) async {
+  Future<AccountItem> createAccountItem(AccountItem item, [List<File>? attachments]) async {
     try {
+      final Map<String, dynamic> data = {
+        'accountBookId': item.accountBookId,
+        'fundId': item.fundId,
+        'amount': item.amount,
+        'type': item.type,
+        'category': item.category,
+        'shop': item.shop,
+        'description': item.description,
+        'accountDate': item.accountDate.toIso8601String(),
+      };
+
+      if (attachments != null) {
+        data['attachments'] = attachments.map((file) => 
+          MultipartFile.fromFileSync(
+            file.path,
+            filename: file.path.split('/').last,
+          )
+        ).toList();
+      }
+
+      final formData = FormData.fromMap(data);
+
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: ApiEndpoints.accountItems,
         method: HttpMethod.post,
-        data: item.toJsonCreate(),
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
       );
+
       return AccountItem.fromJson(response);
     } on DioException catch (e) {
       throw _handleDioError(e);

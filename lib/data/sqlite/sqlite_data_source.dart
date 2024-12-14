@@ -8,6 +8,7 @@ import '../../models/models.dart';
 import 'database_helper.dart';
 import '../http/http_method.dart';
 import '../../services/api_config_service.dart';
+import 'dart:io';
 
 class SqliteDataSource implements DataSource {
   final DatabaseHelper _dbHelper;
@@ -111,22 +112,8 @@ class SqliteDataSource implements DataSource {
   }
 
   @override
-  Future<AccountItem> createAccountItem(AccountItem item) async {
-    final db = await _dbHelper.database;
-    await db.insert('account_items', {
-      'id': item.id,
-      'account_book_id': item.accountBookId,
-      'type': item.type,
-      'amount': item.amount,
-      'category': item.category,
-      'description': item.description,
-      'shop': item.shop,
-      'fund_id': item.fundId,
-      'account_date': item.accountDate.toIso8601String(),
-      'created_at': item.createdAt?.toIso8601String(),
-      'updated_at': item.updatedAt?.toIso8601String(),
-    });
-    return item;
+  Future<AccountItem> createAccountItem(AccountItem item, [List<File>? attachments]) async {
+    throw UnimplementedError('SQLite does not support createAccountItem');
   }
 
   @override

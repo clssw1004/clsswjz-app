@@ -150,6 +150,12 @@
     "confirmLogoutMessage",
     "serverManagement",
     "importSuccessCount",
-    "importErrors"
+    "importErrors",
+    "attachments",
+    "addAttachment",
+    "selectFiles",
+    "fileUploadFailed",
+    "maxFileSize",
+    "fileSelectFailed"
   ]
 }

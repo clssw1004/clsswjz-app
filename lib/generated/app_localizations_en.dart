@@ -982,4 +982,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importErrors => 'The following errors occurred during import:';
+
+  @override
+  String get attachments => 'Attachments';
+
+  @override
+  String get addAttachment => 'Add Attachment';
+
+  @override
+  String get selectFiles => 'Select Files';
+
+  @override
+  String get fileUploadFailed => 'File upload failed';
+
+  @override
+  String maxFileSize(String size) {
+    return 'File size cannot exceed ${size}MB';
+  }
+
+  @override
+  String fileSelectFailed(String error) {
+    return 'Failed to select file: $error';
+  }
 }

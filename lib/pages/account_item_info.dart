@@ -17,6 +17,8 @@ import '../widgets/app_bar_factory.dart';
 import './account_item/widgets/shop_selector.dart';
 import '../l10n/l10n.dart';
 import './account_item/widgets/category_grid_selector.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -37,7 +39,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
-  List<Category> _categories = [];
 
   static const TYPE_EXPENSE = 'EXPENSE';
   static const TYPE_INCOME = 'INCOME';
@@ -52,6 +53,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
   String? _recordId;
   String? _selectedShop;
   String? _selectedShopName;
+
+  final List<File> _attachments = [];
 
   @override
   void initState() {
@@ -292,6 +295,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                                   _descriptionController,
                                             ),
                                             SizedBox(height: 16),
+                                            _buildAttachmentSection(),
                                           ],
                                         ),
                                       ),
@@ -372,19 +376,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
     );
   }
 
-  Future<void> _loadCategories() async {
-    if (_selectedBook == null) return;
-    try {
-      final categories = await ApiService.getCategories(_selectedBook!['id']);
-      if (!mounted) return;
-      setState(() {
-        _categories = categories;
-      });
-    } catch (e) {
-      print('加载分类失败: $e');
-    }
-  }
-
   String get _formattedDateTime {
     final date = DateFormat('yyyy-MM-dd').format(_selectedDate);
     final time =
@@ -439,7 +430,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
       );
 
       if (accountItem.id.isEmpty) {
-        await ApiService.createAccountItem(accountItem);
+        await ApiService.createAccountItem(accountItem, _attachments);
       } else {
         await ApiService.updateAccountItem(accountItem.id, accountItem);
       }
@@ -482,5 +473,125 @@ class _AccountItemFormState extends State<AccountItemForm> {
         );
       },
     );
+  }
+
+  Widget _buildAttachmentSection() {
+    final l10n = L10n.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              l10n.attachments,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              onPressed: _pickFiles,
+              tooltip: l10n.addAttachment,
+            ),
+          ],
+        ),
+        if (_attachments.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _attachments.map((file) {
+              return Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _getFileIcon(file.path),
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          file.path.split('/').last,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: -8,
+                    right: -8,
+                    child: IconButton(
+                      icon: const Icon(Icons.cancel, size: 18),
+                      onPressed: () => _removeAttachment(file),
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+        ],
+      ],
+    );
+  }
+
+  IconData _getFileIcon(String path) {
+    final extension = path.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return Icons.image_outlined;
+      case 'pdf':
+        return Icons.picture_as_pdf_outlined;
+      case 'doc':
+      case 'docx':
+        return Icons.description_outlined;
+      case 'xls':
+      case 'xlsx':
+        return Icons.table_chart_outlined;
+      default:
+        return Icons.insert_drive_file_outlined;
+    }
+  }
+
+  Future<void> _pickFiles() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: true,
+      );
+
+      if (result != null && mounted) {
+        setState(() {
+          _attachments.addAll(
+            result.paths
+                .where((path) => path != null)
+                .map((path) => File(path!))
+                .toList(),
+          );
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        final l10n = L10n.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.fileSelectFailed(e.toString()))),
+        );
+      }
+    }
+  }
+
+  void _removeAttachment(File file) {
+    setState(() {
+      _attachments.remove(file);
+    });
   }
 }

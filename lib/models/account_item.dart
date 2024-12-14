@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import 'attachment.dart';
+
 class AccountItemResponse {
   final List<AccountItem> items;
   final AccountSummary summary;
@@ -64,48 +66,55 @@ class AccountSummary {
 
 class AccountItem {
   final String id;
-  final String accountBookId;
-  final String type;
   final double amount;
+  final String description;
+  final String type;
   final String category;
-  final String? description;
-  final String? shop;
+  final DateTime accountDate;
+  final String accountBookId;
   final String? fundId;
   final String? fund;
-  final DateTime accountDate;
+  final String? shop;
   final String? createdBy;
   final String? updatedBy;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final List<Attachment> attachments;
 
-  AccountItem({
+  const AccountItem({
     required this.id,
-    required this.accountBookId,
-    required this.type,
     required this.amount,
+    required this.description,
+    required this.type,
     required this.category,
-    this.description,
-    this.shop,
+    required this.accountDate,
+    required this.accountBookId,
     this.fundId,
     this.fund,
-    required this.accountDate,
+    this.shop,
     this.createdBy,
     this.updatedBy,
-    this.createdAt,
-    this.updatedAt,
+    required this.createdAt,
+    required this.updatedAt,
+    this.attachments = const [],
   });
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'accountBookId': accountBookId,
-        'type': type,
         'amount': amount,
-        'category': category,
         'description': description,
-        'shop': shop,
-        'fundId': fundId,
-        'fundName': fund,
+        'type': type,
+        'category': category,
         'accountDate': accountDate.toIso8601String(),
+        'accountBookId': accountBookId,
+        'fundId': fundId,
+        'fund': fund,
+        'shop': shop,
+        'createdBy': createdBy,
+        'updatedBy': updatedBy,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+        'attachments': attachments.map((e) => e.toJson()).toList(),
       };
 
   Map<String, dynamic> toJsonUpdate() => {
@@ -131,26 +140,27 @@ class AccountItem {
         'accountDate': DateFormat('yyyy-MM-dd HH:mm:ss').format(accountDate),
       };
 
-  factory AccountItem.fromJson(Map<String, dynamic> json) => AccountItem(
-        id: json['id'],
-        accountBookId: json['accountBookId'],
-        type: json['type'],
-        amount: (json['amount'] as num).toDouble(),
-        category: json['category'],
-        description: json['description'],
-        shop: json['shop'],
-        fundId: json['fundId'],
-        fund: json['fund'],
-        accountDate: DateTime.parse(json['accountDate']),
-        createdBy: json['createdBy'],
-        updatedBy: json['updatedBy'],
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'])
-            : null,
-        updatedAt: json['updatedAt'] != null
-            ? DateTime.parse(json['updatedAt'])
-            : null,
-      );
+  factory AccountItem.fromJson(Map<String, dynamic> json) {
+    return AccountItem(
+      id: json['id'] as String,
+      amount: (json['amount'] as num).toDouble(),
+      description: json['description'] as String? ?? '',
+      type: json['type'] as String,
+      category: json['category'] as String,
+      accountDate: DateTime.parse(json['accountDate'] as String),
+      accountBookId: json['accountBookId'] as String,
+      fundId: json['fundId'] as String?,
+      fund: json['fund'] as String?,
+      shop: json['shop'] as String?,
+      createdBy: json['createdBy'] as String?,
+      updatedBy: json['updatedBy'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      attachments: (json['attachments'] as List<dynamic>?)
+          ?.map((e) => Attachment.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
+    );
+  }
 
   AccountItem copyWith({
     String? id,
@@ -179,5 +189,6 @@ class AccountItem {
         updatedBy: updatedBy,
         createdAt: createdAt,
         updatedAt: updatedAt,
+        attachments: attachments,
       );
 }

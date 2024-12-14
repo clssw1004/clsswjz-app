@@ -1,5 +1,6 @@
-import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import '../models/account_item_request.dart';
 import '../models/models.dart';
 import '../models/server_status.dart';
@@ -55,7 +56,7 @@ abstract class DataSource {
 
   // 账目相关
   Future<AccountItemResponse> getAccountItems(AccountItemRequest request);
-  Future<AccountItem> createAccountItem(AccountItem item);
+  Future<AccountItem> createAccountItem(AccountItem item, [List<File>? attachments]);
   Future<AccountItem> updateAccountItem(String id, AccountItem item);
   Future<void> deleteAccountItem(String id);
 

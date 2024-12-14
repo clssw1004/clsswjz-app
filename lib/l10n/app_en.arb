@@ -359,5 +359,25 @@
       }
     }
   },
-  "importErrors": "The following errors occurred during import:"
+  "importErrors": "The following errors occurred during import:",
+  "attachments": "Attachments",
+  "addAttachment": "Add Attachment",
+  "selectFiles": "Select Files",
+  "fileUploadFailed": "File upload failed",
+  "maxFileSize": "File size cannot exceed {size}MB",
+  "@maxFileSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "fileSelectFailed": "Failed to select file: {error}",
+  "@fileSelectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

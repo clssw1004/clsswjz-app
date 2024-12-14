@@ -1943,6 +1943,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The following errors occurred during import:'**
   String get importErrors;
+
+  /// No description provided for @attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachments;
+
+  /// No description provided for @addAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Attachment'**
+  String get addAttachment;
+
+  /// No description provided for @selectFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Files'**
+  String get selectFiles;
+
+  /// No description provided for @fileUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'File upload failed'**
+  String get fileUploadFailed;
+
+  /// No description provided for @maxFileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'File size cannot exceed {size}MB'**
+  String maxFileSize(String size);
+
+  /// No description provided for @fileSelectFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to select file: {error}'**
+  String fileSelectFailed(String error);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
