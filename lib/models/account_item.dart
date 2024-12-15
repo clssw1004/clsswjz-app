@@ -183,7 +183,7 @@ class AccountItem {
         description: description ?? this.description,
         shop: shop ?? this.shop,
         fundId: fundId ?? this.fundId,
-        fund: fundName ?? this.fund,
+        fund: fundName ?? fund,
         accountDate: accountDate ?? this.accountDate,
         createdBy: createdBy,
         updatedBy: updatedBy,

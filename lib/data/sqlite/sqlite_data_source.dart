@@ -129,7 +129,7 @@ class SqliteDataSource implements DataSource {
         'shop': item.shop,
         'fund_id': item.fundId,
         'account_date': item.accountDate.toIso8601String(),
-        'updated_at': item.updatedAt?.toIso8601String(),
+        'updated_at': item.updatedAt.toIso8601String(),
       },
       where: 'id = ?',
       whereArgs: [id],

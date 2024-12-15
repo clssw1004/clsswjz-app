@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../models/attachment.dart';
 import '../utils/attachment_utils.dart';
@@ -24,7 +25,13 @@ class AttachmentList extends StatefulWidget {
 }
 
 class _AttachmentListState extends State<AttachmentList> {
-  final _downloadProgress = StreamController<double>();
+  final _downloadProgress = StreamController<double>.broadcast();
+
+  @override
+  void initState() {
+    super.initState();
+    _downloadProgress.add(0.0);
+  }
 
   @override
   void dispose() {
@@ -74,9 +81,18 @@ class _AttachmentListState extends State<AttachmentList> {
               borderRadius: BorderRadius.circular(8),
               onTap: () async {
                 if (widget.showPreview && AttachmentUtils.isImage(attachment.extension)) {
-                  // 显示下载进度对话框
+                  // 重置进度
+                  _downloadProgress.add(0.0);
+                  
+                  // 检查是否已缓存
+                  final localPath = await AttachmentUtils.getAttachmentLocalPath(attachment);
+                  final localFile = File(localPath);
+                  final isCached = await localFile.exists();
+
                   BuildContext? dialogContext;
-                  if (context.mounted) {
+                  
+                  // 只有未缓存时才显示进度对话框
+                  if (!isCached && context.mounted) {
                     showDialog(
                       context: context,
                       barrierDismissible: false,
@@ -84,9 +100,10 @@ class _AttachmentListState extends State<AttachmentList> {
                         dialogContext = context;
                         return StreamBuilder<double>(
                           stream: _downloadProgress.stream,
+                          initialData: 0.0,
                           builder: (context, snapshot) {
                             return DownloadProgressDialog(
-                              progress: snapshot.data ?? 0.0,
+                              progress: snapshot.data! ,
                             );
                           },
                         );
@@ -98,13 +115,15 @@ class _AttachmentListState extends State<AttachmentList> {
                     final success = await AttachmentUtils.openAttachment(
                       attachment,
                       onProgress: (received, total) {
-                        final progress = (received / total) * 100;
-                        _downloadProgress.add(progress);
+                        if (total > 0) {
+                          final progress = (received / total) * 100;
+                          _downloadProgress.add(progress);
+                        }
                       },
                       context: context,
                     );
 
-                    // 确保在下载完成后关闭进度对话框
+                    // 关闭进度对话框（如果存在）
                     if (dialogContext != null && dialogContext!.mounted) {
                       Navigator.of(dialogContext!).pop();
                     }
@@ -115,7 +134,6 @@ class _AttachmentListState extends State<AttachmentList> {
                       );
                     }
                   } catch (e) {
-                    // 发生错误时关闭进度对话框
                     if (dialogContext != null && dialogContext!.mounted) {
                       Navigator.of(dialogContext!).pop();
                     }
@@ -130,8 +148,10 @@ class _AttachmentListState extends State<AttachmentList> {
                   final success = await AttachmentUtils.openAttachment(
                     attachment,
                     onProgress: (received, total) {
-                      final progress = (received / total) * 100;
-                      _downloadProgress.add(progress);
+                      if (total > 0) {
+                        final progress = (received / total) * 100;
+                        _downloadProgress.add(progress);
+                      }
                     },
                   );
 

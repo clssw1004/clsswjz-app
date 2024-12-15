@@ -273,7 +273,7 @@ Future<void> main() async {
             theme: themeProvider.lightTheme,
             darkTheme: themeProvider.darkTheme,
             themeMode: themeProvider.themeMode,
-            title: '记账本',
+            title:'CLSSWJZ',
             home: Builder(
               builder: (context) => ServerCheckScreen(
                 themeProvider: themeProvider,

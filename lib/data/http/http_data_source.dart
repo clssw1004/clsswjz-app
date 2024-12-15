@@ -15,8 +15,6 @@ import 'http_client.dart';
 import '../../constants/storage_keys.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:convert';
-import 'dart:typed_data';
 
 class HttpDataSource implements DataSource {
   final HttpClient _httpClient;

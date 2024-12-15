@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/server_config.dart';
 import '../providers/server_config_provider.dart';
 import '../services/auth_service.dart';
 import '../l10n/l10n.dart';
 import '../widgets/app_bar_factory.dart';
 import 'login/widgets/remember_login_checkbox.dart';
 import 'settings/widgets/language_selector_dialog.dart';
-import 'settings/widgets/add_server_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   @override

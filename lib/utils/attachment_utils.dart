@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../models/attachment.dart';
 import '../services/api_service.dart';
-import '../widgets/image_preview.dart';
+import '../widgets/app_bar_factory.dart';
 
 class AttachmentUtils {
   /// 获取附件缓存目录
@@ -38,10 +38,10 @@ class AttachmentUtils {
   }) async {
     final localPath = await getAttachmentLocalPath(attachment);
     final localFile = File(localPath);
-    
+
     if (await localFile.exists()) {
-      // 如果本地已有缓存，直接返回
-      onProgress?.call(1, 1); // 通知进度完成
+      // 如果本地已有缓存，直接返回，并通知进度为100%
+      onProgress?.call(100, 100);
       return localFile;
     }
 
@@ -65,7 +65,7 @@ class AttachmentUtils {
 
     // 删除临时文件
     await downloadedFile.delete();
-    
+
     return newFile;
   }
 
@@ -82,11 +82,21 @@ class AttachmentUtils {
     BuildContext? context,
   }) async {
     try {
+      // 先检查是否已缓存
+      final localPath = await getAttachmentLocalPath(attachment);
+      final localFile = File(localPath);
+      final isCached = await localFile.exists();
+
+      // 如果已缓存，直接通知100%进度
+      if (isCached) {
+        onProgress?.call(100, 100);
+      }
+
       final file = await downloadAndCacheAttachment(
         attachment,
-        onProgress: onProgress,
+        onProgress: isCached ? null : onProgress, // 已缓存时不需要进度回调
       );
-      
+
       if (kIsWeb) {
         final url = Uri.parse('/api/attachments/${attachment.id}');
         return launchUrl(url);
@@ -100,8 +110,10 @@ class AttachmentUtils {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    AppBar(
-                      title: Text(attachment.originName),
+                    AppBarFactory.buildAppBar(
+                      context: context,
+                      title: AppBarFactory.buildTitle(
+                          context, attachment.originName),
                       leading: IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () => Navigator.of(context).pop(),
@@ -131,7 +143,8 @@ class AttachmentUtils {
                             return Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.broken_image_outlined, size: 48),
+                                const Icon(Icons.broken_image_outlined,
+                                    size: 48),
                                 const SizedBox(height: 16),
                                 Text('Failed to load image: $error'),
                               ],
@@ -180,7 +193,8 @@ class AttachmentUtils {
       debugPrint('Failed to clean attachment cache: $e');
     }
   }
-   static IconData getFileIcon(String path) {
+
+  static IconData getFileIcon(String path) {
     final extension = path.split('.').last.toLowerCase();
     switch (extension) {
       case 'jpg':
@@ -199,4 +213,4 @@ class AttachmentUtils {
         return Icons.insert_drive_file_outlined;
     }
   }
-} 
+}
