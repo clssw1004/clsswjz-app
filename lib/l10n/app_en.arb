@@ -390,5 +390,24 @@
     }
   },
   "editServer": "Edit Server",
-  "openInExternalApp": "Open in external app"
+  "openInExternalApp": "Open in external app",
+  "download": "Download",
+  "downloadFailed": "Download failed",
+  "downloadFailedMessage": "Failed to download file: {error}",
+  "@downloadFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "unsupportedPreview": "Unsupported preview",
+  "fileDownloaded": "File downloaded to {path}",
+  "@fileDownloaded": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  }
 }

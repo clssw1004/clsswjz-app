@@ -277,90 +277,14 @@ class _AttachmentListState extends State<AttachmentList> {
 
   // 处理附件点击
   Future<void> _handleAttachmentTap(Attachment attachment) async {
-    if (widget.showPreview && AttachmentUtils.isImage(attachment.extension)) {
-      // 重置进度
-      _downloadProgress.add(0.0);
-
-      // 检查是否已缓存
-      final localPath =
-          await AttachmentUtils.getAttachmentLocalPath(attachment);
-      final localFile = File(localPath);
-      final isCached = await localFile.exists();
-
-      BuildContext? dialogContext;
-      File? downloadedFile;
-
-      try {
-        // 只有未缓存时才显示进度对话框
-        if (!isCached && context.mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) {
-              dialogContext = context;
-              return StreamBuilder<double>(
-                stream: _downloadProgress.stream,
-                initialData: 0.0,
-                builder: (context, snapshot) {
-                  return DownloadProgressDialog(
-                    progress: snapshot.data!,
-                  );
-                },
-              );
-            },
-          );
-        }
-
-        // 下载或获取缓存的文件
-        downloadedFile = await AttachmentUtils.openAttachment(
-          attachment,
-          onProgress: (received, total) {
-            if (total > 0) {
-              final progress = (received / total) * 100;
-              _downloadProgress.add(progress);
-            }
-          },
-          context: context,
-        ) as File?;
-
-        // 关闭进度对话框（如果存在）
-        if (dialogContext != null && dialogContext!.mounted) {
-          Navigator.of(dialogContext!).pop();
-        }
-
-        // 显示预览
-        if (downloadedFile != null &&
-            await downloadedFile.exists() &&
-            context.mounted) {
-          await AttachmentUtils.showImagePreview(
-            context,
-            downloadedFile,
-            attachment.originName,
-          );
-        }
-      } catch (e) {
-        if (dialogContext != null && dialogContext!.mounted) {
-          Navigator.of(dialogContext!).pop();
-        }
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(L10n.of(context).fileOpenFailed)),
-          );
-        }
-      }
-    } else {
-      // 非图片文件直接调用系统打开
-      final success = await AttachmentUtils.openAttachment(
+    try {
+      await AttachmentUtils.previewAttachment(
+        context,
         attachment,
-        onProgress: (received, total) {
-          if (total > 0) {
-            final progress = (received / total) * 100;
-            _downloadProgress.add(progress);
-          }
-        },
+        _downloadProgress,
       );
-
-      if (!success && context.mounted) {
+    } catch (e) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(L10n.of(context).fileOpenFailed)),
         );

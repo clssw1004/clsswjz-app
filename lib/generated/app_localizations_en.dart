@@ -1018,4 +1018,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openInExternalApp => 'Open in external app';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get downloadFailed => 'Download failed';
+
+  @override
+  String downloadFailedMessage(String error) {
+    return 'Failed to download file: $error';
+  }
+
+  @override
+  String get unsupportedPreview => 'Unsupported preview';
+
+  @override
+  String fileDownloaded(String path) {
+    return 'File downloaded to $path';
+  }
 }

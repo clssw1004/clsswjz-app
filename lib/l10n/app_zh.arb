@@ -137,7 +137,7 @@
   "basicInfo": "基本信息",
   "accountName": "账户名称",
   "accountRemark": "账户备注",
-  "currentBalance": "当前余额",
+  "currentBalance": "当前��额",
   "pleaseInputAccountName": "请输入账户名称",
   "fundIncome": "收入",
   "fundExpense": "支出",
@@ -320,7 +320,7 @@
   "license": "开源协议",
   "mitLicenseDescription": "基于 MIT 协议开源",
   "support": "支持",
-  "technicalSupport": "技术支持",
+  "technicalSupport": "技���支持",
   "loadingMore": "加载更多...",
   "noMoreData": "已经到底了",
   "importData": "导入数据",
@@ -367,7 +367,7 @@
       }
     }
   },
-  "editServer": "编辑服务器",
+  "editServer": "���辑服务器",
   "serverName": "服务器名称",
   "serverUrl": "服务器地址",
   "save": "保存",
@@ -381,5 +381,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "unsupportedPreview": "不支持预览该格式文件",
+  "ok": "确定"
 }

@@ -949,7 +949,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get support => '支持';
 
   @override
-  String get technicalSupport => '技术支持';
+  String get technicalSupport => '技���支持';
 
   @override
   String get loadingMore => '加载更多...';
@@ -1014,10 +1014,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get editServer => '编辑服���器';
+  String get editServer => '���辑服务器';
 
   @override
   String get openInExternalApp => '在外部应用中打开';
+
+  @override
+  String get download => '下载';
+
+  @override
+  String get downloadFailed => '下载失败';
+
+  @override
+  String downloadFailedMessage(String error) {
+    return 'Failed to download file: $error';
+  }
+
+  @override
+  String get unsupportedPreview => '不支持预览该格式文件';
+
+  @override
+  String fileDownloaded(String path) {
+    return '文件已保存到: $path';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

@@ -2003,6 +2003,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open in external app'**
   String get openInExternalApp;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed'**
+  String get downloadFailed;
+
+  /// No description provided for @downloadFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to download file: {error}'**
+  String downloadFailedMessage(String error);
+
+  /// No description provided for @unsupportedPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported preview'**
+  String get unsupportedPreview;
+
+  /// No description provided for @fileDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'File downloaded to {path}'**
+  String fileDownloaded(String path);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
