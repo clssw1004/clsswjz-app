@@ -137,7 +137,7 @@
   "basicInfo": "基本信息",
   "accountName": "账户名称",
   "accountRemark": "账户备注",
-  "currentBalance": "当前��额",
+  "currentBalance": "当前余额",
   "pleaseInputAccountName": "请输入账户名称",
   "fundIncome": "收入",
   "fundExpense": "支出",
@@ -367,9 +367,19 @@
       }
     }
   },
-  "editServer": "编辑服���器",
+  "editServer": "编辑服务器",
   "serverName": "服务器名称",
   "serverUrl": "服务器地址",
   "save": "保存",
-  "openInExternalApp": "在外部应用中打开"
+  "openInExternalApp": "在外部应用中打开",
+  "download": "下载",
+  "downloadFailed": "下载失败",
+  "fileDownloaded": "文件已保存到: {path}",
+  "@fileDownloaded": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  }
 }

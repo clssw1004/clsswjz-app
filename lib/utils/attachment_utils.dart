@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:path/path.dart' as path;
 import '../l10n/app_localizations.dart';
 import '../models/attachment.dart';
 import '../services/api_service.dart';
@@ -11,12 +11,27 @@ import '../widgets/app_bar_factory.dart';
 class AttachmentUtils {
   /// 获取附件缓存目录
   static Future<Directory> getAttachmentCacheDir() async {
-    final cacheDir = await getTemporaryDirectory();
-    final attachmentDir = Directory('${cacheDir.path}/attachments');
-    if (!await attachmentDir.exists()) {
-      await attachmentDir.create(recursive: true);
+    if (Platform.isAndroid) {
+      // 在 Android 上使用外部文件目录
+      final dir = await getExternalStorageDirectory();
+      if (dir == null) {
+        throw Exception('Failed to get external storage directory');
+      }
+      final attachmentDir = Directory('${dir.path}/attachments');
+      if (!await attachmentDir.exists()) {
+        await attachmentDir.create(recursive: true);
+      }
+      debugPrint('Attachment dir: ${attachmentDir.path}'); // 调试用
+      return attachmentDir;
+    } else {
+      // 其他平台使用临时目录
+      final cacheDir = await getTemporaryDirectory();
+      final attachmentDir = Directory('${cacheDir.path}/attachments');
+      if (!await attachmentDir.exists()) {
+        await attachmentDir.create(recursive: true);
+      }
+      return attachmentDir;
     }
-    return attachmentDir;
   }
 
   /// 获取附件本地缓存路径
@@ -94,13 +109,33 @@ class AttachmentUtils {
         return downloadedFile;
       }
 
-      // 如果不是图片，直接用系统应用打开
+      // 如果不是图片，下载到 Downloads 文件夹
       if (!isImage(attachment.extension) && localFile.existsSync()) {
-        final uri = Uri.file(localFile.path);
-        await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
+        if (Platform.isAndroid) {
+          final downloadsDir = Directory('/storage/emulated/0/Download');
+          if (!await downloadsDir.exists()) {
+            await downloadsDir.create(recursive: true);
+          }
+
+          final downloadPath = path.join(
+            downloadsDir.path,
+            '${attachment.id}_${attachment.originName}',
+          );
+
+          await localFile.copy(downloadPath);
+
+          if (context != null && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('文件已保存到: ${path.basename(downloadPath)}'),
+                action: SnackBarAction(
+                  label: '确定',
+                  onPressed: () {},
+                ),
+              ),
+            );
+          }
+        }
         return true;
       }
 
@@ -160,7 +195,7 @@ class AttachmentUtils {
     await Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
-        barrierDismissible: true, // 允许点击空白区域关闭
+        barrierDismissible: true, // 允许点击空白区关闭
         barrierColor: Colors.black87,
         pageBuilder: (context, _, __) => PopScope(
           canPop: true,
@@ -182,28 +217,42 @@ class AttachmentUtils {
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.open_in_new, color: Colors.white),
-                  tooltip: L10n.of(context).openInExternalApp,
+                  icon: const Icon(Icons.download, color: Colors.white),
+                  tooltip: L10n.of(context).download,
                   onPressed: () async {
                     try {
-                      final uri = Uri.file(file.path);
-                      final success = await launchUrl(
-                        uri,
-                        mode: LaunchMode.externalApplication,
-                      );
-                      if (!success && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(L10n.of(context).fileOpenFailed),
-                          ),
+                      if (Platform.isAndroid) {
+                        final downloadsDir =
+                            Directory('/storage/emulated/0/Download');
+                        if (!await downloadsDir.exists()) {
+                          await downloadsDir.create(recursive: true);
+                        }
+
+                        final downloadPath = path.join(
+                          downloadsDir.path,
+                          fileName,
                         );
+
+                        await file.copy(downloadPath);
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  '图片已保存到: ${path.basename(downloadPath)}'),
+                              action: SnackBarAction(
+                                label: '确定',
+                                onPressed: () {},
+                              ),
+                            ),
+                          );
+                        }
                       }
                     } catch (e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(L10n.of(context).fileOpenFailed),
-                          ),
+                              content: Text(L10n.of(context).downloadFailed)),
                         );
                       }
                     }
