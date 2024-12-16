@@ -76,10 +76,12 @@ class AccountItem {
   final String? fund;
   final String? shop;
   final String? createdBy;
+  final String? createdByName;
   final String? updatedBy;
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<Attachment> attachments;
+  final List<String>? deleteAttachmentIds;
 
   const AccountItem({
     required this.id,
@@ -93,10 +95,12 @@ class AccountItem {
     this.fund,
     this.shop,
     this.createdBy,
+    this.createdByName,
     this.updatedBy,
     required this.createdAt,
     required this.updatedAt,
     this.attachments = const [],
+    this.deleteAttachmentIds,
   });
 
   Map<String, dynamic> toJson() => {
@@ -111,6 +115,7 @@ class AccountItem {
         'fund': fund,
         'shop': shop,
         'createdBy': createdBy,
+        'createdByName': createdByName,
         'updatedBy': updatedBy,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
@@ -153,12 +158,14 @@ class AccountItem {
       fund: json['fund'] as String?,
       shop: json['shop'] as String?,
       createdBy: json['createdBy'] as String?,
+      createdByName: json['createdByName'] as String?,
       updatedBy: json['updatedBy'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       attachments: (json['attachments'] as List<dynamic>?)
-          ?.map((e) => Attachment.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((e) => Attachment.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 
@@ -186,6 +193,7 @@ class AccountItem {
         fund: fundName ?? fund,
         accountDate: accountDate ?? this.accountDate,
         createdBy: createdBy,
+        createdByName: createdByName,
         updatedBy: updatedBy,
         createdAt: createdAt,
         updatedAt: updatedAt,

@@ -57,7 +57,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
   String? _selectedShop;
   String? _selectedShopName;
 
-  final List<File> _attachments = [];
+  final List<File> _newAttachments = [];
+  final List<String> _deleteAttachmentIds = [];
+  List<Attachment> _existingAttachments = [];
 
   @override
   void initState() {
@@ -72,6 +74,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
     } else {
       _transactionType = TYPE_EXPENSE;
     }
+
+    _existingAttachments = _getInitialAttachments();
   }
 
   @override
@@ -298,18 +302,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                                   _descriptionController,
                                             ),
                                             SizedBox(height: 16),
-                                            _buildAttachmentSection(),
-                                            if (widget.initialData != null && widget.initialData!['attachments'] != null) ...[
-                                              const SizedBox(height: 16),
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                                child: AttachmentList(
-                                                  attachments: (widget.initialData!['attachments'] as List)
-                                                      .map((e) => Attachment.fromJson(e as Map<String, dynamic>))
-                                                      .toList(),
-                                                ),
-                                              ),
-                                            ],
+                                            _buildAttachmentList(),
                                           ],
                                         ),
                                       ),
@@ -399,7 +392,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
   Future<void> _saveTransaction(Map<String, dynamic> data) async {
     if (!mounted) return;
-    
+
     final l10n = L10n.of(context);
 
     try {
@@ -429,24 +422,28 @@ class _AccountItemFormState extends State<AccountItemForm> {
           : _selectedFund?['name'];
 
       final accountItem = AccountItem(
-        id: data['id'] ?? '',
-        accountBookId: data['accountBookId'],
-        type: type,
-        amount: data['amount'],
-        category: data['category'],
-        description: data['description'],
-        shop: data['shop'],
-        fundId: fundId,
-        fund: fundName,
-        accountDate: DateTime.parse(data['accountDate']),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+          id: data['id'] ?? '',
+          accountBookId: data['accountBookId'],
+          type: type,
+          amount: data['amount'],
+          category: data['category'],
+          description: data['description'],
+          shop: data['shop'],
+          fundId: fundId,
+          fund: fundName,
+          accountDate: DateTime.parse(data['accountDate']),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          deleteAttachmentIds: _deleteAttachmentIds);
 
       if (accountItem.id.isEmpty) {
-        await ApiService.createAccountItem(accountItem, _attachments);
+        await ApiService.createAccountItem(accountItem, _newAttachments);
       } else {
-        await ApiService.updateAccountItem(accountItem.id, accountItem);
+        await ApiService.updateAccountItem(
+          accountItem.id,
+          accountItem,
+          _newAttachments,
+        );
       }
 
       AccountItemCache.clearCache();
@@ -489,105 +486,57 @@ class _AccountItemFormState extends State<AccountItemForm> {
     );
   }
 
-  Widget _buildAttachmentSection() {
-    final l10n = L10n.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              l10n.attachments,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: _pickFiles,
-              tooltip: l10n.addAttachment,
-            ),
-          ],
-        ),
-        if (_attachments.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _attachments.map((file) {
-              return Stack(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          AttachmentUtils.getFileIcon(file.path),
-                          size: 20,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          file.path.split('/').last,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    top: -8,
-                    right: -8,
-                    child: IconButton(
-                      icon: const Icon(Icons.cancel, size: 18),
-                      onPressed: () => _removeAttachment(file),
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
-          ),
-        ],
+  Widget _buildAttachmentList() {
+    return AttachmentList(
+      attachments: [
+        ..._existingAttachments,
+        ..._newAttachments.map((file) => Attachment(
+              id: 'temp_${file.path}',
+              originName: file.path.split('/').last,
+              fileLength: file.lengthSync(),
+              extension: file.path.split('.').last,
+              contentType: 'application/octet-stream',
+              businessCode: 'ACCOUNT_ITEM',
+              businessId: '',
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            )),
       ],
+      canUpload: true,
+      onAttachmentsSelected: (files) {
+        setState(() {
+          _newAttachments.addAll(files);
+        });
+      },
+      onAttachmentDelete: (attachment) {
+        setState(() {
+          if (attachment.id.startsWith('temp_')) {
+            final filePath = attachment.id.substring(5);
+            _newAttachments.removeWhere((f) => f.path == filePath);
+          } else {
+            _deleteAttachmentIds.add(attachment.id);
+            _existingAttachments.removeWhere((a) => a.id == attachment.id);
+          }
+        });
+      },
     );
   }
 
-
-
-  Future<void> _pickFiles() async {
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.any,
-        allowMultiple: true,
-      );
-
-      if (result != null && mounted) {
-        setState(() {
-          _attachments.addAll(
-            result.paths
-                .where((path) => path != null)
-                .map((path) => File(path!))
-                .toList(),
-          );
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        final l10n = L10n.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.fileSelectFailed(e.toString()))),
-        );
-      }
+  List<Attachment> _getInitialAttachments() {
+    if (widget.initialData == null ||
+        !widget.initialData!.containsKey('attachments') ||
+        widget.initialData!['attachments'] == null) {
+      return [];
     }
-  }
 
-  void _removeAttachment(File file) {
-    setState(() {
-      _attachments.remove(file);
-    });
+    try {
+      final attachmentsList = widget.initialData!['attachments'] as List;
+      return attachmentsList
+          .map((e) => Attachment.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint('Error parsing attachments: $e');
+      return [];
+    }
   }
 }

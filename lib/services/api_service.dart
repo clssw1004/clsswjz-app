@@ -1,4 +1,5 @@
 import 'package:clsswjz/models/account_item_request.dart';
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../data/data_source.dart';
@@ -73,12 +74,18 @@ class ApiService {
     return ds.getAccountItems(request);
   }
 
-  static Future<AccountItem> createAccountItem(AccountItem item, [List<File>? attachments]) async {
+  static Future<AccountItem> createAccountItem(AccountItem item,
+      [List<File>? attachments]) async {
     return ds.createAccountItem(item, attachments);
   }
 
-  static Future<AccountItem> updateAccountItem(String id, AccountItem item) {
-    return ds.updateAccountItem(id, item);
+  static Future<void> updateAccountItem(String id, AccountItem item,
+      [List<File>? attachments]) async {
+    await ds.updateAccountItem(
+      id,
+      item,
+      attachments,
+    );
   }
 
   static Future<void> deleteAccountItem(String id) {

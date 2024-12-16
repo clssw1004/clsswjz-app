@@ -56,8 +56,10 @@ abstract class DataSource {
 
   // 账目相关
   Future<AccountItemResponse> getAccountItems(AccountItemRequest request);
-  Future<AccountItem> createAccountItem(AccountItem item, [List<File>? attachments]);
-  Future<AccountItem> updateAccountItem(String id, AccountItem item);
+  Future<AccountItem> createAccountItem(AccountItem item,
+      [List<File>? attachments]);
+  Future<void> updateAccountItem(String id, AccountItem item,
+      [List<File>? attachments]);
   Future<void> deleteAccountItem(String id);
 
   // 分类相关
@@ -112,7 +114,7 @@ abstract class DataSource {
   });
 
   /// 下载附件
-  /// 
+  ///
   /// [id] 附件ID
   /// [onProgress] 下载进度回调，参数为已下载字节数和总字节数
   /// 返回下载的文件

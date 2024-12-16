@@ -273,7 +273,7 @@ Future<void> main() async {
             theme: themeProvider.lightTheme,
             darkTheme: themeProvider.darkTheme,
             themeMode: themeProvider.themeMode,
-            title:'CLSSWJZ',
+            title: 'CLSSWJZ',
             home: Builder(
               builder: (context) => ServerCheckScreen(
                 themeProvider: themeProvider,
@@ -286,8 +286,7 @@ Future<void> main() async {
               '/account-books': (context) => AccountBookList(),
               '/create-account-book': (context) => CreateAccountBookPage(),
               '/user-info': (context) => UserInfoPage(),
-              '/server-settings': (context) =>  ServerManagementPage(),
-
+              '/server-settings': (context) => ServerManagementPage(),
             },
             localizationsDelegates: const [
               AppLocalizations.delegate,

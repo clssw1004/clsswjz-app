@@ -15,6 +15,7 @@ import '../constants/storage_keys.dart';
 import '../services/storage_service.dart';
 import '../models/shop.dart';
 import '../models/account_item_request.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class AccountItemList extends StatefulWidget {
   final void Function(Map<String, dynamic>)? onBookSelected;
@@ -592,6 +593,7 @@ class _AccountItemListState extends State<AccountItemList>
     return ListView.builder(
       key: _listKey,
       controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
       itemCount: _groupedItems.length + (_hasMoreData ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == _groupedItems.length) {
@@ -606,19 +608,74 @@ class _AccountItemListState extends State<AccountItemList>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDateHeader(date, dateItems),
-            ...dateItems.map((item) => AccountItemTile(
+            ...dateItems.map((item) => Slidable(
                   key: ValueKey(item.id),
-                  item: item,
-                  onTap: () => _editAccountItem(item),
-                  onLongPress: () => _enterBatchMode(item.id),
-                  showCheckbox: _isBatchMode,
-                  isChecked: _selectedItems.contains(item.id),
-                  onCheckChanged: (checked) => _toggleItemSelection(item.id),
+                  endActionPane: ActionPane(
+                    motion: const ScrollMotion(),
+                    extentRatio: 0.15,
+                    children: [
+                      CustomSlidableAction(
+                        onPressed: (context) async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(L10n.of(context).delete),
+                              content:
+                                  Text(L10n.of(context).confirmDeleteMessage),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: Text(L10n.of(context).cancel),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor:
+                                        Theme.of(context).colorScheme.error,
+                                  ),
+                                  child: Text(L10n.of(context).delete),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirmed == true) {
+                            try {
+                              await ApiService.deleteAccountItem(item.id);
+                              if (context.mounted) {
+                                MessageHelper.showSuccess(
+                                  context,
+                                  message: L10n.of(context).deleteSuccess,
+                                );
+                              }
+                              await _loadAccountItems(isRefresh: true);
+                            } catch (e) {
+                              if (context.mounted) {
+                                MessageHelper.showError(context,
+                                    message: e.toString());
+                              }
+                            }
+                          }
+                        },
+                        foregroundColor: Theme.of(context).colorScheme.error,
+                        child: const Icon(Icons.delete_outline),
+                      ),
+                    ],
+                  ),
+                  child: AccountItemTile(
+                    key: ValueKey(item.id),
+                    item: item,
+                    onTap: () => _editAccountItem(item),
+                    onLongPress: () => _enterBatchMode(item.id),
+                    showCheckbox: _isBatchMode,
+                    isChecked: _selectedItems.contains(item.id),
+                    onCheckChanged: (checked) => _toggleItemSelection(item.id),
+                  ),
                 )),
           ],
         );
       },
-      cacheExtent: 1000.0,
     );
   }
 

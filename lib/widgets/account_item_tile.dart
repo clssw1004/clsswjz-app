@@ -3,6 +3,8 @@ import '../models/models.dart';
 import '../l10n/l10n.dart';
 import 'package:intl/intl.dart';
 
+import '../services/user_service.dart';
+
 class AccountItemTile extends StatelessWidget {
   final AccountItem item;
   final VoidCallback? onTap;
@@ -30,11 +32,14 @@ class AccountItemTile extends StatelessWidget {
     final isExpense = item.type == 'EXPENSE';
     final hasShop = item.shop != null && item.shop != 'NO_SHOP';
     final hasFund = item.fundId != null && item.fundId != 'NO_FUND';
+    final currentUserId = UserService.getUserInfo()?['userId'];
+    final showCreator =
+        item.createdBy != currentUserId && item.createdByName != null;
 
     final timeStr = DateFormat('HH:mm').format(item.accountDate);
 
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4),
+      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -56,7 +61,7 @@ class AccountItemTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (showCheckbox) ...[
                     SizedBox(
@@ -81,17 +86,22 @@ class AccountItemTile extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 16),
-                  Text(
-                    '${isExpense ? '-' : '+'}${l10n.currencySymbol}${item.amount.toStringAsFixed(2)}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color:
-                          isExpense ? colorScheme.error : colorScheme.tertiary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${isExpense ? '-' : '+'}${l10n.currencySymbol}${item.amount.toStringAsFixed(2)}',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color:
+                              isExpense ? colorScheme.error : Color(0xFF43A047),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              if (hasShop || hasFund) ...[
+              if (hasShop || hasFund || showCreator) ...[
                 SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -126,6 +136,57 @@ class AccountItemTile extends StatelessWidget {
                         ],
                       ),
                     ),
+                    Row(
+                      children: [
+                        if (showCreator) ...[
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: colorScheme.secondaryContainer,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              item.createdByName!,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: colorScheme.onSecondaryContainer,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                        ],
+                        Text(
+                          timeStr,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ] else ...[
+                SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (showCreator) ...[
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          item.createdByName!,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onSecondaryContainer,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                    ],
                     Text(
                       timeStr,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -133,17 +194,6 @@ class AccountItemTile extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ] else ...[
-                SizedBox(height: 4),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    timeStr,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
                 ),
               ],
             ],

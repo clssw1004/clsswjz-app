@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:file_picker/file_picker.dart';
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
@@ -121,7 +120,8 @@ class HttpDataSource implements DataSource {
   }
 
   @override
-  Future<AccountItem> createAccountItem(AccountItem item, [List<File>? attachments]) async {
+  Future<AccountItem> createAccountItem(AccountItem item,
+      [List<File>? attachments]) async {
     try {
       final Map<String, dynamic> data = {
         'accountBookId': item.accountBookId,
@@ -135,12 +135,15 @@ class HttpDataSource implements DataSource {
       };
 
       if (attachments != null) {
-        data['attachments'] = attachments.map((file) => 
-          MultipartFile.fromFileSync(
-            file.path,
-            filename: file.path.split('/').last,
-          )
-        ).toList();
+        data['attachments'] = await Future.wait(
+          attachments.map((file) async {
+            final filename = Uri.encodeComponent(file.path.split('/').last);
+            return await MultipartFile.fromFile(
+              file.path,
+              filename: filename,
+            );
+          }),
+        );
       }
 
       final formData = FormData.fromMap(data);
@@ -161,14 +164,45 @@ class HttpDataSource implements DataSource {
   }
 
   @override
-  Future<AccountItem> updateAccountItem(String id, AccountItem item) async {
+  Future<void> updateAccountItem(String id, AccountItem item,
+      [List<File>? attachments]) async {
     try {
-      final response = await _httpClient.request<Map<String, dynamic>>(
+      final Map<String, dynamic> data = ({
+        'amount': item.amount,
+        'type': item.type,
+        'category': item.category,
+        'shop': item.shop,
+        'description': item.description,
+        'accountDate': item.accountDate.toIso8601String(),
+        'fundId': item.fundId,
+        if (item.deleteAttachmentIds?.length == 1)
+          'deleteAttachmentId': item.deleteAttachmentIds
+        else if (item.deleteAttachmentIds != null &&
+            item.deleteAttachmentIds!.length > 1)
+          'deleteAttachmentIds': item.deleteAttachmentIds,
+      });
+
+      if (attachments != null) {
+        data['attachments'] = await Future.wait(
+          attachments.map((file) async {
+            final filename = Uri.encodeComponent(file.path.split('/').last);
+            return await MultipartFile.fromFile(
+              file.path,
+              filename: filename,
+            );
+          }),
+        );
+      }
+      final formData = FormData.fromMap(data);
+
+      await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.accountItems}/$id',
         method: HttpMethod.patch,
-        data: item.toJsonUpdate(),
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
       );
-      return AccountItem.fromJson(response);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
@@ -574,7 +608,7 @@ class HttpDataSource implements DataSource {
     try {
       // 创建临时目录用于保存下载文件
       final tempDir = await getTemporaryDirectory();
-      
+
       // 使用 Dio 下载文件
       final response = await _httpClient.dio.get<List<int>>(
         '${ApiEndpoints.attachments}/$id',
@@ -600,7 +634,7 @@ class HttpDataSource implements DataSource {
           fileName = match.group(1) ?? '';
         }
       }
-      
+
       // 如果没有文件名,使用附件ID作为文件名
       if (fileName.isEmpty) {
         fileName = id;
@@ -608,7 +642,7 @@ class HttpDataSource implements DataSource {
 
       // 创建本地文件
       final file = File('${tempDir.path}/$fileName');
-      
+
       // 直接写入字节数据
       await file.writeAsBytes(response.data!);
       return file;

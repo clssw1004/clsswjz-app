@@ -111,30 +111,15 @@ class SqliteDataSource implements DataSource {
   }
 
   @override
-  Future<AccountItem> createAccountItem(AccountItem item, [List<File>? attachments]) async {
+  Future<AccountItem> createAccountItem(AccountItem item,
+      [List<File>? attachments]) async {
     throw UnimplementedError('SQLite does not support createAccountItem');
   }
 
   @override
-  Future<AccountItem> updateAccountItem(String id, AccountItem item) async {
-    final db = await _dbHelper.database;
-    await db.update(
-      'account_items',
-      {
-        'account_book_id': item.accountBookId,
-        'type': item.type,
-        'amount': item.amount,
-        'category': item.category,
-        'description': item.description,
-        'shop': item.shop,
-        'fund_id': item.fundId,
-        'account_date': item.accountDate.toIso8601String(),
-        'updated_at': item.updatedAt.toIso8601String(),
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    return item;
+  Future<AccountItem> updateAccountItem(String id, AccountItem item,
+      [List<File>? attachments]) async {
+    throw UnimplementedError('SQLite does not support updateAccountItem');
   }
 
   @override
