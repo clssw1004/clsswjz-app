@@ -124,7 +124,7 @@
   "serverStatusNormal": "服务正常\n数据库状态: {dbStatus}\n内存使用: {memUsed}/{memTotal}",
   "serverStatusError": "服务异常: {error}",
   "pleaseInputServerUrl": "请输入服务地址",
-  "saveSuccess": "保存成功，请重启应用",
+  "saveSuccess": "保存成功",
   "saveFailed": "保存失败: {error}",
   "restartAppAfterChange": "修改后需要重启应用才能生效",
   "checkServer": "检测服务",

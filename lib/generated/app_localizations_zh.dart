@@ -353,7 +353,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pleaseInputServerUrl => '请输入服务地址';
 
   @override
-  String get saveSuccess => '保存成功，请重启应用';
+  String get saveSuccess => '保存成功';
 
   @override
   String saveFailed(Object error) {
