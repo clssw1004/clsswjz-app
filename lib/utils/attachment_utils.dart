@@ -76,98 +76,35 @@ class AttachmentUtils {
   }
 
   /// 打开附件
-  static Future<bool> openAttachment(
+  static Future<dynamic> openAttachment(
     Attachment attachment, {
     void Function(int received, int total)? onProgress,
     BuildContext? context,
   }) async {
     try {
-      // 先检查是否已缓存
       final localPath = await getAttachmentLocalPath(attachment);
       final localFile = File(localPath);
       final isCached = await localFile.exists();
 
-      // 如果已缓存，直接通知100%进度
-      if (isCached) {
-        onProgress?.call(100, 100);
+      if (!isCached) {
+        final downloadedFile = await downloadAndCacheAttachment(
+          attachment,
+          onProgress: onProgress,
+        );
+        return downloadedFile;
       }
 
-      final file = await downloadAndCacheAttachment(
-        attachment,
-        onProgress: isCached ? null : onProgress, // 已缓存时不需要进度回调
-      );
-
-      if (kIsWeb) {
-        final url = Uri.parse('/api/attachments/${attachment.id}');
-        return launchUrl(url);
-      } else {
-        if (context != null && isImage(attachment.extension)) {
-          // 如果是图片且提供了context，显示预览对话框
-          if (context.mounted) {
-            await showDialog(
-              context: context,
-              builder: (context) => Dialog(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AppBarFactory.buildAppBar(
-                      context: context,
-                      title: AppBarFactory.buildTitle(
-                          context, attachment.originName),
-                      leading: IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      actions: [
-                        IconButton(
-                          icon: const Icon(Icons.open_in_new),
-                          tooltip: L10n.of(context).openInExternalApp,
-                          onPressed: () {
-                            final uri = Uri.file(file.path);
-                            launchUrl(
-                              uri,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    Flexible(
-                      child: InteractiveViewer(
-                        minScale: 0.5,
-                        maxScale: 4.0,
-                        child: Image.file(
-                          file,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.broken_image_outlined,
-                                    size: 48),
-                                const SizedBox(height: 16),
-                                Text('Failed to load image: $error'),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-          return true;
-        } else {
-          // 其他文件使用系统默认应用打开
-          final uri = Uri.file(file.path);
-          return launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
-        }
+      // 如果不是图片，直接用系统应用打开
+      if (!isImage(attachment.extension) && localFile.existsSync()) {
+        final uri = Uri.file(localFile.path);
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+        return true;
       }
+
+      return localFile;
     } catch (e) {
       debugPrint('Failed to open attachment: $e');
       return false;
@@ -212,5 +149,141 @@ class AttachmentUtils {
       default:
         return Icons.insert_drive_file_outlined;
     }
+  }
+
+  /// 示图片预览
+  static Future<void> showImagePreview(
+    BuildContext context,
+    File file,
+    String fileName,
+  ) async {
+    await Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: true, // 允许点击空白区域关闭
+        barrierColor: Colors.black87,
+        pageBuilder: (context, _, __) => PopScope(
+          canPop: true,
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            extendBodyBehindAppBar: true, // 内容延伸到AppBar下方
+            appBar: AppBarFactory.buildAppBar(
+              context: context,
+              backgroundColor: Colors.black26,
+              title: Text(
+                fileName,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                    ),
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.open_in_new, color: Colors.white),
+                  tooltip: L10n.of(context).openInExternalApp,
+                  onPressed: () async {
+                    try {
+                      final uri = Uri.file(file.path);
+                      final success = await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
+                      if (!success && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(L10n.of(context).fileOpenFailed),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(L10n.of(context).fileOpenFailed),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  // 全屏点击区域用于关闭
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      behavior: HitTestBehavior.opaque, // 确保即使透明也能接收点击
+                      child: Container(color: Colors.transparent),
+                    ),
+                  ),
+                  // 图片预览区域
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {}, // 阻止点击事件冒泡
+                      child: InteractiveViewer(
+                        minScale: 0.5,
+                        maxScale: 4.0,
+                        child: Image.file(
+                          file,
+                          fit: BoxFit.contain,
+                          frameBuilder:
+                              (context, child, frame, wasSynchronouslyLoaded) {
+                            if (frame == null) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              );
+                            }
+                            return child;
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.broken_image_outlined,
+                                      size: 48,
+                                      color: Colors.white,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Failed to load image: $error',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
+    );
   }
 }

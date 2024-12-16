@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/attachment.dart';
 import '../utils/attachment_utils.dart';
 import '../l10n/l10n.dart';
 import '../widgets/download_progress_dialog.dart';
+import 'app_bar_factory.dart';
 
 class AttachmentList extends StatefulWidget {
   final List<Attachment> attachments;
@@ -80,39 +82,43 @@ class _AttachmentListState extends State<AttachmentList> {
             child: InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () async {
-                if (widget.showPreview && AttachmentUtils.isImage(attachment.extension)) {
+                if (widget.showPreview &&
+                    AttachmentUtils.isImage(attachment.extension)) {
                   // 重置进度
                   _downloadProgress.add(0.0);
-                  
+
                   // 检查是否已缓存
-                  final localPath = await AttachmentUtils.getAttachmentLocalPath(attachment);
+                  final localPath =
+                      await AttachmentUtils.getAttachmentLocalPath(attachment);
                   final localFile = File(localPath);
                   final isCached = await localFile.exists();
 
                   BuildContext? dialogContext;
-                  
-                  // 只有未缓存时才显示进度对话框
-                  if (!isCached && context.mounted) {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) {
-                        dialogContext = context;
-                        return StreamBuilder<double>(
-                          stream: _downloadProgress.stream,
-                          initialData: 0.0,
-                          builder: (context, snapshot) {
-                            return DownloadProgressDialog(
-                              progress: snapshot.data! ,
-                            );
-                          },
-                        );
-                      },
-                    );
-                  }
+                  File? downloadedFile;
 
                   try {
-                    final success = await AttachmentUtils.openAttachment(
+                    // 只有未缓存时才显示进度对话框
+                    if (!isCached && context.mounted) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) {
+                          dialogContext = context;
+                          return StreamBuilder<double>(
+                            stream: _downloadProgress.stream,
+                            initialData: 0.0,
+                            builder: (context, snapshot) {
+                              return DownloadProgressDialog(
+                                progress: snapshot.data!,
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }
+
+                    // 下载或获取缓存的文件
+                    downloadedFile = await AttachmentUtils.openAttachment(
                       attachment,
                       onProgress: (received, total) {
                         if (total > 0) {
@@ -121,16 +127,21 @@ class _AttachmentListState extends State<AttachmentList> {
                         }
                       },
                       context: context,
-                    );
+                    ) as File?;
 
                     // 关闭进度对话框（如果存在）
                     if (dialogContext != null && dialogContext!.mounted) {
                       Navigator.of(dialogContext!).pop();
                     }
 
-                    if (!success && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.fileOpenFailed)),
+                    // 显示预览
+                    if (downloadedFile != null &&
+                        await downloadedFile.exists() &&
+                        context.mounted) {
+                      await AttachmentUtils.showImagePreview(
+                        context,
+                        downloadedFile,
+                        attachment.originName,
                       );
                     }
                   } catch (e) {
@@ -139,7 +150,8 @@ class _AttachmentListState extends State<AttachmentList> {
                     }
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.fileOpenFailed)),
+                        SnackBar(
+                            content: Text(L10n.of(context).fileOpenFailed)),
                       );
                     }
                   }
@@ -157,7 +169,7 @@ class _AttachmentListState extends State<AttachmentList> {
 
                   if (!success && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.fileOpenFailed)),
+                      SnackBar(content: Text(L10n.of(context).fileOpenFailed)),
                     );
                   }
                 }
@@ -237,4 +249,4 @@ class _AttachmentListState extends State<AttachmentList> {
 
     return '${size.toStringAsFixed(1)} ${suffixes[i]}';
   }
-} 
+}
