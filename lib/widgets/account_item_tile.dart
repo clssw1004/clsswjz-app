@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../l10n/l10n.dart';
-import 'package:intl/intl.dart';
 
 import '../services/user_service.dart';
 

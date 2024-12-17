@@ -28,8 +28,6 @@ class FormSelectorField<T> extends StatefulWidget {
 }
 
 class _FormSelectorFieldState<T> extends State<FormSelectorField<T>> {
-  final _gridKey = GlobalKey();
-
   String? _getDisplayText() {
     if (widget.value == null) return null;
 

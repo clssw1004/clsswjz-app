@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../models/attachment.dart';
 import '../utils/attachment_utils.dart';
 import '../l10n/l10n.dart';
-import '../widgets/download_progress_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 
 class AttachmentList extends StatefulWidget {
