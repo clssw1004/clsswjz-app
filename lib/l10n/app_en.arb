@@ -232,11 +232,10 @@
   "selectCategoryTitle": "Select Category",
   "noAvailableCategories": "No available categories",
   "searchCategoryHint": "Search or input new category",
-  "addCategoryButton": "Add \"{name}\"",
   "selectShopTitle": "Select Shop",
   "noAvailableShops": "No available shops",
   "searchShopHint": "Search or input new shop",
-  "addShopButton": "Add \"{name}\"",
+  "addButtonWith": "Add \"{name}\"",
   "summaryIncome": "Income",
   "summaryExpense": "Expense",
   "summaryBalance": "Balance",
@@ -409,5 +408,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "fieldRequired": "This field is required",
+  "clear": "Clear",
+  "selectShopHint": "Select shop"
 }

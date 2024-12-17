@@ -699,11 +699,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchCategoryHint => 'Search or input new category';
 
   @override
-  String addCategoryButton(Object name) {
-    return 'Add \"$name\"';
-  }
-
-  @override
   String get selectShopTitle => 'Select Shop';
 
   @override
@@ -713,7 +708,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchShopHint => 'Search or input new shop';
 
   @override
-  String addShopButton(Object name) {
+  String addButtonWith(Object name) {
     return 'Add \"$name\"';
   }
 
@@ -1037,4 +1032,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String fileDownloaded(String path) {
     return 'File downloaded to $path';
   }
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get selectShopHint => 'Select shop';
 }

@@ -1428,12 +1428,6 @@ abstract class AppLocalizations {
   /// **'Search or input new category'**
   String get searchCategoryHint;
 
-  /// No description provided for @addCategoryButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Add \"{name}\"'**
-  String addCategoryButton(Object name);
-
   /// No description provided for @selectShopTitle.
   ///
   /// In en, this message translates to:
@@ -1452,11 +1446,11 @@ abstract class AppLocalizations {
   /// **'Search or input new shop'**
   String get searchShopHint;
 
-  /// No description provided for @addShopButton.
+  /// No description provided for @addButtonWith.
   ///
   /// In en, this message translates to:
   /// **'Add \"{name}\"'**
-  String addShopButton(Object name);
+  String addButtonWith(Object name);
 
   /// No description provided for @summaryIncome.
   ///
@@ -2033,6 +2027,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'File downloaded to {path}'**
   String fileDownloaded(String path);
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequired;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @selectShopHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select shop'**
+  String get selectShopHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -398,7 +398,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accountRemark => '账户备注';
 
   @override
-  String get currentBalance => '当前��额';
+  String get currentBalance => '当前余额';
 
   @override
   String get pleaseInputAccountName => '请输入账户名称';
@@ -621,7 +621,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get categoryLabel => '分类';
 
   @override
-  String get categoryHint => '请选择分类';
+  String get categoryHint => '���选择分类';
 
   @override
   String get dateLabel => '日期';
@@ -699,11 +699,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchCategoryHint => '搜索或输入新分类';
 
   @override
-  String addCategoryButton(Object name) {
-    return '添加\"$name\"';
-  }
-
-  @override
   String get selectShopTitle => '选择商家';
 
   @override
@@ -713,7 +708,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchShopHint => '搜索或输入新商家';
 
   @override
-  String addShopButton(Object name) {
+  String addButtonWith(Object name) {
     return '添加\"$name\"';
   }
 
@@ -949,7 +944,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get support => '支持';
 
   @override
-  String get technicalSupport => '技���支持';
+  String get technicalSupport => '技术支持';
 
   @override
   String get loadingMore => '加载更多...';
@@ -1014,7 +1009,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get editServer => '���辑服务器';
+  String get editServer => '编辑服务器';
 
   @override
   String get openInExternalApp => '在外部应用中打开';
@@ -1037,6 +1032,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String fileDownloaded(String path) {
     return '文件已保存到: $path';
   }
+
+  @override
+  String get fieldRequired => '此字段为必填项';
+
+  @override
+  String get clear => '清除';
+
+  @override
+  String get selectShopHint => '请选择商家';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1285,11 +1289,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get searchCategoryHint => '搜索或輸入新分類';
 
   @override
-  String addCategoryButton(Object name) {
-    return '添加\"$name\"';
-  }
-
-  @override
   String get selectShopTitle => '選擇商家';
 
   @override
@@ -1299,7 +1298,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get searchShopHint => '搜索或輸入新商家';
 
   @override
-  String addShopButton(Object name) {
+  String addButtonWith(Object name) {
     return '添加\"$name\"';
   }
 

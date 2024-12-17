@@ -104,11 +104,10 @@
   "selectCategoryTitle": "選擇分類",
   "noAvailableCategories": "暫無可用分類",
   "searchCategoryHint": "搜索或輸入新分類",
-  "addCategoryButton": "添加\"{name}\"",
   "selectShopTitle": "選擇商家",
   "noAvailableShops": "暫無可用商家",
   "searchShopHint": "搜索或輸入新商家",
-  "addShopButton": "添加\"{name}\"",
+  "addButtonWith": "添加\"{name}\"",
   "summaryIncome": "收入",
   "summaryExpense": "支出",
   "summaryBalance": "結餘",
@@ -139,14 +138,7 @@
   "shop": "商家",
   "noFund": "無賬戶",
   "noShop": "無商家",
-  "@addCategoryButton": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@addShopButton": {
+  "@addButtonWith": {
     "placeholders": {
       "name": {
         "type": "String"

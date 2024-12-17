@@ -133,6 +133,17 @@ class AccountItemProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> addShop(Shop shop) async {
+    try {
+      final newShop = await ApiService.createShop(shop);
+      shops.add(newShop);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('添加商家失败: $e');
+      rethrow;
+    }
+  }
+
   @override
   void dispose() {
     _disposed = true;

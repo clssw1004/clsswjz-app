@@ -166,6 +166,9 @@
     "downloadFailed",
     "downloadFailedMessage",
     "unsupportedPreview",
-    "fileDownloaded"
+    "fileDownloaded",
+    "fieldRequired",
+    "clear",
+    "selectShopHint"
   ]
 }

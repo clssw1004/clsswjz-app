@@ -137,7 +137,7 @@
   "basicInfo": "基本信息",
   "accountName": "账户名称",
   "accountRemark": "账户备注",
-  "currentBalance": "当前��额",
+  "currentBalance": "当前余额",
   "pleaseInputAccountName": "请输入账户名称",
   "fundIncome": "收入",
   "fundExpense": "支出",
@@ -205,7 +205,7 @@
   "amountLabel": "金额",
   "amountHint": "请输入金额",
   "categoryLabel": "分类",
-  "categoryHint": "请选择分类",
+  "categoryHint": "���选择分类",
   "dateLabel": "日期",
   "timeLabel": "时间",
   "accountLabel": "账户",
@@ -231,11 +231,10 @@
   "selectCategoryTitle": "选择分类",
   "noAvailableCategories": "暂无可用分类",
   "searchCategoryHint": "搜索或输入新分类",
-  "addCategoryButton": "添加\"{name}\"",
   "selectShopTitle": "选择商家",
   "noAvailableShops": "暂无可用商家",
   "searchShopHint": "搜索或输入新商家",
-  "addShopButton": "添加\"{name}\"",
+  "addButtonWith": "添加\"{name}\"",
   "summaryIncome": "收入",
   "summaryExpense": "支出",
   "summaryBalance": "结余",
@@ -271,7 +270,7 @@
   "wrongCredentials": "用户名或密码错误",
   "rememberLogin": "记住登录信息",
   "selectServer": "选择服务器",
-  "serverName": "服务器名称",
+  "serverName": "服务器名���",
   "serverNameHint": "例如：本地服务器",
   "serverNameRequired": "请输入服务器名称",
   "serverType": "服务器类型",
@@ -320,7 +319,7 @@
   "license": "开源协议",
   "mitLicenseDescription": "基于 MIT 协议开源",
   "support": "支持",
-  "technicalSupport": "技���支持",
+  "technicalSupport": "技术支持",
   "loadingMore": "加载更多...",
   "noMoreData": "已经到底了",
   "importData": "导入数据",
@@ -367,7 +366,7 @@
       }
     }
   },
-  "editServer": "���辑服务器",
+  "editServer": "编辑服务器",
   "serverName": "服务器名称",
   "serverUrl": "服务器地址",
   "save": "保存",
@@ -383,5 +382,9 @@
     }
   },
   "unsupportedPreview": "不支持预览该格式文件",
-  "ok": "确定"
+  "ok": "确定",
+  "fieldRequired": "此字段为必填项",
+  "clear": "清除",
+  "selectShopHint": "请选择商家",
+  "selectShopTitle": "选择商家"
 }

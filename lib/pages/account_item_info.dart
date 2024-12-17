@@ -18,7 +18,7 @@ import 'package:intl/intl.dart';
 import '../widgets/app_bar_factory.dart';
 import './account_item/widgets/shop_selector.dart';
 import '../l10n/l10n.dart';
-import './account_item/widgets/category_grid_selector.dart';
+import './account_item/widgets/category_selector.dart';
 import 'dart:io';
 
 class AccountItemForm extends StatefulWidget {
@@ -257,13 +257,14 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                               controller: _amountController,
                                             ),
                                             SizedBox(height: 12),
-                                            CategoryGridSelector(
+                                            CategorySelector(
                                               selectedCategory:
                                                   _selectedCategory,
-                                              onChanged: (category) => setState(
-                                                  () => _selectedCategory =
-                                                      category),
-                                              isRequired: true,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _selectedCategory = value;
+                                                });
+                                              },
                                             ),
                                             SizedBox(height: 12),
                                             DateTimeSelector(
