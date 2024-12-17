@@ -1041,4 +1041,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectShopHint => 'Select shop';
+
+  @override
+  String get noCategory => 'No Category';
 }

@@ -146,67 +146,141 @@ class _FormSelectorFieldState<T> extends State<FormSelectorField<T>> {
   Widget _buildGridSelector() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     final displayItems = _getDisplayItems();
 
-    return Wrap(
-      key: _gridKey,
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        ...displayItems.map((item) {
-          final isSelected = _getValue(item) == widget.value;
+    final itemGroups = displayItems.fold<List<List<T>>>(
+      [],
+      (list, item) {
+        if (list.isEmpty || list.last.length >= widget.config.gridRowCount) {
+          list.add([]);
+        }
+        list.last.add(item);
+        return list;
+      },
+    );
 
-          return InkWell(
-            onTap: () => widget.callbacks.onChanged(_getValue(item)),
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? colorScheme.primary
-                    : colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                _getLabel(item),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: isSelected
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurfaceVariant,
-                  fontWeight: isSelected ? FontWeight.w500 : null,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+    final lastRowSpace = widget.config.gridRowCount - itemGroups.last.length;
+    final showMoreInLastRow =
+        widget.items.length > widget.config.gridMaxCount && lastRowSpace > 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ...itemGroups.map((rowItems) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                ...rowItems.map((item) {
+                  final isSelected = _getValue(item) == widget.value;
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: InkWell(
+                        onTap: () =>
+                            widget.callbacks.onChanged(_getValue(item)),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? colorScheme.primary
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.outlineVariant,
+                            ),
+                          ),
+                          child: Text(
+                            _getLabel(item),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: isSelected
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.onSurface,
+                              fontWeight: isSelected ? FontWeight.w500 : null,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                if (showMoreInLastRow && itemGroups.last == rowItems)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 4),
+                      child: InkWell(
+                        onTap: () => _showSelectorDialog(context),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: colorScheme.outlineVariant,
+                            ),
+                          ),
+                          child: Text(
+                            '${L10n.of(context).more}>>',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (!showMoreInLastRow)
+                  ...List.generate(
+                    widget.config.gridRowCount - rowItems.length,
+                    (index) => Expanded(child: Container()),
+                  ),
+              ],
             ),
           );
         }),
-
-        // 更多按钮
-        if (widget.items.length > widget.config.gridMaxCount)
+        if (widget.items.length > widget.config.gridMaxCount &&
+            !showMoreInLastRow)
           InkWell(
             onTap: () => _showSelectorDialog(context),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(8),
             child: Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(16),
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: colorScheme.outlineVariant,
+                ),
               ),
               child: Text(
                 L10n.of(context).more,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w500,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
             ),
           ),

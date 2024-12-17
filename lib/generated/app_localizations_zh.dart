@@ -621,7 +621,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get categoryLabel => '分类';
 
   @override
-  String get categoryHint => '���选择分类';
+  String get categoryHint => '选择分类';
 
   @override
   String get dateLabel => '日期';
@@ -1041,6 +1041,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get selectShopHint => '请选择商家';
+
+  @override
+  String get noCategory => '无分类';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1556,4 +1559,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get selectBook => '選擇賬本';
+
+  @override
+  String get noCategory => '無分類';
 }

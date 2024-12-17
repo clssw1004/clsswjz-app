@@ -205,7 +205,7 @@
   "amountLabel": "金额",
   "amountHint": "请输入金额",
   "categoryLabel": "分类",
-  "categoryHint": "���选择分类",
+  "categoryHint": "选择分类",
   "dateLabel": "日期",
   "timeLabel": "时间",
   "accountLabel": "账户",
@@ -270,7 +270,7 @@
   "wrongCredentials": "用户名或密码错误",
   "rememberLogin": "记住登录信息",
   "selectServer": "选择服务器",
-  "serverName": "服务器名���",
+  "serverName": "服务器名称",
   "serverNameHint": "例如：本地服务器",
   "serverNameRequired": "请输入服务器名称",
   "serverType": "服务器类型",
@@ -386,5 +386,6 @@
   "fieldRequired": "此字段为必填项",
   "clear": "清除",
   "selectShopHint": "请选择商家",
-  "selectShopTitle": "选择商家"
+  "selectShopTitle": "选择商家",
+  "noCategory": "无分类"
 }

@@ -226,5 +226,6 @@
   "dataSource": "數據來源",
   "selectFile": "選擇文件",
   "importFieldsRequired": "請填寫所有必填欄位",
-  "importSuccess": "導入成功"
+  "importSuccess": "導入成功",
+  "noCategory": "無分類"
 }

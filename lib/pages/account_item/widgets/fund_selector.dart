@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../../generated/app_localizations.dart';
 import '../providers/account_item_provider.dart';
+import 'package:provider/provider.dart';
 import '../../../l10n/l10n.dart';
+import '../../../models/form_selector.dart';
+import '../../../widgets/form/form_selector_field.dart';
 
 class FundSelector extends StatelessWidget {
   static const String NO_FUND = 'NO_FUND';
@@ -22,235 +24,51 @@ class FundSelector extends StatelessWidget {
     this.isRequired = false,
   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final l10n = L10n.of(context);
-
-    final currentFund = selectedFund ?? getNoFundOption(l10n);
-
-    return FormField<Map<String, dynamic>>(
-      initialValue: currentFund,
-      validator: (value) {
-        if (isRequired && value == null) {
-          return l10n.pleaseSelectAccount;
-        }
-        return null;
-      },
-      builder: (FormFieldState<Map<String, dynamic>> field) {
-        if (field.value != selectedFund) {
-          Future.microtask(() => field.didChange(currentFund));
-        }
-
-        return Container(
-          height: 48,
-          padding: EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: colorScheme.outlineVariant.withOpacity(0.5),
-              ),
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.account_balance_wallet_outlined,
-                size: 18,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    onTap?.call();
-                    _showFundDialog(context, field);
-                  },
-                  child: Text(
-                    field.value?['name'] ?? l10n.selectFundHint,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: field.value != null
-                          ? colorScheme.onSurface
-                          : colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.chevron_right, size: 18),
-                onPressed: () => _showFundDialog(context, field),
-                color: colorScheme.onSurfaceVariant,
-                visualDensity: VisualDensity.compact,
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints(
-                  minWidth: 32,
-                  minHeight: 32,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showFundDialog(
-      BuildContext context, FormFieldState<Map<String, dynamic>> field) {
-    final provider = Provider.of<AccountItemProvider>(context, listen: false);
-    showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (context) => _FundDialog(
-        selectedFundId: field.value?['id'],
-        provider: provider,
-      ),
-    ).then((fund) {
-      if (fund != null) {
-        field.didChange(fund);
-        onChanged(fund);
-      }
-    });
-  }
-
-  static Map<String, dynamic> getNoFundOption(AppLocalizations l10n) {
-    return {
-      'id': NO_FUND,
-      'name': l10n.noFund,
-      'fundType': 'NONE',
-      'fundRemark': '',
-      'fundBalance': 0,
-      'isDefault': false,
-    };
-  }
-}
-
-class _FundDialog extends StatelessWidget {
-  final String? selectedFundId;
-  final AccountItemProvider provider;
-
-  const _FundDialog({
-    Key? key,
-    this.selectedFundId,
-    required this.provider,
-  }) : super(key: key);
+  static Map<String, dynamic> getNoFundOption(AppLocalizations l10n) => {
+        'id': NO_FUND,
+        'name': l10n.noFund,
+        'fundType': '',
+        'fundRemark': '',
+        'fundBalance': 0.0,
+        'isDefault': false,
+      };
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
-      ),
-      surfaceTintColor: colorScheme.surface,
-      child: Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              l10n.selectFund,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 16),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.4,
-              ),
-              child: _buildFundList(context),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+    return Consumer<AccountItemProvider>(
+      builder: (context, provider, _) {
+        final items = [
+          getNoFundOption(l10n),
+          ...provider.fundList,
+        ];
 
-  Widget _buildFundList(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final l10n = L10n.of(context);
-    final fundList = [
-      FundSelector.getNoFundOption(l10n),
-      ...provider.fundList,
-    ];
-
-    return ListView.builder(
-      itemCount: fundList.length,
-      shrinkWrap: true,
-      itemBuilder: (context, index) {
-        final fund = fundList[index];
-        final isSelected = selectedFundId == FundSelector.NO_FUND
-            ? fund['id'] == FundSelector.NO_FUND
-            : fund['id'] == selectedFundId;
-        final isNoFund = fund['id'] == FundSelector.NO_FUND;
-
-        return ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-          title: Text(
-            fund['name'],
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: isSelected ? colorScheme.primary : colorScheme.onSurface,
-            ),
+        return FormSelectorField<Map<String, dynamic>>(
+          items: items,
+          value: selectedFund?['id'],
+          icon: Icons.account_balance_wallet_outlined,
+          placeholder: l10n.selectFundHint,
+          required: isRequired,
+          config: FormSelectorConfig<Map<String, dynamic>>(
+            idField: 'id',
+            labelField: 'name',
+            valueField: 'id',
+            dialogTitle: l10n.selectFund,
+            searchHint: l10n.searchFund,
+            noDataText: l10n.noAvailableFunds,
+            addItemTemplate: '', // 账户不支持快速添加
+            showSearch: true,
+            showAddButton: false,
+            showGridSelector: false,
           ),
-          subtitle: !isNoFund
-              ? Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        fund['fundType'],
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    if (fund['fundRemark']?.isNotEmpty == true) ...[
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          fund['fundRemark'],
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ],
-                )
-              : null,
-          leading: Icon(
-            isSelected
-                ? Icons.radio_button_checked
-                : Icons.radio_button_unchecked,
-            color: isSelected ? colorScheme.primary : null,
-            size: 20,
+          callbacks: FormSelectorCallbacks(
+            onChanged: (value) {
+              final fund = items.firstWhere((f) => f['id'] == value);
+              onChanged(fund);
+            },
+            onTap: onTap,
           ),
-          trailing: !isNoFund && fund['isDefault']
-              ? Icon(
-                  Icons.star,
-                  size: 16,
-                  color: colorScheme.primary,
-                  semanticLabel: l10n.defaultFund,
-                )
-              : null,
-          onTap: () => Navigator.pop(context, fund),
         );
       },
     );

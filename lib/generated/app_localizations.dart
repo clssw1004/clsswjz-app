@@ -2045,6 +2045,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select shop'**
   String get selectShopHint;
+
+  /// No description provided for @noCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No Category'**
+  String get noCategory;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

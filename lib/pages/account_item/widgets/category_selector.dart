@@ -7,6 +7,8 @@ import '../../../models/form_selector.dart';
 import '../../../widgets/form/form_selector_field.dart';
 
 class CategorySelector extends StatelessWidget {
+  static const String NO_CATEGORY = 'NO_CATEGORY';
+
   final String? selectedCategory;
   final ValueChanged<String?> onChanged;
   final VoidCallback? onTap;
@@ -25,7 +27,9 @@ class CategorySelector extends StatelessWidget {
     return Consumer<AccountItemProvider>(
       builder: (context, provider, _) {
         return FormSelectorField<Category>(
-          items: provider.filteredCategories,
+          items: [
+            ...provider.filteredCategories,
+          ],
           value: selectedCategory,
           icon: Icons.category_outlined,
           placeholder: l10n.categoryHint,
@@ -41,6 +45,7 @@ class CategorySelector extends StatelessWidget {
             showAddButton: true,
             showGridSelector: true,
             gridMaxCount: 9,
+            alignGrid: true,
           ),
           callbacks: FormSelectorCallbacks(
             onChanged: onChanged,

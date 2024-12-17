@@ -23,6 +23,7 @@ class FormSelectorConfig<T> {
   final bool showGridSelector; // 是否展开选项到表单
   final int gridMaxCount; // 展开显示的最大数量
   final int gridRowCount; // 每行显示数量
+  final bool alignGrid; // 新增：是否对齐展开按钮
 
   const FormSelectorConfig({
     required this.idField,
@@ -37,6 +38,7 @@ class FormSelectorConfig<T> {
     this.showGridSelector = false,
     this.gridMaxCount = 9,
     this.gridRowCount = 3,
+    this.alignGrid = false,
   });
 }
 

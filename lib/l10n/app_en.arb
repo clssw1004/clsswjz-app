@@ -411,5 +411,6 @@
   },
   "fieldRequired": "This field is required",
   "clear": "Clear",
-  "selectShopHint": "Select shop"
+  "selectShopHint": "Select shop",
+  "noCategory": "No Category"
 }

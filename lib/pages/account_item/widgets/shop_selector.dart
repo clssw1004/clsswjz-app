@@ -31,7 +31,15 @@ class ShopSelector extends StatelessWidget {
     return Consumer<AccountItemProvider>(
       builder: (context, provider, _) {
         return FormSelectorField<Shop>(
-          items: provider.shops,
+          items: [
+            Shop(
+              id: NO_SHOP,
+              name: l10n.noShop,
+              shopCode: '',
+              accountBookId: accountBookId,
+            ),
+            ...provider.shops,
+          ],
           value: selectedShop,
           icon: Icons.store_outlined,
           placeholder: l10n.shopHint,

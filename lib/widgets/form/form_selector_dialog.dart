@@ -127,7 +127,8 @@ class _FormSelectorDialogState<T> extends State<FormSelectorDialog<T>> {
                     ],
                   ),
                   filled: true,
-                  fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+                  fillColor:
+                      colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -151,62 +152,67 @@ class _FormSelectorDialogState<T> extends State<FormSelectorDialog<T>> {
             ),
             const SizedBox(height: 16),
             Flexible(
-              child: _filteredItems.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.search_off_outlined,
-                              size: 48,
-                              color:
-                                  colorScheme.onSurfaceVariant.withOpacity(0.5),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              widget.config.noDataText,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.4,
+                ),
+                child: _filteredItems.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.search_off_outlined,
+                                size: 48,
+                                color: colorScheme.onSurfaceVariant
+                                    .withOpacity(0.5),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                              const SizedBox(height: 16),
+                              Text(
+                                widget.config.noDataText,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _filteredItems.length,
-                      itemBuilder: (context, index) {
-                        final item = _filteredItems[index];
-                        final isSelected =
-                            _getValue(item) == widget.selectedValue;
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _filteredItems.length,
+                        itemBuilder: (context, index) {
+                          final item = _filteredItems[index];
+                          final isSelected =
+                              _getValue(item) == widget.selectedValue;
 
-                        return ListTile(
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 24),
-                          title: Text(
-                            _getLabel(item),
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: isSelected ? colorScheme.primary : null,
+                          return ListTile(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 24),
+                            title: Text(
+                              _getLabel(item),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: isSelected ? colorScheme.primary : null,
+                              ),
                             ),
-                          ),
-                          leading: Icon(
-                            isSelected
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_unchecked,
-                            color: isSelected ? colorScheme.primary : null,
-                            size: 20,
-                          ),
-                          onTap: () {
-                            widget.onSelected(_getValue(item));
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    ),
+                            leading: Icon(
+                              isSelected
+                                  ? Icons.radio_button_checked
+                                  : Icons.radio_button_unchecked,
+                              color: isSelected ? colorScheme.primary : null,
+                              size: 20,
+                            ),
+                            onTap: () {
+                              widget.onSelected(_getValue(item));
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+              ),
             ),
           ],
         ),

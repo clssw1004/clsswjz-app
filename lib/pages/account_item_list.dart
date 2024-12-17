@@ -587,95 +587,30 @@ class _AccountItemListState extends State<AccountItemList>
   }
 
   Widget _buildList() {
-    final items = _items;
-    if (items.isEmpty) return _buildEmptyView(Theme.of(context).colorScheme);
+    if (_isLoading && _items.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    return ListView.builder(
-      key: _listKey,
+    if (_items.isEmpty) {
+      return Center(
+        child: Text(L10n.of(context).noAccountItems),
+      );
+    }
+
+    // 使用 ValueKey 而不是 GlobalKey
+    return ListView(
+      key: ValueKey('account_items_${_currentPage}_${_items.length}'),
       controller: _scrollController,
-      physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: _groupedItems.length + (_hasMoreData ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index == _groupedItems.length) {
-          return _buildLoadingIndicator();
-        }
-
-        final date = _groupedItems.keys.elementAt(index);
-        final dateItems = _groupedItems[date]!;
-
-        return Column(
-          key: ValueKey(date),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDateHeader(date, dateItems),
-            ...dateItems.map((item) => Slidable(
-                  key: ValueKey(item.id),
-                  endActionPane: ActionPane(
-                    motion: const ScrollMotion(),
-                    extentRatio: 0.15,
-                    children: [
-                      CustomSlidableAction(
-                        onPressed: (context) async {
-                          final confirmed = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(L10n.of(context).delete),
-                              content:
-                                  Text(L10n.of(context).confirmDeleteMessage),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, false),
-                                  child: Text(L10n.of(context).cancel),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor:
-                                        Theme.of(context).colorScheme.error,
-                                  ),
-                                  child: Text(L10n.of(context).delete),
-                                ),
-                              ],
-                            ),
-                          );
-
-                          if (confirmed == true) {
-                            try {
-                              await ApiService.deleteAccountItem(item.id);
-                              if (context.mounted) {
-                                MessageHelper.showSuccess(
-                                  context,
-                                  message: L10n.of(context).deleteSuccess,
-                                );
-                              }
-                              await _loadAccountItems(isRefresh: true);
-                            } catch (e) {
-                              if (context.mounted) {
-                                MessageHelper.showError(context,
-                                    message: e.toString());
-                              }
-                            }
-                          }
-                        },
-                        foregroundColor: Theme.of(context).colorScheme.error,
-                        child: const Icon(Icons.delete_outline),
-                      ),
-                    ],
-                  ),
-                  child: AccountItemTile(
-                    key: ValueKey(item.id),
-                    item: item,
-                    onTap: () => _editAccountItem(item),
-                    onLongPress: () => _enterBatchMode(item.id),
-                    showCheckbox: _isBatchMode,
-                    isChecked: _selectedItems.contains(item.id),
-                    onCheckChanged: (checked) => _toggleItemSelection(item.id),
-                  ),
-                )),
-          ],
-        );
-      },
+      padding: EdgeInsets.only(bottom: 80),
+      children: [
+        // 分组列表项
+        for (final date in _groupedItems.keys) ...[
+          _buildDateHeader(date, _groupedItems[date]!),
+          ..._groupedItems[date]!.map((item) => _buildListItem(item)),
+        ],
+        // 加载更多指示器
+        if (_isLoading || !_hasMoreData) _buildLoadingIndicator(),
+      ],
     );
   }
 
@@ -806,6 +741,70 @@ class _AccountItemListState extends State<AccountItemList>
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
+      ),
+    );
+  }
+
+  Widget _buildListItem(AccountItem item) {
+    return Slidable(
+      key: ValueKey(item.id),
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        extentRatio: 0.15,
+        children: [
+          CustomSlidableAction(
+            onPressed: (context) async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(L10n.of(context).delete),
+                  content: Text(L10n.of(context).confirmDeleteMessage),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text(L10n.of(context).cancel),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                      child: Text(L10n.of(context).delete),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmed == true) {
+                try {
+                  await ApiService.deleteAccountItem(item.id);
+                  if (context.mounted) {
+                    MessageHelper.showSuccess(
+                      context,
+                      message: L10n.of(context).deleteSuccess,
+                    );
+                  }
+                  await _loadAccountItems(isRefresh: true);
+                } catch (e) {
+                  if (context.mounted) {
+                    MessageHelper.showError(context, message: e.toString());
+                  }
+                }
+              }
+            },
+            foregroundColor: Theme.of(context).colorScheme.error,
+            child: const Icon(Icons.delete_outline),
+          ),
+        ],
+      ),
+      child: AccountItemTile(
+        key: ValueKey(item.id),
+        item: item,
+        onTap: () => _editAccountItem(item),
+        onLongPress: () => _enterBatchMode(item.id),
+        showCheckbox: _isBatchMode,
+        isChecked: _selectedItems.contains(item.id),
+        onCheckChanged: (checked) => _toggleItemSelection(item.id),
       ),
     );
   }
