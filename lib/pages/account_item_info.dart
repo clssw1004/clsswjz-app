@@ -5,7 +5,6 @@ import '../models/attachment.dart';
 import '../services/account_item_cache.dart';
 import '../services/api_service.dart';
 import '../models/models.dart';
-import '../utils/attachment_utils.dart';
 import '../utils/message_helper.dart';
 import '../widgets/attachment_list.dart';
 import './account_item/widgets/type_selector.dart';
@@ -20,7 +19,6 @@ import '../widgets/app_bar_factory.dart';
 import './account_item/widgets/shop_selector.dart';
 import '../l10n/l10n.dart';
 import './account_item/widgets/category_grid_selector.dart';
-import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
 class AccountItemForm extends StatefulWidget {

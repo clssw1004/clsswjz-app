@@ -178,7 +178,7 @@ class AccountItem {
     String? description,
     String? shop,
     String? fundId,
-    String? fundName,
+    String? fund,
     DateTime? accountDate,
   }) =>
       AccountItem(
@@ -190,7 +190,7 @@ class AccountItem {
         description: description ?? this.description,
         shop: shop ?? this.shop,
         fundId: fundId ?? this.fundId,
-        fund: fundName ?? fund,
+        fund: fund ?? this.fund,
         accountDate: accountDate ?? this.accountDate,
         createdBy: createdBy,
         createdByName: createdByName,

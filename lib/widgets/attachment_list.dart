@@ -175,7 +175,7 @@ class _AttachmentListState extends State<AttachmentList> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _handleAttachmentTap(attachment),
-        child: Container(
+        child: SizedBox(
           height: 56,
           child: Row(
             children: [
