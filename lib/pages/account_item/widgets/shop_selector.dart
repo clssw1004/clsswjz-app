@@ -35,7 +35,7 @@ class ShopSelector extends StatelessWidget {
             Shop(
               id: NO_SHOP,
               name: l10n.noShop,
-              shopCode: '',
+              code: '',
               accountBookId: accountBookId,
             ),
             ...provider.shops,
@@ -44,7 +44,7 @@ class ShopSelector extends StatelessWidget {
           icon: Icons.store_outlined,
           placeholder: l10n.shopHint,
           config: FormSelectorConfig<Shop>(
-            idField: 'shopCode',
+            idField: 'code',
             labelField: 'name',
             valueField: 'name',
             dialogTitle: l10n.selectShopTitle,

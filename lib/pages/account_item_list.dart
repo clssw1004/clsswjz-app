@@ -436,7 +436,7 @@ class _AccountItemListState extends State<AccountItemList>
       setState(() {
         _shops = shops
             .map((s) => ShopOption(
-                  code: s.shopCode ?? '',
+                  code: s.code ?? '',
                   name: s.name,
                 ))
             .toList();

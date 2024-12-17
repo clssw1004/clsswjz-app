@@ -1,7 +1,7 @@
 class Shop {
   final String id;
   final String name;
-  final String? shopCode;
+  final String? code;
   final String accountBookId;
   final String? createdBy;
   final String? updatedBy;
@@ -11,7 +11,7 @@ class Shop {
   Shop({
     required this.id,
     required this.name,
-    this.shopCode,
+    this.code,
     required this.accountBookId,
     this.createdBy,
     this.updatedBy,
@@ -22,7 +22,7 @@ class Shop {
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
-        'shopCode': shopCode,
+        'code': code,
         'accountBookId': accountBookId,
       };
 
@@ -38,7 +38,7 @@ class Shop {
   factory Shop.fromJson(Map<String, dynamic> json) => Shop(
         id: json['id'],
         name: json['name'],
-        shopCode: json['shopCode'],
+        code: json['code'],
         accountBookId: json['accountBookId'],
         createdBy: json['createdBy'],
         updatedBy: json['updatedBy'],
@@ -49,13 +49,13 @@ class Shop {
   Shop copyWith({
     String? id,
     String? name,
-    String? shopCode,
+    String? code,
     String? accountBookId,
   }) {
     return Shop(
       id: id ?? this.id,
       name: name ?? this.name,
-      shopCode: shopCode ?? this.shopCode,
+      code: code ?? this.code,
       accountBookId: accountBookId ?? this.accountBookId,
       createdBy: createdBy,
       updatedBy: updatedBy,
