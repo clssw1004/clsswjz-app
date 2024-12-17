@@ -36,7 +36,7 @@ class AccountItemTile extends StatelessWidget {
     final showCreator =
         item.createdBy != currentUserId && item.createdByName != null;
 
-    final timeStr = DateFormat('HH:mm').format(item.accountDate);
+    final timeStr = item.accountDate.split(' ')[1];
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 16),

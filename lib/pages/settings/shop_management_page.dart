@@ -57,8 +57,6 @@ class ShopManagementPageState extends State<ShopManagementPage> {
         id: '', // 由后端生成
         name: name,
         accountBookId: _currentAccountBookId!,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
 
       await ApiService.createShop(shop);

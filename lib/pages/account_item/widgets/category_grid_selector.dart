@@ -100,8 +100,6 @@ class CategoryGridSelector extends StatelessWidget {
                               name: l10n.more,
                               accountBookId: '',
                               categoryType: '',
-                              createdAt: DateTime.now(),
-                              updatedAt: DateTime.now(),
                             ),
                         ],
                         _thirdRowCount,
@@ -235,8 +233,6 @@ class CategoryGridSelector extends StatelessWidget {
           name: selectedCategory!,
           accountBookId: '',
           categoryType: '',
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
         );
       },
     );

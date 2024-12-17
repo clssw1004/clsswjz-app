@@ -221,7 +221,7 @@ class _FundEditPageState extends State<FundEditPage> {
                         padding: EdgeInsets.symmetric(
                             horizontal: AppDimens.paddingSmall),
                         child: Text(
-                          l10n.lastUpdated(_formatDate(widget.fund.updatedAt)),
+                          l10n.lastUpdated(widget.fund.updatedAt ?? ''),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

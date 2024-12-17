@@ -101,8 +101,6 @@ class AccountItemProvider extends ChangeNotifier {
           name: category,
           accountBookId: selectedBook!['id'],
           categoryType: _transactionType,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
         )
       ];
       notifyListeners();

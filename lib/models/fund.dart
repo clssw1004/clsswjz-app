@@ -7,8 +7,8 @@ class UserFund {
   final List<FundBook> fundBooks;
   final String? createdBy;
   final String? updatedBy;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
   UserFund({
     required this.id,
@@ -48,24 +48,19 @@ class UserFund {
       };
 
   factory UserFund.fromJson(Map<String, dynamic> json) => UserFund(
-        id: json['id'],
-        name: json['name'],
-        fundType: json['fundType'],
-        fundRemark: json['fundRemark'],
-        fundBalance: (json['fundBalance'] as num).toDouble(),
-        fundBooks: (json['fundBooks'] as List?)
-                ?.map((book) => FundBook.fromJson(book))
-                .toList() ??
-            [],
-        createdBy: json['createdBy'],
-        updatedBy: json['updatedBy'],
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'])
-            : null,
-        updatedAt: json['updatedAt'] != null
-            ? DateTime.parse(json['updatedAt'])
-            : null,
-      );
+      id: json['id'],
+      name: json['name'],
+      fundType: json['fundType'],
+      fundRemark: json['fundRemark'],
+      fundBalance: (json['fundBalance'] as num).toDouble(),
+      fundBooks: (json['fundBooks'] as List?)
+              ?.map((book) => FundBook.fromJson(book))
+              .toList() ??
+          [],
+      createdBy: json['createdBy'],
+      updatedBy: json['updatedBy'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt']);
 
   UserFund copyWith({
     String? id,

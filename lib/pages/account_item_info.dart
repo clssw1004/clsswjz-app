@@ -429,9 +429,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
           shop: data['shop'],
           fundId: fundId,
           fund: fundName,
-          accountDate: DateTime.parse(data['accountDate']),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+          accountDate: data['accountDate'],
           deleteAttachmentIds: _deleteAttachmentIds);
 
       if (accountItem.id.isEmpty) {
@@ -496,8 +494,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
               contentType: 'application/octet-stream',
               businessCode: 'ACCOUNT_ITEM',
               businessId: '',
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
             )),
       ],
       canUpload: true,

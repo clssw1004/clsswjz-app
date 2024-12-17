@@ -5,8 +5,8 @@ class Shop {
   final String accountBookId;
   final String? createdBy;
   final String? updatedBy;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
   Shop({
     required this.id,
@@ -42,12 +42,8 @@ class Shop {
         accountBookId: json['accountBookId'],
         createdBy: json['createdBy'],
         updatedBy: json['updatedBy'],
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'])
-            : null,
-        updatedAt: json['updatedAt'] != null
-            ? DateTime.parse(json['updatedAt'])
-            : null,
+        createdAt: json['createdAt'],
+        updatedAt: json['updatedAt'],
       );
 
   Shop copyWith({

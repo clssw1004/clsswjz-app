@@ -157,7 +157,7 @@ class _AccountItemListState extends State<AccountItemList>
   void _updateGroupedItems() {
     _groupedItems = <String, List<AccountItem>>{};
     for (var item in _items) {
-      final date = DateFormat('yyyy-MM-dd').format(item.accountDate);
+      final date = item.accountDate.split(' ')[0];
       _groupedItems.putIfAbsent(date, () => []).add(item);
     }
   }

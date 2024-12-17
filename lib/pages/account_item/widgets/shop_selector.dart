@@ -39,8 +39,6 @@ class ShopSelector extends StatelessWidget {
             id: NO_SHOP,
             name: L10n.of(context).noShop,
             accountBookId: accountBookId,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
           ),
           ...provider.shops,
         ],
@@ -179,8 +177,6 @@ class _ShopDialogState extends State<ShopDialog> {
       accountBookId: widget.accountBookId,
       createdBy: '',
       updatedBy: '',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
     );
 
     setState(() {

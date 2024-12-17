@@ -3,8 +3,8 @@ class Category {
   final String name;
   final String accountBookId;
   final String categoryType;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
   Category({
     required this.id,
@@ -21,10 +21,8 @@ class Category {
       name: json['name'],
       accountBookId: json['accountBookId'],
       categoryType: json['categoryType'] ?? 'EXPENSE',
-      createdAt:
-          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt:
-          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
     );
   }
 
@@ -34,8 +32,8 @@ class Category {
       'name': name,
       'accountBookId': accountBookId,
       'categoryType': categoryType,
-      if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
-      if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
+      if (createdAt != null) 'createdAt': createdAt,
+      if (updatedAt != null) 'updatedAt': updatedAt,
     };
   }
 
@@ -52,8 +50,8 @@ class Category {
     String? name,
     String? accountBookId,
     String? categoryType,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    String? createdAt,
+    String? updatedAt,
   }) {
     return Category(
       id: id ?? this.id,

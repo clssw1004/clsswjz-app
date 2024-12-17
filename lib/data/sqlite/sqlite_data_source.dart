@@ -160,8 +160,8 @@ class SqliteDataSource implements DataSource {
       'id': category.id,
       'name': category.name,
       'account_book_id': category.accountBookId,
-      'created_at': category.createdAt?.toIso8601String(),
-      'updated_at': category.updatedAt?.toIso8601String(),
+      'created_at': category.createdAt,
+      'updated_at': category.updatedAt,
     });
     return category;
   }
@@ -173,7 +173,7 @@ class SqliteDataSource implements DataSource {
       'categories',
       {
         'name': category.name,
-        'updated_at': category.updatedAt?.toIso8601String(),
+        'updated_at': category.updatedAt,
       },
       where: 'id = ?',
       whereArgs: [id],
@@ -219,8 +219,8 @@ class SqliteDataSource implements DataSource {
       'id': shop.id,
       'name': shop.name,
       'account_book_id': shop.accountBookId,
-      'created_at': shop.createdAt?.toIso8601String(),
-      'updated_at': shop.updatedAt?.toIso8601String(),
+      'created_at': shop.createdAt,
+      'updated_at': shop.updatedAt,
     });
     return shop;
   }
@@ -232,7 +232,7 @@ class SqliteDataSource implements DataSource {
       'shops',
       {
         'name': shop.name,
-        'updated_at': shop.updatedAt?.toIso8601String(),
+        'updated_at': shop.updatedAt,
       },
       where: 'id = ?',
       whereArgs: [id],
@@ -310,8 +310,8 @@ class SqliteDataSource implements DataSource {
       'fund_out': fundBook.fundOut ? 1 : 0,
       'created_by': fund.createdBy,
       'updated_by': fund.updatedBy,
-      'created_at': fund.createdAt?.toIso8601String(),
-      'updated_at': fund.updatedAt?.toIso8601String(),
+      'created_at': fund.createdAt,
+      'updated_at': fund.updatedAt,
     });
     return fund;
   }
@@ -331,7 +331,7 @@ class SqliteDataSource implements DataSource {
         'fund_in': fundBook.fundIn ? 1 : 0,
         'fund_out': fundBook.fundOut ? 1 : 0,
         'updated_by': fund.updatedBy,
-        'updated_at': fund.updatedAt?.toIso8601String(),
+        'updated_at': fund.updatedAt,
       },
       where: 'id = ?',
       whereArgs: [id],

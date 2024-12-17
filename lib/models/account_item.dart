@@ -70,7 +70,7 @@ class AccountItem {
   final String description;
   final String type;
   final String category;
-  final DateTime accountDate;
+  final String accountDate;
   final String accountBookId;
   final String? fundId;
   final String? fund;
@@ -78,8 +78,8 @@ class AccountItem {
   final String? createdBy;
   final String? createdByName;
   final String? updatedBy;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
   final List<Attachment> attachments;
   final List<String>? deleteAttachmentIds;
 
@@ -97,8 +97,8 @@ class AccountItem {
     this.createdBy,
     this.createdByName,
     this.updatedBy,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
     this.attachments = const [],
     this.deleteAttachmentIds,
   });
@@ -109,7 +109,7 @@ class AccountItem {
         'description': description,
         'type': type,
         'category': category,
-        'accountDate': accountDate.toIso8601String(),
+        'accountDate': accountDate,
         'accountBookId': accountBookId,
         'fundId': fundId,
         'fund': fund,
@@ -117,8 +117,8 @@ class AccountItem {
         'createdBy': createdBy,
         'createdByName': createdByName,
         'updatedBy': updatedBy,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
+        'createdAt': createdAt,
+        'updatedAt': updatedAt,
         'attachments': attachments.map((e) => e.toJson()).toList(),
       };
 
@@ -131,7 +131,7 @@ class AccountItem {
         'description': description,
         'shop': shop,
         'fundId': fundId,
-        'accountDate': DateFormat('yyyy-MM-dd HH:mm:ss').format(accountDate),
+        'accountDate': accountDate,
       };
 
   Map<String, dynamic> toJsonCreate() => {
@@ -142,7 +142,7 @@ class AccountItem {
         'description': description,
         'shop': shop,
         'fundId': fundId,
-        'accountDate': DateFormat('yyyy-MM-dd HH:mm:ss').format(accountDate),
+        'accountDate': accountDate,
       };
 
   factory AccountItem.fromJson(Map<String, dynamic> json) {
@@ -152,7 +152,7 @@ class AccountItem {
       description: json['description'] as String? ?? '',
       type: json['type'] as String,
       category: json['category'] as String,
-      accountDate: DateTime.parse(json['accountDate'] as String),
+      accountDate: json['accountDate'] as String,
       accountBookId: json['accountBookId'] as String,
       fundId: json['fundId'] as String?,
       fund: json['fund'] as String?,
@@ -160,8 +160,8 @@ class AccountItem {
       createdBy: json['createdBy'] as String?,
       createdByName: json['createdByName'] as String?,
       updatedBy: json['updatedBy'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt: json['createdAt'] as String,
+      updatedAt: json['updatedAt'] as String,
       attachments: (json['attachments'] as List<dynamic>?)
               ?.map((e) => Attachment.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -179,7 +179,7 @@ class AccountItem {
     String? shop,
     String? fundId,
     String? fund,
-    DateTime? accountDate,
+    String? accountDate,
   }) =>
       AccountItem(
         id: id ?? this.id,

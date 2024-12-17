@@ -6,8 +6,8 @@ class Attachment {
   final String contentType;
   final String businessCode;
   final String businessId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
 
   const Attachment({
     required this.id,
@@ -17,8 +17,8 @@ class Attachment {
     required this.contentType,
     required this.businessCode,
     required this.businessId,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Attachment.fromJson(Map<String, dynamic> json) {
@@ -30,20 +30,20 @@ class Attachment {
       contentType: json['contentType'] as String,
       businessCode: json['businessCode'] as String,
       businessId: json['businessId'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'originName': originName,
-    'fileLength': fileLength,
-    'extension': extension,
-    'contentType': contentType,
-    'businessCode': businessCode,
-    'businessId': businessId,
-    'createdAt': createdAt.toIso8601String(),
-    'updatedAt': updatedAt.toIso8601String(),
-  };
-} 
+        'id': id,
+        'originName': originName,
+        'fileLength': fileLength,
+        'extension': extension,
+        'contentType': contentType,
+        'businessCode': businessCode,
+        'businessId': businessId,
+        'createdAt': createdAt,
+        'updatedAt': updatedAt,
+      };
+}

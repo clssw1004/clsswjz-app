@@ -131,7 +131,7 @@ class HttpDataSource implements DataSource {
         'category': item.category,
         'shop': item.shop,
         'description': item.description,
-        'accountDate': item.accountDate.toIso8601String(),
+        'accountDate': item.accountDate,
       };
 
       if (attachments != null) {
@@ -173,7 +173,7 @@ class HttpDataSource implements DataSource {
         'category': item.category,
         'shop': item.shop,
         'description': item.description,
-        'accountDate': item.accountDate.toIso8601String(),
+        'accountDate': item.accountDate,
         'fundId': item.fundId,
         if (item.deleteAttachmentIds?.length == 1)
           'deleteAttachmentId': item.deleteAttachmentIds
