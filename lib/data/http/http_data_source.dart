@@ -730,4 +730,22 @@ class HttpDataSource implements DataSource {
       throw _handleDioError(e);
     }
   }
+
+  @override
+  Future<AccountSymbol> createSymbol(AccountSymbol symbol) async {
+    try {
+      final response = await _httpClient.request<Map<String, dynamic>>(
+        path: ApiEndpoints.accountSymbols,
+        method: HttpMethod.post,
+        data: {
+          'name': symbol.name,
+          'symbolType': symbol.symbolType,
+          'accountBookId': symbol.accountBookId,
+        },
+      );
+      return AccountSymbol.fromJson(response);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
 }

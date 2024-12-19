@@ -132,6 +132,8 @@ abstract class DataSource {
     String symbolType,
   );
 
+  Future<void> createSymbol(AccountSymbol symbol);
+
   /// 更新标识数据
   Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol);
 

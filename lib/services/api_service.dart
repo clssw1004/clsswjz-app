@@ -200,6 +200,11 @@ class ApiService {
     return ds.getBookSymbolsByType(accountBookId, symbolType);
   }
 
+  /// 增加标识数据
+  static Future<void> createSymbol(AccountSymbol symbol) {
+    return ds.createSymbol(symbol);
+  }
+
   /// 更新标识数据
   static Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol) {
     return ds.updateSymbol(id, symbol);
