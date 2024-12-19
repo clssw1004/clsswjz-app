@@ -6,6 +6,7 @@ import 'account_book_info.dart';
 import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
 import '../l10n/l10n.dart';
+import '../models/account_book.dart';
 
 class AccountBookList extends StatefulWidget {
   static const IconData addIcon = Icons.add;
@@ -20,7 +21,7 @@ class AccountBookList extends StatefulWidget {
 }
 
 class _AccountBookListState extends State<AccountBookList> {
-  List<dynamic> _accountBooks = [];
+  List<AccountBook> _accountBooks = [];
   bool _isLoading = true;
   String? _error;
 
@@ -39,7 +40,7 @@ class _AccountBookListState extends State<AccountBookList> {
     try {
       final books = await ApiService.getAccountBooks();
       setState(() {
-        _accountBooks = books.map((book) => book.toJson()).toList();
+        _accountBooks = books;
         _isLoading = false;
       });
     } catch (e) {
@@ -59,8 +60,8 @@ class _AccountBookListState extends State<AccountBookList> {
     }
   }
 
-  Future<void> _openAccountBookInfo(Map<String, dynamic> accountBook) async {
-    final updatedAccountBook = await Navigator.push<Map<String, dynamic>>(
+  Future<void> _openAccountBookInfo(AccountBook accountBook) async {
+    final updatedAccountBook = await Navigator.push<AccountBook>(
       context,
       MaterialPageRoute(
         builder: (context) => AccountBookInfo(accountBook: accountBook),
@@ -70,7 +71,7 @@ class _AccountBookListState extends State<AccountBookList> {
     if (updatedAccountBook != null) {
       setState(() {
         final index = _accountBooks
-            .indexWhere((book) => book['id'] == updatedAccountBook['id']);
+            .indexWhere((book) => book.id == updatedAccountBook.id);
         if (index != -1) {
           _accountBooks[index] = updatedAccountBook;
         }
@@ -78,13 +79,13 @@ class _AccountBookListState extends State<AccountBookList> {
     }
   }
 
-  IconData _getBookIcon(Map<String, dynamic> book) {
-    if (book['icon'] == null || book['icon'].isEmpty) {
+  IconData _getBookIcon(AccountBook book) {
+    if (book.icon == null) {
       return BookIcons.defaultIcon;
     }
     try {
       return IconData(
-        int.parse(book['icon']),
+        int.parse(book.icon!),
         fontFamily: 'MaterialIcons',
       );
     } catch (e) {
@@ -203,13 +204,13 @@ class _AccountBookListState extends State<AccountBookList> {
     return 16;
   }
 
-  Widget _buildAccountItem(Map<String, dynamic> book) {
+  Widget _buildAccountItem(AccountBook book) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
     final currentUserId = UserService.getUserInfo()?['userId'];
-    final isShared = book['fromId'] != currentUserId;
-    final permissions = book['permissions'] as Map<String, dynamic>;
+    final isShared = book.fromId != currentUserId;
+    final permissions = book.permissions as Map<String, dynamic>;
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4),
@@ -246,16 +247,16 @@ class _AccountBookListState extends State<AccountBookList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          book['name'] ?? l10n.unnamedBook,
+                          book.name ?? l10n.unnamedBook,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: colorScheme.onSurface,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        if (book['description'] != null) ...[
+                        if (book.description != null) ...[
                           SizedBox(height: 4),
                           Text(
-                            book['description'],
+                            book.description ?? '',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -278,7 +279,7 @@ class _AccountBookListState extends State<AccountBookList> {
                         ),
                         SizedBox(width: 4),
                         Text(
-                          l10n.sharedFrom(book['fromName'] ?? l10n.unknownUser),
+                          l10n.sharedFrom(book.fromName ?? l10n.unknownUser),
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

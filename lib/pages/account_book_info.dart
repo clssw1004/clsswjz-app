@@ -11,7 +11,7 @@ import '../models/models.dart';
 import '../l10n/l10n.dart';
 
 class AccountBookInfo extends StatefulWidget {
-  final Map<String, dynamic> accountBook;
+  final AccountBook accountBook;
 
   const AccountBookInfo({
     Key? key,
@@ -46,7 +46,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
 
   void _initializeData() {
     _currentUserId = UserService.getUserInfo()?['userId'];
-    _accountBook = AccountBook.fromJson(widget.accountBook);
+    _accountBook = widget.accountBook;
     _canEdit = _checkEditPermission();
 
     _nameController = TextEditingController(text: _accountBook.name);
@@ -112,7 +112,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
       );
 
       if (!mounted) return;
-      Navigator.pop(context, response.toJson());
+      Navigator.pop(context, response);
       MessageHelper.showSuccess(context, message: l10n.saveSuccess);
     } catch (e) {
       if (!mounted) return;
