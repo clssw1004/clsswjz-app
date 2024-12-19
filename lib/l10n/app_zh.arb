@@ -271,7 +271,7 @@
   "rememberLogin": "记住登录信息",
   "selectServer": "选择服务器",
   "serverName": "服务器名称",
-  "serverNameHint": "例如：本地服务器",
+  "serverNameHint": "例如���本地服务器",
   "serverNameRequired": "请输入服务器名称",
   "serverType": "服务器类型",
   "serverUrlRequired": "请输入服务器地址",
@@ -387,5 +387,14 @@
   "clear": "清除",
   "selectShopHint": "请选择商家",
   "selectShopTitle": "选择商家",
-  "noCategory": "无分类"
+  "noCategory": "无分类",
+  "selectTagHint": "标签",
+  "selectTagTitle": "标签",
+  "searchTagHint": "搜索标签",
+  "noAvailableTags": "暂无可用标签",
+  "selectProjectHint": "项目",
+  "selectProjectTitle": "项目",
+  "searchProjectHint": "搜索项目",
+  "noAvailableProjects": "暂无可用项目",
+  "noEditPermission": "您没有编辑权限"
 }

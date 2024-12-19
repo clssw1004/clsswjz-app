@@ -10,8 +10,7 @@ class LanguageSelectorDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    Theme.of(context);
 
     return AlertDialog(
       title: Text(l10n.languageSettings),

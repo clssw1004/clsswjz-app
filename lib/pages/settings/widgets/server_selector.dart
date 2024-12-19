@@ -11,7 +11,6 @@ class ServerSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Consumer<ServerConfigProvider>(
       builder: (context, provider, _) {

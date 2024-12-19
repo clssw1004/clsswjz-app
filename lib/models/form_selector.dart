@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+enum FormSelectorMode {
+  // 图标+文字模式
+  standard,
+  // 展开按钮模式
+  grid,
+  // 徽章模式
+  badge,
+}
+
 /// 选择器配置
 class FormSelectorConfig<T> {
   // ID字段的key
@@ -20,7 +29,7 @@ class FormSelectorConfig<T> {
   // 新增配置项
   final bool showSearch; // 是否显示搜索框
   final bool showAddButton; // 是否显示添加按钮
-  final bool showGridSelector; // 是否展开选项到表单
+  final FormSelectorMode mode; // 替换 showGridSelector 为 mode
   final int gridMaxCount; // 展开显示的最大数量
   final int gridRowCount; // 每行显示数量
   final bool alignGrid; // 新增：是否对齐展开按钮
@@ -35,7 +44,7 @@ class FormSelectorConfig<T> {
     required this.addItemTemplate,
     this.showSearch = true,
     this.showAddButton = true,
-    this.showGridSelector = false,
+    this.mode = FormSelectorMode.standard,
     this.gridMaxCount = 9,
     this.gridRowCount = 3,
     this.alignGrid = false,

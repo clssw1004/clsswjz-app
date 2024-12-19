@@ -827,7 +827,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverName => '服务器名称';
 
   @override
-  String get serverNameHint => '例如：本地服务器';
+  String get serverNameHint => '例如���本地服务器';
 
   @override
   String get serverNameRequired => '请输入服务器名称';
@@ -1044,6 +1044,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noCategory => '无分类';
+
+  @override
+  String get selectTagHint => '标签';
+
+  @override
+  String get selectTagTitle => '标签';
+
+  @override
+  String get searchTagHint => '搜索标签';
+
+  @override
+  String get selectProjectHint => '项目';
+
+  @override
+  String get selectProjectTitle => '项目';
+
+  @override
+  String get searchProjectHint => '搜索项目';
+
+  @override
+  String get noEditPermission => '您没有编辑权限';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).

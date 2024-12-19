@@ -9,7 +9,6 @@ import '../../../widgets/form/form_selector_field.dart';
 class ShopSelector extends StatelessWidget {
   static const String NO_SHOP = 'NO_SHOP';
 
-  final String? selectedShop;
   final String accountBookId;
   final ValueChanged<String?> onChanged;
   final VoidCallback? onTap;
@@ -17,7 +16,6 @@ class ShopSelector extends StatelessWidget {
 
   const ShopSelector({
     Key? key,
-    this.selectedShop,
     required this.accountBookId,
     required this.onChanged,
     this.onTap,
@@ -35,12 +33,12 @@ class ShopSelector extends StatelessWidget {
             Shop(
               id: NO_SHOP,
               name: l10n.noShop,
-              code: '',
+              code: NO_SHOP,
               accountBookId: accountBookId,
             ),
             ...provider.shops,
           ],
-          value: selectedShop,
+          value: selectedShopName,
           icon: Icons.store_outlined,
           placeholder: l10n.shopHint,
           config: FormSelectorConfig<Shop>(
@@ -53,7 +51,7 @@ class ShopSelector extends StatelessWidget {
             addItemTemplate: l10n.addButtonWith('商户'),
             showSearch: true,
             showAddButton: true,
-            showGridSelector: false,
+            mode: FormSelectorMode.standard,
           ),
           callbacks: FormSelectorCallbacks(
             onChanged: onChanged,

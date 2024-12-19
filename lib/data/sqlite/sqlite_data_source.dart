@@ -132,7 +132,7 @@ class SqliteDataSource implements DataSource {
     );
   }
 
-  // 分类相关方法
+  // 分类��关方法
   @override
   Future<List<Category>> getCategories(String bookId) async {
     final db = await _dbHelper.database;
@@ -511,5 +511,62 @@ class SqliteDataSource implements DataSource {
     void Function(int received, int total)? onProgress,
   }) {
     throw UnimplementedError('SQLite does not support attachment download');
+  }
+
+  @override
+  Future<Map<String, List<AccountSymbol>>> getBookSymbols(
+      String accountBookId) async {
+    final db = await _dbHelper.database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'account_symbols',
+      where: 'account_book_id = ?',
+      whereArgs: [accountBookId],
+    );
+
+    final result = <String, List<AccountSymbol>>{};
+
+    // 按类型分组
+    for (final type in ['TAG', 'PROJECT']) {
+      final symbols = maps
+          .where((map) => map['symbol_type'] == type)
+          .map((map) => AccountSymbol.fromJson({
+                'id': map['id'],
+                'name': map['name'],
+                'code': map['code'],
+                'symbolType': map['symbol_type'],
+                'accountBookId': map['account_book_id'],
+                'createdBy': map['created_by'],
+                'updatedBy': map['updated_by'],
+                'createdAt': map['created_at'],
+                'updatedAt': map['updated_at'],
+              }))
+          .toList();
+
+      if (symbols.isNotEmpty) {
+        result[type] = symbols;
+      }
+    }
+
+    return result;
+  }
+
+  @override
+  Future<void> deleteSymbol(String id) {
+    // TODO: implement deleteSymbol
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<AccountSymbol>> getBookSymbolsByType(
+      String accountBookId, String symbolType) {
+    // TODO: implement getBookSymbolsByType
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol) {
+    // TODO: implement updateSymbol
+    throw UnimplementedError();
   }
 }

@@ -169,6 +169,13 @@
     "fileDownloaded",
     "fieldRequired",
     "clear",
-    "selectShopHint"
+    "selectShopHint",
+    "selectTagHint",
+    "selectTagTitle",
+    "searchTagHint",
+    "selectProjectHint",
+    "selectProjectTitle",
+    "searchProjectHint",
+    "noEditPermission"
   ]
 }

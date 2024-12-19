@@ -8,4 +8,5 @@ class ApiEndpoints {
   static const String shops = '/api/account/shop';
   static const String health = '/api/health';
   static const String attachments = '/api/attachments';
+  static const String accountSymbols = '/api/account/symbol';
 }

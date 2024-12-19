@@ -60,7 +60,7 @@ class FundSelector extends StatelessWidget {
             addItemTemplate: '', // 账户不支持快速添加
             showSearch: true,
             showAddButton: false,
-            showGridSelector: false,
+            mode: FormSelectorMode.standard,
           ),
           callbacks: FormSelectorCallbacks(
             onChanged: (value) {

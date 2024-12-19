@@ -1,11 +1,12 @@
+import 'package:clsswjz/models/account_book.dart';
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
 import '../constants/book_icons.dart';
 
 class GlobalBookSelector extends StatelessWidget {
-  final Map<String, dynamic>? selectedBook;
-  final List<Map<String, dynamic>> books;
-  final ValueChanged<Map<String, dynamic>> onBookSelected;
+  final AccountBook? selectedBook;
+  final List<AccountBook> books;
+  final ValueChanged<AccountBook> onBookSelected;
 
   static const IconData dropdownIcon = Icons.arrow_drop_down;
   static const IconData bookIcon = Icons.book;
@@ -19,10 +20,10 @@ class GlobalBookSelector extends StatelessWidget {
     required this.onBookSelected,
   }) : super(key: key);
 
-  IconData _getBookIcon(Map<String, dynamic>? book) {
+  IconData _getBookIcon(AccountBook? book) {
     if (book == null) return BookIcons.defaultIcon;
 
-    final String? iconString = book['icon']?.toString();
+    final String? iconString = book.icon?.toString();
     if (iconString == null || iconString.isEmpty) {
       return BookIcons.defaultIcon;
     }
@@ -60,9 +61,7 @@ class GlobalBookSelector extends StatelessWidget {
           ),
           SizedBox(width: 8),
           Text(
-            selectedBook != null
-                ? (selectedBook!['name'] as String?) ?? '选择账本'
-                : '选择账本',
+            selectedBook != null ? selectedBook!.name : '选择账本',
             style: theme.textTheme.titleMedium?.copyWith(
               color: colorScheme.onSurface,
             ),
@@ -108,9 +107,9 @@ class GlobalBookSelector extends StatelessWidget {
             itemCount: books.length,
             itemBuilder: (context, index) {
               final book = books[index];
-              final isSelected = selectedBook?['id'] == book['id'];
-              final isShared = book['createdBy'] != currentUserId;
-              final canEdit = book['canEditBook'] == true;
+              final isSelected = selectedBook?.id == book.id;
+              final isShared = book.createdBy != currentUserId;
+              final canEdit = book.canEditBook == true;
 
               return ListTile(
                 selected: isSelected,
@@ -130,7 +129,7 @@ class GlobalBookSelector extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        book['name'] ?? '未命名账本',
+                        book.name,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: isSelected
                               ? colorScheme.primary
@@ -193,18 +192,18 @@ class GlobalBookSelector extends StatelessWidget {
                       ),
                   ],
                 ),
-                subtitle: book['description'] != null &&
-                        book['description'].isNotEmpty
-                    ? Text(
-                        book['description'],
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : null,
-                onTap: () => Navigator.pop(context, book),
+                subtitle:
+                    book.description != null && book.description!.isNotEmpty
+                        ? Text(
+                            book.description!,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        : null,
+                onTap: () => Navigator.pop(context, book.toJson()),
               );
             },
           ),
@@ -219,7 +218,7 @@ class GlobalBookSelector extends StatelessWidget {
     );
 
     if (result != null) {
-      onBookSelected(result);
+      onBookSelected(AccountBook.fromJson(result));
     }
   }
 }

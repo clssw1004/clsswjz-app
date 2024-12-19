@@ -6,16 +6,14 @@ import '../../../l10n/l10n.dart';
 import '../../../models/form_selector.dart';
 import '../../../widgets/form/form_selector_field.dart';
 
-class CategorySelector extends StatelessWidget {
-  static const String NO_CATEGORY = 'NO_CATEGORY';
-
-  final String? selectedCategory;
+class ProjectSelector extends StatelessWidget {
+  final String? selectedProject;
   final ValueChanged<String?> onChanged;
   final VoidCallback? onTap;
 
-  const CategorySelector({
+  const ProjectSelector({
     Key? key,
-    this.selectedCategory,
+    this.selectedProject,
     required this.onChanged,
     this.onTap,
   }) : super(key: key);
@@ -26,38 +24,37 @@ class CategorySelector extends StatelessWidget {
 
     return Consumer<AccountItemProvider>(
       builder: (context, provider, _) {
-        return FormSelectorField<Category>(
-          items: [
-            ...provider.filteredCategories,
-          ],
-          value: selectedCategory,
-          icon: Icons.category_outlined,
-          placeholder: l10n.categoryHint,
-          config: FormSelectorConfig<Category>(
-            idField: 'categoryCode',
+        return FormSelectorField<AccountSymbol>(
+          items: provider.projects,
+          value: selectedProject,
+          icon: Icons.folder_outlined,
+          placeholder: l10n.selectProjectHint,
+          config: FormSelectorConfig<AccountSymbol>(
+            idField: 'code',
             labelField: 'name',
             valueField: 'name',
-            dialogTitle: l10n.selectCategoryTitle,
-            searchHint: l10n.searchCategoryHint,
-            noDataText: l10n.noAvailableCategories,
-            addItemTemplate: l10n.addButtonWith('分类'),
+            dialogTitle: l10n.selectProjectTitle,
+            searchHint: l10n.searchProjectHint,
+            noDataText: l10n.selectProjectTitle,
+            addItemTemplate: l10n.addButtonWith('项目'),
             showSearch: true,
             showAddButton: true,
-            mode: FormSelectorMode.grid,
+            mode: FormSelectorMode.badge,
             gridMaxCount: 9,
             alignGrid: true,
           ),
           callbacks: FormSelectorCallbacks(
             onChanged: onChanged,
             onItemAdded: (name) async {
-              final category = Category(
+              final symbol = AccountSymbol(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
                 name: name,
+                code: name,
+                symbolType: 'PROJECT',
                 accountBookId: provider.selectedBook?.id ?? '',
-                categoryType: provider.transactionType,
               );
-              provider.addCategory(name);
-              onChanged(category.name);
+              provider.addTag(symbol);
+              onChanged(symbol.name);
             },
             onTap: onTap,
           ),

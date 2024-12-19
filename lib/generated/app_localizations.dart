@@ -2051,6 +2051,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Category'**
   String get noCategory;
+
+  /// No description provided for @selectTagHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get selectTagHint;
+
+  /// No description provided for @selectTagTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get selectTagTitle;
+
+  /// No description provided for @searchTagHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tags'**
+  String get searchTagHint;
+
+  /// No description provided for @selectProjectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Project'**
+  String get selectProjectHint;
+
+  /// No description provided for @selectProjectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Project'**
+  String get selectProjectTitle;
+
+  /// No description provided for @searchProjectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search projects'**
+  String get searchProjectHint;
+
+  /// No description provided for @noEditPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to edit'**
+  String get noEditPermission;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

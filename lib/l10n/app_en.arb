@@ -412,5 +412,12 @@
   "fieldRequired": "This field is required",
   "clear": "Clear",
   "selectShopHint": "Select shop",
-  "noCategory": "No Category"
+  "noCategory": "No Category",
+  "selectTagHint": "Tag",
+  "selectTagTitle": "Tag",
+  "searchTagHint": "Search tags",
+  "selectProjectHint": "Project",
+  "selectProjectTitle": "Project",
+  "searchProjectHint": "Search projects",
+  "noEditPermission": "You don't have permission to edit"
 }

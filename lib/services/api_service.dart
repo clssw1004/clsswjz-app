@@ -186,4 +186,27 @@ class ApiService {
   }) {
     return ds.downloadAttachment(id, onProgress: onProgress);
   }
+
+  static Future<Map<String, List<AccountSymbol>>> getBookSymbols(
+      String bookId) {
+    return ds.getBookSymbols(bookId);
+  }
+
+  /// 获取账本下指定类型的标识数据
+  static Future<List<AccountSymbol>> getBookSymbolsByType(
+    String accountBookId,
+    String symbolType,
+  ) {
+    return ds.getBookSymbolsByType(accountBookId, symbolType);
+  }
+
+  /// 更新标识数据
+  static Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol) {
+    return ds.updateSymbol(id, symbol);
+  }
+
+  /// 删除标识数据
+  static Future<void> deleteSymbol(String id) {
+    return ds.deleteSymbol(id);
+  }
 }

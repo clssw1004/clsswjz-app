@@ -122,4 +122,19 @@ abstract class DataSource {
     String id, {
     void Function(int received, int total)? onProgress,
   });
+
+  /// 获取账本下所有类型标识的数据
+  Future<Map<String, List<AccountSymbol>>> getBookSymbols(String accountBookId);
+
+  /// 获取账本下指定类型的标识数据
+  Future<List<AccountSymbol>> getBookSymbolsByType(
+    String accountBookId,
+    String symbolType,
+  );
+
+  /// 更新标识数据
+  Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol);
+
+  /// 删除标识数据
+  Future<void> deleteSymbol(String id);
 }

@@ -3,13 +3,15 @@ import '../../../models/models.dart';
 import '../../../services/api_service.dart';
 
 class AccountItemProvider extends ChangeNotifier {
-  Map<String, dynamic>? selectedBook;
+  AccountBook? selectedBook;
   List<Category> categories = [];
   List<AccountBookFund> funds = [];
   List<Shop> shops = [];
   String _transactionType = 'EXPENSE';
   bool isLoading = false;
   bool _disposed = false;
+  List<AccountSymbol> _tags = [];
+  List<AccountSymbol> _projects = [];
 
   String get transactionType => _transactionType;
 
@@ -33,6 +35,9 @@ class AccountItemProvider extends ChangeNotifier {
           (c) => c.categoryType.isEmpty || c.categoryType == _transactionType)
       .toList(growable: false);
 
+  List<AccountSymbol> get tags => _tags;
+  List<AccountSymbol> get projects => _projects;
+
   AccountItemProvider({this.selectedBook}) {
     if (selectedBook != null) {
       loadData();
@@ -46,16 +51,21 @@ class AccountItemProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final bookId = selectedBook!['id'];
+      final bookId = selectedBook!.id;
       final results = await Future.wait([
         ApiService.getCategories(bookId),
         ApiService.getBookFunds(bookId),
         ApiService.getShops(bookId),
+        ApiService.getBookSymbols(bookId),
       ]);
 
       categories = results[0] as List<Category>;
       funds = results[1] as List<AccountBookFund>;
       shops = results[2] as List<Shop>;
+
+      final symbols = results[3] as Map<String, List<AccountSymbol>>;
+      _tags = symbols['TAG'] ?? [];
+      _projects = symbols['PROJECT'] ?? [];
 
       // 如果没有选择账户，设置默认账户
       if (_selectedFund == null && funds.isNotEmpty) {
@@ -80,8 +90,8 @@ class AccountItemProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> setSelectedBook(Map<String, dynamic>? book) async {
-    if (book == null || book['id'] == selectedBook?['id']) return;
+  Future<void> setSelectedBook(AccountBook? book) async {
+    if (book == null || book.id == selectedBook?.id) return;
     selectedBook = book;
     await loadData();
   }
@@ -99,7 +109,7 @@ class AccountItemProvider extends ChangeNotifier {
         Category(
           id: '',
           name: category,
-          accountBookId: selectedBook!['id'],
+          accountBookId: selectedBook!.id,
           categoryType: _transactionType,
         )
       ];
@@ -122,7 +132,7 @@ class AccountItemProvider extends ChangeNotifier {
       final category = Category(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: newCategory,
-        accountBookId: selectedBook?['id'],
+        accountBookId: selectedBook!.id,
         categoryType: _transactionType,
       );
 
@@ -134,14 +144,20 @@ class AccountItemProvider extends ChangeNotifier {
   }
 
   Future<void> addShop(Shop shop) async {
-    try {
-      final newShop = await ApiService.createShop(shop);
-      shops.add(newShop);
-      notifyListeners();
-    } catch (e) {
-      debugPrint('添加商家失败: $e');
-      rethrow;
+    shops.add(shop);
+    notifyListeners();
+  }
+
+  Future<void> addTag(AccountSymbol symbol) async {
+    switch (symbol.symbolType) {
+      case 'TAG':
+        _tags.add(symbol);
+        break;
+      case 'PROJECT':
+        _projects.add(symbol);
+        break;
     }
+    notifyListeners();
   }
 
   @override

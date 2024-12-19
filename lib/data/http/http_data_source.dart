@@ -130,6 +130,8 @@ class HttpDataSource implements DataSource {
         'type': item.type,
         'category': item.category,
         'shop': item.shop,
+        'tag': item.tag,
+        'project': item.project,
         'description': item.description,
         'accountDate': item.accountDate,
       };
@@ -172,6 +174,8 @@ class HttpDataSource implements DataSource {
         'type': item.type,
         'category': item.category,
         'shop': item.shop,
+        'tag': item.tag,
+        'project': item.project,
         'description': item.description,
         'accountDate': item.accountDate,
         'fundId': item.fundId,
@@ -646,6 +650,82 @@ class HttpDataSource implements DataSource {
       // 直接写入字节数据
       await file.writeAsBytes(response.data!);
       return file;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<Map<String, List<AccountSymbol>>> getBookSymbols(
+      String accountBookId) async {
+    try {
+      final response = await _httpClient.request<Map<String, dynamic>>(
+        path: '${ApiEndpoints.accountSymbols}/list',
+        method: HttpMethod.post,
+        data: {'accountBookId': accountBookId},
+      );
+
+      final result = <String, List<AccountSymbol>>{};
+
+      if (response['TAG'] != null) {
+        result['TAG'] = (response['TAG'] as List)
+            .map((item) => AccountSymbol.fromJson(item))
+            .toList();
+      }
+
+      if (response['PROJECT'] != null) {
+        result['PROJECT'] = (response['PROJECT'] as List)
+            .map((item) => AccountSymbol.fromJson(item))
+            .toList();
+      }
+
+      return result;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<List<AccountSymbol>> getBookSymbolsByType(
+    String accountBookId,
+    String symbolType,
+  ) async {
+    try {
+      final response = await _httpClient.request<List<dynamic>>(
+        path: '${ApiEndpoints.accountSymbols}/listByType',
+        method: HttpMethod.post,
+        data: {
+          'accountBookId': accountBookId,
+          'symbolType': symbolType,
+        },
+      );
+      return response.map((item) => AccountSymbol.fromJson(item)).toList();
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol) async {
+    try {
+      final response = await _httpClient.request<Map<String, dynamic>>(
+        path: '${ApiEndpoints.accountSymbols}/$id',
+        method: HttpMethod.patch,
+        data: {'name': symbol.name},
+      );
+      return AccountSymbol.fromJson(response);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<void> deleteSymbol(String id) async {
+    try {
+      await _httpClient.request<void>(
+        path: '${ApiEndpoints.accountSymbols}/$id',
+        method: HttpMethod.delete,
+      );
     } on DioException catch (e) {
       throw _handleDioError(e);
     }

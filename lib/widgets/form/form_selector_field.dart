@@ -67,64 +67,79 @@ class _FormSelectorFieldState<T> extends State<FormSelectorField<T>> {
               value?.isEmpty ?? true ? L10n.of(context).fieldRequired : null
           : null,
       builder: (field) {
+        Widget selector;
+
+        switch (widget.config.mode) {
+          case FormSelectorMode.standard:
+            selector = Container(
+              height: 48,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: field.hasError
+                        ? colorScheme.error
+                        : colorScheme.outlineVariant.withOpacity(0.5),
+                  ),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    widget.icon,
+                    size: 18,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        widget.callbacks.onTap?.call();
+                        _showSelectorDialog(context);
+                      },
+                      child: Text(
+                        _getDisplayText() ?? widget.placeholder,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: _getDisplayText() != null
+                              ? colorScheme.onSurface
+                              : colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right, size: 18),
+                    onPressed: () => _showSelectorDialog(context),
+                    color: colorScheme.onSurfaceVariant,
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                ],
+              ),
+            );
+            break;
+          case FormSelectorMode.grid:
+            selector = _buildGridSelector();
+            break;
+          case FormSelectorMode.badge:
+            selector = Align(
+              alignment: Alignment.centerLeft,
+              child: _buildBadgeSelector(),
+            );
+            break;
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!widget.config.showGridSelector)
-              Container(
-                height: 48,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: field.hasError
-                          ? colorScheme.error
-                          : colorScheme.outlineVariant.withOpacity(0.5),
-                    ),
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      widget.icon,
-                      size: 18,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          widget.callbacks.onTap?.call();
-                          _showSelectorDialog(context);
-                        },
-                        child: Text(
-                          _getDisplayText() ?? widget.placeholder,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: _getDisplayText() != null
-                                ? colorScheme.onSurface
-                                : colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.chevron_right, size: 18),
-                      onPressed: () => _showSelectorDialog(context),
-                      color: colorScheme.onSurfaceVariant,
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (widget.config.showGridSelector) _buildGridSelector(),
+            selector,
             if (field.hasError)
               Padding(
                 padding: const EdgeInsets.only(top: 6, left: 12),
@@ -146,6 +161,10 @@ class _FormSelectorFieldState<T> extends State<FormSelectorField<T>> {
     final colorScheme = theme.colorScheme;
     final displayItems = _getDisplayItems();
 
+    if (displayItems.isEmpty) {
+      return Container();
+    }
+
     final itemGroups = displayItems.fold<List<List<T>>>(
       [],
       (list, item) {
@@ -156,6 +175,10 @@ class _FormSelectorFieldState<T> extends State<FormSelectorField<T>> {
         return list;
       },
     );
+
+    if (itemGroups.isEmpty) {
+      return Container();
+    }
 
     final lastRowSpace = widget.config.gridRowCount - itemGroups.last.length;
     final showMoreInLastRow =
@@ -323,16 +346,58 @@ class _FormSelectorFieldState<T> extends State<FormSelectorField<T>> {
         config: widget.config,
         onSelected: (value) {
           widget.callbacks.onChanged(value);
-          if (widget.config.showGridSelector) {
-            setState(() {});
-          }
+          setState(() {});
         },
         onItemAdded: (value) {
           widget.callbacks.onItemAdded?.call(value);
-          if (widget.config.showGridSelector) {
-            setState(() {});
-          }
+          setState(() {});
         },
+      ),
+    );
+  }
+
+  Widget _buildBadgeSelector() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final hasValue = widget.value != null;
+
+    return InkWell(
+      onTap: () {
+        widget.callbacks.onTap?.call();
+        _showSelectorDialog(context);
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        decoration: BoxDecoration(
+          color: hasValue ? colorScheme.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: hasValue ? colorScheme.primary : colorScheme.outlineVariant,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              widget.icon,
+              size: 16,
+              color: hasValue
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
+            ),
+            SizedBox(width: 4),
+            Text(
+              hasValue ? (_getDisplayText() ?? '') : widget.config.dialogTitle,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: hasValue
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSurfaceVariant,
+                fontWeight: hasValue ? FontWeight.w500 : null,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

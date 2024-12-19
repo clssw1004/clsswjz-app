@@ -1,8 +1,9 @@
+import 'package:clsswjz/models/account_book.dart';
 import 'package:flutter/material.dart';
 import '../../../l10n/l10n.dart';
 
 class BookHeader extends StatelessWidget {
-  final Map<String, dynamic>? book;
+  final AccountBook? book;
 
   const BookHeader({Key? key, this.book}) : super(key: key);
 
@@ -26,7 +27,7 @@ class BookHeader extends StatelessWidget {
           SizedBox(width: 8),
           Expanded(
             child: Text(
-              book?['name'] ?? l10n.selectBookHint,
+              book?.name ?? l10n.selectBookHint,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: book != null
                     ? colorScheme.onSurface

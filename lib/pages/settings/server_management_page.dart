@@ -10,7 +10,6 @@ class ServerManagementPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
     return Scaffold(
@@ -46,7 +45,6 @@ class ServerManagementPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   itemBuilder: (context, index) {
                     final config = provider.configs[index];
-                    final isSelected = config.id == provider.selectedConfig?.id;
 
                     return _buildServerCard(context, config);
                   },
@@ -82,9 +80,8 @@ class ServerManagementPage extends StatelessWidget {
 
   void _editServer(BuildContext context, ServerConfig config) {
     final l10n = L10n.of(context);
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
+    Theme.of(context);
+
     final nameController = TextEditingController(text: config.name);
     final urlController = TextEditingController(text: config.serverUrl);
     
@@ -194,7 +191,7 @@ class ServerManagementPage extends StatelessWidget {
   Widget _buildServerCard(BuildContext context, ServerConfig config) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final l10n = L10n.of(context);
+    L10n.of(context);
 
     return Card(
       elevation: 0,

@@ -20,10 +20,12 @@ import './account_item/widgets/shop_selector.dart';
 import '../l10n/l10n.dart';
 import './account_item/widgets/category_selector.dart';
 import 'dart:io';
+import './account_item/widgets/tag_selector.dart';
+import './account_item/widgets/project_selector.dart';
 
 class AccountItemForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
-  final Map<String, dynamic>? initialBook;
+  final AccountBook? initialBook;
 
   const AccountItemForm({
     Key? key,
@@ -50,7 +52,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   Map<String, dynamic>? _selectedFund;
-  Map<String, dynamic>? _selectedBook;
+  AccountBook? _selectedBook;
   String? _recordId;
   String? _selectedShop;
   String? _selectedShopName;
@@ -58,6 +60,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
   final List<File> _newAttachments = [];
   final List<String> _deleteAttachmentIds = [];
   List<Attachment> _existingAttachments = [];
+
+  String? _selectedTag;
+  String? _selectedProject;
 
   @override
   void initState() {
@@ -147,6 +152,9 @@ class _AccountItemFormState extends State<AccountItemForm> {
             _selectedDate = dateTime;
             _selectedTime = TimeOfDay.fromDateTime(dateTime);
           }
+
+          _selectedTag = widget.initialData!['tag'];
+          _selectedProject = widget.initialData!['project'];
         });
       } else {
         setState(() {
@@ -276,12 +284,13 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                                   () => _selectedTime = time),
                                             ),
                                             SizedBox(height: 8),
+                                            _buildFundSelector(),
+                                            SizedBox(height: 8),
                                             ShopSelector(
-                                              selectedShop: _selectedShop,
                                               selectedShopName:
                                                   _selectedShopName,
                                               accountBookId:
-                                                  _selectedBook?['id'] ?? '',
+                                                  _selectedBook?.id ?? '',
                                               onTap: () {
                                                 _amountFocusNode.unfocus();
                                               },
@@ -294,11 +303,37 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                               },
                                             ),
                                             SizedBox(height: 8),
-                                            _buildFundSelector(),
-                                            SizedBox(height: 8),
                                             DescriptionInput(
                                               controller:
                                                   _descriptionController,
+                                            ),
+                                            SizedBox(height: 16),
+                                            Row(
+                                              children: [
+                                                TagSelector(
+                                                  selectedTag: _selectedTag,
+                                                  onChanged: (value) {
+                                                    setState(() =>
+                                                        _selectedTag = value);
+                                                  },
+                                                  onTap: () {
+                                                    _amountFocusNode.unfocus();
+                                                  },
+                                                ),
+                                                SizedBox(width: 8),
+                                                ProjectSelector(
+                                                  selectedProject:
+                                                      _selectedProject,
+                                                  onChanged: (value) {
+                                                    setState(() =>
+                                                        _selectedProject =
+                                                            value);
+                                                  },
+                                                  onTap: () {
+                                                    _amountFocusNode.unfocus();
+                                                  },
+                                                ),
+                                              ],
                                             ),
                                             SizedBox(height: 16),
                                             _buildAttachmentList(),
@@ -322,54 +357,75 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                   ),
                                 ),
                               ),
-                              child: FilledButton(
-                                onPressed: () {
-                                  print(
-                                      'Form validation: ${_formKey.currentState?.validate()}');
+                              child: _selectedBook!.canEditItem
+                                  ? FilledButton(
+                                      onPressed: () {
+                                        print(
+                                            'Form validation: ${_formKey.currentState?.validate()}');
 
-                                  if (_formKey.currentState?.validate() ??
-                                      false) {
-                                    final amount = double.tryParse(
-                                            _amountController.text) ??
-                                        0.0;
-                                    _saveTransaction({
-                                      'amount': amount,
-                                      'description':
-                                          _descriptionController.text.trim(),
-                                      'type': _transactionType,
-                                      'category': _selectedCategory,
-                                      'accountDate': _formattedDateTime,
-                                      'fundId': _selectedFund?['id'],
-                                      'accountBookId': _selectedBook?['id'],
-                                      if (_recordId != null) 'id': _recordId,
-                                      'shop':
-                                          _selectedShop == ShopSelector.NO_SHOP
-                                              ? ShopSelector.NO_SHOP
-                                              : _selectedShopName,
-                                    });
-                                  } else {
-                                    print('Form validation failed');
-                                    print('Amount: ${_amountController.text}');
-                                    print('Category: $_selectedCategory');
-                                    print('Fund: $_selectedFund');
-                                    print('Book: $_selectedBook');
-                                  }
-                                },
-                                style: FilledButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.save_outlined, size: 18),
-                                    SizedBox(width: 8),
-                                    Text(l10n.saveRecord),
-                                  ],
-                                ),
-                              ),
+                                        if (_formKey.currentState?.validate() ??
+                                            false) {
+                                          final amount = double.tryParse(
+                                                  _amountController.text) ??
+                                              0.0;
+                                          _saveTransaction({
+                                            'amount': amount,
+                                            'description':
+                                                _descriptionController.text
+                                                    .trim(),
+                                            'type': _transactionType,
+                                            'category': _selectedCategory,
+                                            'accountDate': _formattedDateTime,
+                                            'fundId': _selectedFund?['id'],
+                                            'accountBookId': _selectedBook?.id,
+                                            if (_recordId != null)
+                                              'id': _recordId,
+                                            'shop': _selectedShop ==
+                                                    ShopSelector.NO_SHOP
+                                                ? ShopSelector.NO_SHOP
+                                                : _selectedShopName,
+                                            'tag': _selectedTag,
+                                            'project': _selectedProject,
+                                          });
+                                        } else {
+                                          print('Form validation failed');
+                                          print(
+                                              'Amount: ${_amountController.text}');
+                                          print('Category: $_selectedCategory');
+                                          print('Fund: $_selectedFund');
+                                          print('Book: $_selectedBook');
+                                        }
+                                      },
+                                      style: FilledButton.styleFrom(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.save_outlined, size: 18),
+                                          SizedBox(width: 8),
+                                          Text(l10n.saveRecord),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8),
+                                      child: Text(
+                                        l10n.noEditPermission,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                          color: colorScheme.error,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
                             ),
                           ],
                         ),
@@ -431,6 +487,8 @@ class _AccountItemFormState extends State<AccountItemForm> {
           fundId: fundId,
           fund: fundName,
           accountDate: data['accountDate'],
+          tag: data['tag'],
+          project: data['project'],
           deleteAttachmentIds: _deleteAttachmentIds);
 
       if (accountItem.id.isEmpty) {
@@ -468,7 +526,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
         return FundSelector(
           selectedFund: _selectedFund,
-          accountBookId: _selectedBook!['id'],
+          accountBookId: _selectedBook!.id,
           onChanged: (fund) {
             setState(() {
               _selectedFund = fund;

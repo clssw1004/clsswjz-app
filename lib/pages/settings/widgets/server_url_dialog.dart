@@ -16,7 +16,6 @@ class ServerUrlDialog extends StatefulWidget {
 class _ServerUrlDialogState extends State<ServerUrlDialog> {
   late TextEditingController _controller;
   bool _isChecking = false;
-  String? _checkResult;
   ServerStatus _serverStatus = ServerStatus.error('');
 
   @override
@@ -89,7 +88,6 @@ class _ServerUrlDialogState extends State<ServerUrlDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
     print('Building ServerUrlDialog');

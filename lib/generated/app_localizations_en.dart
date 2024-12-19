@@ -1044,4 +1044,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noCategory => 'No Category';
+
+  @override
+  String get selectTagHint => 'Tag';
+
+  @override
+  String get selectTagTitle => 'Tag';
+
+  @override
+  String get searchTagHint => 'Search tags';
+
+  @override
+  String get selectProjectHint => 'Project';
+
+  @override
+  String get selectProjectTitle => 'Project';
+
+  @override
+  String get searchProjectHint => 'Search projects';
+
+  @override
+  String get noEditPermission => 'You don\'t have permission to edit';
 }

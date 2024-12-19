@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 import 'attachment.dart';
 
 class AccountItemResponse {
@@ -75,6 +73,8 @@ class AccountItem {
   final String? fundId;
   final String? fund;
   final String? shop;
+  final String? tag;
+  final String? project;
   final String? createdBy;
   final String? createdByName;
   final String? updatedBy;
@@ -94,6 +94,8 @@ class AccountItem {
     this.fundId,
     this.fund,
     this.shop,
+    this.tag,
+    this.project,
     this.createdBy,
     this.createdByName,
     this.updatedBy,
@@ -114,6 +116,8 @@ class AccountItem {
         'fundId': fundId,
         'fund': fund,
         'shop': shop,
+        'tag': tag,
+        'project': project,
         'createdBy': createdBy,
         'createdByName': createdByName,
         'updatedBy': updatedBy,
@@ -157,6 +161,8 @@ class AccountItem {
       fundId: json['fundId'] as String?,
       fund: json['fund'] as String?,
       shop: json['shop'] as String?,
+      tag: json['tag'] as String?,
+      project: json['project'] as String?,
       createdBy: json['createdBy'] as String?,
       createdByName: json['createdByName'] as String?,
       updatedBy: json['updatedBy'] as String?,
@@ -180,6 +186,8 @@ class AccountItem {
     String? fundId,
     String? fund,
     String? accountDate,
+    String? tag,
+    String? project,
   }) =>
       AccountItem(
         id: id ?? this.id,

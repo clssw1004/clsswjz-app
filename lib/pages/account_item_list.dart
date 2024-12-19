@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../models/models.dart';
 import '../services/api_service.dart';
 import '../pages/account_item_info.dart';
 import 'account_item/widgets/filter_section.dart';
@@ -8,12 +9,10 @@ import '../widgets/app_bar_factory.dart';
 import '../widgets/global_book_selector.dart';
 import '../utils/message_helper.dart';
 import 'account_item/widgets/summary_card.dart';
-import '../models/account_item.dart';
 import '../l10n/l10n.dart';
 import '../widgets/account_item_tile.dart';
 import '../constants/storage_keys.dart';
 import '../services/storage_service.dart';
-import '../models/shop.dart';
 import '../models/account_item_request.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -38,9 +37,9 @@ class _AccountItemListState extends State<AccountItemList>
   bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();
   List<AccountItem> _items = [];
-  List<Map<String, dynamic>> _accountBooks = [];
+  List<AccountBook> _accountBooks = [];
   List<String> _categories = [];
-  Map<String, dynamic>? _selectedBook;
+  AccountBook? _selectedBook;
   String? _selectedType;
   DateTime? _startDate;
   DateTime? _endDate;
@@ -116,7 +115,7 @@ class _AccountItemListState extends State<AccountItemList>
       }
 
       final request = AccountItemRequest(
-        accountBookId: _selectedBook!['id'],
+        accountBookId: _selectedBook!.id,
         page: _currentPage,
         pageSize: _pageSize,
         categories: _selectedCategories,
@@ -173,29 +172,27 @@ class _AccountItemListState extends State<AccountItemList>
       final books = await ApiService.getAccountBooks();
       if (!mounted) return;
 
-      final booksJson = books.map((book) => book.toJson()).toList();
-      Map<String, dynamic>? defaultBook;
+      AccountBook? defaultBook;
 
       // 尝试找到保存的账本
-      defaultBook = booksJson.firstWhere(
-        (book) => book['id'] == savedBookId,
-        orElse: () => _getFirstOwnedBook(booksJson) ?? booksJson.first,
+      defaultBook = books.firstWhere(
+        (book) => book.id == savedBookId,
+        orElse: () => _getFirstOwnedBook(books) ?? books.first,
       );
 
+      await StorageService.setString(StorageKeys.currentBookId, defaultBook.id);
       await StorageService.setString(
-          StorageKeys.currentBookId, defaultBook['id']);
-      await StorageService.setString(
-          StorageKeys.currentBookName, defaultBook['name']);
+          StorageKeys.currentBookName, defaultBook.id);
 
       if (!mounted) return;
       setState(() {
-        _accountBooks = booksJson;
+        _accountBooks = books;
         _selectedBook = defaultBook;
       });
 
       if (_selectedBook != null) {
         // 保存选中的账本ID
-        await UserService.setCurrentAccountBookId(_selectedBook!['id']);
+        await UserService.setCurrentAccountBookId(_selectedBook!.id);
         await _loadCategories();
         await _loadShops();
         await _loadAccountItems();
@@ -211,11 +208,11 @@ class _AccountItemListState extends State<AccountItemList>
   }
 
   // 获取第一个本人的账本
-  Map<String, dynamic>? _getFirstOwnedBook(List<Map<String, dynamic>> books) {
+  AccountBook? _getFirstOwnedBook(List<AccountBook> books) {
     final currentUserId = UserService.getUserInfo()?['userId'];
     try {
       return books.firstWhere(
-        (book) => book['createdBy'] == currentUserId,
+        (book) => book.createdBy == currentUserId,
         orElse: () => books.first,
       );
     } catch (e) {
@@ -224,16 +221,13 @@ class _AccountItemListState extends State<AccountItemList>
   }
 
   // 修改选择账本的回调方法
-  void _onBookSelected(Map<String, dynamic> book) async {
-    setState(() => _selectedBook = book);
+  void _onBookSelected(AccountBook book) async {
+    _selectedBook = book;
 
     // 保存选中的账本ID和名称
-    await StorageService.setString(StorageKeys.currentBookId, book['id']);
-    await StorageService.setString(StorageKeys.currentBookName, book['name']);
-    await UserService.setCurrentAccountBookId(book['id']);
-
-    // 调用回调通知父组件
-    widget.onBookSelected?.call(book);
+    await StorageService.setString(StorageKeys.currentBookId, book.id);
+    await StorageService.setString(StorageKeys.currentBookName, book.name);
+    await UserService.setCurrentAccountBookId(book.id);
 
     // 重新加载数据
     await _loadCategories();
@@ -343,7 +337,9 @@ class _AccountItemListState extends State<AccountItemList>
           ],
         ),
       ),
-      floatingActionButton: _isBatchMode
+      floatingActionButton: _isBatchMode ||
+              _selectedBook == null ||
+              _selectedBook!.canEditItem == false
           ? null
           : FloatingActionButton(
               onPressed: _addNewRecord,
@@ -431,7 +427,7 @@ class _AccountItemListState extends State<AccountItemList>
 
   Future<void> _loadShops() async {
     try {
-      final shops = await ApiService.getShops(_selectedBook!['id']);
+      final shops = await ApiService.getShops(_selectedBook!.id);
       if (!mounted) return;
       setState(() {
         _shops = shops
@@ -553,7 +549,7 @@ class _AccountItemListState extends State<AccountItemList>
 
   Future<void> _loadCategories() async {
     try {
-      final categories = await ApiService.getCategories(_selectedBook!['id']);
+      final categories = await ApiService.getCategories(_selectedBook!.id);
       if (!mounted) return;
       setState(() {
         _categories = categories.map((c) => c.name).toList();
