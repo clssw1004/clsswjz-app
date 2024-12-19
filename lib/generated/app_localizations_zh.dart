@@ -621,7 +621,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get categoryLabel => '分类';
 
   @override
-  String get categoryHint => '选择分类';
+  String get categoryHint => '���择分类';
 
   @override
   String get dateLabel => '日期';
@@ -827,7 +827,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverName => '服务器名称';
 
   @override
-  String get serverNameHint => '例如���本地服务器';
+  String get serverNameHint => '例如本地服务器';
 
   @override
   String get serverNameRequired => '请输入服务器名称';
@@ -905,7 +905,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get retry => '重试';
 
   @override
-  String get about => '关于';
+  String get about => '���于';
 
   @override
   String get version => '版本';
@@ -953,7 +953,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noMoreData => '已经到底了';
 
   @override
-  String get importData => '导入数据';
+  String get importData => '导入';
 
   @override
   String get dataSource => '数据来源';
@@ -1049,13 +1049,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get selectTagHint => '标签';
 
   @override
-  String get selectTagTitle => '标签';
+  String get bookTag => '标签';
 
   @override
   String get searchTagHint => '搜索标签';
 
   @override
-  String get selectProjectHint => '项目';
+  String get bookProject => '项目';
 
   @override
   String get selectProjectTitle => '项目';
@@ -1065,6 +1065,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noEditPermission => '您没有编辑权限';
+
+  @override
+  String get name => '名称';
+
+  @override
+  String pleaseInput(Object field) {
+    return '请输入$field';
+  }
+
+  @override
+  String editButtonWith(Object name) {
+    return '编辑$name';
+  }
+
+  @override
+  String get noDataAvailable => '暂无数据';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1564,7 +1580,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get noMoreData => '已經到底了';
 
   @override
-  String get importData => '導入數據';
+  String get importData => '導入';
 
   @override
   String get dataSource => '數據來源';

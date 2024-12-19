@@ -206,7 +206,7 @@ class ApiService {
   }
 
   /// 更新标识数据
-  static Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol) {
+  static Future<void> updateSymbol(String id, AccountSymbol symbol) {
     return ds.updateSymbol(id, symbol);
   }
 

@@ -953,7 +953,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noMoreData => 'No more data';
 
   @override
-  String get importData => 'Import Data';
+  String get importData => 'Import';
 
   @override
   String get dataSource => 'Data Source';
@@ -1049,13 +1049,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectTagHint => 'Tag';
 
   @override
-  String get selectTagTitle => 'Tag';
+  String get bookTag => 'Tag';
 
   @override
   String get searchTagHint => 'Search tags';
 
   @override
-  String get selectProjectHint => 'Project';
+  String get bookProject => 'Project';
 
   @override
   String get selectProjectTitle => 'Project';
@@ -1065,4 +1065,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noEditPermission => 'You don\'t have permission to edit';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String pleaseInput(Object field) {
+    return 'Please input $field';
+  }
+
+  @override
+  String editButtonWith(Object name) {
+    return 'Edit $name';
+  }
+
+  @override
+  String get noDataAvailable => 'No data available';
 }

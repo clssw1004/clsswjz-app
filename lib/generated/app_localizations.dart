@@ -1893,7 +1893,7 @@ abstract class AppLocalizations {
   /// No description provided for @importData.
   ///
   /// In en, this message translates to:
-  /// **'Import Data'**
+  /// **'Import'**
   String get importData;
 
   /// No description provided for @dataSource.
@@ -2058,11 +2058,11 @@ abstract class AppLocalizations {
   /// **'Tag'**
   String get selectTagHint;
 
-  /// No description provided for @selectTagTitle.
+  /// No description provided for @bookTag.
   ///
   /// In en, this message translates to:
   /// **'Tag'**
-  String get selectTagTitle;
+  String get bookTag;
 
   /// No description provided for @searchTagHint.
   ///
@@ -2070,11 +2070,11 @@ abstract class AppLocalizations {
   /// **'Search tags'**
   String get searchTagHint;
 
-  /// No description provided for @selectProjectHint.
+  /// No description provided for @bookProject.
   ///
   /// In en, this message translates to:
   /// **'Project'**
-  String get selectProjectHint;
+  String get bookProject;
 
   /// No description provided for @selectProjectTitle.
   ///
@@ -2093,6 +2093,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You don\'t have permission to edit'**
   String get noEditPermission;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @pleaseInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Please input {field}'**
+  String pleaseInput(Object field);
+
+  /// No description provided for @editButtonWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {name}'**
+  String editButtonWith(Object name);
+
+  /// No description provided for @noDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available'**
+  String get noDataAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

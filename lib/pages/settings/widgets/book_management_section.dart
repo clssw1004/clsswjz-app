@@ -6,6 +6,7 @@ import '../../../l10n/l10n.dart';
 import '../../../pages/account_book_list.dart';
 import '../../../pages/import/import_page.dart';
 import '../../../services/storage_service.dart';
+import '../../common/symbol_list_page.dart';
 import '../category_management_page.dart';
 import '../fund_management_page.dart';
 import '../providers/category_management_provider.dart';
@@ -95,8 +96,36 @@ class BookManagementSection extends StatelessWidget {
             ),
       ),
       (
-        icon: Icons.upload_file_outlined,
-        label: l10n.importData.replaceAll('数据', ''),
+        icon: Icons.tag_outlined,
+        label: l10n.bookTag,
+        color: Colors.amber,
+        onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SymbolListPage(
+                  title: l10n.bookTag,
+                  symbolType: 'TAG',
+                ),
+              ),
+            ),
+      ),
+      (
+        icon: Icons.propane_outlined,
+        label: l10n.bookProject,
+        color: Colors.brown,
+        onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SymbolListPage(
+                  title: l10n.bookProject,
+                  symbolType: 'PROJECT',
+                ),
+              ),
+            ),
+      ),
+      (
+        icon: Icons.folder_outlined,
+        label: l10n.importData,
         color: Colors.purple,
         onTap: () => Navigator.push(
               context,

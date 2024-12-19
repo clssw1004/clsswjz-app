@@ -569,4 +569,10 @@ class SqliteDataSource implements DataSource {
     // TODO: implement updateSymbol
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> createSymbol(AccountSymbol symbol) {
+    // TODO: implement createSymbol
+    throw UnimplementedError();
+  }
 }

@@ -344,7 +344,7 @@
   "technicalSupport": "Technical Support",
   "loadingMore": "Loading more...",
   "noMoreData": "No more data",
-  "importData": "Import Data",
+  "importData": "Import",
   "dataSource": "Data Source",
   "selectFile": "Select File",
   "importFieldsRequired": "Please fill in all required fields",
@@ -414,10 +414,14 @@
   "selectShopHint": "Select shop",
   "noCategory": "No Category",
   "selectTagHint": "Tag",
-  "selectTagTitle": "Tag",
+  "bookTag": "Tag",
   "searchTagHint": "Search tags",
-  "selectProjectHint": "Project",
+  "bookProject": "Project",
   "selectProjectTitle": "Project",
   "searchProjectHint": "Search projects",
-  "noEditPermission": "You don't have permission to edit"
+  "noEditPermission": "You don't have permission to edit",
+  "name": "Name",
+  "pleaseInput": "Please input {field}",
+  "editButtonWith": "Edit {name}",
+  "noDataAvailable": "No data available"
 }

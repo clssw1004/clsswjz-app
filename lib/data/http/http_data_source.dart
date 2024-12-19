@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:file_picker/file_picker.dart';
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
@@ -706,14 +707,13 @@ class HttpDataSource implements DataSource {
   }
 
   @override
-  Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol) async {
+  Future<void> updateSymbol(String id, AccountSymbol symbol) async {
     try {
       final response = await _httpClient.request<Map<String, dynamic>>(
         path: '${ApiEndpoints.accountSymbols}/$id',
         method: HttpMethod.patch,
         data: {'name': symbol.name},
       );
-      return AccountSymbol.fromJson(response);
     } on DioException catch (e) {
       throw _handleDioError(e);
     }

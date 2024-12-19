@@ -135,7 +135,7 @@ abstract class DataSource {
   Future<void> createSymbol(AccountSymbol symbol);
 
   /// 更新标识数据
-  Future<AccountSymbol> updateSymbol(String id, AccountSymbol symbol);
+  Future<void> updateSymbol(String id, AccountSymbol symbol);
 
   /// 删除标识数据
   Future<void> deleteSymbol(String id);

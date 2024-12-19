@@ -171,11 +171,15 @@
     "clear",
     "selectShopHint",
     "selectTagHint",
-    "selectTagTitle",
+    "bookTag",
     "searchTagHint",
-    "selectProjectHint",
+    "bookProject",
     "selectProjectTitle",
     "searchProjectHint",
-    "noEditPermission"
+    "noEditPermission",
+    "name",
+    "pleaseInput",
+    "editButtonWith",
+    "noDataAvailable"
   ]
 }

@@ -28,7 +28,7 @@ class ProjectSelector extends StatelessWidget {
           items: provider.projects,
           value: selectedProject,
           icon: Icons.folder_outlined,
-          placeholder: l10n.selectProjectHint,
+          placeholder: l10n.bookProject,
           config: FormSelectorConfig<AccountSymbol>(
             idField: 'code',
             labelField: 'name',

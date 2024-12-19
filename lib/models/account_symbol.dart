@@ -44,4 +44,18 @@ class AccountSymbol {
         'createdAt': createdAt,
         'updatedAt': updatedAt,
       };
+
+  AccountSymbol copyWith({
+    String? id,
+    String? name,
+    String? code,
+    String? symbolType,
+  }) =>
+      AccountSymbol(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        code: code ?? this.code,
+        symbolType: symbolType ?? this.symbolType,
+        accountBookId: accountBookId,
+      );
 }
