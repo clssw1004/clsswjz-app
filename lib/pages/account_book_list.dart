@@ -210,7 +210,7 @@ class _AccountBookListState extends State<AccountBookList> {
     final l10n = L10n.of(context);
     final currentUserId = UserService.getUserInfo()?['userId'];
     final isShared = book.fromId != currentUserId;
-    final permissions = book.permissions as Map<String, dynamic>;
+    final permissions = book.permissions;
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4),
@@ -300,19 +300,19 @@ class _AccountBookListState extends State<AccountBookList> {
                     children: [
                       _buildPermissionIcon(
                         icon: Icons.visibility,
-                        enabled: permissions['canViewBook'] == true,
+                        enabled: permissions.canViewBook,
                         colorScheme: colorScheme,
                       ),
                       SizedBox(width: 8),
                       _buildPermissionIcon(
                         icon: Icons.edit_outlined,
-                        enabled: permissions['canEditBook'] == true,
+                        enabled: permissions.canEditBook,
                         colorScheme: colorScheme,
                       ),
                       SizedBox(width: 8),
                       _buildPermissionIcon(
                         icon: Icons.delete_outline,
-                        enabled: permissions['canDeleteBook'] == true,
+                        enabled: permissions.canDeleteBook,
                         colorScheme: colorScheme,
                         useErrorColor: true,
                       ),
