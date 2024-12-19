@@ -630,14 +630,14 @@ class _AccountItemListState extends State<AccountItemList>
       context,
       MaterialPageRoute(
         builder: (context) => AccountItemForm(
-          initialData: item.toJson(),
+          initialData: item,
           initialBook: _selectedBook,
         ),
       ),
     );
 
     if (result == true) {
-      _loadAccountItems(isRefresh: true);
+      await _loadAccountItems(isRefresh: true);
     }
   }
 

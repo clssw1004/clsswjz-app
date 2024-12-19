@@ -24,7 +24,7 @@ import './account_item/widgets/tag_selector.dart';
 import './account_item/widgets/project_selector.dart';
 
 class AccountItemForm extends StatefulWidget {
-  final Map<String, dynamic>? initialData;
+  final AccountItem? initialData;
   final AccountBook? initialBook;
 
   const AccountItemForm({
@@ -54,7 +54,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
   Map<String, dynamic>? _selectedFund;
   AccountBook? _selectedBook;
   String? _recordId;
-  String? _selectedShop;
   String? _selectedShopName;
 
   final List<File> _newAttachments = [];
@@ -71,14 +70,12 @@ class _AccountItemFormState extends State<AccountItemForm> {
     _selectedBook = widget.initialBook;
 
     if (widget.initialData != null) {
-      _transactionType = widget.initialData!['type'] == TYPE_EXPENSE
-          ? TYPE_EXPENSE
-          : TYPE_INCOME;
+      _transactionType = widget.initialData!.type;
     } else {
       _transactionType = TYPE_EXPENSE;
     }
 
-    _existingAttachments = _getInitialAttachments();
+    _existingAttachments = widget.initialData?.attachments ?? [];
   }
 
   @override
@@ -97,21 +94,19 @@ class _AccountItemFormState extends State<AccountItemForm> {
 
       if (widget.initialData != null) {
         setState(() {
-          _recordId = widget.initialData!['id'];
-          _transactionType = widget.initialData!['type'] == TYPE_EXPENSE
-              ? TYPE_EXPENSE
-              : TYPE_INCOME;
+          _recordId = widget.initialData!.id;
+          _transactionType = widget.initialData!.type;
           _provider
               .setTransactionType(_getLocalizedType(l10n, _transactionType));
-          _amountController.text = widget.initialData!['amount'].toString();
-          _selectedCategory = widget.initialData!['category'];
+          _amountController.text = widget.initialData!.amount.toString();
+          _selectedCategory = widget.initialData!.category;
 
-          if (widget.initialData!['fundId'] != null) {
-            if (widget.initialData!['fundId'] == FundSelector.NO_FUND) {
+          if (widget.initialData!.fundId != null) {
+            if (widget.initialData!.fundId == FundSelector.NO_FUND) {
               _selectedFund = FundSelector.getNoFundOption(l10n);
             } else {
               final fund = _provider.funds.firstWhere(
-                (f) => f.id == widget.initialData!['fundId'],
+                (f) => f.id == widget.initialData!.fundId,
                 orElse: () => AccountBookFund(
                   id: FundSelector.NO_FUND,
                   name: l10n.noFund,
@@ -136,29 +131,20 @@ class _AccountItemFormState extends State<AccountItemForm> {
             }
           }
 
-          if (widget.initialData!['shop'] != null) {
-            _selectedShop = widget.initialData!['shop'];
-            _selectedShopName = widget.initialData!['shop'];
-          } else {
-            _selectedShop = ShopSelector.NO_SHOP;
-            _selectedShopName = l10n.noShop;
-          }
+          _selectedShopName = widget.initialData!.shop ?? l10n.noShop;
+          _descriptionController.text = widget.initialData!.description;
 
-          _descriptionController.text =
-              widget.initialData!['description'] ?? '';
-
-          if (widget.initialData!['accountDate'] != null) {
-            final dateTime = DateTime.parse(widget.initialData!['accountDate']);
+          if (widget.initialData!.accountDate.isNotEmpty) {
+            final dateTime = DateTime.parse(widget.initialData!.accountDate);
             _selectedDate = dateTime;
             _selectedTime = TimeOfDay.fromDateTime(dateTime);
           }
 
-          _selectedTag = widget.initialData!['tag'];
-          _selectedProject = widget.initialData!['project'];
+          _selectedTag = widget.initialData!.tag;
+          _selectedProject = widget.initialData!.project;
         });
       } else {
         setState(() {
-          _selectedShop = ShopSelector.NO_SHOP;
           _selectedShopName = l10n.noShop;
         });
       }
@@ -249,13 +235,12 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                             ),
                                             SizedBox(height: 12),
                                             AmountInput(
-                                              initialValue: widget
-                                                          .initialData !=
-                                                      null
-                                                  ? double.parse(widget
-                                                      .initialData!['amount']
-                                                      .toString())
-                                                  : null,
+                                              initialValue:
+                                                  widget.initialData != null
+                                                      ? double.parse(widget
+                                                          .initialData!.amount
+                                                          .toString())
+                                                      : null,
                                               onChanged: (value) =>
                                                   _amountController.text =
                                                       value.toString(),
@@ -296,8 +281,6 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                               },
                                               onChanged: (shop) {
                                                 setState(() {
-                                                  _selectedShop = shop ??
-                                                      ShopSelector.NO_SHOP;
                                                   _selectedShopName = shop;
                                                 });
                                               },
@@ -380,10 +363,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
                                             'accountBookId': _selectedBook?.id,
                                             if (_recordId != null)
                                               'id': _recordId,
-                                            'shop': _selectedShop ==
-                                                    ShopSelector.NO_SHOP
-                                                ? ShopSelector.NO_SHOP
-                                                : _selectedShopName,
+                                            'shop': _selectedShopName,
                                             'tag': _selectedTag,
                                             'project': _selectedProject,
                                           });
@@ -573,23 +553,5 @@ class _AccountItemFormState extends State<AccountItemForm> {
         });
       },
     );
-  }
-
-  List<Attachment> _getInitialAttachments() {
-    if (widget.initialData == null ||
-        !widget.initialData!.containsKey('attachments') ||
-        widget.initialData!['attachments'] == null) {
-      return [];
-    }
-
-    try {
-      final attachmentsList = widget.initialData!['attachments'] as List;
-      return attachmentsList
-          .map((e) => Attachment.fromJson(e as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      debugPrint('Error parsing attachments: $e');
-      return [];
-    }
   }
 }
