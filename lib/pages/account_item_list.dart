@@ -48,7 +48,6 @@ class _AccountItemListState extends State<AccountItemList>
   final Set<String> _selectedItems = {};
   final Set<String> _selectedDates = {};
   Map<String, List<AccountItem>> _groupedItems = {};
-  final _listKey = GlobalKey<State>();
   FilterState _filterState = const FilterState();
 
   @override

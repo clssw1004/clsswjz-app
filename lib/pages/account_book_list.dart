@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../generated/app_localizations.dart';
 import '../services/api_service.dart';
 import '../utils/message_helper.dart';
 import '../constants/book_icons.dart';
@@ -21,43 +22,41 @@ class AccountBookList extends StatefulWidget {
 }
 
 class _AccountBookListState extends State<AccountBookList> {
-  List<AccountBook> _accountBooks = [];
-  bool _isLoading = true;
-  String? _error;
+  late Future<List<AccountBook>> _accountBooksFuture;
 
   @override
   void initState() {
     super.initState();
-    _fetchAccountBooks();
+    _accountBooksFuture = _fetchAccountBooks();
   }
 
-  Future<void> _fetchAccountBooks() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
+  Future<List<AccountBook>> _fetchAccountBooks() async {
     try {
-      final books = await ApiService.getAccountBooks();
-      setState(() {
-        _accountBooks = books;
-        _isLoading = false;
-      });
+      return await ApiService.getAccountBooks();
     } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
-
-      if (mounted) {
-        MessageHelper.showError(
-          context,
-          message: '获取账本列表失败',
-          actionLabel: '重试',
-          onAction: _fetchAccountBooks,
-        );
-      }
+      // 显示错误消息
+      Future.microtask(() => _showErrorMessage(e.toString()));
+      throw e;
     }
+  }
+
+  void _showErrorMessage(String error) {
+    MessageHelper.showError(
+      context,
+      message: '获取账本列表失败',
+      actionLabel: '重试',
+      onAction: () {
+        setState(() {
+          _accountBooksFuture = _fetchAccountBooks();
+        });
+      },
+    );
+  }
+
+  Future<void> _refreshAccountBooks() async {
+    setState(() {
+      _accountBooksFuture = _fetchAccountBooks();
+    });
   }
 
   Future<void> _openAccountBookInfo(AccountBook accountBook) async {
@@ -69,13 +68,7 @@ class _AccountBookListState extends State<AccountBookList> {
     );
 
     if (updatedAccountBook != null) {
-      setState(() {
-        final index = _accountBooks
-            .indexWhere((book) => book.id == updatedAccountBook.id);
-        if (index != -1) {
-          _accountBooks[index] = updatedAccountBook;
-        }
-      });
+      _refreshAccountBooks();
     }
   }
 
@@ -109,90 +102,102 @@ class _AccountBookListState extends State<AccountBookList> {
           IconButton(
             icon: Icon(Icons.add),
             tooltip: l10n.actionWithTarget(l10n.actionNew, l10n.targetBook),
-            onPressed: () {
-              Navigator.pushNamed(context, '/create-account-book')
-                  .then((_) => _fetchAccountBooks());
+            onPressed: () async {
+              await Navigator.pushNamed(context, '/create-account-book');
+              _refreshAccountBooks();
             },
           ),
         ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: _fetchAccountBooks,
-          child: _buildContent(),
+          onRefresh: _refreshAccountBooks,
+          child: FutureBuilder<List<AccountBook>>(
+            future: _accountBooksFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return _buildLoadingWidget(colorScheme);
+              }
+
+              if (snapshot.hasError) {
+                return _buildErrorWidget(snapshot.error.toString(), theme, colorScheme, l10n);
+              }
+
+              final books = snapshot.data ?? [];
+              if (books.isEmpty) {
+                return _buildEmptyWidget(colorScheme, l10n);
+              }
+
+              return _buildBookList(books);
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildContent() {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final l10n = L10n.of(context);
+  Widget _buildLoadingWidget(ColorScheme colorScheme) {
+    return Center(
+      child: CircularProgressIndicator(
+        color: colorScheme.primary,
+      ),
+    );
+  }
 
-    if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: colorScheme.primary,
-        ),
-      );
-    }
+  Widget _buildErrorWidget(String error, ThemeData theme, ColorScheme colorScheme, AppLocalizations l10n) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            error,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          SizedBox(height: 16),
+          FilledButton.tonal(
+            onPressed: _refreshAccountBooks,
+            child: Text(l10n.retryLoading),
+          ),
+        ],
+      ),
+    );
+  }
 
-    if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              _error!,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+  Widget _buildEmptyWidget(ColorScheme colorScheme, AppLocalizations l10n) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            l10n.noAccountBooks,
+            style: TextStyle(
+              color: colorScheme.onSurfaceVariant,
             ),
-            SizedBox(height: 16),
-            FilledButton.tonal(
-              onPressed: _fetchAccountBooks,
-              child: Text(l10n.retryLoading),
-            ),
-          ],
-        ),
-      );
-    }
+          ),
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () async {
+              await Navigator.pushNamed(context, '/create-account-book');
+              _refreshAccountBooks();
+            },
+            child: Text(l10n.actionWithTarget(l10n.actionNew, l10n.targetBook)),
+          ),
+        ],
+      ),
+    );
+  }
 
-    if (_accountBooks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              l10n.noAccountBooks,
-              style: TextStyle(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/create-account-book').then((_) {
-                  _fetchAccountBooks();
-                });
-              },
-              child:
-                  Text(l10n.actionWithTarget(l10n.actionNew, l10n.targetBook)),
-            ),
-          ],
-        ),
-      );
-    }
-
+  Widget _buildBookList(List<AccountBook> books) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(
         vertical: 8,
         horizontal: _getHorizontalPadding(context),
       ),
-      itemCount: _accountBooks.length,
+      itemCount: books.length,
       itemBuilder: (context, index) {
-        final book = _accountBooks[index];
+        final book = books[index];
         return _buildAccountItem(book);
       },
     );
@@ -295,7 +300,6 @@ class _AccountBookListState extends State<AccountBookList> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // 权限图标
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

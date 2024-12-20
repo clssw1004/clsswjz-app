@@ -15,7 +15,7 @@ import '../shop_management_page.dart';
 class BookManagementSection extends StatelessWidget {
   const BookManagementSection({super.key});
 
-  void _handleCategoryManagement(BuildContext context, String l10nNoDefaultBook) async {
+  Future<void> _handleCategoryManagement(BuildContext context, String l10nNoDefaultBook) async {
     final currentBookId = StorageService.getString(StorageKeys.currentBookId);
 
     if (currentBookId.isEmpty) {
@@ -26,18 +26,24 @@ class BookManagementSection extends StatelessWidget {
     }
 
     final dataSource = await DataSourceFactory.create(DataSourceType.http);
-
-    if (context.mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChangeNotifierProvider(
-            create: (_) => CategoryManagementProvider(dataSource),
-            child: CategoryManagementPage(bookId: currentBookId),
-          ),
+    
+    // 使用 Navigator.pushReplacement 避免重复压栈
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          create: (_) => CategoryManagementProvider(dataSource),
+          child: CategoryManagementPage(bookId: currentBookId),
         ),
-      );
-    }
+      ),
+    );
+  }
+
+  void _navigateTo(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => page),
+    );
   }
 
   @override
@@ -51,10 +57,7 @@ class BookManagementSection extends StatelessWidget {
         icon: Icons.book_outlined,
         label: l10n.accountManagement,
         color: colorScheme.primary,
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => AccountBookList()),
-        ),
+        onTap: () => _navigateTo(context, AccountBookList()),
       ),
       _MenuItem(
         icon: Icons.category_outlined,
@@ -66,31 +69,23 @@ class BookManagementSection extends StatelessWidget {
         icon: Icons.account_balance_wallet_outlined,
         label: l10n.fundManagement,
         color: Colors.green,
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => FundManagementPage()),
-        ),
+        onTap: () => _navigateTo(context, FundManagementPage()),
       ),
       _MenuItem(
         icon: Icons.store_outlined,
         label: l10n.shopManagement,
         color: Colors.orange,
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => ShopManagementPage()),
-        ),
+        onTap: () => _navigateTo(context, ShopManagementPage()),
       ),
       _MenuItem(
         icon: Icons.tag_outlined,
         label: l10n.bookTag,
         color: Colors.amber,
-        onTap: () => Navigator.push(
+        onTap: () => _navigateTo(
           context,
-          MaterialPageRoute(
-            builder: (_) => SymbolListPage(
-              title: l10n.bookTag,
-              symbolType: 'TAG',
-            ),
+          SymbolListPage(
+            title: l10n.bookTag,
+            symbolType: 'TAG',
           ),
         ),
       ),
@@ -98,13 +93,11 @@ class BookManagementSection extends StatelessWidget {
         icon: Icons.propane_outlined,
         label: l10n.bookProject,
         color: Colors.brown,
-        onTap: () => Navigator.push(
+        onTap: () => _navigateTo(
           context,
-          MaterialPageRoute(
-            builder: (_) => SymbolListPage(
-              title: l10n.bookProject,
-              symbolType: 'PROJECT',
-            ),
+          SymbolListPage(
+            title: l10n.bookProject,
+            symbolType: 'PROJECT',
           ),
         ),
       ),
@@ -112,42 +105,34 @@ class BookManagementSection extends StatelessWidget {
         icon: Icons.folder_outlined,
         label: l10n.importData,
         color: Colors.purple,
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => ImportPage()),
-        ),
+        onTap: () => _navigateTo(context, ImportPage()),
       ),
     ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: colorScheme.outlineVariant),
-          ),
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 1,
-              childAspectRatio: 1.3,
-            ),
-            itemCount: menuItems.length,
-            itemBuilder: (context, index) => _buildMenuItem(
-              context,
-              menuItems[index],
-              theme,
-            ),
-          ),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.outlineVariant),
+      ),
+      child: GridView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          mainAxisSpacing: 4,
+          crossAxisSpacing: 1,
+          childAspectRatio: 1.3,
         ),
-      ],
+        itemCount: menuItems.length,
+        itemBuilder: (context, index) => _buildMenuItem(
+          context,
+          menuItems[index],
+          theme,
+        ),
+      ),
     );
   }
 
