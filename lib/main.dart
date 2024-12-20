@@ -23,7 +23,6 @@ import 'data/data_source.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
 import 'services/storage_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'services/server_config_service.dart';
 import 'providers/server_config_provider.dart';
 import 'pages/settings/widgets/server_url_dialog.dart';
@@ -97,7 +96,6 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
 
   Future<bool> _showServerCheckFailedDialog() async {
     final l10n = L10n.of(context);
-    final theme = Theme.of(context);
 
     final result = await showDialog<bool>(
       context: context,
@@ -228,7 +226,6 @@ Future<void> main() async {
   AuthService.init(dataSource);
   await UserService.init();
 
-  final prefs = await SharedPreferences.getInstance();
   final serverConfigService = ServerConfigService();
 
   // 初始化主题

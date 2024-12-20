@@ -14,6 +14,7 @@ import '../widgets/account_item_tile.dart';
 import '../constants/storage_keys.dart';
 import '../services/storage_service.dart';
 import '../models/account_item_request.dart';
+import '../models/filter_state.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class AccountItemList extends StatefulWidget {
@@ -40,21 +41,15 @@ class _AccountItemListState extends State<AccountItemList>
   List<AccountBook> _accountBooks = [];
   List<String> _categories = [];
   AccountBook? _selectedBook;
-  String? _selectedType;
-  DateTime? _startDate;
-  DateTime? _endDate;
   bool _isFilterExpanded = false;
-  List<String> _selectedCategories = [];
-  double? _minAmount;
-  double? _maxAmount;
   AccountSummary? _summary;
-  List<String> _selectedShopCodes = [];
   List<ShopOption> _shops = [];
   bool _isBatchMode = false;
   final Set<String> _selectedItems = {};
   final Set<String> _selectedDates = {};
   Map<String, List<AccountItem>> _groupedItems = {};
   final _listKey = GlobalKey<State>();
+  FilterState _filterState = const FilterState();
 
   @override
   void initState() {
@@ -118,13 +113,13 @@ class _AccountItemListState extends State<AccountItemList>
         accountBookId: _selectedBook!.id,
         page: _currentPage,
         pageSize: _pageSize,
-        categories: _selectedCategories,
-        type: _selectedType,
-        startDate: _startDate,
-        endDate: _endDate,
-        shopCodes: _selectedShopCodes,
-        minAmount: _minAmount,
-        maxAmount: _maxAmount,
+        categories: _filterState.selectedCategories,
+        type: _filterState.selectedType,
+        startDate: _filterState.startDate,
+        endDate: _filterState.endDate,
+        shopCodes: _filterState.selectedShopCodes,
+        minAmount: _filterState.minAmount,
+        maxAmount: _filterState.maxAmount,
       );
 
       final response = await ApiService.getAccountItems(request);
@@ -176,7 +171,7 @@ class _AccountItemListState extends State<AccountItemList>
 
       AccountBook? defaultBook;
 
-      // 尝试找到保存的账本
+      // 尝试找保存的账本
       defaultBook = books.firstWhere(
         (book) => book.id == savedBookId,
         orElse: () => _getFirstOwnedBook(books) ?? books.first,
@@ -260,7 +255,7 @@ class _AccountItemListState extends State<AccountItemList>
           IconButton(
             icon: Icon(
               _isFilterExpanded ? Icons.filter_list : Icons.filter_alt_outlined,
-              color: _hasAnyFilter ? colorScheme.primary : null,
+              color: _filterState.hasFilter ? colorScheme.primary : null,
             ),
             tooltip: l10n.filter,
             onPressed: _toggleFilter,
@@ -272,50 +267,13 @@ class _AccountItemListState extends State<AccountItemList>
           children: [
             FilterSection(
               isExpanded: _isFilterExpanded,
-              selectedType: _selectedType,
-              selectedCategories: _selectedCategories,
-              minAmount: _minAmount,
-              maxAmount: _maxAmount,
-              startDate: _startDate,
-              endDate: _endDate,
+              filterState: _filterState,
               categories: _categories,
-              onTypeChanged: (type) {
-                setState(() => _selectedType = type);
-                _loadAccountItems(isRefresh: true);
-              },
-              onCategoriesChanged: (categories) {
-                setState(() => _selectedCategories = categories);
-                _loadAccountItems(isRefresh: true);
-              },
-              onMinAmountChanged: (amount) {
-                setState(() => _minAmount = amount);
-              },
-              onMaxAmountChanged: (amount) {
-                setState(() => _maxAmount = amount);
-                _loadAccountItems(isRefresh: true);
-              },
-              onStartDateChanged: (date) {
-                setState(() => _startDate = date);
-              },
-              onEndDateChanged: (date) {
-                setState(() => _endDate = date);
-                _loadAccountItems(isRefresh: true);
-              },
-              onClearFilter: () {
-                setState(() {
-                  _selectedType = null;
-                  _selectedCategories = [];
-                  _minAmount = null;
-                  _maxAmount = null;
-                  _startDate = null;
-                  _endDate = null;
-                });
-                _loadAccountItems(isRefresh: true);
-              },
-              selectedShopCodes: _selectedShopCodes,
               shops: _shops,
-              onShopCodesChanged: (codes) {
-                setState(() => _selectedShopCodes = codes);
+              onFilterChanged: (newState) {
+                setState(() {
+                  _filterState = newState;
+                });
                 _loadAccountItems(isRefresh: true);
               },
             ),
@@ -415,15 +373,6 @@ class _AccountItemListState extends State<AccountItemList>
       setState(() => _isFilterExpanded = newState);
     }
   }
-
-  bool get _hasAnyFilter =>
-      _selectedType != null ||
-      _selectedCategories.isNotEmpty ||
-      _minAmount != null ||
-      _maxAmount != null ||
-      _startDate != null ||
-      _endDate != null ||
-      _selectedShopCodes.isNotEmpty;
 
   Future<void> _loadShops() async {
     try {
