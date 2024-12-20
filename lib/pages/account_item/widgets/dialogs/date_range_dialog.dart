@@ -4,15 +4,13 @@ import 'package:intl/intl.dart';
 class DateRangeDialog extends StatefulWidget {
   final DateTime? startDate;
   final DateTime? endDate;
-  final Function(DateTime?) onStartDateChanged;
-  final Function(DateTime?) onEndDateChanged;
+  final Function(DateTime? start, DateTime? end) onConfirm;
 
   const DateRangeDialog({
     Key? key,
     this.startDate,
     this.endDate,
-    required this.onStartDateChanged,
-    required this.onEndDateChanged,
+    required this.onConfirm,
   }) : super(key: key);
 
   @override
@@ -43,8 +41,7 @@ class _DateRangeDialogState extends State<DateRangeDialog> {
             .parse('${DateFormat('yyyy-MM-dd').format(_endDate!)} 23:59:59.999')
         : null;
 
-    widget.onStartDateChanged(startDate);
-    widget.onEndDateChanged(endDate);
+    widget.onConfirm(startDate, endDate);
     Navigator.pop(context);
   }
 
@@ -99,8 +96,7 @@ class _DateRangeDialogState extends State<DateRangeDialog> {
       actions: [
         TextButton(
           onPressed: () {
-            widget.onStartDateChanged(null);
-            widget.onEndDateChanged(null);
+            widget.onConfirm(null, null);
             Navigator.pop(context);
           },
           child: Text(

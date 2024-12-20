@@ -4,15 +4,13 @@ import 'package:flutter/services.dart';
 class AmountRangeDialog extends StatefulWidget {
   final double? minAmount;
   final double? maxAmount;
-  final Function(double?) onMinAmountChanged;
-  final Function(double?) onMaxAmountChanged;
+  final Function(double? min, double? max) onConfirm;
 
   const AmountRangeDialog({
     Key? key,
     this.minAmount,
     this.maxAmount,
-    required this.onMinAmountChanged,
-    required this.onMaxAmountChanged,
+    required this.onConfirm,
   }) : super(key: key);
 
   @override
@@ -83,8 +81,7 @@ class _AmountRangeDialogState extends State<AmountRangeDialog> {
       actions: [
         TextButton(
           onPressed: () {
-            widget.onMinAmountChanged(null);
-            widget.onMaxAmountChanged(null);
+            widget.onConfirm(null, null);
             Navigator.pop(context);
           },
           child: Text(
@@ -100,8 +97,7 @@ class _AmountRangeDialogState extends State<AmountRangeDialog> {
           onPressed: () {
             final minAmount = double.tryParse(_minController.text);
             final maxAmount = double.tryParse(_maxController.text);
-            widget.onMinAmountChanged(minAmount);
-            widget.onMaxAmountChanged(maxAmount);
+            widget.onConfirm(minAmount, maxAmount);
             Navigator.pop(context);
           },
           child: Text('确定'),

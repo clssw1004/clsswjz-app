@@ -5,6 +5,8 @@ class AccountItemRequest {
   final DateTime? startDate;
   final DateTime? endDate;
   final List<String>? shopCodes;
+  final double? maxAmount;
+  final double? minAmount;
   final int page;
   final int pageSize;
 
@@ -15,6 +17,8 @@ class AccountItemRequest {
     this.startDate,
     this.endDate,
     this.shopCodes,
+    this.maxAmount,
+    this.minAmount,
     this.page = 1,
     this.pageSize = 20,
   });
@@ -26,6 +30,8 @@ class AccountItemRequest {
         'startDate': startDate?.toIso8601String(),
         'endDate': endDate?.toIso8601String(),
         'shopCodes': shopCodes,
+        'maxAmount': maxAmount,
+        'minAmount': minAmount,
         'page': page,
         'pageSize': pageSize,
       };

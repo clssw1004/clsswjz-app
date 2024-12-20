@@ -123,6 +123,8 @@ class _AccountItemListState extends State<AccountItemList>
         startDate: _startDate,
         endDate: _endDate,
         shopCodes: _selectedShopCodes,
+        minAmount: _minAmount,
+        maxAmount: _maxAmount,
       );
 
       final response = await ApiService.getAccountItems(request);
@@ -287,7 +289,6 @@ class _AccountItemListState extends State<AccountItemList>
               },
               onMinAmountChanged: (amount) {
                 setState(() => _minAmount = amount);
-                _loadAccountItems(isRefresh: true);
               },
               onMaxAmountChanged: (amount) {
                 setState(() => _maxAmount = amount);
@@ -295,7 +296,6 @@ class _AccountItemListState extends State<AccountItemList>
               },
               onStartDateChanged: (date) {
                 setState(() => _startDate = date);
-                _loadAccountItems(isRefresh: true);
               },
               onEndDateChanged: (date) {
                 setState(() => _endDate = date);

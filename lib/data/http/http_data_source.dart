@@ -109,6 +109,8 @@ class HttpDataSource implements DataSource {
           if (request.endDate != null)
             'endDate': request.endDate!.toIso8601String(),
           if (request.shopCodes != null) 'shopCodes': request.shopCodes,
+          if (request.maxAmount != null) 'maxAmount': request.maxAmount,
+          if (request.minAmount != null) 'minAmount': request.minAmount,
           'page': request.page,
           'pageSize': request.pageSize,
         },

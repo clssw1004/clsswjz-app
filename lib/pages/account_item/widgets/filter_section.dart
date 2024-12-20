@@ -260,8 +260,10 @@ class FilterSection extends StatelessWidget {
       builder: (context) => AmountRangeDialog(
         minAmount: minAmount,
         maxAmount: maxAmount,
-        onMinAmountChanged: onMinAmountChanged,
-        onMaxAmountChanged: onMaxAmountChanged,
+        onConfirm: (min, max) {
+          onMinAmountChanged(min);
+          onMaxAmountChanged(max);
+        },
       ),
     );
   }
@@ -272,8 +274,10 @@ class FilterSection extends StatelessWidget {
       builder: (context) => DateRangeDialog(
         startDate: startDate,
         endDate: endDate,
-        onStartDateChanged: onStartDateChanged,
-        onEndDateChanged: onEndDateChanged,
+        onConfirm: (start, end) {
+          onStartDateChanged(start);
+          onEndDateChanged(end);
+        },
       ),
     );
   }
