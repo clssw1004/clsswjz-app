@@ -31,7 +31,7 @@ class AccountItemTile extends StatelessWidget {
     final isExpense = item.type == 'EXPENSE';
     final hasShop = item.shop != null && item.shop != 'NO_SHOP';
     final hasFund = item.fundId != null && item.fundId != 'NO_FUND';
-    final currentUserId = UserService.getUserInfo()?['userId'];
+    final currentUserId = UserService.getUserInfo()?.id;
     final showCreator =
         item.createdBy != currentUserId && item.createdByName != null;
 

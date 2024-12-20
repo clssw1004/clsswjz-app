@@ -446,22 +446,22 @@ class HttpDataSource implements DataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> getUserInfo() async {
+  Future<User> getUserInfo() async {
     final response = await request<Map<String, dynamic>>(
       path: '${ApiEndpoints.users}/current',
       method: HttpMethod.get,
     );
-    return response;
+    return User.fromJson(response);
   }
 
   @override
-  Future<Map<String, dynamic>> updateUserInfo(Map<String, dynamic> data) async {
+  Future<User> updateUserInfo(Map<String, dynamic> data) async {
     final response = await request<Map<String, dynamic>>(
       path: '${ApiEndpoints.users}/current',
       method: HttpMethod.patch,
       data: data,
     );
-    return response;
+    return User.fromJson(response);
   }
 
   @override

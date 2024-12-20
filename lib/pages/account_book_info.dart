@@ -45,7 +45,7 @@ class _AccountBookInfoState extends State<AccountBookInfo> {
   }
 
   void _initializeData() {
-    _currentUserId = UserService.getUserInfo()?['userId'];
+    _currentUserId = UserService.getUserInfo()?.id;
     _accountBook = widget.accountBook;
     _canEdit = _checkEditPermission();
 

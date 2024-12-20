@@ -1022,7 +1022,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String downloadFailedMessage(String error) {
-    return 'Failed to download file: $error';
+    return 'Download failed: $error';
   }
 
   @override
@@ -1081,4 +1081,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noDataAvailable => 'No data available';
+
+  @override
+  String get noAvailableTags => 'No available tags';
+
+  @override
+  String get noAvailableProjects => 'No available projects';
 }

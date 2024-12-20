@@ -205,7 +205,7 @@
   "amountLabel": "金额",
   "amountHint": "请输入金额",
   "categoryLabel": "分类",
-  "categoryHint": "���择分类",
+  "categoryHint": "选择分类",
   "dateLabel": "日期",
   "timeLabel": "时间",
   "accountLabel": "账户",
@@ -271,7 +271,7 @@
   "rememberLogin": "记住登录信息",
   "selectServer": "选择服务器",
   "serverName": "服务器名称",
-  "serverNameHint": "例如本地服务器",
+  "serverNameHint": "例如：本地服务器",
   "serverNameRequired": "请输入服务器名称",
   "serverType": "服务器类型",
   "serverUrlRequired": "请输入服务器地址",
@@ -400,5 +400,13 @@
   "name": "名称",
   "pleaseInput": "请输入{field}",
   "editButtonWith": "编辑{name}",
-  "noDataAvailable": "暂无数据"
+  "noDataAvailable": "暂无数据",
+  "downloadFailedMessage": "下载失败：{error}",
+  "@downloadFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

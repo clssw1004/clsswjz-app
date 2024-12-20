@@ -119,11 +119,11 @@ class ApiService {
     return ds.updateShop(id, shop);
   }
 
-  static Future<Map<String, dynamic>> getUserInfo() {
+  static Future<User> getUserInfo() {
     return ds.getUserInfo();
   }
 
-  static Future<Map<String, dynamic>> updateUserInfo(
+  static Future<User> updateUserInfo(
       Map<String, dynamic> data) {
     return ds.updateUserInfo(data);
   }

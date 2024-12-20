@@ -1,3 +1,4 @@
+import 'package:clsswjz/models/models.dart';
 import 'package:flutter/material.dart';
 import '../../../services/api_service.dart';
 import '../../user/user_info_page.dart';
@@ -10,7 +11,7 @@ class UserCard extends StatefulWidget {
 }
 
 class _UserCardState extends State<UserCard> {
-  Map<String, dynamic>? _userInfo;
+  User? _userInfo;
   bool _isLoading = true;
 
   @override
@@ -65,8 +66,8 @@ class _UserCardState extends State<UserCard> {
       );
     }
 
-    final firstLetter = _userInfo?['nickname']?.substring(0, 1) ??
-        _userInfo?['username']?.substring(0, 1) ??
+    final firstLetter = _userInfo?.nickname?.substring(0, 1) ??
+        _userInfo?.username?.substring(0, 1) ??
         'U';
 
     return Padding(
@@ -117,18 +118,16 @@ class _UserCardState extends State<UserCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _userInfo?['nickname'] ??
-                            _userInfo?['username'] ??
-                            '未登录',
+                        _userInfo?.nickname ?? _userInfo?.username ?? '未登录',
                         style: theme.textTheme.titleLarge?.copyWith(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      if (_userInfo?['email'] != null) ...[
+                      if (_userInfo?.email != null) ...[
                         SizedBox(height: 4),
                         Text(
-                          _userInfo!['email'],
+                          _userInfo!.email!,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

@@ -44,8 +44,8 @@ abstract class DataSource {
   });
 
   // 用户相关方法
-  Future<Map<String, dynamic>> getUserInfo();
-  Future<Map<String, dynamic>> updateUserInfo(Map<String, dynamic> data);
+  Future<User> getUserInfo();
+  Future<User> updateUserInfo(Map<String, dynamic> data);
   Future<String> resetInviteCode();
 
   // 账本相关

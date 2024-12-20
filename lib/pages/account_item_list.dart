@@ -206,7 +206,7 @@ class _AccountItemListState extends State<AccountItemList>
 
   // 获取第一个本人的账本
   AccountBook? _getFirstOwnedBook(List<AccountBook> books) {
-    final currentUserId = UserService.getUserInfo()?['userId'];
+    final currentUserId = UserService.getUserInfo()?.id;
     try {
       return books.firstWhere(
         (book) => book.createdBy == currentUserId,

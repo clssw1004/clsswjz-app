@@ -621,7 +621,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get categoryLabel => '分类';
 
   @override
-  String get categoryHint => '���择分类';
+  String get categoryHint => '选择分类';
 
   @override
   String get dateLabel => '日期';
@@ -827,7 +827,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverName => '服务器名称';
 
   @override
-  String get serverNameHint => '例如本地服务器';
+  String get serverNameHint => '例如：本地服务器';
 
   @override
   String get serverNameRequired => '请输入服务器名称';
@@ -1022,7 +1022,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String downloadFailedMessage(String error) {
-    return 'Failed to download file: $error';
+    return '下载失败：$error';
   }
 
   @override
@@ -1081,6 +1081,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noDataAvailable => '暂无数据';
+
+  @override
+  String get noAvailableTags => '暂无可用标签';
+
+  @override
+  String get noAvailableProjects => '暂无可用项目';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1598,5 +1604,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get selectBook => '選擇賬本';
 
   @override
+  String downloadFailedMessage(String error) {
+    return '下載失敗：$error';
+  }
+
+  @override
   String get noCategory => '無分類';
+
+  @override
+  String get noAvailableTags => '暫無可用標籤';
+
+  @override
+  String get noAvailableProjects => '暫無可用項目';
 }

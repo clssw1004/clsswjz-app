@@ -359,12 +359,12 @@ class SqliteDataSource implements DataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> getUserInfo() async {
+  Future<User> getUserInfo() async {
     throw UnimplementedError('SQLite does not support user operations');
   }
 
   @override
-  Future<Map<String, dynamic>> updateUserInfo(Map<String, dynamic> data) async {
+  Future<User> updateUserInfo(Map<String, dynamic> data) async {
     throw UnimplementedError('SQLite does not support user operations');
   }
 

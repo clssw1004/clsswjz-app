@@ -1,8 +1,7 @@
 {
   "zh": [
     "invalidEmailFormat",
-    "invalidPhoneFormat",
-    "downloadFailedMessage"
+    "invalidPhoneFormat"
   ],
 
   "zh_Hant": [
@@ -164,7 +163,6 @@
     "openInExternalApp",
     "download",
     "downloadFailed",
-    "downloadFailedMessage",
     "unsupportedPreview",
     "fileDownloaded",
     "fieldRequired",

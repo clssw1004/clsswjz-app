@@ -78,7 +78,7 @@ class GlobalBookSelector extends StatelessWidget {
   Future<void> _showBookSelector(BuildContext context) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final currentUserId = UserService.getUserInfo()?['userId'];
+    final currentUserId = UserService.getUserInfo()?.id;
 
     if (books.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

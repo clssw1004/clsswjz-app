@@ -2013,7 +2013,7 @@ abstract class AppLocalizations {
   /// No description provided for @downloadFailedMessage.
   ///
   /// In en, this message translates to:
-  /// **'Failed to download file: {error}'**
+  /// **'Download failed: {error}'**
   String downloadFailedMessage(String error);
 
   /// No description provided for @unsupportedPreview.
@@ -2117,6 +2117,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No data available'**
   String get noDataAvailable;
+
+  /// No description provided for @noAvailableTags.
+  ///
+  /// In en, this message translates to:
+  /// **'No available tags'**
+  String get noAvailableTags;
+
+  /// No description provided for @noAvailableProjects.
+  ///
+  /// In en, this message translates to:
+  /// **'No available projects'**
+  String get noAvailableProjects;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -109,7 +109,7 @@ class BookSelectorHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
-    final currentUserId = UserService.getUserInfo()?['userId'];
+    final currentUserId = UserService.getUserInfo()?.id;
 
     if (books.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

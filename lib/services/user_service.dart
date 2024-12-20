@@ -1,10 +1,12 @@
+import 'package:clsswjz/models/models.dart';
+
 import 'api_service.dart';
 import 'storage_service.dart';
 import 'api_config_manager.dart';
 import '../constants/storage_keys.dart';
 
 class UserService {
-  static Map<String, dynamic>? _userInfo;
+  static User? _userInfo;
   static bool _initialized = false;
   static String? _currentAccountBookId;
 
@@ -33,13 +35,14 @@ class UserService {
     }
   }
 
-  static Map<String, dynamic>? getUserInfo() => _userInfo;
+  static User? getUserInfo() => _userInfo;
 
-  static Future<void> updateUserInfo(Map<String, dynamic> info) async {
-    _userInfo = {
-      ...?_userInfo,
-      ...info,
-    };
+  static Future<void> updateUserInfo(User info) async {
+    _userInfo = _userInfo?.copyWith(
+      nickname: info.nickname,
+      email: info.email,
+      phone: info.phone,
+    );
   }
 
   static Future<void> logout() async {

@@ -208,7 +208,7 @@ class _AccountBookListState extends State<AccountBookList> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
-    final currentUserId = UserService.getUserInfo()?['userId'];
+    final currentUserId = UserService.getUserInfo()?.id;
     final isShared = book.fromId != currentUserId;
     final permissions = book.permissions;
 

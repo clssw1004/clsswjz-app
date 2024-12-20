@@ -423,5 +423,15 @@
   "name": "Name",
   "pleaseInput": "Please input {field}",
   "editButtonWith": "Edit {name}",
-  "noDataAvailable": "No data available"
+  "noDataAvailable": "No data available",
+  "noAvailableTags": "No available tags",
+  "noAvailableProjects": "No available projects",
+  "downloadFailedMessage": "Download failed: {error}",
+  "@downloadFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

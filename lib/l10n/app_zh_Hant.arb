@@ -227,5 +227,15 @@
   "selectFile": "選擇文件",
   "importFieldsRequired": "請填寫所有必填欄位",
   "importSuccess": "導入成功",
-  "noCategory": "無分類"
+  "noCategory": "無分類",
+  "noAvailableTags": "暫無可用標籤",
+  "noAvailableProjects": "暫無可用項目",
+  "downloadFailedMessage": "下載失敗：{error}",
+  "@downloadFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

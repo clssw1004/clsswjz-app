@@ -45,9 +45,6 @@ class AuthService {
 
           // 设置 token
           await ApiConfigManager.setToken(token);
-
-          // 更新用户信息缓存
-          await UserService.updateUserInfo(response);
           return true;
         }
       }
