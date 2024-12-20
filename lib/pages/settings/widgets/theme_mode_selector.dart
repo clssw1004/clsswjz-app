@@ -11,61 +11,36 @@ class ThemeModeSelector extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
+    final themeProvider = context.watch<ThemeProvider>();
 
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) {
-        return ListTile(
-          leading: Icon(
-            Icons.dark_mode,
-            color: colorScheme.primary,
+    return ListTile(
+      leading: Icon(
+        Icons.brightness_6_outlined,
+        color: colorScheme.primary,
+      ),
+      title: Text(l10n.themeMode),
+      trailing: DropdownButton<ThemeMode>(
+        value: themeProvider.themeMode,
+        onChanged: (ThemeMode? mode) {
+          if (mode != null) {
+            themeProvider.setThemeMode(mode);
+          }
+        },
+        items: [
+          DropdownMenuItem(
+            value: ThemeMode.system,
+            child: Text(l10n.system),
           ),
-          title: Text(
-            l10n.themeMode,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurface,
-            ),
+          DropdownMenuItem(
+            value: ThemeMode.light,
+            child: Text(l10n.light),
           ),
-          trailing: DropdownButton<ThemeMode>(
-            value: themeProvider.themeMode,
-            underline: SizedBox(),
-            dropdownColor: colorScheme.surface,
-            items: [
-              DropdownMenuItem(
-                value: ThemeMode.system,
-                child: Text(
-                  l10n.system,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              DropdownMenuItem(
-                value: ThemeMode.light,
-                child: Text(
-                  l10n.light,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              DropdownMenuItem(
-                value: ThemeMode.dark,
-                child: Text(
-                  l10n.dark,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
-            onChanged: (ThemeMode? mode) {
-              if (mode != null) {
-                themeProvider.setThemeMode(mode);
-              }
-            },
+          DropdownMenuItem(
+            value: ThemeMode.dark,
+            child: Text(l10n.dark),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

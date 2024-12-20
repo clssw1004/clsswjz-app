@@ -15,198 +15,197 @@ import '../shop_management_page.dart';
 class BookManagementSection extends StatelessWidget {
   const BookManagementSection({super.key});
 
+  void _handleCategoryManagement(BuildContext context, String l10nNoDefaultBook) async {
+    final currentBookId = StorageService.getString(StorageKeys.currentBookId);
+
+    if (currentBookId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10nNoDefaultBook)),
+      );
+      return;
+    }
+
+    final dataSource = await DataSourceFactory.create(DataSourceType.http);
+
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChangeNotifierProvider(
+            create: (_) => CategoryManagementProvider(dataSource),
+            child: CategoryManagementPage(bookId: currentBookId),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final List<
-        ({
-          IconData icon,
-          String label,
-          Color? color,
-          VoidCallback onTap,
-        })> menuItems = [
-      (
+    final menuItems = [
+      _MenuItem(
         icon: Icons.book_outlined,
         label: l10n.accountManagement,
         color: colorScheme.primary,
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AccountBookList(),
-            ),
-          );
-        },
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => AccountBookList()),
+        ),
       ),
-      (
+      _MenuItem(
         icon: Icons.category_outlined,
         label: l10n.categoryManagement,
         color: Colors.blue,
-        onTap: () async {
-          final currentBookId = StorageService.getString(
-            StorageKeys.currentBookId,
-          );
-
-          if (currentBookId.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.noDefaultBook)),
-            );
-            return;
-          }
-
-          final dataSource =
-              await DataSourceFactory.create(DataSourceType.http);
-
-          if (context.mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChangeNotifierProvider(
-                  create: (_) => CategoryManagementProvider(dataSource),
-                  child: CategoryManagementPage(bookId: currentBookId),
-                ),
-              ),
-            );
-          }
-        },
+        onTap: () => _handleCategoryManagement(context, l10n.noDefaultBook),
       ),
-      (
+      _MenuItem(
         icon: Icons.account_balance_wallet_outlined,
         label: l10n.fundManagement,
         color: Colors.green,
         onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FundManagementPage(),
-              ),
-            ),
+          context,
+          MaterialPageRoute(builder: (_) => FundManagementPage()),
+        ),
       ),
-      (
+      _MenuItem(
         icon: Icons.store_outlined,
         label: l10n.shopManagement,
         color: Colors.orange,
         onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ShopManagementPage(),
-              ),
-            ),
+          context,
+          MaterialPageRoute(builder: (_) => ShopManagementPage()),
+        ),
       ),
-      (
+      _MenuItem(
         icon: Icons.tag_outlined,
         label: l10n.bookTag,
         color: Colors.amber,
         onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SymbolListPage(
-                  title: l10n.bookTag,
-                  symbolType: 'TAG',
-                ),
-              ),
+          context,
+          MaterialPageRoute(
+            builder: (_) => SymbolListPage(
+              title: l10n.bookTag,
+              symbolType: 'TAG',
             ),
+          ),
+        ),
       ),
-      (
+      _MenuItem(
         icon: Icons.propane_outlined,
         label: l10n.bookProject,
         color: Colors.brown,
         onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SymbolListPage(
-                  title: l10n.bookProject,
-                  symbolType: 'PROJECT',
-                ),
-              ),
+          context,
+          MaterialPageRoute(
+            builder: (_) => SymbolListPage(
+              title: l10n.bookProject,
+              symbolType: 'PROJECT',
             ),
+          ),
+        ),
       ),
-      (
+      _MenuItem(
         icon: Icons.folder_outlined,
         label: l10n.importData,
         color: Colors.purple,
         onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ImportPage(),
-              ),
-            ),
+          context,
+          MaterialPageRoute(builder: (_) => ImportPage()),
+        ),
       ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
-          child: Text(
-            l10n.accountManagement,
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: colorScheme.primary,
-            ),
-          ),
-        ),
         Card(
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(color: colorScheme.outlineVariant),
           ),
-          child: GridView.count(
-            padding: EdgeInsets.all(16),
+          child: GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            crossAxisCount: 4,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1.1,
-            children: menuItems.map((item) {
-              return InkWell(
-                onTap: item.onTap,
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: item.color?.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          item.icon,
-                          color: item.color,
-                          size: 24,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        child: Text(
-                          item.label,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 1,
+              childAspectRatio: 1.3,
+            ),
+            itemCount: menuItems.length,
+            itemBuilder: (context, index) => _buildMenuItem(
+              context,
+              menuItems[index],
+              theme,
+            ),
           ),
         ),
       ],
     );
   }
+
+  Widget _buildMenuItem(BuildContext context, _MenuItem item, ThemeData theme) {
+    return InkWell(
+      onTap: item.onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: item.color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                item.icon,
+                color: item.color,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1),
+              child: Text(
+                item.label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 11,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MenuItem {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _MenuItem({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 }
