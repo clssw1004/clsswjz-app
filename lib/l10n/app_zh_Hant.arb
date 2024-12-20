@@ -258,5 +258,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "totalItems": "總賬目數",
+  "totalDays": "記賬天數",
+  "totalFunds": "淨資產",
+  "noAccount": "未登錄"
 }

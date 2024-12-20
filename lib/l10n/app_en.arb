@@ -454,5 +454,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "totalItems": "Total Items",
+  "totalDays": "Total Days",
+  "totalFunds": "Net Assets",
+  "noAccount": "Not Logged In"
 }

@@ -363,7 +363,7 @@ abstract class AppLocalizations {
   /// No description provided for @noAccount.
   ///
   /// In en, this message translates to:
-  /// **'No account? Register now'**
+  /// **'Not Logged In'**
   String get noAccount;
 
   /// No description provided for @bookName.
@@ -2195,6 +2195,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{action} {target}'**
   String actionWithTarget(String action, String target);
+
+  /// No description provided for @totalItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Items'**
+  String get totalItems;
+
+  /// No description provided for @totalDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Days'**
+  String get totalDays;
+
+  /// No description provided for @totalFunds.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Assets'**
+  String get totalFunds;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

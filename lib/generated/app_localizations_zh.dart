@@ -143,7 +143,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passwordRequired => '请输入密码';
 
   @override
-  String get noAccount => '还没有账号？立即注册';
+  String get noAccount => '未登录';
 
   @override
   String get bookName => '账本名称';
@@ -1122,6 +1122,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String actionWithTarget(String action, String target) {
     return '$action$target';
   }
+
+  @override
+  String get totalItems => '总账目数';
+
+  @override
+  String get totalDays => '记账天数';
+
+  @override
+  String get totalFunds => '净资产';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1228,6 +1237,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get serverUrl => '服務器地址';
+
+  @override
+  String get noAccount => '未登錄';
 
   @override
   String get noAccountItems => '暫無交易記錄';
@@ -1686,4 +1698,13 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String actionWithTarget(String action, String target) {
     return '$action$target';
   }
+
+  @override
+  String get totalItems => '總賬目數';
+
+  @override
+  String get totalDays => '記賬天數';
+
+  @override
+  String get totalFunds => '淨資產';
 }

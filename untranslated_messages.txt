@@ -16,7 +16,6 @@
     "password",
     "usernameRequired",
     "passwordRequired",
-    "noAccount",
     "bookName",
     "bookNameHint",
     "bookNameRequired",

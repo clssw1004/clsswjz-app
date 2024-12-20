@@ -429,5 +429,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "totalItems": "总账目数",
+  "totalDays": "记账天数",
+  "totalFunds": "净资产",
+  "noAccount": "未登录"
 }

@@ -143,7 +143,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordRequired => 'Password is required';
 
   @override
-  String get noAccount => 'No account? Register now';
+  String get noAccount => 'Not Logged In';
 
   @override
   String get bookName => 'Book Name';
@@ -1122,4 +1122,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String actionWithTarget(String action, String target) {
     return '$action $target';
   }
+
+  @override
+  String get totalItems => 'Total Items';
+
+  @override
+  String get totalDays => 'Total Days';
+
+  @override
+  String get totalFunds => 'Net Assets';
 }
