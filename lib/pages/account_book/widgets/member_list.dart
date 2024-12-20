@@ -99,7 +99,7 @@ class _MemberListState extends State<MemberList> {
             child: FilledButton.icon(
               onPressed: () => _showAddMemberDialog(context),
               icon: Icon(Icons.person_add_outlined, size: 18),
-              label: Text(l10n.addMember),
+              label: Text(l10n.actionWithTarget(l10n.actionAdd, l10n.targetMember)),
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.primaryContainer,
                 foregroundColor: colorScheme.onPrimaryContainer,

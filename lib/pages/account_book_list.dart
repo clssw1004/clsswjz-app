@@ -108,7 +108,7 @@ class _AccountBookListState extends State<AccountBookList> {
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            tooltip: l10n.newAccountBook,
+            tooltip: l10n.actionWithTarget(l10n.actionNew, l10n.targetBook),
             onPressed: () {
               Navigator.pushNamed(context, '/create-account-book')
                   .then((_) => _fetchAccountBooks());
@@ -177,7 +177,8 @@ class _AccountBookListState extends State<AccountBookList> {
                   _fetchAccountBooks();
                 });
               },
-              child: Text(l10n.newAccountBook),
+              child:
+                  Text(l10n.actionWithTarget(l10n.actionNew, l10n.targetBook)),
             ),
           ],
         ),

@@ -2129,6 +2129,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No available projects'**
   String get noAvailableProjects;
+
+  /// No description provided for @actionNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get actionNew;
+
+  /// No description provided for @actionEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get actionEdit;
+
+  /// No description provided for @actionAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get actionAdd;
+
+  /// No description provided for @targetShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get targetShop;
+
+  /// No description provided for @targetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get targetCategory;
+
+  /// No description provided for @targetFund.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get targetFund;
+
+  /// No description provided for @targetBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Book'**
+  String get targetBook;
+
+  /// No description provided for @targetMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get targetMember;
+
+  /// No description provided for @targetAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment'**
+  String get targetAttachment;
+
+  /// No description provided for @targetRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get targetRecord;
+
+  /// No description provided for @actionWithTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'{action} {target}'**
+  String actionWithTarget(String action, String target);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

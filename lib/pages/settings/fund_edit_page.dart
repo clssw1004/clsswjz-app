@@ -141,7 +141,9 @@ class _FundEditPageState extends State<FundEditPage> {
             context: context,
             title: AppBarFactory.buildTitle(
               context,
-              widget.fund.id.isEmpty ? l10n.newFundTitle : l10n.editFundTitle,
+              widget.fund.id.isEmpty 
+                ? l10n.actionWithTarget(l10n.actionNew, l10n.targetFund)
+                : l10n.actionWithTarget(l10n.actionEdit, l10n.targetFund),
             ),
             actions: [
               if (_isLoading)

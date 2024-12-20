@@ -62,7 +62,7 @@ class _FundManagementPageState extends State<FundManagementPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            tooltip: l10n.newFund,
+            tooltip: l10n.actionWithTarget(l10n.actionNew, l10n.targetFund),
             onPressed: () => _editFund(UserFund(
               id: '',
               name: '',

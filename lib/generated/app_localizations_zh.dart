@@ -1087,6 +1087,41 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noAvailableProjects => '暂无可用项目';
+
+  @override
+  String get actionNew => '新建';
+
+  @override
+  String get actionEdit => '编辑';
+
+  @override
+  String get actionAdd => '添加';
+
+  @override
+  String get targetShop => '商家';
+
+  @override
+  String get targetCategory => '分类';
+
+  @override
+  String get targetFund => '账户';
+
+  @override
+  String get targetBook => '账本';
+
+  @override
+  String get targetMember => '成员';
+
+  @override
+  String get targetAttachment => '附件';
+
+  @override
+  String get targetRecord => '记录';
+
+  @override
+  String actionWithTarget(String action, String target) {
+    return '$action$target';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1616,4 +1651,39 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get noAvailableProjects => '暫無可用項目';
+
+  @override
+  String get actionNew => '新建';
+
+  @override
+  String get actionEdit => '編輯';
+
+  @override
+  String get actionAdd => '添加';
+
+  @override
+  String get targetShop => '商家';
+
+  @override
+  String get targetCategory => '分類';
+
+  @override
+  String get targetFund => '賬戶';
+
+  @override
+  String get targetBook => '賬本';
+
+  @override
+  String get targetMember => '成員';
+
+  @override
+  String get targetAttachment => '附件';
+
+  @override
+  String get targetRecord => '記錄';
+
+  @override
+  String actionWithTarget(String action, String target) {
+    return '$action$target';
+  }
 }

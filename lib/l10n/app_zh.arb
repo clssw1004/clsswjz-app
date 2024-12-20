@@ -408,5 +408,26 @@
         "type": "String"
       }
     }
+  },
+  "actionNew": "新建",
+  "actionEdit": "编辑",
+  "actionAdd": "添加",
+  "targetShop": "商家",
+  "targetCategory": "分类",
+  "targetFund": "账户",
+  "targetBook": "账本",
+  "targetMember": "成员",
+  "targetAttachment": "附件",
+  "targetRecord": "记录",
+  "actionWithTarget": "{action}{target}",
+  "@actionWithTarget": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
   }
 }

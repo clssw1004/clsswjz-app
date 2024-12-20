@@ -78,7 +78,7 @@ class AttachmentSelector extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.add_circle_outline),
               onPressed: () => _pickFiles(context),
-              tooltip: l10n.addAttachment,
+              tooltip: l10n.actionWithTarget(l10n.actionAdd, l10n.targetAttachment),
             ),
           ],
         ),

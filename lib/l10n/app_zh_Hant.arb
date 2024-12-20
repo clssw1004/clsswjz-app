@@ -237,5 +237,26 @@
         "type": "String"
       }
     }
+  },
+  "actionNew": "新建",
+  "actionEdit": "編輯",
+  "actionAdd": "添加",
+  "targetShop": "商家",
+  "targetCategory": "分類",
+  "targetFund": "賬戶",
+  "targetBook": "賬本",
+  "targetMember": "成員",
+  "targetAttachment": "附件",
+  "targetRecord": "記錄",
+  "actionWithTarget": "{action}{target}",
+  "@actionWithTarget": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -1087,4 +1087,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noAvailableProjects => 'No available projects';
+
+  @override
+  String get actionNew => 'New';
+
+  @override
+  String get actionEdit => 'Edit';
+
+  @override
+  String get actionAdd => 'Add';
+
+  @override
+  String get targetShop => 'Shop';
+
+  @override
+  String get targetCategory => 'Category';
+
+  @override
+  String get targetFund => 'Account';
+
+  @override
+  String get targetBook => 'Book';
+
+  @override
+  String get targetMember => 'Member';
+
+  @override
+  String get targetAttachment => 'Attachment';
+
+  @override
+  String get targetRecord => 'Record';
+
+  @override
+  String actionWithTarget(String action, String target) {
+    return '$action $target';
+  }
 }

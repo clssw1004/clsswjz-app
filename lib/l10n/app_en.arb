@@ -433,5 +433,26 @@
         "type": "String"
       }
     }
+  },
+  "actionNew": "New",
+  "actionEdit": "Edit",
+  "actionAdd": "Add",
+  "targetShop": "Shop",
+  "targetCategory": "Category",
+  "targetFund": "Account",
+  "targetBook": "Book",
+  "targetMember": "Member",
+  "targetAttachment": "Attachment",
+  "targetRecord": "Record",
+  "actionWithTarget": "{action} {target}",
+  "@actionWithTarget": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -116,7 +116,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.newCategory),
+        title: Text(l10n.actionWithTarget(l10n.actionNew, l10n.targetCategory)),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
@@ -166,7 +166,8 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.editCategory),
+        title: Text(l10n.actionWithTarget(
+            l10n.actionEdit, l10n.targetCategory)),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(

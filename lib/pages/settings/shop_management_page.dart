@@ -99,8 +99,9 @@ class ShopManagementPageState extends State<ShopManagementPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
         ),
-        title:
-            Text(initialName == null ? l10n.newShopTitle : l10n.editShopTitle),
+        title: Text(initialName == null 
+          ? l10n.actionWithTarget(l10n.actionNew, l10n.targetShop)
+          : l10n.actionWithTarget(l10n.actionEdit, l10n.targetShop)),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -166,7 +167,7 @@ class ShopManagementPageState extends State<ShopManagementPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            tooltip: l10n.newShopButton,
+            tooltip: l10n.actionWithTarget(l10n.actionNew, l10n.targetShop),
             onPressed: _createShop,
           ),
         ],
