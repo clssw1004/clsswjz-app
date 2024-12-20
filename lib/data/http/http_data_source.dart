@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'package:file_picker/file_picker.dart';
 import '../../models/account_item_request.dart';
 import '../../models/server_status.dart';
@@ -14,7 +13,7 @@ import 'api_endpoints.dart';
 import 'http_client.dart';
 import '../../constants/storage_keys.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:path_provider/path_provider.dart';
+import '../../utils/attachment_utils.dart';
 
 class HttpDataSource implements DataSource {
   final HttpClient _httpClient;
@@ -611,9 +610,9 @@ class HttpDataSource implements DataSource {
     void Function(int received, int total)? onProgress,
   }) async {
     try {
-      // 创建临时目录用于保存下载文件
-      final tempDir = await getTemporaryDirectory();
-
+      // 使用 AttachmentUtils 获取统一的附件存储目录
+      final attachmentDir = await AttachmentUtils.getAttachmentCacheDir();
+      
       // 使用 Dio 下载文件
       final response = await _httpClient.dio.get<List<int>>(
         '${ApiEndpoints.attachments}/$id',
@@ -645,10 +644,10 @@ class HttpDataSource implements DataSource {
         fileName = id;
       }
 
-      // 创建本地文件
-      final file = File('${tempDir.path}/$fileName');
+      // 使用统一的附件目录创建文件
+      final file = File('${attachmentDir.path}/$fileName');
 
-      // 直接写入字节数据
+      // 写入字节数据
       await file.writeAsBytes(response.data!);
       return file;
     } on DioException catch (e) {

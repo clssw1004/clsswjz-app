@@ -32,7 +32,7 @@ class _AccountItemListState extends State<AccountItemList>
     with AutomaticKeepAliveClientMixin {
   int _currentPage = 1;
   static const int _pageSize = 100;
-  static const double _loadMoreThreshold = 0.85;
+  static const double _loadMoreThreshold = 1;
   bool _hasMoreData = true;
   bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();

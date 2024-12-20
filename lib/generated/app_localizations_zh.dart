@@ -905,7 +905,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get retry => '重试';
 
   @override
-  String get about => '���于';
+  String get about => '关于';
 
   @override
   String get version => '版本';
