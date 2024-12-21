@@ -27,7 +27,7 @@ import 'services/server_config_service.dart';
 import 'providers/server_config_provider.dart';
 import 'pages/settings/widgets/server_url_dialog.dart';
 import 'services/api_config_manager.dart';
-import 'pages/account_item/providers/account_item_provider.dart';
+import 'providers/account_item_list_provider.dart';
 
 class ServerCheckScreen extends StatefulWidget {
   final ThemeProvider themeProvider;
@@ -127,7 +127,7 @@ class _ServerCheckScreenState extends State<ServerCheckScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return _buildLoadingScreen(context);
         }
-        // 如果没有服务器配置或服务器检查失败
+        // 如果没有服务器配置或服务器检查失���
         if (snapshot.data != true) {
           // 如果没有服务器配置，直接跳转登录页
           if (StorageService.getString(StorageKeys.serverUrl).isEmpty) {
@@ -254,8 +254,8 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => AccountItemProvider(),
+        ChangeNotifierProvider<AccountItemListProvider>(
+          create: (_) => AccountItemListProvider(),
         ),
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: localeProvider),

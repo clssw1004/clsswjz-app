@@ -13,7 +13,7 @@ import './account_item/widgets/datetime_selector.dart';
 import './account_item/widgets/fund_selector.dart';
 import './account_item/widgets/description_input.dart';
 import './account_item/widgets/book_header.dart';
-import './account_item/providers/account_item_provider.dart';
+import 'account_item/providers/account_item_info_provider.dart';
 import 'package:intl/intl.dart';
 import '../widgets/app_bar_factory.dart';
 import './account_item/widgets/shop_selector.dart';
@@ -38,7 +38,7 @@ class AccountItemForm extends StatefulWidget {
 }
 
 class _AccountItemFormState extends State<AccountItemForm> {
-  late final AccountItemProvider _provider;
+  late final AccountItemInfoProvider _provider;
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -66,7 +66,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
   @override
   void initState() {
     super.initState();
-    _provider = AccountItemProvider(selectedBook: widget.initialBook);
+    _provider = AccountItemInfoProvider(selectedBook: widget.initialBook);
     _selectedBook = widget.initialBook;
 
     if (widget.initialData != null) {
@@ -178,7 +178,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
       value: _provider,
       child: Builder(
         builder: (context) {
-          return Consumer<AccountItemProvider>(
+          return Consumer<AccountItemInfoProvider>(
             builder: (context, provider, child) {
               return Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -500,7 +500,7 @@ class _AccountItemFormState extends State<AccountItemForm> {
   final _amountFocusNode = FocusNode();
 
   Widget _buildFundSelector() {
-    return Consumer<AccountItemProvider>(
+    return Consumer<AccountItemInfoProvider>(
       builder: (context, provider, _) {
         if (_selectedBook == null) return SizedBox.shrink();
 

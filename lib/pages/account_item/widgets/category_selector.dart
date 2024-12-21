@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../models/models.dart';
-import '../../../theme/app_theme.dart';
-import '../providers/account_item_provider.dart';
+import '../providers/account_item_info_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../l10n/l10n.dart';
 import '../../../models/form_selector.dart';
@@ -25,7 +24,7 @@ class CategorySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
 
-    return Consumer<AccountItemProvider>(
+    return Consumer<AccountItemInfoProvider>(
       builder: (context, provider, _) {
         return FormSelectorField<Category>(
           items: [

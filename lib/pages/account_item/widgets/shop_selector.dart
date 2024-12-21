@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../models/models.dart';
-import '../providers/account_item_provider.dart';
+import '../providers/account_item_info_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../l10n/l10n.dart';
 import '../../../models/form_selector.dart';
@@ -28,7 +28,7 @@ class ShopSelector extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
-    return Consumer<AccountItemProvider>(
+    return Consumer<AccountItemInfoProvider>(
       builder: (context, provider, _) {
         return FormSelectorField<Shop>(
           items: [

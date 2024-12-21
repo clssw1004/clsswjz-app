@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../models/models.dart';
 import '../../../services/api_service.dart';
 
-class AccountItemProvider extends ChangeNotifier {
+class AccountItemInfoProvider extends ChangeNotifier {
   AccountBook? selectedBook;
   List<Category> categories = [];
   List<AccountBookFund> funds = [];
@@ -38,7 +38,7 @@ class AccountItemProvider extends ChangeNotifier {
   List<AccountSymbol> get tags => _tags;
   List<AccountSymbol> get projects => _projects;
 
-  AccountItemProvider({this.selectedBook}) {
+  AccountItemInfoProvider({this.selectedBook}) {
     if (selectedBook != null) {
       loadData();
     }
