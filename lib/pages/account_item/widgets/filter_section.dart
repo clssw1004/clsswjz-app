@@ -43,20 +43,12 @@ class FilterSection extends StatelessWidget {
           bottom: 4,
         ),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
+          color: colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: colorScheme.outlineVariant.withOpacity(0.2),
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-              spreadRadius: 0,
-            ),
-          ],
         ),
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
@@ -106,8 +98,9 @@ class FilterSection extends StatelessWidget {
           child: Text(
             l10n.clearFilter,
             style: theme.textTheme.labelSmall?.copyWith(
-              fontSize: 12,
-              color: filterState.hasFilter ? colorScheme.primary : colorScheme.outline,
+              color: filterState.hasFilter 
+                  ? colorScheme.primary 
+                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
               fontWeight: filterState.hasFilter ? FontWeight.w500 : null,
             ),
           ),
@@ -307,15 +300,17 @@ class _FilterButton extends StatelessWidget {
         minimumSize: const Size(0, 32),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         side: BorderSide(
-          color: isSelected ? colorScheme.primary : colorScheme.outline.withOpacity(0.5),
+          color: isSelected 
+              ? colorScheme.primary 
+              : colorScheme.outline.withOpacity(0.3),
           width: isSelected ? 1.5 : 1,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
         backgroundColor: isSelected 
-            ? colorScheme.primary.withOpacity(0.1)
-            : Colors.transparent,
+            ? colorScheme.primaryContainer.withOpacity(0.1)
+            : colorScheme.surfaceContainerLowest,
         elevation: 0,
         shadowColor: Colors.transparent,
       ),

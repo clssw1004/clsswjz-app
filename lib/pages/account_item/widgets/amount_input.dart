@@ -74,8 +74,8 @@ class _AmountInputState extends State<AmountInput> {
     final l10n = L10n.of(context);
 
     final typeColor = widget.type == '支出'
-        ? Color(0xFFE53935) // Material Red 600
-        : Color(0xFF43A047); // Material Green 600
+        ? colorScheme.error
+        : colorScheme.tertiary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,7 +85,7 @@ class _AmountInputState extends State<AmountInput> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: colorScheme.outlineVariant.withOpacity(0.5),
+                color: colorScheme.outlineVariant.withOpacity(0.2),
               ),
             ),
           ),
@@ -124,6 +124,9 @@ class _AmountInputState extends State<AmountInput> {
                       errorStyle: TextStyle(
                         fontSize: 0,
                         height: 0,
+                      ),
+                      labelStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     validator: _validateAmount,
