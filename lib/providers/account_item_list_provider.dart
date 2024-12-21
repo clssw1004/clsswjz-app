@@ -167,9 +167,12 @@ class AccountItemListProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setFilterState(FilterState newState) {
+  void setFilterState(FilterState newState, {bool refresh = true}) {
     _filterState = newState;
     notifyListeners();
+    if (refresh && _selectedBook != null) {
+      loadAccountItems(isRefresh: true);
+    }
   }
 
   Future<void> loadCategories() async {
