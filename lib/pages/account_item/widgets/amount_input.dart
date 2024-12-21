@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/l10n.dart';
 
-class AmountInput extends StatelessWidget {
+class AmountInput extends StatefulWidget {
   final double? initialValue;
   final ValueChanged<double> onChanged;
   final String type;
@@ -18,12 +18,64 @@ class AmountInput extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<AmountInput> createState() => _AmountInputState();
+}
+
+class _AmountInputState extends State<AmountInput> {
+  String? _errorText;
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTextChanged);
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    final text = widget.controller.text;
+    if (!_isInitialized) {
+      _isInitialized = true;
+      return;
+    }
+
+    setState(() {
+      _errorText = _validateAmount(text);
+    });
+
+    if (_errorText == null && text.isNotEmpty) {
+      final amount = double.tryParse(text);
+      if (amount != null) {
+        widget.onChanged(amount);
+      }
+    }
+  }
+
+  String? _validateAmount(String? value) {
+    if (value == null || value.isEmpty) {
+      return L10n.of(context).pleaseInputAmount;
+    }
+    final amount = double.tryParse(value);
+    if (amount == null || amount <= 0) {
+      return L10n.of(context).pleaseInputAmount;
+    }
+    return null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
-    final typeColor = type == '支出' ? colorScheme.error : colorScheme.primary;
+    final typeColor = widget.type == '支出'
+        ? Color(0xFFE53935) // Material Red 600
+        : Color(0xFF43A047); // Material Green 600
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +97,7 @@ class AmountInput extends StatelessWidget {
                 child: SizedBox(
                   height: 60,
                   child: TextFormField(
-                    controller: controller,
+                    controller: widget.controller,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                       signed: false,
@@ -74,17 +126,9 @@ class AmountInput extends StatelessWidget {
                         height: 0,
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return l10n.pleaseInputAmount;
-                      }
-                      final amount = double.tryParse(value);
-                      if (amount == null || amount <= 0) {
-                        return l10n.pleaseInputAmount;
-                      }
-                      return null;
-                    },
-                    focusNode: focusNode,
+                    validator: _validateAmount,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    focusNode: widget.focusNode,
                   ),
                 ),
               ),
@@ -92,31 +136,16 @@ class AmountInput extends StatelessWidget {
           ),
         ),
         // 错误提示
-        FormField<String>(
-          initialValue: controller.text,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return l10n.pleaseInputAmount;
-            }
-            final amount = double.tryParse(value);
-            if (amount == null || amount <= 0) {
-              return l10n.pleaseInputAmount;
-            }
-            return null;
-          },
-          builder: (field) {
-            if (!field.hasError) return SizedBox.shrink();
-            return Padding(
-              padding: const EdgeInsets.only(top: 6, left: 12),
-              child: Text(
-                field.errorText!,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.error,
-                ),
+        if (_errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 6, left: 12),
+            child: Text(
+              _errorText!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.error,
               ),
-            );
-          },
-        ),
+            ),
+          ),
       ],
     );
   }
