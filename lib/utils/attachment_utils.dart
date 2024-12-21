@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import '../l10n/app_localizations.dart';
@@ -90,7 +91,7 @@ class AttachmentUtils {
     }
   }
 
-  static Future<File> saveToDownloads(
+  static Future<void> copyToDownloadAndOpenWith(
     File sourceFile,
     String fileName,
   ) async {
@@ -101,7 +102,8 @@ class AttachmentUtils {
       }
 
       final downloadPath = path.join(downloadsDir.path, fileName);
-      return sourceFile.copy(downloadPath);
+      final file = await sourceFile.copy(downloadPath);
+      OpenFilex.open(file.path);
     }
     throw UnsupportedError('Platform not supported');
   }
@@ -147,22 +149,7 @@ class AttachmentUtils {
     String fileName,
   ) async {
     try {
-      final downloadedFile = await saveToDownloads(file, fileName);
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              L10n.of(context)
-                  .fileDownloaded(path.basename(downloadedFile.path)),
-            ),
-            action: SnackBarAction(
-              label: L10n.of(context).confirm,
-              onPressed: () {},
-            ),
-          ),
-        );
-      }
+       await copyToDownloadAndOpenWith(file, fileName);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -234,7 +221,7 @@ class AttachmentUtils {
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.download, color: Colors.white),
+                  icon: const Icon(Icons.open_in_new, color: Colors.white),
                   tooltip: L10n.of(context).download,
                   onPressed: () async {
                     try {
