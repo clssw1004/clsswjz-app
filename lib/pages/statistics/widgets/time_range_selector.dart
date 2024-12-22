@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/statistics_provider.dart';
 import '../../../l10n/l10n.dart';
+import '../../../theme/app_theme.dart';
 
 class TimeRangeSelector extends StatelessWidget {
   const TimeRangeSelector({super.key});
@@ -9,11 +10,21 @@ class TimeRangeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
     return Card(
+      margin: EdgeInsets.all(AppDimens.padding),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimens.cardRadius),
+        side: BorderSide(
+          color:
+              colorScheme.outlineVariant.withOpacity(AppDimens.opacityOverlay),
+        ),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimens.padding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/l10n.dart';
 import '../../../utils/amount_formatter.dart';
+import '../../../theme/app_theme.dart';
 
 class SummaryCard extends StatelessWidget {
   final double allIn;
@@ -21,12 +22,16 @@ class SummaryCard extends StatelessWidget {
     final l10n = L10n.of(context);
 
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppDimens.padding,
+        vertical: AppDimens.paddingSmall,
+      ),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimens.cardRadius),
         side: BorderSide(
-          color: colorScheme.outlineVariant.withOpacity(0.5),
+          color:
+              colorScheme.outlineVariant.withOpacity(AppDimens.opacityOverlay),
         ),
       ),
       child: Column(
@@ -54,7 +59,7 @@ class SummaryCard extends StatelessWidget {
                       context,
                       label: l10n.summaryIncome,
                       amount: allIn,
-                      color: Color(0xFF43A047), // Material Green 600
+                      color: colorScheme.primary,
                     ),
                   ),
                   Container(
@@ -67,7 +72,7 @@ class SummaryCard extends StatelessWidget {
                       context,
                       label: l10n.summaryExpense,
                       amount: allOut,
-                      color: Color(0xFFE53935), // Material Red 600
+                      color: colorScheme.error,
                     ),
                   ),
                 ],
@@ -100,7 +105,8 @@ class SummaryCard extends StatelessWidget {
         SizedBox(height: 4),
         FittedBox(
           child: Text(
-            AmountFormatter.formatFullWithSymbol(amount, l10n.currencySymbol, locale),
+            AmountFormatter.formatFullWithSymbol(
+                amount, l10n.currencySymbol, locale),
             style: theme.textTheme.titleLarge?.copyWith(
               color: color,
               fontWeight: FontWeight.w500,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../generated/app_localizations.dart';
 import '../../../services/api_service.dart';
 import '../../user/user_info_page.dart';
+import '../../../theme/app_theme.dart';
 
 class UserCard extends StatefulWidget {
   const UserCard({Key? key}) : super(key: key);
@@ -121,12 +122,10 @@ class _UserCardState extends State<UserCard> {
                 Row(
                   children: [
                     CircleAvatar(
-                      radius: 24,
+                      radius: AppDimens.avatarSizeMedium / 2,
                       backgroundColor: colorScheme.primary,
                       child: Text(
-                        _userInfo?.nickname?.substring(0, 1) ??
-                            _userInfo?.username?.substring(0, 1) ??
-                            'U',
+                        _userInfo?.nickname?.substring(0, 1) ?? 'U',
                         style: theme.textTheme.titleLarge?.copyWith(
                           color: colorScheme.onPrimary,
                         ),
@@ -138,7 +137,9 @@ class _UserCardState extends State<UserCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _userInfo?.nickname ?? _userInfo?.username ?? l10n.noAccount,
+                            _userInfo?.nickname ??
+                                _userInfo?.username ??
+                                l10n.noAccount,
                             style: theme.textTheme.titleLarge?.copyWith(
                               color: colorScheme.onSurface,
                               fontWeight: FontWeight.w500,

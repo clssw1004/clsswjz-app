@@ -24,6 +24,8 @@ class ShopSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
     return Consumer<AccountItemProvider>(
@@ -52,6 +54,9 @@ class ShopSelector extends StatelessWidget {
             showSearch: true,
             showAddButton: true,
             mode: FormSelectorMode.standard,
+            gridMaxCount: 9,
+            gridRowCount: 3,
+            alignGrid: true,
           ),
           callbacks: FormSelectorCallbacks(
             onChanged: onChanged,

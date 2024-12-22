@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../theme/app_theme.dart';
 import '../../../theme/theme_provider.dart';
-import '../../../constants/theme_constants.dart';
 
 class ThemeColorSelector extends StatelessWidget {
   final Color currentColor;
@@ -34,9 +34,7 @@ class ThemeColorSelector extends StatelessWidget {
                 color: color,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected
-                      ? colorScheme.primary
-                      : Colors.transparent,
+                  color: isSelected ? colorScheme.primary : Colors.transparent,
                   width: 2,
                 ),
               ),

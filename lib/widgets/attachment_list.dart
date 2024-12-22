@@ -5,6 +5,7 @@ import '../models/attachment.dart';
 import '../utils/attachment_utils.dart';
 import '../l10n/l10n.dart';
 import 'package:file_picker/file_picker.dart';
+import '../theme/app_theme.dart';
 
 class AttachmentList extends StatefulWidget {
   final List<Attachment> attachments;
@@ -175,14 +176,20 @@ class _AttachmentListState extends State<AttachmentList> {
       child: InkWell(
         onTap: () => _handleAttachmentTap(attachment),
         child: SizedBox(
-          height: 56,
+          height: AppDimens.listItemHeight,
           child: Row(
             children: [
               // 缩略图/图标区域
               Container(
-                width: 56,
-                height: 56,
-                color: colorScheme.surfaceContainerLow,
+                height: AppDimens.listItemHeight,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.listItemPadding,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+                  color: colorScheme.surfaceVariant
+                      .withOpacity(AppDimens.opacityOverlay),
+                ),
                 child: isImage
                     ? FutureBuilder<String>(
                         future:

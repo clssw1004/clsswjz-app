@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/fund_type.dart';
-import '../../../constants/theme_constants.dart';
 import '../../../l10n/l10n.dart';
+import '../../../theme/app_theme.dart';
 
 class FundTypeSelector extends StatelessWidget {
   final String value;

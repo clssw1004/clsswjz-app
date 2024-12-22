@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../constants/theme_constants.dart';
 import '../services/api_service.dart';
 import '../constants/language.dart';
 import '../constants/timezone.dart';
+import '../theme/app_theme.dart';
 
 class RegisterPage extends StatefulWidget {
   @override

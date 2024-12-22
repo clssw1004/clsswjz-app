@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../constants/theme_constants.dart';
+import '../../../theme/app_theme.dart';
 
 class FundFilterChip extends StatelessWidget {
   final String label;

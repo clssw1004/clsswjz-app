@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/form_selector.dart';
 import '../../l10n/l10n.dart';
 import 'form_selector_dialog.dart';
+import '../../theme/app_theme.dart';
 
 class FormSelectorField<T> extends StatefulWidget {
   final List<T> items;
@@ -72,15 +73,16 @@ class _FormSelectorFieldState<T> extends State<FormSelectorField<T>> {
         switch (widget.config.mode) {
           case FormSelectorMode.standard:
             selector = Container(
-              height: 48,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              height: AppDimens.inputHeight,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.padding,
+                vertical: AppDimens.paddingSmall,
+              ),
               decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: field.hasError
-                        ? colorScheme.error
-                        : colorScheme.outlineVariant.withOpacity(0.5),
-                  ),
+                borderRadius: BorderRadius.circular(AppDimens.inputRadius),
+                border: Border.all(
+                  color:
+                      colorScheme.outline.withOpacity(AppDimens.opacityOverlay),
                 ),
               ),
               child: Row(

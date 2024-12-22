@@ -18,6 +18,54 @@ class AppDimens {
   static const double inputHeight = 48.0;
   static const double appBarHeight = 56.0;
 
+  // 边距
+  static const double paddingTiny = 4.0;
+
+  // 圆角
+  static const double radius = 12.0;
+  static const double radiusSmall = 8.0;
+  static const double radiusTiny = 4.0;
+
+  // 高度
+  static const double chipHeight = 32.0;
+
+  // 字体大小
+  static const double fontSizeTiny = 12.0;
+
+  // 断点
+  static const double breakpointMobile = 600;
+  static const double breakpointTablet = 900;
+  static const double breakpointDesktop = 1200;
+
+  // 对话框
+  static const double dialogMaxWidth = 560.0;
+  static const double dialogPadding = 24.0;
+
+  // 间距
+  static const double spacing8 = 8.0;
+  static const double spacing12 = 12.0;
+  static const double spacing16 = 16.0;
+  static const double spacing24 = 24.0;
+
+  // 列表项
+  static const double listItemHeight = 56.0;
+  static const double listItemPadding = 16.0;
+
+  // 图标
+  static const double iconSizeSmall = 18.0;
+  static const double iconSizeMedium = 24.0;
+  static const double iconSizeLarge = 32.0;
+
+  // 头像
+  static const double avatarSizeSmall = 32.0;
+  static const double avatarSizeMedium = 40.0;
+  static const double avatarSizeLarge = 48.0;
+
+  // 透明度
+  static const double opacityDisabled = 0.38;
+  static const double opacityHint = 0.6;
+  static const double opacityOverlay = 0.08;
+
   const AppDimens._();
 }
 
@@ -90,6 +138,32 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppDimens.dialogRadius),
         ),
       ),
+
+      // ListTile主题
+      listTileTheme: ListTileThemeData(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.listItemPadding,
+        ),
+        minLeadingWidth: 0,
+        minVerticalPadding: 0,
+      ),
+
+      // Icon主题
+      iconTheme: IconThemeData(
+        size: AppDimens.iconSizeMedium,
+        color: scheme.onSurface,
+      ),
+
+      // Chip主题
+      chipTheme: ChipThemeData(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.paddingSmall,
+          vertical: AppDimens.paddingTiny,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
+        ),
+      ),
     );
   }
 
@@ -144,6 +218,32 @@ class AppTheme {
         backgroundColor: const Color(0xFF2C2C2C),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.dialogRadius),
+        ),
+      ),
+
+      // ListTile主题
+      listTileTheme: ListTileThemeData(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.listItemPadding,
+        ),
+        minLeadingWidth: 0,
+        minVerticalPadding: 0,
+      ),
+
+      // Icon主题
+      iconTheme: IconThemeData(
+        size: AppDimens.iconSizeMedium,
+        color: scheme.onSurface,
+      ),
+
+      // Chip主题
+      chipTheme: ChipThemeData(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.paddingSmall,
+          vertical: AppDimens.paddingTiny,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.radiusSmall),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../pages/account_item_info.dart';
+import '../theme/app_theme.dart';
 import 'account_item/widgets/filter_section.dart';
 import '../services/user_service.dart';
 import '../widgets/app_bar_factory.dart';
@@ -591,6 +592,7 @@ class _AccountItemListState extends State<AccountItemList>
 
   Widget _buildDateHeader(String date, List<AccountItem> items) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
     double dailyIncome = 0;
@@ -603,13 +605,48 @@ class _AccountItemListState extends State<AccountItemList>
       }
     }
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant.withOpacity(0.1),
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant
+                .withOpacity(AppDimens.opacityOverlay),
+          ),
+          bottom: BorderSide(
+            color: colorScheme.outlineVariant
+                .withOpacity(AppDimens.opacityOverlay),
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Row(
         children: [
+          if (_isBatchMode)
+            Checkbox(
+              value: _selectedDates.contains(date),
+              onChanged: (checked) {
+                setState(() {
+                  if (checked ?? false) {
+                    _selectedDates.add(date);
+                    _selectedItems.addAll(
+                      items.map((item) => item.id),
+                    );
+                  } else {
+                    _selectedDates.remove(date);
+                    _selectedItems.removeAll(
+                      items.map((item) => item.id),
+                    );
+                  }
+                });
+              },
+            ),
           Text(
             _formatDateHeader(date),
-            style: theme.textTheme.titleSmall,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           Spacer(),
           if (dailyExpense > 0)
@@ -619,13 +656,13 @@ class _AccountItemListState extends State<AccountItemList>
                 Icon(
                   Icons.arrow_downward,
                   size: 14,
-                  color: theme.colorScheme.error,
+                  color: colorScheme.error,
                 ),
                 SizedBox(width: 2),
                 Text(
                   dailyExpense.toStringAsFixed(2),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.error,
+                    color: colorScheme.error,
                   ),
                 ),
               ],
@@ -638,13 +675,13 @@ class _AccountItemListState extends State<AccountItemList>
                 Icon(
                   Icons.arrow_upward,
                   size: 14,
-                  color: Colors.green,
+                  color: colorScheme.primary,
                 ),
                 SizedBox(width: 2),
                 Text(
                   dailyIncome.toStringAsFixed(2),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.green,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
@@ -690,65 +727,77 @@ class _AccountItemListState extends State<AccountItemList>
   }
 
   Widget _buildListItem(AccountItem item) {
-    return Slidable(
-      key: ValueKey(item.id),
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        extentRatio: 0.15,
-        children: [
-          CustomSlidableAction(
-            onPressed: (context) async {
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(L10n.of(context).delete),
-                  content: Text(L10n.of(context).confirmDeleteMessage),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: Text(L10n.of(context).cancel),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.error,
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: colorScheme.outlineVariant
+                .withOpacity(AppDimens.opacityOverlay),
+          ),
+        ),
+      ),
+      child: Slidable(
+        key: ValueKey(item.id),
+        endActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          extentRatio: 0.15,
+          children: [
+            CustomSlidableAction(
+              onPressed: (context) async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(L10n.of(context).delete),
+                    content: Text(L10n.of(context).confirmDeleteMessage),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text(L10n.of(context).cancel),
                       ),
-                      child: Text(L10n.of(context).delete),
-                    ),
-                  ],
-                ),
-              );
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                        ),
+                        child: Text(L10n.of(context).delete),
+                      ),
+                    ],
+                  ),
+                );
 
-              if (confirmed == true) {
-                try {
-                  await ApiService.deleteAccountItem(item.id);
-                  if (context.mounted) {
-                    MessageHelper.showSuccess(
-                      context,
-                      message: L10n.of(context).deleteSuccess,
-                    );
-                  }
-                  await _loadAccountItems(isRefresh: true);
-                } catch (e) {
-                  if (context.mounted) {
-                    MessageHelper.showError(context, message: e.toString());
+                if (confirmed == true) {
+                  try {
+                    await ApiService.deleteAccountItem(item.id);
+                    if (context.mounted) {
+                      MessageHelper.showSuccess(
+                        context,
+                        message: L10n.of(context).deleteSuccess,
+                      );
+                    }
+                    await _loadAccountItems(isRefresh: true);
+                  } catch (e) {
+                    if (context.mounted) {
+                      MessageHelper.showError(context, message: e.toString());
+                    }
                   }
                 }
-              }
-            },
-            foregroundColor: Theme.of(context).colorScheme.error,
-            child: const Icon(Icons.delete_outline),
-          ),
-        ],
-      ),
-      child: AccountItemTile(
-        key: ValueKey(item.id),
-        item: item,
-        onTap: () => _editAccountItem(item),
-        onLongPress: () => _enterBatchMode(item.id),
-        showCheckbox: _isBatchMode,
-        isChecked: _selectedItems.contains(item.id),
-        onCheckChanged: (checked) => _toggleItemSelection(item.id),
+              },
+              foregroundColor: colorScheme.error,
+              child: const Icon(Icons.delete_outline),
+            ),
+          ],
+        ),
+        child: AccountItemTile(
+          key: ValueKey(item.id),
+          item: item,
+          onTap: () => _editAccountItem(item),
+          onLongPress: () => _enterBatchMode(item.id),
+          showCheckbox: _isBatchMode,
+          isChecked: _selectedItems.contains(item.id),
+          onCheckChanged: (checked) => _toggleItemSelection(item.id),
+        ),
       ),
     );
   }

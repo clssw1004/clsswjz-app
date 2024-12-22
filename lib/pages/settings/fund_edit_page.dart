@@ -4,10 +4,10 @@ import '../../services/api_service.dart';
 import '../../utils/message_helper.dart';
 import '../../widgets/app_bar_factory.dart';
 import 'package:intl/intl.dart';
-import '../../constants/theme_constants.dart';
 import '../../pages/settings/widgets/fund_book_list.dart';
 import '../../pages/settings/widgets/fund_basic_info_card.dart';
 import '../../l10n/l10n.dart';
+import '../../theme/app_theme.dart';
 
 class FundEditPage extends StatefulWidget {
   final UserFund fund;
@@ -141,9 +141,9 @@ class _FundEditPageState extends State<FundEditPage> {
             context: context,
             title: AppBarFactory.buildTitle(
               context,
-              widget.fund.id.isEmpty 
-                ? l10n.actionWithTarget(l10n.actionNew, l10n.targetFund)
-                : l10n.actionWithTarget(l10n.actionEdit, l10n.targetFund),
+              widget.fund.id.isEmpty
+                  ? l10n.actionWithTarget(l10n.actionNew, l10n.targetFund)
+                  : l10n.actionWithTarget(l10n.actionEdit, l10n.targetFund),
             ),
             actions: [
               if (_isLoading)

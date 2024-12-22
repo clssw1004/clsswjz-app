@@ -5,6 +5,7 @@ import '../../services/user_service.dart';
 import '../../utils/message_helper.dart';
 import '../../l10n/l10n.dart';
 import '../../widgets/app_bar_factory.dart';
+import '../../theme/app_theme.dart';
 
 class SymbolListPage extends StatefulWidget {
   final String title;
@@ -74,6 +75,9 @@ class _SymbolListPageState extends State<SymbolListPage> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.dialogRadius),
+        ),
         title: Text(l10n.addButtonWith(widget.title)),
         content: Form(
           key: _formKey,
@@ -82,6 +86,18 @@ class _SymbolListPageState extends State<SymbolListPage> {
             decoration: InputDecoration(
               labelText: l10n.name,
               hintText: l10n.pleaseInput(widget.title),
+              filled: true,
+              fillColor: Theme.of(context).brightness == Brightness.light
+                  ? AppColors.white
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimens.inputRadius),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.padding,
+                vertical: AppDimens.paddingSmall,
+              ),
             ),
             validator: (value) {
               if (value?.isEmpty ?? true) {

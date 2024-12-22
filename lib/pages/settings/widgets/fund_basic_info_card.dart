@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../constants/theme_constants.dart';
 import './fund_text_field.dart';
 import './fund_type_selector.dart';
 import './fund_balance_input.dart';
 import '../../../l10n/l10n.dart';
+import '../../../theme/app_theme.dart';
 
 class FundBasicInfoCard extends StatelessWidget {
   final TextEditingController nameController;

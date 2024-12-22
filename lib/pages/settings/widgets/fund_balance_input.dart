@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../constants/theme_constants.dart';
 import '../../../l10n/l10n.dart';
+import '../../../theme/app_theme.dart';
 
 class FundBalanceInput extends StatelessWidget {
   final TextEditingController controller;

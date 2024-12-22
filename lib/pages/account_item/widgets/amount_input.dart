@@ -23,9 +23,7 @@ class AmountInput extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
-    final typeColor = type == '支出'
-        ? Color(0xFFE53935) // Material Red 600
-        : Color(0xFF43A047); // Material Green 600
+    final typeColor = type == '支出' ? colorScheme.error : colorScheme.primary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

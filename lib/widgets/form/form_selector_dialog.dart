@@ -167,7 +167,7 @@ class _FormSelectorDialogState<T> extends State<FormSelectorDialog<T>> {
                                 Icons.search_off_outlined,
                                 size: 48,
                                 color: colorScheme.onSurfaceVariant
-                                    .withOpacity(0.5),
+                                    .withOpacity(0.38),
                               ),
                               const SizedBox(height: 16),
                               Text(

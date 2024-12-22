@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../models/models.dart';
-import '../../../constants/theme_constants.dart';
 import './fund_filter_chip.dart';
 import '../../../l10n/l10n.dart';
+import '../../../theme/app_theme.dart';
 
 class FundBookList extends StatelessWidget {
   final List<AccountBook> books;
