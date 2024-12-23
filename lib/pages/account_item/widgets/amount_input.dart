@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/l10n.dart';
+import './calculator_panel.dart';
 
 class AmountInput extends StatefulWidget {
   final double? initialValue;
@@ -23,37 +24,25 @@ class AmountInput extends StatefulWidget {
 
 class _AmountInputState extends State<AmountInput> {
   String? _errorText;
-  bool _isInitialized = false;
 
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_onTextChanged);
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_onTextChanged);
-    super.dispose();
-  }
-
-  void _onTextChanged() {
-    final text = widget.controller.text;
-    if (!_isInitialized) {
-      _isInitialized = true;
-      return;
-    }
-
-    setState(() {
-      _errorText = _validateAmount(text);
-    });
-
-    if (_errorText == null && text.isNotEmpty) {
-      final amount = double.tryParse(text);
-      if (amount != null) {
-        widget.onChanged(amount);
-      }
-    }
+  void _showCalculator() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CalculatorPanel(
+        initialValue: widget.controller.text.isEmpty
+            ? null
+            : double.tryParse(widget.controller.text),
+        onConfirm: (value) {
+          setState(() {
+            widget.controller.text = value.toString();
+            _errorText = _validateAmount(value.toString());
+          });
+          widget.onChanged(value);
+        },
+      ),
+    );
   }
 
   String? _validateAmount(String? value) {
@@ -73,72 +62,61 @@ class _AmountInputState extends State<AmountInput> {
     final colorScheme = theme.colorScheme;
     final l10n = L10n.of(context);
 
-    final typeColor = widget.type == '支出'
-        ? colorScheme.error
-        : colorScheme.tertiary;
+    final typeColor =
+        widget.type == l10n.expense ? colorScheme.error : colorScheme.tertiary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: colorScheme.outlineVariant.withOpacity(0.2),
-              ),
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(width: 8),
-              Expanded(
-                child: SizedBox(
-                  height: 60,
-                  child: TextFormField(
-                    controller: widget.controller,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                      signed: false,
-                    ),
-                    textInputAction: TextInputAction.done,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: typeColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    decoration: InputDecoration(
-                      labelText: l10n.amountLabel,
-                      hintText: l10n.amountHint,
-                      hintStyle: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(vertical: 8),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      focusedErrorBorder: InputBorder.none,
-                      filled: false,
-                      errorStyle: TextStyle(
-                        fontSize: 0,
-                        height: 0,
-                      ),
-                      labelStyle: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    validator: _validateAmount,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    focusNode: widget.focusNode,
-                  ),
+        InkWell(
+          onTap: _showCalculator,
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: colorScheme.outlineVariant.withOpacity(0.2),
                 ),
               ),
-            ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.amountLabel,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        widget.controller.text.isEmpty
+                            ? l10n.amountHint
+                            : widget.controller.text,
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: widget.controller.text.isEmpty
+                              ? colorScheme.onSurfaceVariant
+                              : typeColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.calculate_outlined,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                SizedBox(width: 8),
+              ],
+            ),
           ),
         ),
-        // 错误提示
         if (_errorText != null)
           Padding(
             padding: const EdgeInsets.only(top: 6, left: 12),
